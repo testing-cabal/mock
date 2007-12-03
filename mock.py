@@ -3,7 +3,7 @@
 # Copyright (C) 2007 Michael Foord
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 
-# mock 0.3.0
+# mock 0.3.1
 # http://www.voidspace.org.uk/python/mock.html
 
 # Released subject to the BSD License
@@ -72,6 +72,14 @@ class Mock(object):
         return self._children[name]
 
 
+def _importer(name):
+    mod = __import__(name)
+    components = name.split('.')
+    for comp in components[1:]:
+        mod = getattr(mod, comp)
+    return mod
+
+
 def patch(target, attribute, new=None):
     if isinstance(target, basestring):
         target = _importer(target)
@@ -102,14 +110,6 @@ def patch(target, attribute, new=None):
         return patched
     
     return patcher
-
-
-def _importer(name):
-    mod = __import__(name)
-    components = name.split('.')
-    for comp in components[1:]:
-        mod = getattr(mod, comp)
-    return mod
 
 
 class SentinelObject(object):
