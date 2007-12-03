@@ -41,12 +41,16 @@ It also provides utility functions / objects to assist with testing, particularl
 Downloading
 ===========
 
-The current version is **0.3.0**, dated 30th November 2007. Mock is still experimental. The API may change or it may never get used! If you find bugs or have suggestions for improvements / extensions then please email me.
+The current version is **0.3.1**, dated 3rd December 2007. Mock is still experimental. The API may change or it may never get used! If you find bugs or have suggestions for improvements / extensions then please email me.
 
 * `mock.py (module only) <http://www.voidspace.org.uk/cgi-bin/voidspace/downman.py?section=python&file=mock.py>`_
-* `mock-0.3.0.zip (module, tests and documentation) <http://www.voidspace.org.uk/cgi-bin/voidspace/downman.py?section=python&file=mock-0.3.0.zip>`_
+* `mock-0.3.1.zip (module, tests and documentation) <http://www.voidspace.org.uk/cgi-bin/voidspace/downman.py?section=python&file=mock-0.3.1.zip>`_
 * `mock.txt (documentation) <http://www.voidspace.org.uk/python/docs/mock.txt>`_
+* `Google Code Home & Subversion Repository <http://code.google.com/p/mock/>`_
 
+You can checkout the latest development version from the Google Code Subversion repository with the following command:
+
+    ``svn checkout http://mock.googlecode.com/svn/trunk/ mock-read-only``
 
 
 Getting Started
@@ -146,7 +150,18 @@ A nice pattern is to actually decorate test methods themselves:
     def testMethod(self):
         # do something
     {-coloring}
+    
 
+If you want to patch with a Mock, you can use ``patch`` with only two arguments. The mock will be created for you and passed into the test function / method:
+
+.. raw:: html
+
+    {+coloring}
+    
+    @patch('Package.Module', 'method')
+    def testMethod(self, mockMethod):
+        # do something
+    {-coloring}
 
 
 API Documentation
@@ -626,17 +641,35 @@ A nice pattern is to actually decorate test methods themselves:
     {-coloring}
     
     
-If you omit the third argument to ``patch`` then the attribute will be patched with a mock for you:
+If you omit the third argument to ``patch`` then the attribute will be patched with a mock for you. The mock will be passed in as extra argument(s) to the function / method under test:
 
 .. raw:: html
 
     {+coloring}
     
     @patch(SomeClass, 'staticmethod')
-    def testMethod(self):
+    def testMethod(self, mockMethod):
         SomeClass.staticmethod()
-        self.assertEquals(SomeClass.staticmethod.called, "SomeClass not patched with a mock")
+        self.assertEquals(mockMethod.called, "SomeClass not patched with a mock")
     {-coloring}
+
+
+You can stack up multiple patch decorators using this pattern:
+
+.. raw:: html
+
+    {+coloring}
+    
+    @patch('Module', 'ClassName1')
+    @patch('Module', 'ClassName2')
+    def testMethod(self, mockClass1, mockClass2):
+        ClassName1()
+        ClassName2()
+        self.assertEquals(mockClass1.called, "ClassName1 not patched")
+        self.assertEquals(mockClass2.called, "ClassName2 not patched")
+    {-coloring}
+
+
 
 
 Limitations
@@ -652,6 +685,7 @@ There are various disadvantages and things that Mock doesn't (yet) do.
 
 CHANGELOG
 =========
+
 
 2007/12/03  Version 0.3.1
 -------------------------
