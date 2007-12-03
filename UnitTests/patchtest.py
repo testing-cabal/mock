@@ -114,7 +114,7 @@ class PatchTest(TestCase):
         outerMock1, outerMock2 = test(sentinel.this1, sentinel.this2)
         
         # Test that executing a second time creates new mocks
-        outerMock1, outerMock2 = test(sentinel.this1, sentinel.this2)
+        test(sentinel.this1, sentinel.this2)
 
 
 if __name__ == '__main__':
