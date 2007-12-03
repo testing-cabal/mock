@@ -98,7 +98,7 @@ def patch(target, attribute, new=None):
             for target, attribute, new in func.patch_list:
                 if new is None:
                     new = Mock()
-                    args = args + (new,)
+                    args += (new,)
                 setattr(target, attribute, new)
             try:
                 return func(*args, **keywargs)
