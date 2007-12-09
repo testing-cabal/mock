@@ -692,7 +692,7 @@ CHANGELOG
 
 ``patch`` maintains the name of decorated functions for compatibility with nose test autodiscovery.
 
-Tests decorated with ``path`` that use the two argument form (implicit mock creation) will receive the mock(s) passed in as extra arguments.
+Tests decorated with ``patch`` that use the two argument form (implicit mock creation) will receive the mock(s) passed in as extra arguments.
 
 Thanks to Kevin Dangoor for these changes.
 
