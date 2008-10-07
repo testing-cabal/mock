@@ -1,9 +1,9 @@
 # mock.py
 # Test tools for mocking and patching.
-# Copyright (C) 2007 Michael Foord
+# Copyright (C) 2007-2008 Michael Foord
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 
-# mock 0.3.1
+# mock 0.4.0
 # http://www.voidspace.org.uk/python/mock.html
 
 # Released subject to the BSD License
@@ -20,7 +20,9 @@ __all__ = (
     '__version__'
 )
 
-__version__ = '0.3.1'
+__version__ = '0.4.0'
+
+_default_return_value = object()
 
 
 class Mock(object):
@@ -36,12 +38,23 @@ class Mock(object):
         
     def reset(self):
         self.called = False
-        self.return_value = None
+        self._return_value = _default_return_value
         self.call_args = None
         self.call_count = 0
         self.call_args_list = []
         self.method_calls = []
         self._children = {}
+        
+    
+    def __get_return_value(self):
+        if self._return_value == _default_return_value:
+            self._return_value = Mock()
+        return self._return_value
+    
+    def __set_return_value(self, value):
+        self._return_value = value
+        
+    return_value = property(__get_return_value, __set_return_value)
 
 
     def __call__(self, *args, **keywargs):
@@ -70,7 +83,11 @@ class Mock(object):
             self._children[name] = Mock(parent=self, name=name)
             
         return self._children[name]
-
+    
+    
+    def assert_called_with(self, *args, **kwargs):
+        assert self.call_args == (args, kwargs), 'Called with %s' % (self.call_args,)
+        
 
 def _importer(name):
     mod = __import__(name)
