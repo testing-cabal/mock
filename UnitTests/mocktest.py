@@ -11,7 +11,7 @@ class MockTest(TestCase):
         
         self.assertFalse(mock.called, "called not initialised correctly")
         self.assertEquals(mock.call_count, 0, "call_count not initialised correctly")
-        self.assertNone(mock.return_value, "return_value not initialised correctly")
+        self.assertTrue(isinstance(mock.return_value, Mock), "return_value not initialised correctly")
         
         self.assertEquals(mock.call_args, None, "call_args not initialised correctly")
         self.assertEquals(mock.call_args_list, [], "call_args_list not initialised correctly")
@@ -27,7 +27,7 @@ class MockTest(TestCase):
         parent = Mock()
         methods = ["something"]
         mock = Mock(name="child", parent=parent, methods=methods)
-        mock(sentinel.Something, something=sentinel.SomethingElse)
+        result = mock(sentinel.Something, something=sentinel.SomethingElse)
         mock.something()
         
         mock.reset()
@@ -38,7 +38,7 @@ class MockTest(TestCase):
         
         self.assertFalse(mock.called, "called not reset")
         self.assertEquals(mock.call_count, 0, "call_count not reset")
-        self.assertNone(mock.return_value, "return_value not reset")
+        self.assertNotEquals(result, mock.return_value, "return_value not reset")
         self.assertEquals(mock.call_args, None, "call_args not reset")
         self.assertEquals(mock.call_args_list, [], "call_args_list not reset")
         self.assertEquals(mock.method_calls, [], 
@@ -49,10 +49,13 @@ class MockTest(TestCase):
     
     def testCall(self):
         mock = Mock()
+        self.assertTrue(isinstance(mock.return_value, Mock), "Default return_value should be a Mock")
+        
+        result = mock()
+        self.assertEquals(mock(), result, "different result from consecutive calls")
+        mock.reset()
         
         ret_val = mock(sentinel.Arg)
-        self.assertNone(ret_val, "incorrect return value")
-        
         self.assertTrue(mock.called, "called not set")
         self.assertEquals(mock.call_count, 1, "call_count incoreect")
         self.assertEquals(mock.call_args, ((sentinel.Arg,), {}), "call_args not set")
@@ -66,7 +69,22 @@ class MockTest(TestCase):
         self.assertEquals(mock.call_args, ((sentinel.Arg,), {'key': sentinel.KeyArg}), "call_args not set")
         self.assertEquals(mock.call_args_list, [((sentinel.Arg,), {}), ((sentinel.Arg,), {'key': sentinel.KeyArg})], "call_args_list not set")
         
+    
+    def testassert_called_with(self):
+        mock = Mock()
+        mock()
+        
+        # Will raise an exception if it fails
+        mock.assert_called_with()
+        self.assertRaises(AssertionError, mock.assert_called_with, 1)
+        
+        mock.reset()
+        self.assertRaises(AssertionError, mock.assert_called_with)
+        
+        mock(1, 2, 3, a='fish', b='nothing')        
+        mock.assert_called_with(1, 2, 3, a='fish', b='nothing')
 
+        
     def testAttributeAccessReturnsMocks(self):
         mock = Mock()
         something = mock.something

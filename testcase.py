@@ -21,7 +21,7 @@ class TestCase(unittest.TestCase):
             
     def assertNone(self, value, message=None):
         if value is not None:
-            msg = "%s is not None" % actual
+            msg = "%s is not None" % value
             if message:
                 msg = msg + ': ' + message
             raise AssertionError(msg)
