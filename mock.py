@@ -16,13 +16,14 @@
 __all__ = (
     'Mock',
     'patch',
+    'patch_object',
     'sentinel',
     '__version__'
 )
 
 __version__ = '0.4.0'
 
-_default_return_value = object()
+DEFAULT = object()
 
 
 class Mock(object):
@@ -38,16 +39,17 @@ class Mock(object):
         
     def reset(self):
         self.called = False
-        self._return_value = _default_return_value
+        self._return_value = DEFAULT
         self.call_args = None
         self.call_count = 0
         self.call_args_list = []
         self.method_calls = []
         self._children = {}
+        self.side_effect = None
         
     
     def __get_return_value(self):
-        if self._return_value == _default_return_value:
+        if self._return_value is DEFAULT:
             self._return_value = Mock()
         return self._return_value
     
@@ -71,7 +73,10 @@ class Mock(object):
                 break
             name = parent._name + '.' + name
             parent = parent._parent
-        
+
+        if self.side_effect is not None:
+            self.side_effect()
+            
         return self.return_value
     
     
@@ -97,9 +102,7 @@ def _importer(name):
     return mod
 
 
-def patch(target, attribute, new=None):
-    if isinstance(target, basestring):
-        target = _importer(target)
+def _patch(target, attribute, new):
         
     def patcher(func):
         original = getattr(target, attribute)
@@ -113,7 +116,7 @@ def patch(target, attribute, new=None):
         
         def patched(*args, **keywargs):
             for target, attribute, new in func.patch_list:
-                if new is None:
+                if new is DEFAULT:
                     new = Mock()
                     args += (new,)
                 setattr(target, attribute, new)
@@ -127,6 +130,18 @@ def patch(target, attribute, new=None):
         return patched
     
     return patcher
+
+
+def patch_object(target, attribute, new=DEFAULT):
+    return _patch(target, attribute, new)
+
+
+def patch(target, attribute, new=DEFAULT):
+    if isinstance(target, basestring):
+        target = _importer(target)
+    return _patch(target, attribute, new)
+
+
 
 
 class SentinelObject(object):

@@ -23,6 +23,26 @@ class MockTest(TestCase):
         self.assertEquals(mock._children, {}, "children not initialised incorrectly")
         
         
+    def testSideEffect(self):
+        mock = Mock()
+        
+        test = []
+        def effect():
+            test.append(True)
+        mock.side_effect = effect
+        mock()
+        self.assertEquals(test, [True], "side effect not called")
+        self.assertTrue(mock.called, "call not recorded")
+        
+        results = [1, 2, 3]
+        def effect():
+            mock.return_value = results.pop()
+        mock.side_effect = effect
+        
+        self.assertEquals([mock(), mock(), mock()], [3, 2, 1],
+                          "side effect not used correctly")
+            
+        
     def testReset(self):
         parent = Mock()
         methods = ["something"]
@@ -70,7 +90,7 @@ class MockTest(TestCase):
         self.assertEquals(mock.call_args_list, [((sentinel.Arg,), {}), ((sentinel.Arg,), {'key': sentinel.KeyArg})], "call_args_list not set")
         
     
-    def testassert_called_with(self):
+    def testAssertCalledWith(self):
         mock = Mock()
         mock()
         

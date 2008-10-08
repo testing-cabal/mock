@@ -1,7 +1,7 @@
 from testcase import TestCase
 from testutils import RunTests
 
-from mock import Mock, patch, sentinel
+from mock import Mock, patch, patch_object, sentinel
 
 
 # for use in the test
@@ -11,17 +11,29 @@ something_else  = sentinel.SomethingElse
 
 class PatchTest(TestCase):
 
-    def testSinglePatch(self):
+    def testSinglePatchObject(self):
         class Something(object):
             attribute = sentinel.Original
           
         @apply
-        @patch(Something, 'attribute', sentinel.Patched)
+        @patch_object(Something, 'attribute', sentinel.Patched)
         def test():
             self.assertEquals(Something.attribute, sentinel.Patched, "unpatched")
             
         self.assertEquals(Something.attribute, sentinel.Original, "patch not restored")
 
+        
+    def testPatchObjectWithNone(self):
+        class Something(object):
+            attribute = sentinel.Original
+          
+        @apply
+        @patch_object(Something, 'attribute', None)
+        def test():
+            self.assertNone(Something.attribute, "unpatched")
+            
+        self.assertEquals(Something.attribute, sentinel.Original, "patch not restored")
+        
 
     def testMultiplePatch(self):
         class Something(object):
@@ -29,8 +41,8 @@ class PatchTest(TestCase):
             next_attribute = sentinel.Original2
         
         @apply
-        @patch(Something, 'attribute', sentinel.Patched)
-        @patch(Something, 'next_attribute', sentinel.Patched2)
+        @patch_object(Something, 'attribute', sentinel.Patched)
+        @patch_object(Something, 'next_attribute', sentinel.Patched2)
         def test():
             self.assertEquals(Something.attribute, sentinel.Patched, "unpatched")
             self.assertEquals(Something.next_attribute, sentinel.Patched2, "unpatched")
@@ -85,14 +97,14 @@ class PatchTest(TestCase):
             something2 = sentinel.Original2
         
         @apply
-        @patch(Test, 'something')
+        @patch_object(Test, 'something')
         def test(mock):
             self.assertEquals(mock, Test.something, "Mock not passed into test function")
             self.assertTrue(isinstance(mock, Mock), 
                             "patch with two arguments did not create a mock")
                             
-        @patch(Test, 'something')                    
-        @patch(Test, 'something2')
+        @patch_object(Test, 'something')                    
+        @patch_object(Test, 'something2')
         def test(this1, this2, mock1, mock2):
             self.assertEquals(this1, sentinel.this1, "Patched function didn't receive initial argument")
             self.assertEquals(this2, sentinel.this2, "Patched function didn't receive second argument")
