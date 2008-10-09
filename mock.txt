@@ -24,6 +24,31 @@
 .. _BSD License: http://www.voidspace.org.uk/python/license.shtml
 
 
+.. todo::
+
+    Changes:
+    
+        * Default return value is now a new mock rather than None
+        * return_value added as a keyword argument to the constructor
+        * New method 'assert_called_with'
+        * Added 'side_effect' property called when mock is called
+        * patch decorator split into two decorators:
+            - patch_object which takes an object and an attribute name to patch
+              (plus optionally a value to patch with which defaults to a mock object)
+            - patch which takes a string specifying a target to patch; in the form
+              'package.module.Class.attribute'. (plus optionally a value to 
+              patch with which defaults to a mock object)
+        
+    TODO:
+    
+        * Add 'side_effect' keyword argument
+        * Build eggs
+        * Add support for inplace operations, iteration, get_item, set_item
+          comparison methods - other magic methods?
+        * Reset should not reset children ?
+        
+        
+
 Introduction
 ============
 

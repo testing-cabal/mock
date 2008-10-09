@@ -27,7 +27,7 @@ DEFAULT = object()
 
 
 class Mock(object):
-    def __init__(self, methods=None, spec=None, name=None, parent=None):
+    def __init__(self, methods=None, spec=None, name=None, parent=None, return_value=DEFAULT):
         self._parent = parent
         self._name = name
         if spec is not None and methods is None:
@@ -35,6 +35,7 @@ class Mock(object):
                        (member.startswith('__') and  member.endswith('__'))]
         self._methods = methods
         self.reset()
+        self._return_value = return_value
         
         
     def reset(self):
@@ -94,12 +95,23 @@ class Mock(object):
         assert self.call_args == (args, kwargs), 'Called with %s' % (self.call_args,)
         
 
-def _importer(name):
-    mod = __import__(name)
-    components = name.split('.')
-    for comp in components[1:]:
-        mod = getattr(mod, comp)
-    return mod
+def _dot_lookup(thing, comp, import_path):
+    try:
+        return getattr(thing, comp)
+    except AttributeError:
+        __import__(import_path)
+        return getattr(thing, comp)
+
+
+def _importer(target):
+    components = target.split('.')
+    import_path = components.pop(0)
+    thing = __import__(import_path)
+
+    for comp in components:
+        import_path += ".%s" % comp
+        thing = _dot_lookup(thing, comp, import_path)
+    return thing
 
 
 def _patch(target, attribute, new):
@@ -136,9 +148,12 @@ def patch_object(target, attribute, new=DEFAULT):
     return _patch(target, attribute, new)
 
 
-def patch(target, attribute, new=DEFAULT):
-    if isinstance(target, basestring):
-        target = _importer(target)
+def patch(target, new=DEFAULT):
+    try:
+        target, attribute = target.rsplit('.', 1)    
+    except (TypeError, ValueError):
+        raise TypeError("Need a valid target to patch. You supplied: %s" % (target,))
+    target = _importer(target)
     return _patch(target, attribute, new)
 
 

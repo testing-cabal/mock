@@ -23,15 +23,20 @@ class MockTest(TestCase):
         self.assertEquals(mock._children, {}, "children not initialised incorrectly")
         
         
+    def testReturnValueInConstructor(self):
+        mock = Mock(return_value=None)
+        self.assertNone(mock.return_value, "return value in constructor not honoured")
+        
+        
     def testSideEffect(self):
         mock = Mock()
         
-        test = []
+        called = []
         def effect():
-            test.append(True)
+            called.append(True)
         mock.side_effect = effect
         mock()
-        self.assertEquals(test, [True], "side effect not called")
+        self.assertEquals(called, [True], "side effect not called")
         self.assertTrue(mock.called, "call not recorded")
         
         results = [1, 2, 3]
