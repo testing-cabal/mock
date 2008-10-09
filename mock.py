@@ -12,7 +12,6 @@
 # Scripts maintained at http://www.voidspace.org.uk/python/index.shtml
 # Comments, suggestions and bug reports welcome.
 
-
 __all__ = (
     'Mock',
     'patch',
@@ -60,16 +59,16 @@ class Mock(object):
     return_value = property(__get_return_value, __set_return_value)
 
 
-    def __call__(self, *args, **keywargs):
+    def __call__(self, *args, **kwargs):
         self.called = True
         self.call_count += 1
-        self.call_args = (args, keywargs)
-        self.call_args_list.append((args, keywargs))
+        self.call_args = (args, kwargs)
+        self.call_args_list.append((args, kwargs))
         
         parent = self._parent
         name = self._name
         while parent is not None:
-            parent.method_calls.append((name, args, keywargs))
+            parent.method_calls.append((name, args, kwargs))
             if parent._parent is None:
                 break
             name = parent._name + '.' + name
@@ -92,9 +91,10 @@ class Mock(object):
     
     
     def assert_called_with(self, *args, **kwargs):
-        assert self.call_args == (args, kwargs), 'Called with %s' % (self.call_args,)
+        assert self.call_args == (args, kwargs), 'Expected: %s\nCalled with: %s' % ((*args, **kwargs), self.call_args)
         
 
+        
 def _dot_lookup(thing, comp, import_path):
     try:
         return getattr(thing, comp)
@@ -139,6 +139,8 @@ def _patch(target, attribute, new):
                     setattr(target, attribute, original)
                     
         patched.__name__ = func.__name__ 
+        patched.compat_co_firstlineno = getattr(func, "compat_co_firstlineno", 
+                                                func.func_code.co_firstlineno)
         return patched
     
     return patcher
@@ -155,8 +157,6 @@ def patch(target, new=DEFAULT):
         raise TypeError("Need a valid target to patch. You supplied: %s" % (target,))
     target = _importer(target)
     return _patch(target, attribute, new)
-
-
 
 
 class SentinelObject(object):

@@ -38,6 +38,8 @@
             - patch which takes a string specifying a target to patch; in the form
               'package.module.Class.attribute'. (plus optionally a value to 
               patch with which defaults to a mock object)
+              
+        * Change to patch for nose compatibility with error reporting in wrapped functions
         
     TODO:
     
@@ -46,7 +48,7 @@
         * Add support for inplace operations, iteration, get_item, set_item
           comparison methods - other magic methods?
         * Reset should not reset children ?
-        
+        * document 'call_count'
         
 
 Introduction
@@ -675,7 +677,7 @@ If you omit the third argument to ``patch`` then the attribute will be patched w
     @patch(SomeClass, 'staticmethod')
     def testMethod(self, mockMethod):
         SomeClass.staticmethod()
-        self.assertEquals(mockMethod.called, "SomeClass not patched with a mock")
+        self.assertTrue(mockMethod.called, "SomeClass not patched with a mock")
     {-coloring}
 
 
