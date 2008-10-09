@@ -8,6 +8,9 @@ from mock import Mock, patch, patch_object, sentinel
 something  = sentinel.Something
 something_else  = sentinel.SomethingElse
 
+class SomeClass(object):
+    class_attribute = None
+
 
 class PatchTest(TestCase):
 
@@ -35,7 +38,7 @@ class PatchTest(TestCase):
         self.assertEquals(Something.attribute, sentinel.Original, "patch not restored")
         
 
-    def testMultiplePatch(self):
+    def testMultiplePatchObject(self):
         class Something(object):
             attribute = sentinel.Original
             next_attribute = sentinel.Original2
@@ -51,12 +54,12 @@ class PatchTest(TestCase):
         self.assertEquals(Something.next_attribute, sentinel.Original2, "patch not restored")
 
 
-    def testPatchModule(self):
+    def testPatch(self):
         import __main__
         __main__.something = sentinel.Something
         
         @apply
-        @patch('__main__', 'something', sentinel.Something2)
+        @patch('__main__.something', sentinel.Something2)
         def test():
             self.assertEquals(__main__.something, sentinel.Something2, "unpatched")
             
@@ -64,8 +67,8 @@ class PatchTest(TestCase):
                 
         import UnitTests.patchtest as PTModule
         
-        @patch('UnitTests.patchtest', 'something', sentinel.Something2)
-        @patch('UnitTests.patchtest', 'something_else', sentinel.SomethingElse)
+        @patch('UnitTests.patchtest.something', sentinel.Something2)
+        @patch('UnitTests.patchtest.something_else', sentinel.SomethingElse)
         def test():
             self.assertEquals(PTModule.something, sentinel.Something2, "unpatched")
             self.assertEquals(PTModule.something_else, sentinel.SomethingElse, "unpatched")
@@ -82,7 +85,7 @@ class PatchTest(TestCase):
         
         mock = Mock()
         mock.return_value = sentinel.Handle
-        @patch('__builtin__', 'open', mock)
+        @patch('__builtin__.open', mock)
         def test():
             self.assertEquals(open('filename', 'r'), sentinel.Handle, "open not patched")
         test()
@@ -90,8 +93,19 @@ class PatchTest(TestCase):
         
         self.assertNotEquals(open, mock, "patch not restored")
 
+        
+    def testPatchClassAttribute(self):
+        import UnitTests.patchtest as PTModule
 
-    def testPatchWithTwoArgs(self):
+        @patch('UnitTests.patchtest.SomeClass.class_attribute', sentinel.ClassAttribute)
+        def test():
+            self.assertEquals(PTModule.SomeClass.class_attribute, sentinel.ClassAttribute, "unpatched")
+        test()   
+        
+        self.assertNone(PTModule.SomeClass.class_attribute, "patch not restored")
+        
+
+    def testPatchObjectWithDefaultMock(self):
         class Test(object):
             something = sentinel.Original
             something2 = sentinel.Original2
