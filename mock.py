@@ -91,7 +91,7 @@ class Mock(object):
     
     
     def assert_called_with(self, *args, **kwargs):
-        assert self.call_args == (args, kwargs), 'Expected: %s\nCalled with: %s' % ((*args, **kwargs), self.call_args)
+        assert self.call_args == (args, kwargs), 'Expected: %s\nCalled with: %s' % ((args, kwargs), self.call_args)
         
 
         
