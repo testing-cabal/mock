@@ -1,3 +1,7 @@
+# Copyright (C) 2007-2008 Michael Foord
+# E-mail: fuzzyman AT voidspace DOT org DOT uk
+# http://www.voidspace.org.uk/python/mock.html
+
 import os
 import sys
 this_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -37,12 +41,11 @@ class MockTest(TestCase):
     def testSideEffect(self):
         mock = Mock()
         
-        called = []
         def effect():
-            called.append(True)
+            raise SystemError('kablooie')
+        
         mock.side_effect = effect
-        mock()
-        self.assertEquals(called, [True], "side effect not called")
+        self.assertRaises(SystemError, mock)
         self.assertTrue(mock.called, "call not recorded")
         
         results = [1, 2, 3]
@@ -52,14 +55,22 @@ class MockTest(TestCase):
         
         self.assertEquals([mock(), mock(), mock()], [3, 2, 1],
                           "side effect not used correctly")
-            
+
+        mock = Mock(side_effect=sentinel.SideEffect)
+        self.assertEquals(mock.side_effect, sentinel.SideEffect,
+                          "side effect in constructor not used")
+        
         
     def testReset(self):
         parent = Mock()
         methods = ["something"]
         mock = Mock(name="child", parent=parent, methods=methods)
-        result = mock(sentinel.Something, something=sentinel.SomethingElse)
+        mock(sentinel.Something, something=sentinel.SomethingElse)
+        something = mock.something
         mock.something()
+        mock.side_effect = sentinel.SideEffect
+        return_value = mock.return_value
+        return_value()
         
         mock.reset()
         
@@ -69,13 +80,21 @@ class MockTest(TestCase):
         
         self.assertFalse(mock.called, "called not reset")
         self.assertEquals(mock.call_count, 0, "call_count not reset")
-        self.assertNotEquals(result, mock.return_value, "return_value not reset")
         self.assertEquals(mock.call_args, None, "call_args not reset")
         self.assertEquals(mock.call_args_list, [], "call_args_list not reset")
         self.assertEquals(mock.method_calls, [], 
                           "method_calls not initialised correctly")
         
-        self.assertEquals(mock._children, {}, "children not reset incorrectly")
+        self.assertEquals(mock.side_effect, sentinel.SideEffect,
+                          "side_effect incorrectly reset")
+        self.assertEquals(mock.return_value, return_value,
+                          "return_value incorrectly reset")
+        self.assertFalse(return_value.called, "return value mock not reset")
+        self.assertEquals(mock._children, {'something': something}, 
+                          "children reset incorrectly")
+        self.assertEquals(mock.something, something,
+                          "children incorrectly cleared")
+        self.assertFalse(mock.something.called, "child not reset")
         
     
     def testCall(self):

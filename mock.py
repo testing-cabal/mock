@@ -26,26 +26,31 @@ DEFAULT = object()
 
 
 class Mock(object):
-    def __init__(self, methods=None, spec=None, name=None, parent=None, return_value=DEFAULT):
+    def __init__(self, methods=None, spec=None, side_effect=None, 
+                 name=None, parent=None):
         self._parent = parent
         self._name = name
         if spec is not None and methods is None:
             methods = [member for member in dir(spec) if not 
                        (member.startswith('__') and  member.endswith('__'))]
         self._methods = methods
-        self.reset()
+        self._children = {}
         self._return_value = return_value
+        self.side_effect = side_effect
+        
+        self.reset()
         
         
     def reset(self):
         self.called = False
-        self._return_value = DEFAULT
         self.call_args = None
         self.call_count = 0
         self.call_args_list = []
         self.method_calls = []
-        self._children = {}
-        self.side_effect = None
+        for child in self._children.itervalues():
+            child.reset()
+        if isinstance(self._return_value, Mock):
+            self._return_value.reset()
         
     
     def __get_return_value(self):
