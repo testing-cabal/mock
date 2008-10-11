@@ -27,7 +27,7 @@ DEFAULT = object()
 
 class Mock(object):
     def __init__(self, methods=None, spec=None, side_effect=None, 
-                 name=None, parent=None):
+                 return_value=DEFAULT, name=None, parent=None):
         self._parent = parent
         self._name = name
         if spec is not None and methods is None:
