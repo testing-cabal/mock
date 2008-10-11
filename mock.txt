@@ -727,6 +727,26 @@ There are various disadvantages and things that Mock doesn't (yet) do.
 CHANGELOG
 =========
 
+2008/10/XX Version 0.4.0
+------------------------
+
+* Default return value is now a new mock rather than None
+* return_value added as a keyword argument to the constructor
+* New method 'assert_called_with'
+* Added 'side_effect' attribute / keyword argument called when mock is called
+* patch decorator split into two decorators:
+
+    - ``patch_object`` which takes an object and an attribute name to patch
+      (plus optionally a value to patch with which defaults to a mock object)
+    - ``patch`` which takes a string specifying a target to patch; in the form
+      'package.module.Class.attribute'. (plus optionally a value to 
+      patch with which defaults to a mock object)
+      
+* Change to patch for nose compatibility with error reporting in wrapped functions
+* Reset no longer clears children / return value etc - it just resets
+  call count and call args. It also calls reset on all children (and
+  the return value if it is a mock).
+
 
 2007/12/03  Version 0.3.1
 -------------------------
@@ -746,7 +766,6 @@ Removed ``patch_module``. ``patch`` can now take a string as the first argument 
 The third argument to ``patch`` is optional - a mock will be created by default if it is not passed in.
 
 
-
 2007/11/21  Version 0.2.1
 -------------------------
 
@@ -755,7 +774,6 @@ Bug fix, allows reuse of functions decorated with ``patch`` and ``patch_module``
 
 2007/11/20  Version 0.2.0
 -------------------------
-
 
 Added ``spec`` keyword argument for creating ``Mock`` objects from a specification object.
 
