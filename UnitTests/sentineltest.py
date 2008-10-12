@@ -1,3 +1,7 @@
+# Copyright (C) 2007-2008 Michael Foord
+# E-mail: fuzzyman AT voidspace DOT org DOT uk
+# http://www.voidspace.org.uk/python/mock.html
+
 import os
 import sys
 this_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))

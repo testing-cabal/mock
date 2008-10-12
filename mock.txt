@@ -7,7 +7,7 @@
 
 :Author: `Michael Foord`_
 :Version: Mock 0.4.0
-:Date: 2007/12/03
+:Date: 2008/10/12
 :Homepage: `Mock Homepage`_
 :License: `BSD License`_
 :Support: fuzzyman@voidspace.org.uk
@@ -43,12 +43,6 @@
         * Reset no longer clears children / return value etc - it just resets
           call count and call args. It also calls reset on all children (and
           the return value if it is a mock).
-        
-    TODO:
-    
-        * Build eggs
-        * Add support for inplace operations, iteration, get_item, set_item
-          comparison methods - other magic methods?
         
 
 Introduction
