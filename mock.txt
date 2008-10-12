@@ -24,48 +24,36 @@
 .. _BSD License: http://www.voidspace.org.uk/python/license.shtml
 
 
-.. todo::
-
-    Changes:
-    
-        * Default return value is now a new mock rather than None
-        * return_value added as a keyword argument to the constructor
-        * New method 'assert_called_with'
-        * Added 'side_effect' property called when mock is called
-        * patch decorator split into two decorators:
-            - patch_object which takes an object and an attribute name to patch
-              (plus optionally a value to patch with which defaults to a mock object)
-            - patch which takes a string specifying a target to patch; in the form
-              'package.module.Class.attribute'. (plus optionally a value to 
-              patch with which defaults to a mock object)
-              
-        * Change to patch for nose compatibility with error reporting in wrapped functions
-        * Reset no longer clears children / return value etc - it just resets
-          call count and call args. It also calls reset on all children (and
-          the return value if it is a mock).
-        
-
 Introduction
 ============
 
 There are already several Python mocking libraries available, so why another one?
 
-Most mocking libraries follow the 'record -> replay' pattern of mocking. I prefer the 'action -> assertion' pattern, which is more readable and intuitive particularly when working with the Python `unittest module <http://docs.python.org/lib/module-unittest.html>`_. For a discussion of the merits of the two approaches, see `Mocking, Patching, Stubbing: all that Stuff <http://www.voidspace.org.uk/python/articles/mocking.shtml>`_.
+Most mocking libraries follow the 'record -> replay' pattern of mocking. I
+prefer the 'action -> assertion' pattern, which is more readable and intuitive
+particularly when working with the Python `unittest module
+<http://docs.python.org/lib/module-unittest.html>`_. For a discussion of the
+merits of the two approaches, see `Mocking, Patching, Stubbing: all that Stuff
+<http://www.voidspace.org.uk/python/articles/mocking.shtml>`_.
 
-``mock`` provides a core ``Mock`` class that is intended to reduce the need to create a host of trivial stubs throughout your test suite. After performing an action, you can make assertions about which methods / attributes were used and arguments they were called with. You can also specify return values and set needed attributes in the normal way.
+``mock`` provides a core ``Mock`` class that is intended to reduce the need to
+create a host of trivial stubs throughout your test suite. After performing an
+action, you can make assertions about which methods / attributes were used and
+arguments they were called with. You can also specify return values and set
+specific attributes in the normal way.
 
-This approach is inspired by the testing patterns used at `Resolver Systems <http://www.resolversystems.com>`_.
-
-It also provides utility functions / objects to assist with testing, particularly monkey patching.
+It also provides a ``patch`` decorator that handles patching module and class
+level attributes within the scope of a test, along with ``sentinel`` for 
+creating unique objects.
 
 
 Downloading
 ===========
 
-The current version is **0.3.1**, dated 3rd December 2007. Mock is still experimental. The API may change or it may never get used! If you find bugs or have suggestions for improvements / extensions then please email me.
+The current version is **0.4.0**, dated 12th October 2008. Mock is still experimental. The API may change or it may never get used! If you find bugs or have suggestions for improvements / extensions then please email me.
 
-* `mock.py (module only) <http://www.voidspace.org.uk/cgi-bin/voidspace/downman.py?section=python&file=mock.py>`_
-* `mock-0.3.1.zip (module, tests and documentation) <http://www.voidspace.org.uk/cgi-bin/voidspace/downman.py?section=python&file=mock-0.3.1.zip>`_
+* `mock.py (module only) <http://www.voidspace.org.uk/downloads/mock.py>`_
+* `mock-0.4.0.zip (module, tests and documentation) <http://www.voidspace.org.uk/downloads/mock-0.4.0.zip>`_
 * `mock.txt (documentation) <http://www.voidspace.org.uk/python/docs/mock.txt>`_
 * `Google Code Home & Subversion Repository <http://code.google.com/p/mock/>`_
 
@@ -73,7 +61,7 @@ You can checkout the latest development version from the Google Code Subversion 
 
     ``svn checkout http://mock.googlecode.com/svn/trunk/ mock-read-only``
 
-The are now eggs up on the `Mock Cheeseshop Page <>`_. This means that if you have setuptools you should be able to install mock with:
+The are now eggs  (for Python 2.4-2.6) up on the `Mock Cheeseshop Page <http://pypi.python.org/pypi/mock/>`_. This means that if you have setuptools you should be able to install mock with:
 
     ``easy_install mock``
 
@@ -115,7 +103,31 @@ Getting Started
     AttributeError: object has no attribute 'something_else'
     {-coloring}
 
-There are various ways of configuring the mock, including setting return values on the mock and its methods. A useful attribute is ``side_effect``. If you set this to a callable then it will be called whenever the mock is called. This allows you to raise an exception
+There are various ways of configuring the mock, including setting return values on the mock and its methods. A useful attribute is ``side_effect``. If you set this to a callable then it will be called whenever the mock is called. This allows you to raise an exception or return members of a sequence from repeated calls:
+
+
+.. raw:: html
+
+    {+coloring}
+    >>> from mock import Mock
+    >>> mock = Mock()
+    >>> def side_effect():
+    ...     raise Exception('Boom!')
+    ... 
+    >>> mock.side_effect = side_effect
+    >>> mock()
+    Traceback (most recent call last):
+      ...
+    Exception: Boom!
+    
+    >>> results = [1, 2, 3]
+    >>> def side_effect():
+    ...     mock.return_value = results.pop()
+    ... 
+    >>> mock.side_effect = side_effect
+    >>> mock(), mock(), mock()
+    (3, 2, 1)
+    {-coloring}
 
 ``sentinel`` is a useful object for providing unique objects in your tests:
 
@@ -135,7 +147,6 @@ There are also decorators for doing module and class level patching. As modules 
 
 The two decorators are 'patch' and 'patch_object'. 'patch' takes a single string, of the form ``package.module.Class.attribute`` to specify the attribute you are patching. It also optionally takes a value that you want the attribute (or class or whatever) to be replaced with. 'patch_object' takes an object and the name of the attribute you would like patched, plus optionally the value to patch it with.
 
-XXXX
 
 .. raw:: html
 
@@ -217,9 +228,9 @@ Initialisation
 
 * ``spec``: This takes an existing object as the specification for the mock object. All attributes on the object (whether a class or an instance) are allowed, but accessing any other attributes will raise an ``AttributeError``. Passing in an object as the spec argument is the equivalent of passing in a list of strings to ``method`` with all the attributes on the object.
 
-* ``return_value``
+* ``return_value``: The value returned when the mock is called. By default this is a new Mock (created on first access). See the return_value_ attribute.
 
-* ``side_effect``
+* ``side_effect``: A function to be called whenever the Mock is called. See the side_effect_ attribute.
 
 
 Calling
@@ -231,9 +242,11 @@ Calling
     def __call__(self, *args, **keywargs):
     {-coloring}
     
-Mock objects are callable. The call will return the value set as the `return_value`_ attribute.
+Mock objects are callable. The call will return the value set as the `return_value`_ attribute. The default return value is a new Mock object; it is created the first time the return value is accessed (either explicitly or by calling the Mock) - but it is stored and the same one returned each time.
 
 Calls made to the object will be recorded in the attributes_.
+
+If side_effect_ is set then it will be called after the call has been recorded but before any value is returned.
 
 
 reset
@@ -259,7 +272,22 @@ The reset method resets all the call attributes on a mock object.
     False
     {-coloring}
 
-This can be useful where you want to make a series of assertions that reuse the same object. Note that ``reset`` also clears the return value and any child attributes. Attributes you have set using normal assignment will be left in place.
+This can be useful where you want to make a series of assertions that reuse the same object. Note that ``reset`` *doesn't* clear the return value or any child attributes. Attributes you have set using normal assignment are also left in place. Child mocks and the return value mock (if any) are reset as well.
+
+
+assert_called_with
+~~~~~~~~~~~~~~~~~~
+
+This method is a convenient way of asserting that calls are made in a particular way:
+
+.. raw:: html
+
+    {+coloring}
+    >>> mock = Mock()
+    >>> mock.method(1, 2, 3, test='wow')
+    >>> mock.method.assert_called_with(1, 2, 3, test='wow')
+    {-coloring}
+    
 
 
 Attributes
@@ -295,12 +323,52 @@ Set this to configure the value returned by calling the mock.
     >>> mock()
     'fish'
     {-coloring}
+    
+The default return value is a mock object and you can configure it in the normal way.
+
+.. raw:: html
+
+    {+coloring}
+    >>> mock = Mock()
+    >>> mock.return_value.attribute = sentinel.Attribute
+    >>> mock.return_value()
+    >>> mock.return_value.assert_called_with()
+    {-coloring}
+
+
+side_effect
+###########
+
+Sometimes when a mock is called you want to raise an exception (to test exception handling of an API) or return values from a sequence instead of a single value. These can be achieved with the ``side_effect`` attribute:
+
+.. raw:: html
+
+    {+coloring}
+    >>> from mock import Mock
+    >>> mock = Mock()
+    >>> def side_effect():
+    ...     raise Exception('Boom!')
+    ... 
+    >>> mock.side_effect = side_effect
+    >>> mock()
+    Traceback (most recent call last):
+      ...
+    Exception: Boom!
+    
+    >>> results = [1, 2, 3]
+    >>> def side_effect():
+    ...     mock.return_value = results.pop()
+    ... 
+    >>> mock.side_effect = side_effect
+    >>> mock(), mock(), mock()
+    (3, 2, 1)
+    {-coloring}
 
 
 call_args
 #########
 
-This is either ``None`` (if the mock hasn't been called), or the arguments that the mock was last called with. This will in the form of a tuple: the first member is any ordered arguments the mock was called with (or an empty tuple) and the second member is any keyword arguments (or an empty dictionary):
+This is either ``None`` (if the mock hasn't been called), or the arguments that the mock was last called with. This will be in the form of a tuple: the first member is any ordered arguments the mock was called with (or an empty tuple) and the second member is any keyword arguments (or an empty dictionary):
 
 .. raw:: html
 
@@ -358,8 +426,38 @@ The ``sentinel`` object provides a convenient way of providing unique objects fo
 Attributes are created on demand when you access them by name. Accessing the same attribute will always return the same object. The objects returned have a sensible repr so that test failure messages are readable.
 
 
-Patch Decorator
+Patch Decorators
 ----------------
+
+The patch decorators are used for patching objects only within the scope of the function they decorate. They automatically handle the unpatching for you, even if exceptions are raised.
+
+
+patch_object
+~~~~~~~~~~~~
+
+``patch_object`` patches named members on objects - usually class or module objects.
+
+.. raw:: html
+
+    {+coloring}
+    def patch_object(target, attribute, new=None):
+    {-coloring}
+
+You can either call it with three arguments or two arguments. The three argument form takes the object to be patched, the attribute name and the object to replace the attribute with.
+
+When calling with the two argument form you omit the replacement object, and a mock is created for you and passed in as an extra argument to the decorated function:
+
+
+.. raw:: html
+
+    {+coloring}
+    @patch_object(SomeClass, 'classmethod')
+    def test_something(self, mockMethod):
+        SomeClass.classmethod(3)
+        
+        mockMethod.assert_called_with(3)
+    {-coloring}
+    
 
 patch
 ~~~~~
@@ -367,22 +465,31 @@ patch
 .. raw:: html
 
     {+coloring}
-    def patch(target, attribute, new=None):
+    def patch(target, new=None):
     {-coloring}
 
-``patch`` decorates a function. Inside the body of the function, the ``target`` has ``attribute`` patched with a ``new`` object. When the function exits the patch is undone (which of course is done in a try-finally).
+``patch`` decorates a function. Inside the body of the function, the ``target`` (specified in the form 'PackageName.ModuleName.ClassName') is patched with a ``new`` object. When the function exits the patch is undone.
 
 If you want to perform multiple patches then you can simply stack up the decorators on a function if you particularly feel the need.
 
-If ``target`` is string, then ``patch`` will use it as a module name. The module is imported and the specified attribute patched with the new object. When the function exits the patch is undone (which of course is done in a try-finally). The module name can be dotted, e.g. ``package.module``.
+The target is imported and the specified attribute patched with the new object - so it must be importable from the environment you are calling the decorator from.
 
-If ``new`` is omitted, then a new ``Mock`` instance is supplied for you.
+If ``new`` is omitted, then a new ``Mock`` is created and passed in as an extra argument to the decorated function:
+
+.. raw:: html
+
+    {+coloring}
+    @patch('Package.ModuleName.ClassName')
+    def test_something(self, mockClass):
+        # ...
+    {-coloring}
+    
 
 
 Examples
 ========
 
-For further examples, see the unit tests included in the full distribution.
+For further examples, see the unit tests included in the full source distribution.
 
 Mock Examples
 -------------
@@ -534,8 +641,7 @@ Sometimes you want to mock up a more complex situation, like for example ``mock.
 
     {+coloring}
     >>> mock = Mock()
-    >>> cursor = Mock()
-    >>> mock.connection.cursor.return_value = cursor
+    >>> cursor = mock.connection.cursor.return_value
     >>>
     >>> mock.connection.cursor().execute("SELECT 1")
     >>> mock.method_calls
@@ -596,13 +702,16 @@ Patch Decorator Examples
 
 A common need in tests is to patch a class attribute or a module attribute, for example patching a builtin or patching a class in a module to test that it is instantiated. Modules and classes are effectively global, so patching on them has to be undone after the test or the patch will persist into other tests and cause hard to diagnose problems.
 
-The patch_ provides a convenient way of doing this. 
+The patch_ and patch_object_ decorators provide a convenient way of doing this. 
+
+``patch_object`` patches attributes on objects within the scope of a function they decorate:
 
 .. raw:: html
 
     {+coloring}
     mock = Mock()
-    @patch(SomeClass, 'class_method', mock) 
+    
+    @patch_object(SomeClass, 'class_method', mock) 
     def test():
         SomeClass.class_method()
     test()
@@ -620,8 +729,8 @@ They can be stacked to perform multiple simultaneous patches:
     mock1 = Mock()
     mock2 = Mock()
     
-    @patch(SomeClass, 'class_method', mock1) 
-    @patch(SomeClass, 'static_method', mock2) 
+    @patch_object(SomeClass, 'class_method', mock1) 
+    @patch_object(SomeClass, 'static_method', mock2) 
     def test():
         SomeClass.class_method()
         SomeClass.static_method()
@@ -631,7 +740,7 @@ They can be stacked to perform multiple simultaneous patches:
     self.assertTrue(mock2.called, "static_method not called")
     {-coloring}
 
-If you are patching a module (including ``__builtin__``) then supply a module name instead of an object to patch:
+If you are patching a module (including ``__builtin__``) then use patch instead of patch_object:
 
 .. raw:: html
 
@@ -639,7 +748,7 @@ If you are patching a module (including ``__builtin__``) then supply a module na
     mock = Mock()
     mock.return_value = sentinel.Handle
     
-    @patch('__builtin__', 'open', mock) 
+    @patch('__builtin__.open', mock) 
     def test():
         return open('filename', 'r')
     
@@ -658,7 +767,7 @@ If you don't want to call the decorated test function yourself, you can add ``ap
 
     {+coloring}
     @apply
-    @patch('Package.Module', 'attribute', sentinel.Attribute)
+    @patch('Package.Module.attribute', sentinel.Attribute)
     def test():
         # do something
     {-coloring}
@@ -670,19 +779,19 @@ A nice pattern is to actually decorate test methods themselves:
 
     {+coloring}
     
-    @patch(SomeClass, 'attribute', sentinel.Attribute)
+    @patch_object(SomeClass, 'attribute', sentinel.Attribute)
     def testMethod(self):
         self.assertEquals(SomeClass.attribute, sentinel.Attribute, "SomeClass not patched")
     {-coloring}
     
     
-If you omit the third argument to ``patch`` then the attribute will be patched with a mock for you. The mock will be passed in as extra argument(s) to the function / method under test:
+If you omit the second argument to ``patch`` (or the third argument to ``patch_object``) then the attribute will be patched with a mock for you. The mock will be passed in as extra argument(s) to the function / method under test:
 
 .. raw:: html
 
     {+coloring}
     
-    @patch(SomeClass, 'staticmethod')
+    @patch_object(SomeClass, 'staticmethod')
     def testMethod(self, mockMethod):
         SomeClass.staticmethod()
         self.assertTrue(mockMethod.called, "SomeClass not patched with a mock")
@@ -695,8 +804,8 @@ You can stack up multiple patch decorators using this pattern:
 
     {+coloring}
     
-    @patch('Module', 'ClassName1')
-    @patch('Module', 'ClassName2')
+    @patch('Module.ClassName1')
+    @patch('Module.ClassName2')
     def testMethod(self, mockClass1, mockClass2):
         ClassName1()
         ClassName2()
@@ -705,23 +814,21 @@ You can stack up multiple patch decorators using this pattern:
     {-coloring}
 
 
-
-
 Limitations
 ===========
 
 There are various disadvantages and things that Mock doesn't (yet) do. 
 
 * It doesn't wrap objects. If you need to pass calls through to the real object *and* record them then you can't yet do that.
-* You can specify return values, but they are fixed values. You may want to provide a factory function to provide a sequence of return values for example.
-* ``Mock`` has several attributes. This makes it unsuitable for mocking objects that use these attribute names. A way round this would be to provide ``start`` and ``stop`` (or similar) methods that *hide* these attributes when needed. 
+* ``Mock`` has several attributes. This makes it unsuitable for mocking objects that use these attribute names. A way round this would be to provide ``start`` and ``stop`` (or similar) methods that *hide* these attributes when needed.
+* It doesn't yet mock any of the magic methods (like iteration or the mapping and sequence protocol methods). I have an idea of how to do this for a future release though.
 
 
 
 CHANGELOG
 =========
 
-2008/10/XX Version 0.4.0
+2008/10/12 Version 0.4.0
 ------------------------
 
 * Default return value is now a new mock rather than None
@@ -735,11 +842,14 @@ CHANGELOG
     - ``patch`` which takes a string specifying a target to patch; in the form
       'package.module.Class.attribute'. (plus optionally a value to 
       patch with which defaults to a mock object)
-      
+
+* Can now patch objects with ``None``
 * Change to patch for nose compatibility with error reporting in wrapped functions
 * Reset no longer clears children / return value etc - it just resets
   call count and call args. It also calls reset on all children (and
   the return value if it is a mock).
+  
+Thanks to Konrad Delong, Kevin Dangoor and others for patches and suggestions.
 
 
 2007/12/03  Version 0.3.1
