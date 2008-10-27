@@ -272,7 +272,7 @@ The reset method resets all the call attributes on a mock object.
     False
     {-coloring}
 
-This can be useful where you want to make a series of assertions that reuse the same object. Note that ``reset`` *doesn't* clear the return value or any child attributes. Attributes you have set using normal assignment are also left in place. Child mocks and the return value mock (if any) are reset as well.
+This can be useful where you want to make a series of assertions that reuse the same object. Note that ``reset`` *doesn't* clear the return value, ``side_effect`` or any child attributes. Attributes you have set using normal assignment are also left in place. Child mocks and the return value mock (if any) are reset as well.
 
 
 assert_called_with
