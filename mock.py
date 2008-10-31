@@ -14,20 +14,37 @@
 
 __all__ = (
     'Mock',
+    'MakeMock',
     'patch',
     'patch_object',
     'sentinel',
     '__version__'
 )
 
-__version__ = '0.4.0'
+__version__ = '0.5.0'
 
 DEFAULT = object()
 
 
 class Mock(object):
+    
+    def __new__(cls, methods=None, spec=None, *args, **kwargs):
+        if spec is not None or methods is not None:
+            if methods is None:
+                magics = [method for method in magic_methods if hasattr(spec, '__%s__' % method)]
+            else:
+                magics = [method[2:-2] for method in methods if (method.startswith('__') and
+                                                           method.endswith('__') and
+                                                           method[2:-2] in magic_methods)]
+            if magics:
+                # It might be magic, but I like it
+                cls = MakeMock(magics)
+        return object.__new__(cls)
+        
+    
     def __init__(self, methods=None, spec=None, side_effect=None, 
-                 return_value=DEFAULT, name=None, parent=None):
+                 return_value=DEFAULT, name=None, parent=None,
+                 items=None):
         self._parent = parent
         self._name = name
         if spec is not None and methods is None:
@@ -38,8 +55,13 @@ class Mock(object):
         self._return_value = return_value
         self.side_effect = side_effect
         
-        self.reset()
+        if self._has_items():
+            if items is None:
+                items = {}
+            self._items = items
         
+        self.reset()
+
         
     def reset(self):
         self.called = False
@@ -51,6 +73,10 @@ class Mock(object):
             child.reset()
         if isinstance(self._return_value, Mock):
             self._return_value.reset()
+    
+            
+    def _has_items(self):
+        return False
         
     
     def __get_return_value(self):
@@ -98,6 +124,45 @@ class Mock(object):
     def assert_called_with(self, *args, **kwargs):
         assert self.call_args == (args, kwargs), 'Expected: %s\nCalled with: %s' % ((args, kwargs), self.call_args)
         
+
+        
+def __getitem__(self, key):
+    val = self._items[key]
+    self.method_calls.append(('__getitem__', (key,), {}))
+    return val
+        
+def __setitem__(self, key, value):
+    self.method_calls.append(('__setitem__', (key, value), {}))
+    self._items[key] = value
+
+def __iter__(self):
+    self.method_calls.append(('__iter__', (), {}))
+    for item in list(self._items):
+        yield item
+    
+magic_methods = {
+    'getitem': __getitem__,
+    'setitem': __setitem__,
+    'iter': __iter__
+}
+
+def MakeMock(members):
+    class SpecialMock(Mock):
+        def __length_hint__(self):
+            # todo: this is a workaround - could also filter in __getattr__?
+            return len(self._items)
+        def _has_items(self):
+            return ('getitem' in members or 'setitem' in members
+                    or 'iter' in members)
+    
+    for method in members:
+        if method not in magic_methods:
+            raise NameError("Unknown magic method %r" % method)
+        
+        impl = magic_methods[method]
+        name = '__%s__' % method
+        setattr(SpecialMock, name, impl)
+    return SpecialMock
 
         
 def _dot_lookup(thing, comp, import_path):

@@ -11,7 +11,7 @@ if not this_dir in sys.path:
 from testcase import TestCase
 from testutils import RunTests
 
-from mock import Mock, sentinel
+from mock import Mock, sentinel, MakeMock
 
 
 class MockTest(TestCase):
@@ -27,6 +27,9 @@ class MockTest(TestCase):
         self.assertEquals(mock.call_args_list, [], "call_args_list not initialised correctly")
         self.assertEquals(mock.method_calls, [], 
                           "method_calls not initialised correctly")
+        
+        # Can't use hasattr for this test as it always returns True on a mock...
+        self.assertFalse('_items' in mock.__dict__, "default mock should not have '_items' attribute")
         
         self.assertNone(mock._parent, "parent not initialised correctly")
         self.assertNone(mock._methods, "methods not initialised correctly")
@@ -204,6 +207,107 @@ class MockTest(TestCase):
         testAttributes(Mock(spec=Something()))
         
 
+    def testMakeMockBasic(self):
+        Class = MakeMock([])
+        self.assertTrue(issubclass(Class, Mock))
+        
+        self.assertRaisesWithMessage(NameError, "Unknown magic method 'frob'",
+                                     MakeMock, ['frob'])
+
+        
+    def testMakeMockGetItem(self):
+        Class = MakeMock(['getitem'])
+        self.assertTrue(hasattr(Class, '__getitem__'))
+        self.assertFalse(hasattr(Class, '__setitem__'))
+        
+        self.assertEquals(Class()._items, {})
+        
+        instance = Class(items={0: 'fish', 1: 'trouble'})
+        self.assertEquals(instance._items, {0: 'fish', 1: 'trouble'})
+        self.assertEquals(instance[0], 'fish')
+        self.assertEquals(instance[1], 'trouble')
+        self.assertRaises(KeyError, lambda: instance[2])
+        
+        self.assertEquals(instance.method_calls,
+                          [('__getitem__', (0,), {}),
+                           ('__getitem__', (1,), {})])
+        
+        instance = Class(items=[3, 2, 1])
+        self.assertEquals(instance._items, [3, 2, 1])
+        self.assertEquals(instance[0], 3)
+        self.assertEquals(instance[1], 2)
+        self.assertRaises(IndexError, lambda: instance[3])
+        
+        
+    def testMakeMockSetItem(self):
+        Class = MakeMock(['setitem'])
+        self.assertTrue(hasattr(Class, '__setitem__'))
+        self.assertFalse(hasattr(Class, '__getitem__'))
+                
+        instance = Class()
+        self.assertEquals(instance._items, {})
+        instance[0] = 'fish'
+        instance[1] = 'trouble'
+        
+        self.assertEquals(instance.method_calls,
+                          [('__setitem__', (0, 'fish'), {}),
+                           ('__setitem__', (1, 'trouble'), {})])
+        
+        self.assertEquals(instance._items, {0: 'fish', 1: 'trouble'})
+        
+    
+    def testMakeMockIter(self):
+        Class = MakeMock(['iter'])
+        self.assertTrue(hasattr(Class, '__iter__'))
+
+        self.assertEquals(Class()._items, {})
+                
+        instance = Class(items=[6, 5])
+        self.assertEquals(list(instance), [6, 5])
+        self.assertEquals(instance.method_calls,
+                          [('__iter__', (), {})])    
+
+
+    def testSpecClassesImplementMagicMethods(self):
+        class Something(object):
+            def __getitem__(self, key):
+                pass
+            def __setitem__(self, key, value):
+                pass
+            def __iter__(self):
+                pass
+            
+        mock = Mock(spec=Something)
+        self.assertEquals(mock._items, {})
+        mock._items = [3, 2, 1]
+        self.assertEquals(list(mock), [3, 2, 1])
+        self.assertEquals(mock[1], 2)
+        mock[1] = 4
+        self.assertEquals(list(mock), [3, 4, 1])
+        
+    def testMethodsArgumentCreatesMagicMethods(self):
+        mock = Mock(methods=['__getitem__', '__setitem__', '__iter__'])
+        self.assertEquals(mock._items, {})
+        mock._items = [3, 2, 1]
+        self.assertEquals(list(mock), [3, 2, 1])
+        self.assertEquals(mock[1], 2)
+        mock[1] = 4
+        self.assertEquals(list(mock), [3, 4, 1])
+
+"""
+Should a failed indexing attempt still be added to 'method_calls'?
+
+Should reset affect '_items'?
+
+When iterating, a single call to '__iter__' is recorded, which returns a
+generator.
+
+Parent method calls if magic methods called on a child?
+
+Should attributes (children) on mocks created from MakeMock be plain 'Mock' or from the
+same class as their parent? (currently they are plain mocks)
+"""
+        
 if __name__ == '__main__':
     RunTests(MockTest)
     
