@@ -134,26 +134,46 @@ def __getitem__(self, key):
 def __setitem__(self, key, value):
     self.method_calls.append(('__setitem__', (key, value), {}))
     self._items[key] = value
+        
+def __delitem__(self, key):
+    self.method_calls.append(('__delitem__', (key,), {}))
+    del self._items[key]
 
 def __iter__(self):
     self.method_calls.append(('__iter__', (), {}))
     for item in list(self._items):
         yield item
+        
+def __len__(self):
+    self.method_calls.append(('__len__', (), {}))
+    return len(self._items)
+
+def __contains__(self, key):
+    self.method_calls.append(('__contains__', (), {}))
+    return key in self._items
+
+def __nonzero__(self):
+    self.method_calls.append(('__nonzero__', (), {}))
+    return bool(self._items)
     
+
 magic_methods = {
+    'delitem': __delitem__,
     'getitem': __getitem__,
     'setitem': __setitem__,
-    'iter': __iter__
+    'iter': __iter__,
+    'len': __len__,
+    'contains': __contains__,
+    'nonzero': __nonzero__
 }
 
 def MakeMock(members):
-    class SpecialMock(Mock):
+    class MagicMock(Mock):
         def __length_hint__(self):
             # todo: this is a workaround - could also filter in __getattr__?
             return len(self._items)
         def _has_items(self):
-            return ('getitem' in members or 'setitem' in members
-                    or 'iter' in members)
+            return True
     
     for method in members:
         if method not in magic_methods:
@@ -161,8 +181,8 @@ def MakeMock(members):
         
         impl = magic_methods[method]
         name = '__%s__' % method
-        setattr(SpecialMock, name, impl)
-    return SpecialMock
+        setattr(MagicMock, name, impl)
+    return MagicMock
 
         
 def _dot_lookup(thing, comp, import_path):

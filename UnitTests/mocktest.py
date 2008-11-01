@@ -213,7 +213,7 @@ class MockTest(TestCase):
         
         self.assertRaisesWithMessage(NameError, "Unknown magic method 'frob'",
                                      MakeMock, ['frob'])
-
+        
         
     def testMakeMockGetItem(self):
         Class = MakeMock(['getitem'])
@@ -255,6 +255,18 @@ class MockTest(TestCase):
         
         self.assertEquals(instance._items, {0: 'fish', 1: 'trouble'})
         
+        
+    def testMakeMockDelItem(self):
+        Class = MakeMock(['delitem'])
+        self.assertTrue(hasattr(Class, '__delitem__'))
+                
+        instance = Class(items={'fish': 'eggs'})
+        del instance['fish']
+        self.assertEquals(instance._items, {})
+        
+        self.assertEquals(instance.method_calls,
+                          [('__delitem__', ('fish',), {})])
+        
     
     def testMakeMockIter(self):
         Class = MakeMock(['iter'])
@@ -285,6 +297,7 @@ class MockTest(TestCase):
         mock[1] = 4
         self.assertEquals(list(mock), [3, 4, 1])
         
+        
     def testMethodsArgumentCreatesMagicMethods(self):
         mock = Mock(methods=['__getitem__', '__setitem__', '__iter__'])
         self.assertEquals(mock._items, {})
@@ -293,19 +306,85 @@ class MockTest(TestCase):
         self.assertEquals(mock[1], 2)
         mock[1] = 4
         self.assertEquals(list(mock), [3, 4, 1])
+        
+    
+    def testMakeMockLen(self):
+        Class = MakeMock(['len'])
+        self.assertTrue(hasattr(Class, '__len__'))
+
+        instance = Class()
+        self.assertEquals(len(instance), 0)
+        self.assertEquals(instance.method_calls,
+                          [('__len__', (), {})])    
+        
+        instance.reset()
+        instance._items = 1, 2, 3
+        self.assertEquals(len(instance), 3)
+        
+    
+    def testMakeMockContains(self):
+        Class = MakeMock(['contains'])
+        self.assertTrue(hasattr(Class, '__contains__'))
+
+        instance = Class()
+        self.assertFalse(3 in instance) 
+        self.assertEquals(instance.method_calls,
+                          [('__contains__', (), {})])    
+        
+        instance.reset()
+        instance._items = 1, 2, 3
+        self.assertTrue(3 in instance)
+        
+    
+    def testMakeMockNonZero(self):
+        Class = MakeMock(['nonzero'])
+        self.assertTrue(hasattr(Class, '__nonzero__'))
+
+        instance = Class()
+        self.assertFalse(bool(instance)) 
+        self.assertEquals(instance.method_calls,
+                          [('__nonzero__', (), {})])    
+        
+        instance.reset()
+        instance._items = 1, 2, 3
+        self.assertTrue(bool(instance)) 
+        
+
+
+        
 
 """
+Keyword arguments to patch and patch_object to create a 
+comparable or container like Mock - or Mock with methods
+or spec. (spec, methods, cmp, container).
+
 Should a failed indexing attempt still be added to 'method_calls'?
+(Currently not.)
 
-Should reset affect '_items'?
-
-When iterating, a single call to '__iter__' is recorded, which returns a
-generator.
+Should reset affect '_items'? Take a copy of the items and restore
+it.
 
 Parent method calls if magic methods called on a child?
 
 Should attributes (children) on mocks created from MakeMock be plain 'Mock' or from the
 same class as their parent? (currently they are plain mocks)
+
+Still to implement:
+
+    __hash__
+    comparisons
+    __delitem__
+    
+    numeric types
+    
+    unary operators
+    
+    context managers - enter, exit
+    
+    descriptors - get, set, delete
+    
+    
+    
 """
         
 if __name__ == '__main__':
