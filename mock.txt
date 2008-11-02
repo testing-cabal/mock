@@ -821,12 +821,25 @@ There are various disadvantages and things that Mock doesn't (yet) do.
 
 * It doesn't wrap objects. If you need to pass calls through to the real object *and* record them then you can't yet do that.
 * ``Mock`` has several attributes. This makes it unsuitable for mocking objects that use these attribute names. A way round this would be to provide ``start`` and ``stop`` (or similar) methods that *hide* these attributes when needed.
-* It doesn't yet mock any of the magic methods (like iteration or the mapping and sequence protocol methods). I have an idea of how to do this for a future release though.
 
 
 
 CHANGELOG
 =========
+
+2008/XX/XX Version 0.5.0
+------------------------
+
+* patch and patch_object now take methods and spec keyword arguments
+* TODO: verify - Nested patches may now be applied in a different order (created mocks
+                 passed in the opposite order). This is actually a bugfix.
+                 
+* MakeMock is a Mock class factory. It takes a list of magic methods and creates a 
+  MagicMock class (Mock subclass) with the magic methods you specified. Currently
+  only container methods are available.
+* Instantiating a Mock with methods / spec will actually create a MagicMock with 
+  magic methods from the method / spec list.
+
 
 2008/10/12 Version 0.4.0
 ------------------------
