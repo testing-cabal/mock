@@ -350,43 +350,6 @@ class MockTest(TestCase):
         instance._items = 1, 2, 3
         self.assertTrue(bool(instance))
         
-
-
-        
-
-"""
-Keyword arguments to patch and patch_object to create a 
-comparable or container like Mock - or Mock with methods
-or spec. (cmp, container).
-
-Should a failed indexing attempt still be added to 'method_calls'?
-(Currently not.)
-
-Should reset affect '_items'? Take a copy of the items and restore
-it.
-
-Parent method calls if magic methods called on a child? (not currently
-possible as all children will be mocks rather than magic mocks)
-
-Should attributes (children) on mocks created from MakeMock be plain 'Mock' or from the
-same class as their parent? (currently they are plain mocks)
-
-Still to implement:
-
-    __hash__
-    comparisons
-    
-    numeric
-    in-place
-    right hand side
-    
-    unary operators
-    
-    context managers - enter, exit
-    
-    descriptors - get, set, delete
-    
-"""
         
 if __name__ == '__main__':
     RunTests(MockTest)
