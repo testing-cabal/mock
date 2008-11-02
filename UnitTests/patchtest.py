@@ -5,9 +5,16 @@
 import os
 import sys
 this_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-if not this_dir in sys.path:
+if this_dir not in sys.path:
+    # Fix for running tests on the Mac 
     sys.path.insert(0, this_dir)
 
+if 'patchtest' in sys.modules:
+    # Fix for running tests under Wing
+    import UnitTests
+    import patchtest
+    UnitTests.patchtest = patchtest
+    
 from testcase import TestCase
 from testutils import RunTests
 
@@ -18,10 +25,14 @@ from mock import Mock, patch, patch_object, sentinel
 something  = sentinel.Something
 something_else  = sentinel.SomethingElse
 
+
 class SomeClass(object):
     class_attribute = None
+    
+    def wibble(self):
+        pass
 
-
+    
 class PatchTest(TestCase):
 
     def testSinglePatchObject(self):
@@ -132,8 +143,8 @@ class PatchTest(TestCase):
         def test(this1, this2, mock1, mock2):
             self.assertEquals(this1, sentinel.this1, "Patched function didn't receive initial argument")
             self.assertEquals(this2, sentinel.this2, "Patched function didn't receive second argument")
-            self.assertEquals(mock1, Test.something, "Mock not passed into test function")
-            self.assertEquals(mock2, Test.something2, "Second Mock not passed into test function")
+            self.assertEquals(mock1, Test.something2, "Mock not passed into test function")
+            self.assertEquals(mock2, Test.something, "Second Mock not passed into test function")
             self.assertTrue(isinstance(mock2, Mock), 
                             "patch with two arguments did not create a mock")
             self.assertTrue(isinstance(mock2, Mock), 
@@ -152,6 +163,59 @@ class PatchTest(TestCase):
         # Test that executing a second time creates new mocks
         test(sentinel.this1, sentinel.this2)
 
+        
+    def testPatchWithSpec(self):
+        @patch('UnitTests.patchtest.SomeClass', spec=SomeClass)
+        def test(MockSomeClass):
+            self.assertEquals(SomeClass, MockSomeClass)
+            self.assertTrue(isinstance(SomeClass.wibble, Mock))
+            self.assertRaises(AttributeError, lambda: SomeClass.not_wibble)
+            
+        test()
 
+        
+    def testPatchObjectWithSpec(self):
+        @patch_object(SomeClass, 'class_attribute', spec=SomeClass)
+        def test(MockAttribute):
+            self.assertEquals(SomeClass.class_attribute, MockAttribute)
+            self.assertTrue(isinstance(SomeClass.class_attribute.wibble, Mock))
+            self.assertRaises(AttributeError, lambda: SomeClass.class_attribute.not_wibble)
+            
+        test()
+
+        
+    def testPatchWithMethods(self):
+        @patch('UnitTests.patchtest.SomeClass', methods=['wibble'])
+        def test(MockSomeClass):
+            self.assertEquals(SomeClass, MockSomeClass)
+            self.assertTrue(isinstance(SomeClass.wibble, Mock))
+            self.assertRaises(AttributeError, lambda: SomeClass.not_wibble)
+            
+        test()
+
+        
+    def testPatchObjectWithMethods(self):
+        @patch_object(SomeClass, 'class_attribute', methods=['wibble'])
+        def test(MockAttribute):
+            self.assertEquals(SomeClass.class_attribute, MockAttribute)
+            self.assertTrue(isinstance(SomeClass.class_attribute.wibble, Mock))
+            self.assertRaises(AttributeError, lambda: SomeClass.class_attribute.not_wibble)
+            
+        test()
+        
+    
+    def testNestedPatchWithMethods(self):
+        # regression test for nested decorators
+        @patch('__builtin__.open')
+        @patch('UnitTests.patchtest.SomeClass', methods=['wibble'])
+        def test(MockSomeClass, MockOpen):
+            self.assertEquals(SomeClass, MockSomeClass)
+            self.assertTrue(isinstance(SomeClass.wibble, Mock))
+            self.assertRaises(AttributeError, lambda: SomeClass.not_wibble)
+            
+        test()
+        
+
+        
 if __name__ == '__main__':
     RunTests(PatchTest)
