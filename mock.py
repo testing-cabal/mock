@@ -251,7 +251,7 @@ def patch(target, new=DEFAULT, methods=None, spec=None):
     try:
         target, attribute = target.rsplit('.', 1)    
     except (TypeError, ValueError):
-        raise TypeError("Need a valid target to patch. You supplied: %s" % (target,))
+        raise TypeError("Need a valid target to patch. You supplied: %r" % (target,))
     target = _importer(target)
     return _patch(target, attribute, new, methods, spec)
 
