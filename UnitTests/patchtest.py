@@ -184,8 +184,8 @@ class PatchTest(TestCase):
         test()
 
         
-    def testPatchWithMethods(self):
-        @patch('UnitTests.patchtest.SomeClass', methods=['wibble'])
+    def testPatchWithSpecAsList(self):
+        @patch('UnitTests.patchtest.SomeClass', spec=['wibble'])
         def test(MockSomeClass):
             self.assertEquals(SomeClass, MockSomeClass)
             self.assertTrue(isinstance(SomeClass.wibble, Mock))
@@ -194,8 +194,8 @@ class PatchTest(TestCase):
         test()
 
         
-    def testPatchObjectWithMethods(self):
-        @patch_object(SomeClass, 'class_attribute', methods=['wibble'])
+    def testPatchObjectWithSpecAsList(self):
+        @patch_object(SomeClass, 'class_attribute', spec=['wibble'])
         def test(MockAttribute):
             self.assertEquals(SomeClass.class_attribute, MockAttribute)
             self.assertTrue(isinstance(SomeClass.class_attribute.wibble, Mock))
@@ -203,11 +203,29 @@ class PatchTest(TestCase):
             
         test()
         
+        
+    def testPatchWithMagics(self):
+        @patch('UnitTests.patchtest.SomeClass', magics=['getitem', 'setitem'])
+        def test(MockSomeClass):
+            MockSomeClass[0] = 'broom'
+            self.assertEquals(MockSomeClass[0], 'broom')
+            
+        test()
+
+        
+    def testPatchObjectWithMagics(self):
+        @patch_object(SomeClass, 'class_attribute', magics=['getitem', 'setitem'])
+        def test(MockAttribute):
+            SomeClass.class_attribute[0] = 'broom'
+            self.assertEquals(SomeClass.class_attribute[0], 'broom')
+            
+        test()
+        
     
-    def testNestedPatchWithMethods(self):
+    def testNestedPatchWithSpecAsList(self):
         # regression test for nested decorators
         @patch('__builtin__.open')
-        @patch('UnitTests.patchtest.SomeClass', methods=['wibble'])
+        @patch('UnitTests.patchtest.SomeClass', spec=['wibble'])
         def test(MockSomeClass, MockOpen):
             self.assertEquals(SomeClass, MockSomeClass)
             self.assertTrue(isinstance(SomeClass.wibble, Mock))

@@ -817,13 +817,12 @@ You can stack up multiple patch decorators using this pattern:
 TODO
 ====
 
-Merge spec and methods.
+Should passing in spec and magics raise an exception?
 
 Keyword arguments to patch and patch_object to create a 
 comparable or container like Mock. (cmp, container).
 
-magics keyword for magic methods (accepting a string on which string.split
-is called).
+MakeMock should accept a string argument?
 
 Should a failed indexing attempt still be added to 'method_calls'?
 (Currently not.)
@@ -865,14 +864,19 @@ CHANGELOG
 2008/XX/XX Version 0.5.0
 ------------------------
 
-* patch and patch_object now take methods and spec keyword arguments
+* Mock has a new 'magics' keyword arguments - a list (or string separated by whitespace)
+  of magic methods that the Mock instance should provide (only container 
+  methods available so far).
+* The methods keyword argument to Mock has been removed and merged with spec. The spec
+  argument can now be a list of methods or an object to take the spec from.
+* patch and patch_object now take magics and spec keyword arguments
 * TODO: verify - Nested patches may now be applied in a different order (created mocks
                  passed in the opposite order). This is actually a bugfix.
                  
 * MakeMock is a Mock class factory. It takes a list of magic methods and creates a 
   MagicMock class (Mock subclass) with the magic methods you specified. Currently
   only container methods are available.
-* Instantiating a Mock with methods / spec will actually create a MagicMock with 
+* Instantiating a Mock with magics / spec will actually create a MagicMock with 
   magic methods from the method / spec list.
 
 
