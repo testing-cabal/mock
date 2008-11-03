@@ -28,28 +28,30 @@ DEFAULT = object()
 
 class Mock(object):
     
-    def __new__(cls, methods=None, spec=None, *args, **kwargs):
-        if spec is not None or methods is not None:
-            if methods is None:
-                magics = [method for method in magic_methods if hasattr(spec, '__%s__' % method)]
-            else:
-                magics = [method[2:-2] for method in methods if ('__%s__' % method[2:-2] == method  and
-                                                                 method[2:-2] in magic_methods)]
-            if magics:
-                # It might be magic, but I like it
-                cls = MakeMock(magics)
+    def __new__(cls, spec=None, magics=None, *args, **kwargs):
+        if isinstance(spec, list):           
+            magics = [method[2:-2] for method in spec if ('__%s__' % method[2:-2] == method
+                                                          and method[2:-2] in magic_methods)]
+        elif spec is not None:
+            magics = [method for method in magic_methods if hasattr(spec, '__%s__' % method)]
+        elif isinstance(magics, basestring):
+            magics = magics.split()
+            
+        if magics:
+            # It might be magic, but I like it
+            cls = MakeMock(magics)
         return object.__new__(cls)
         
     
-    def __init__(self, methods=None, spec=None, side_effect=None, 
+    def __init__(self, spec=None, magics=None, side_effect=None, 
                  return_value=DEFAULT, name=None, parent=None,
                  items=None):
         self._parent = parent
         self._name = name
-        if spec is not None and methods is None:
-            methods = [member for member in dir(spec) if not 
+        if spec is not None and not isinstance(spec, list):
+            spec = [member for member in dir(spec) if not 
                        (member.startswith('__') and  member.endswith('__'))]
-        self._methods = methods
+        self._methods = spec
         self._children = {}
         self._return_value = return_value
         self.side_effect = side_effect
@@ -75,6 +77,7 @@ class Mock(object):
     
             
     def _has_items(self):
+        # Overriden in MagicMock
         return False
         
     
@@ -208,22 +211,22 @@ def _importer(target):
     return thing
 
 
-def _patch(target, attribute, new, methods, spec):
+def _patch(target, attribute, new, spec, magics):
         
     def patcher(func):
         original = getattr(target, attribute)
         if hasattr(func, 'restore_list'):
             func.restore_list.append((target, attribute, original))
-            func.patch_list.append((target, attribute, new, methods, spec))
+            func.patch_list.append((target, attribute, new, spec, magics))
             return func
         
-        patch_list = [(target, attribute, new, methods, spec)]
+        patch_list = [(target, attribute, new, spec, magics)]
         restore_list = [(target, attribute, original)]
         
         def patched(*args, **keywargs):
-            for target, attribute, new, methods, spec in patch_list:
+            for target, attribute, new, spec, magics in patch_list:
                 if new is DEFAULT:
-                    new = Mock(methods=methods, spec=spec)
+                    new = Mock(spec=spec, magics=magics)
                     args += (new,)
                 setattr(target, attribute, new)
             try:
@@ -242,18 +245,18 @@ def _patch(target, attribute, new, methods, spec):
     return patcher
 
 
-def patch_object(target, attribute, new=DEFAULT, methods=None, spec=None):
-    return _patch(target, attribute, new, methods, spec)
+def patch_object(target, attribute, new=DEFAULT, spec=None, magics=None):
+    return _patch(target, attribute, new, spec, magics)
 
 
-def patch(target, new=DEFAULT, methods=None, spec=None):
+def patch(target, new=DEFAULT, spec=None, magics=None):
     print target
     try:
         target, attribute = target.rsplit('.', 1)    
     except (TypeError, ValueError):
         raise TypeError("Need a valid target to patch. You supplied: %r" % (target,))
     target = _importer(target)
-    return _patch(target, attribute, new, methods, spec)
+    return _patch(target, attribute, new, spec, magics)
 
 
 class SentinelObject(object):

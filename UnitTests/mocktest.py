@@ -67,8 +67,8 @@ class MockTest(TestCase):
         
     def testReset(self):
         parent = Mock()
-        methods = ["something"]
-        mock = Mock(name="child", parent=parent, methods=methods)
+        spec = ["something"]
+        mock = Mock(name="child", parent=parent, spec=spec)
         mock(sentinel.Something, something=sentinel.SomethingElse)
         something = mock.something
         mock.something()
@@ -80,7 +80,7 @@ class MockTest(TestCase):
         
         self.assertEquals(mock._name, "child", "name incorrectly reset")
         self.assertEquals(mock._parent, parent, "parent incorrectly reset")
-        self.assertEquals(mock._methods, methods, "methods incorrectly reset")
+        self.assertEquals(mock._methods, spec, "methods incorrectly reset")
         
         self.assertFalse(mock.called, "called not reset")
         self.assertEquals(mock.call_count, 0, "call_count not reset")
@@ -176,8 +176,8 @@ class MockTest(TestCase):
         
         
     def testOnlyAllowedMethodsExist(self):
-        methods = ["something"]
-        mock = Mock(methods=methods)
+        spec = ["something"]
+        mock = Mock(spec=spec)
         
         # this should be allowed
         mock.something
@@ -299,14 +299,42 @@ class MockTest(TestCase):
         self.assertEquals(list(mock), [3, 4, 1])
         
         
-    def testMethodsArgumentCreatesMagicMethods(self):
-        mock = Mock(methods=['__getitem__', '__setitem__', '__iter__'])
+    def testSpecAsListCreatesMagicMethods(self):
+        mock = Mock(spec=['__getitem__', '__setitem__', '__iter__'])
         self.assertEquals(mock._items, {})
         mock._items = [3, 2, 1]
         self.assertEquals(list(mock), [3, 2, 1])
         self.assertEquals(mock[1], 2)
         mock[1] = 4
         self.assertEquals(list(mock), [3, 4, 1])
+        
+    
+    def testMagicsKeywordCreatesMockWithMagicMethods(self):
+        mock = Mock(magics=['getitem', 'setitem', 'iter'])
+        self.assertEquals(mock._items, {})
+        mock._items = [3, 2, 1]
+        self.assertEquals(list(mock), [3, 2, 1])
+        self.assertEquals(mock[1], 2)
+        mock[1] = 4
+        self.assertEquals(list(mock), [3, 4, 1])
+        
+        # If the magic methods were created in the same way as spec
+        # then this would raise an attribute error
+        mock.foobar
+        
+    
+    def testMagicsAsStringCreatesMockWithMagicMethods(self):
+        mock = Mock(magics='getitem setitem iter')
+        self.assertEquals(mock._items, {})
+        mock._items = [3, 2, 1]
+        self.assertEquals(list(mock), [3, 2, 1])
+        self.assertEquals(mock[1], 2)
+        mock[1] = 4
+        self.assertEquals(list(mock), [3, 4, 1])
+        
+        # If the magic methods were created in the same way as spec
+        # then this would raise an attribute error
+        mock.foobar
         
     
     def testMakeMockLen(self):
