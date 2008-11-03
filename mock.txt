@@ -817,12 +817,13 @@ You can stack up multiple patch decorators using this pattern:
 TODO
 ====
 
+Merge spec and methods.
+
 Keyword arguments to patch and patch_object to create a 
 comparable or container like Mock. (cmp, container).
 
-A keyword for having patch mock with Mock class rather than
-instance. The class will have to keep a reference to all
-its instances.
+magics keyword for magic methods (accepting a string on which string.split
+is called).
 
 Should a failed indexing attempt still be added to 'method_calls'?
 (Currently not.)
