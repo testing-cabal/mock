@@ -867,6 +867,7 @@ CHANGELOG
 * Mock has a new 'magics' keyword arguments - a list (or string separated by whitespace)
   of magic methods that the Mock instance should provide (only container 
   methods available so far).
+* Mock has an 'items' keyword argument for mocks implementing container methods.
 * The methods keyword argument to Mock has been removed and merged with spec. The spec
   argument can now be a list of methods or an object to take the spec from.
 * patch and patch_object now take magics and spec keyword arguments
