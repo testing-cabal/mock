@@ -358,7 +358,7 @@ class MockTest(TestCase):
         instance = Class()
         self.assertFalse(3 in instance) 
         self.assertEquals(instance.method_calls,
-                          [('__contains__', (), {})])    
+                          [('__contains__', (3,), {})])    
         
         instance.reset()
         instance._items = 1, 2, 3

@@ -130,20 +130,20 @@ class Mock(object):
         assert self.call_args == (args, kwargs), 'Expected: %s\nCalled with: %s' % ((args, kwargs), self.call_args)
         
 
-def _args(name, args=(), kwargs={}):
-    return (name, args, kwargs)
+def _args(name, *args):
+    return (name, args, {})
 
 def __getitem__(self, key):
     val = self._items[key]
-    self.method_calls.append(_args('__getitem__', (key,)))
+    self.method_calls.append(_args('__getitem__', key))
     return val
         
 def __setitem__(self, key, value):
-    self.method_calls.append(_args('__setitem__', (key, value)))
+    self.method_calls.append(_args('__setitem__', key, value))
     self._items[key] = value
         
 def __delitem__(self, key):
-    self.method_calls.append(_args('__delitem__', (key,)))
+    self.method_calls.append(_args('__delitem__', key))
     del self._items[key]
 
 def __iter__(self):
@@ -156,7 +156,7 @@ def __len__(self):
     return len(self._items)
 
 def __contains__(self, key):
-    self.method_calls.append(_args('__contains__'))
+    self.method_calls.append(_args('__contains__', key))
     return key in self._items
 
 def __nonzero__(self):
