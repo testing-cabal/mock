@@ -182,7 +182,7 @@ class MockTest(TestCase):
         # this should be allowed
         mock.something
         self.assertRaisesWithMessage(AttributeError, 
-                                     "object has no attribute 'something_else'",
+                                     "Mock object has no attribute 'something_else'",
                                      lambda: mock.something_else)
 
     
@@ -198,10 +198,10 @@ class MockTest(TestCase):
             mock.x
             mock.y
             self.assertRaisesWithMessage(AttributeError, 
-                                         "object has no attribute 'z'",
+                                         "Mock object has no attribute 'z'",
                                          lambda: mock.z)
             self.assertRaisesWithMessage(AttributeError, 
-                                         "object has no attribute '__something__'",
+                                         "Mock object has no attribute '__something__'",
                                          lambda: mock.__something__)
             
         testAttributes(Mock(spec=Something))
@@ -377,6 +377,15 @@ class MockTest(TestCase):
         instance.reset()
         instance._items = 1, 2, 3
         self.assertTrue(bool(instance))
+        
+        
+    def testMockRaisesAttributeErrorForMagicAttributes(self):
+        mock = Mock()
+        self.assertRaisesWithMessage(AttributeError, '__something__', getattr, mock, '__something__')
+        
+        mock = Mock(spec=['__something__'])
+        # shouldn't raise an AttributeError
+        mock.__something__
         
         
 if __name__ == '__main__':

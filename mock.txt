@@ -879,6 +879,8 @@ CHANGELOG
   only container methods are available.
 * Instantiating a Mock with magics / spec will actually create a MagicMock with 
   magic methods from the method / spec list.
+* A Mock created without a spec will not attempt to mock any magic methods / attributes
+  (it will raise an AttributeError instead).
 
 
 2008/10/12 Version 0.4.0
@@ -945,8 +947,6 @@ Distribution includes unit tests.
 -------------------------
 
 Initial release.
-
-
 
 
 .. _Michael Foord: http://www.voidspace.org.uk/python/weblog/index.shtml

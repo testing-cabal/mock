@@ -25,13 +25,14 @@ __version__ = '0.5.0 alpha'
 
 DEFAULT = object()
 
+def _is_magic(name):
+    return '__%s__' % name[2:-2] == name
 
 class Mock(object):
     
     def __new__(cls, spec=None, magics=None, *args, **kwargs):
         if isinstance(spec, list):           
-            magics = [method[2:-2] for method in spec if ('__%s__' % method[2:-2] == method
-                                                          and method[2:-2] in magic_methods)]
+            magics = [method[2:-2] for method in spec if (_is_magic(method) and method[2:-2] in magic_methods)]
         elif spec is not None:
             magics = [method for method in magic_methods if hasattr(spec, '__%s__' % method)]
         elif isinstance(magics, basestring):
@@ -114,11 +115,11 @@ class Mock(object):
     
     
     def __getattr__(self, name):
-        if name == '__length_hint__':
-            # an unfortunate workaround for mocking iterables
-            raise AttributeError('__length_hint__')
-        if self._methods is not None and name not in self._methods:
-            raise AttributeError("object has no attribute '%s'" % name)
+        if self._methods is not None:
+            if name not in self._methods:
+                raise AttributeError("Mock object has no attribute '%s'" % name)
+        elif _is_magic(name):
+            raise AttributeError(name)
         
         if name not in self._children:
             self._children[name] = Mock(parent=self, name=name)
