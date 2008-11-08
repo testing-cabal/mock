@@ -12,6 +12,8 @@
 # Scripts maintained at http://www.voidspace.org.uk/python/index.shtml
 # Comments, suggestions and bug reports welcome.
 
+from copy import copy
+
 __all__ = (
     'Mock',
     'MakeMock',
@@ -60,7 +62,7 @@ class Mock(object):
         if self._has_items():
             if items is None:
                 items = {}
-            self._items = items
+            self.__items = items
         
         self.reset()
 
@@ -75,6 +77,8 @@ class Mock(object):
             child.reset()
         if isinstance(self._return_value, Mock):
             self._return_value.reset()
+        if self._has_items():
+            self._items = copy(self.__items)
     
             
     def _has_items(self):
@@ -251,7 +255,6 @@ def patch_object(target, attribute, new=DEFAULT, spec=None, magics=None):
 
 
 def patch(target, new=DEFAULT, spec=None, magics=None):
-    print target
     try:
         target, attribute = target.rsplit('.', 1)    
     except (TypeError, ValueError):
