@@ -8,6 +8,13 @@ this_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if not this_dir in sys.path:
     sys.path.insert(0, this_dir)
 
+
+if 'mocktest' in sys.modules:
+    # Fix for running tests under Wing
+    import UnitTests
+    import mocktest
+    UnitTests.mocktest = mocktest
+
 from testcase import TestCase
 from testutils import RunTests
 
@@ -386,6 +393,16 @@ class MockTest(TestCase):
         mock = Mock(spec=['__something__'])
         # shouldn't raise an AttributeError
         mock.__something__
+        
+        
+    def testItemsReset(self):
+        items = [1, 2, 4]
+        mock = Mock(magics='setitem', items=[1, 2, 4])
+        
+        mock._items.append('fish')
+        mock.reset()
+        self.assertEquals(mock._items, items)
+        
         
         
 if __name__ == '__main__':
