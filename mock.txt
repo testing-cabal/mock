@@ -861,6 +861,7 @@ There are various disadvantages and things that Mock doesn't (yet) do.
 * It doesn't wrap objects. If you need to pass calls through to the real object *and* record them then you can't yet do that.
 * ``Mock`` has several attributes. This makes it unsuitable for mocking objects that use these attribute names. A way round this would be to provide ``start`` and ``stop`` (or similar) methods that *hide* these attributes when needed.
 
+'spec=True' keyword to patch to use the object it is patching as the spec argument?
 
 
 CHANGELOG
