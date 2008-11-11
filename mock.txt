@@ -874,7 +874,8 @@ CHANGELOG
   methods available so far).
 * Mock has an 'items' keyword argument for mocks implementing container methods. The
   '_items' attribute is set to a copy of this argument. Calling reset sets the _items
-  to a new copy of the original items keyword argument.
+  to a new copy of the original items keyword argument. Copies are only used for the
+  built-in container types dict, list, tuple, set.
 * The methods keyword argument to Mock has been removed and merged with spec. The spec
   argument can now be a list of methods or an object to take the spec from.
 * patch and patch_object now take magics and spec keyword arguments

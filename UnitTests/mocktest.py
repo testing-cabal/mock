@@ -396,7 +396,20 @@ class MockTest(TestCase):
         mock.__something__
         
         
-    def testItemsReset(self):
+    def testMagicsAll(self):
+        mock = Mock(magics='all', items={})
+        
+        mock['a'] = sentinel.value # setitem
+        self.assertEquals(mock['a'], sentinel.value) # getitem
+        self.assertTrue('a' in mock) # contains
+        self.assertEquals(len(mock), 1) # len
+        self.assertEquals(list(mock), ['a']) # list
+        self.assertTrue(bool(mock))
+        del mock['a'] # delitem
+        self.assertFalse(bool(mock))        
+        
+        
+    def testItemsCopyingForReset(self):
         items = [1, 2, 4]
         mock = Mock(magics='setitem', items=[1, 2, 4])
         
@@ -404,6 +417,49 @@ class MockTest(TestCase):
         mock.reset()
         self.assertEquals(mock._items, items)
         
+        items = [1, 2, 3, 4]
+        mock = Mock(magics='getitem', items=items)
+        mock._items = object()
+        mock.reset()
+        
+        self.assertEquals(mock._items, items)
+        
+        items = (1, 2, 3, 4)
+        mock = Mock(magics='getitem', items=items)
+        mock._items = object()
+        mock.reset()
+        
+        self.assertEquals(mock._items, items)
+        
+        items = {1:2, 2: 3, 3: 4, 4: 5}
+        mock = Mock(magics='getitem', items=items)
+        mock._items = object()
+        mock.reset()
+        
+        self.assertEquals(mock._items, items)
+                
+        items = set((1, 2, 3, 4))
+        mock = Mock(magics='getitem', items=items)
+        mock._items = object()
+        mock.reset()
+        
+        self.assertEquals(mock._items, items)
+                
+        items = sentinel.items
+        mock = Mock(magics='getitem', items=items)
+        mock._items = object()
+        mock.reset()
+        
+        self.assertEquals(mock._items, items)
+        
+        class ListSubclass(list):
+            pass
+        items = ListSubclass()
+        mock = Mock(magics='getitem', items=items)
+
+        self.assertTrue(mock._items is items)
+        mock.reset()        
+        self.assertTrue(mock._items is items)
         
         
 if __name__ == '__main__':

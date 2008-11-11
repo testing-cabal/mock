@@ -12,7 +12,6 @@
 # Scripts maintained at http://www.voidspace.org.uk/python/index.shtml
 # Comments, suggestions and bug reports welcome.
 
-from copy import copy
 
 __all__ = (
     'Mock',
@@ -29,6 +28,11 @@ DEFAULT = object()
 
 def _is_magic(name):
     return '__%s__' % name[2:-2] == name
+
+def _copy(value):
+    if type(value) in (dict, list, tuple, set):
+        return type(value)(value)
+    return value
 
 class Mock(object):
     
@@ -78,7 +82,7 @@ class Mock(object):
         if isinstance(self._return_value, Mock):
             self._return_value.reset()
         if self._has_items():
-            self._items = copy(self.__items)
+            self._items = _copy(self.__items)
     
             
     def _has_items(self):
@@ -178,8 +182,6 @@ magic_methods = {
     'contains': __contains__,
     'nonzero': __nonzero__
 }
-
-container_methods = ['nonzero', 'contains', 'len', 'setitem', 'iter', 'getitem', 'delitem']
 
 
 def MakeMock(members):
