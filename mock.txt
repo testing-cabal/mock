@@ -819,16 +819,12 @@ TODO and Limitations
 
 Contributions and comments welcomed!
 
-Should passing in spec and magics raise an exception?
+Should passing in spec *and* magics raise an exception?
 
 Keyword arguments to patch and patch_object to create a 
 comparable or container like Mock. (cmp, container).
 
 Shuld MakeMock accept a string argument?
-
-A copy is always taken of the items keyword argument, using
-'copy.copy'. Reset also takes a copy. copy.copy does too
-much - probably we only want to copy containers.
 
 Should a failed indexing attempt still be added to 'method_calls'?
 (Currently not.)
@@ -856,12 +852,15 @@ Could take a patch keyword argument and auto-do the patching in the constructor 
 in the destructor. This would be useful in itself, but violates TOOWTDI and would be unsafe 
 for IronPython (non-deterministic calling of destructors).
 
+A context manager version of patch (also violates TOOWTDI but might be a nice pattern),
+
+'spec=True' keyword to patch to use the object it is patching as the spec argument?
+
 There are various disadvantages and things that Mock doesn't (yet) do. 
 
 * It doesn't wrap objects. If you need to pass calls through to the real object *and* record them then you can't yet do that.
 * ``Mock`` has several attributes. This makes it unsuitable for mocking objects that use these attribute names. A way round this would be to provide ``start`` and ``stop`` (or similar) methods that *hide* these attributes when needed.
 
-'spec=True' keyword to patch to use the object it is patching as the spec argument?
 
 
 CHANGELOG
