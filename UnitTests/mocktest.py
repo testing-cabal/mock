@@ -389,7 +389,7 @@ class MockTest(TestCase):
         
     def testMockRaisesAttributeErrorForMagicAttributes(self):
         mock = Mock()
-        self.assertRaisesWithMessage(AttributeError, '__something__', getattr, mock, '__something__')
+        self.assertRaisesWithMessage(AttributeError, '__something__', lambda: mock.__something__)
         
         mock = Mock(spec=['__something__'])
         # shouldn't raise an AttributeError
@@ -403,13 +403,15 @@ class MockTest(TestCase):
         self.assertEquals(mock['a'], sentinel.value) # getitem
         self.assertTrue('a' in mock) # contains
         self.assertEquals(len(mock), 1) # len
-        self.assertEquals(list(mock), ['a']) # list
-        self.assertTrue(bool(mock))
+        self.assertEquals(list(mock), ['a']) # iter
+        self.assertTrue(bool(mock))  # nonzero
         del mock['a'] # delitem
-        self.assertFalse(bool(mock))        
+        self.assertFalse(bool(mock))
         
         
     def testItemsCopyingForReset(self):
+        # reset should only use a copy of items if it
+        # is one of the built-in containers
         items = [1, 2, 4]
         mock = Mock(magics='setitem', items=[1, 2, 4])
         
