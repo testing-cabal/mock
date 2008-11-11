@@ -188,7 +188,9 @@ def MakeMock(members):
     class MagicMock(Mock):
         def _has_items(self):
             return True
-    
+        
+    if 'all' in members:
+        members = magic_methods.keys()
     for method in members:
         if method not in magic_methods:
             raise NameError("Unknown magic method %r" % method)
