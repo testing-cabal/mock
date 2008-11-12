@@ -233,6 +233,30 @@ class PatchTest(TestCase):
             
         test()
         
+        
+    def testPatchWithSpecAsBoolean(self):
+        @patch('UnitTests.patchtest.SomeClass', spec=True)
+        def test(MockSomeClass):
+            self.assertEquals(SomeClass, MockSomeClass)
+            # Should not raise attribute error
+            MockSomeClass.wibble
+            
+            self.assertRaises(AttributeError, lambda: MockSomeClass.not_wibble)
+            
+        test()
+      
+        
+    def testPatchObjectWithSpecAsBoolean(self):
+        from UnitTests import patchtest
+        @patch_object(patchtest, 'SomeClass', spec=True)
+        def test(MockSomeClass):
+            self.assertEquals(SomeClass, MockSomeClass)
+            # Should not raise attribute error
+            MockSomeClass.wibble
+            
+            self.assertRaises(AttributeError, lambda: MockSomeClass.not_wibble)
+            
+        test()
 
         
 if __name__ == '__main__':
