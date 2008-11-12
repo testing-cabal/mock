@@ -22,7 +22,7 @@ __all__ = (
     '__version__'
 )
 
-__version__ = '0.5.0 alpha'
+__version__ = '0.5.0'
 
 DEFAULT = object()
 
@@ -233,8 +233,11 @@ def _patch(target, attribute, new, spec, magics):
         restore_list = [(target, attribute, original)]
         
         def patched(*args, **keywargs):
-            for target, attribute, new, spec, magics in patch_list:
+            for index, (target, attribute, new, spec, magics) in enumerate(patch_list):
                 if new is DEFAULT:
+                    if spec == True:
+                        # set spec to the object we are replacing
+                        spec = restore_list[index][2]
                     new = Mock(spec=spec, magics=magics)
                     args += (new,)
                 setattr(target, attribute, new)
