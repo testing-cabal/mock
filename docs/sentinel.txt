@@ -1,0 +1,33 @@
+==========
+ Sentinel
+==========
+
+.. module:: mock
+
+.. data:: sentinel
+
+    The ``sentinel`` object provides a convenient way of providing unique objects for your tests.
+
+    Attributes are created on demand when you access them by name. Accessing the same attribute will always return the same object. The objects returned have a sensible repr so that test failure messages are readable.
+
+
+Sentinel Example
+================
+
+Sometimes when testing you need to test that a specific object is passed as an argument to another method, or returned. It can be common to create named sentinel objects to test this. ``sentinel`` provides a convenient way of creating and testing the identity of objects like this.
+
+In this example we monkey patch ``method`` to return ``sentinel.ReturnValue``. We want to test that this is the value returned when we call ``something``.
+
+::
+
+    from mock import Mock, sentinel
+    
+    real = ProductionClass()
+    
+    real.method = Mock()
+    real.method.return_value = sentinel.ReturnValue
+    
+    returned = real.something()
+    self.assertEquals(returned, sentinel.ReturnValue, "something returned the wrong value")
+
+

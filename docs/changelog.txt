@@ -1,0 +1,96 @@
+===========
+ CHANGELOG
+===========
+
+2008/XX/XX Version 0.5.0
+------------------------
+
+* Mock has a new 'magics' keyword arguments - a list (or string separated by whitespace)
+  of magic methods that the Mock instance should provide (only container 
+  methods available so far).
+* Mock has an 'items' keyword argument for mocks implementing container methods. The
+  '_items' attribute is set to a copy of this argument. Calling reset sets the _items
+  to a new copy of the original items keyword argument. Copies are only used for the
+  built-in container types dict, list, tuple, set.
+* The methods keyword argument to Mock has been removed and merged with spec. The spec
+  argument can now be a list of methods or an object to take the spec from.
+* patch and patch_object now take magics and spec keyword arguments. If spec is 
+  passed in as 'True' then the Mock created will take the object it is replacing
+  as its spec object.
+* Nested patches may now be applied in a different order (created mocks passed 
+  in the opposite order). This is actually a bugfix.               
+* MakeMock is a Mock class factory. It takes a list of magic methods and creates a 
+  MagicMock class (Mock subclass) with the magic methods you specified. Currently
+  only container methods are available.
+* Instantiating a Mock with magics / spec will actually create a MagicMock with 
+  magic methods from the method / spec list.
+* A Mock created without a spec will not attempt to mock any magic methods / attributes
+  (it will raise an AttributeError instead).
+
+
+2008/10/12 Version 0.4.0
+------------------------
+
+* Default return value is now a new mock rather than None
+* return_value added as a keyword argument to the constructor
+* New method 'assert_called_with'
+* Added 'side_effect' attribute / keyword argument called when mock is called
+* patch decorator split into two decorators:
+
+    - ``patch_object`` which takes an object and an attribute name to patch
+      (plus optionally a value to patch with which defaults to a mock object)
+    - ``patch`` which takes a string specifying a target to patch; in the form
+      'package.module.Class.attribute'. (plus optionally a value to 
+      patch with which defaults to a mock object)
+
+* Can now patch objects with ``None``
+* Change to patch for nose compatibility with error reporting in wrapped functions
+* Reset no longer clears children / return value etc - it just resets
+  call count and call args. It also calls reset on all children (and
+  the return value if it is a mock).
+  
+Thanks to Konrad Delong, Kevin Dangoor and others for patches and suggestions.
+
+
+2007/12/03  Version 0.3.1
+-------------------------
+
+``patch`` maintains the name of decorated functions for compatibility with nose 
+test autodiscovery.
+
+Tests decorated with ``patch`` that use the two argument form (implicit mock 
+creation) will receive the mock(s) passed in as extra arguments.
+
+Thanks to Kevin Dangoor for these changes.
+
+
+2007/11/30  Version 0.3.0
+-------------------------
+
+Removed ``patch_module``. ``patch`` can now take a string as the first argument for patching modules.
+
+The third argument to ``patch`` is optional - a mock will be created by default if it is not passed in.
+
+
+2007/11/21  Version 0.2.1
+-------------------------
+
+Bug fix, allows reuse of functions decorated with ``patch`` and ``patch_module``.
+
+
+2007/11/20  Version 0.2.0
+-------------------------
+
+Added ``spec`` keyword argument for creating ``Mock`` objects from a specification object.
+
+Added ``patch`` and ``patch_module`` monkey patching decorators.
+
+Added ``sentinel`` for convenient access to unique objects.
+
+Distribution includes unit tests.
+
+
+2007/11/19  Version 0.1.0
+-------------------------
+
+Initial release.
