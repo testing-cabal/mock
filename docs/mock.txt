@@ -1,0 +1,172 @@
+================
+ The Mock Class
+================
+
+.. module:: mock
+   :synopsis: Mock object and testing tool library.
+.. moduleauthor:: Michael Foord <fuzzyman@voidspace.org.uk>
+.. sectionauthor:: Michael Foord <fuzzyman@voidspace.org.uk>
+
+.. class:: Mock(spec=None, magics=None, side_effect=None, return_value=None, items=None)
+
+    Create a new ``Mock`` object. Mock takes several optional arguments. See initialisation_ for a summary of how these arguments specify the behaviour of the Mock object.
+
+Methods
+=======
+
+.. method:: Mock.reset()
+
+    The reset method resets all the call attributes on a mock object::
+
+        >>> mock = Mock()
+        >>> mock('hello')
+        >>> mock.called
+        True
+        >>> mock.reset()
+        >>> mock.called
+        False
+
+    This can be useful where you want to make a series of assertions that reuse the same object. Note that ``reset`` *doesn't* clear the return value, ``side_effect`` or any child attributes. Attributes you have set using normal assignment are also left in place. Child mocks and the return value mock (if any) are reset as well.
+
+
+.. method:: Mock.assert_called_with(*args, **kwargs)
+
+    This method is a convenient way of asserting that calls are made in a particular way::
+
+        >>> mock = Mock()
+        >>> mock.method(1, 2, 3, test='wow')
+        >>> mock.method.assert_called_with(1, 2, 3, test='wow')
+
+
+
+Initialisation
+==============
+
+``Mock`` has several optional arguments:
+
+* ``spec``: This can be either a list of strings or takes an existing object as the specification for the mock object. All attributes on the object (whether a class or an instance) are allowed, but accessing any other attributes will raise an ``AttributeError``. Passing in an object as the spec argument is the equivalent of passing in a list of strings to ``method`` with all the attributes on the object.
+
+* ``magics``: XXXX
+
+* ``return_value``: The value returned when the mock is called. By default this is a new Mock (created on first access). See the :attr:`Mock.return_value` attribute.
+
+* ``side_effect``: A function to be called whenever the Mock is called. See the :attr:`Mock.side_effect` attribute.
+
+* ``items``: XXXX
+
+
+Calling
+=======
+    
+Mock objects are callable. The call will return the value set as the :attr:`Mock.return_value` attribute. The default return value is a new Mock object; it is created the first time the return value is accessed (either explicitly or by calling the Mock) - but it is stored and the same one returned each time.
+
+Calls made to the object will be recorded in the attributes_.
+
+If :attr:`Mock.side_effect` is set then it will be called after the call has been recorded but before any value is returned.
+
+
+Attributes
+==========
+
+.. attribute:: Mock.called
+
+    A boolean representing whether or not the mock object has been called::
+
+        >>> mock = Mock()
+        >>> mock.called
+        False
+        >>> mock()
+        >>> mock.called
+        True
+    
+
+.. attribute:: Mock.return_value
+
+    Set this to configure the value returned by calling the mock::
+
+        >>> mock = Mock()
+        >>> mock.return_value = 'fish'
+        >>> mock()
+        'fish'
+    
+    The default return value is a mock object and you can configure it in the normal way::
+
+        >>> mock = Mock()
+        >>> mock.return_value.attribute = sentinel.Attribute
+        >>> mock.return_value()
+        >>> mock.return_value.assert_called_with()
+
+
+.. attribute:: Mock.side_effect
+
+    Sometimes when a mock is called you want to raise an exception (to test exception handling of an API) or return values from a sequence instead of a single value. These can be achieved with the ``side_effect`` attribute::
+
+        >>> from mock import Mock
+        >>> mock = Mock()
+        >>> def side_effect():
+        ...     raise Exception('Boom!')
+        ... 
+        >>> mock.side_effect = side_effect
+        >>> mock()
+        Traceback (most recent call last):
+          ...
+        Exception: Boom!
+    
+        >>> results = [1, 2, 3]
+        >>> def side_effect():
+        ...     mock.return_value = results.pop()
+        ... 
+        >>> mock.side_effect = side_effect
+        >>> mock(), mock(), mock()
+        (3, 2, 1)
+
+
+.. attribute:: Mock.call_args
+
+    This is either ``None`` (if the mock hasn't been called), or the arguments that the mock was last called with. This will be in the form of a tuple: the first member is any ordered arguments the mock was called with (or an empty tuple) and the second member is any keyword arguments (or an empty dictionary)::
+
+        >>> mock = Mock()
+        >>> print mock.call_args
+        None
+        >>> mock()
+        >>> mock.call_args
+        ((), {})
+        >>> 
+        >>> mock(3, 4, 5, key='fish', next='w00t!')
+        >>> mock.call_args
+        ((3, 4, 5), {'key': 'fish', 'next': 'w00t!'})
+
+
+.. attribute:: Mock.call_args_list
+
+    This is a list of all the calls made to the mock object in sequence. Before any calls have been made it is an empty list::
+
+        >>> mock = Mock()
+        >>> mock()
+        >>> mock(3, 4, 5, key='fish', next='w00t!')
+        >>> mock.call_args_list
+        [((), {}), ((3, 4, 5), {'key': 'fish', 'next': 'w00t!'})]
+
+
+.. attribute:: Mock.method_calls
+
+    As well as tracking calls to themselves, mocks also track calls to methods and attributes, and *their* methods and attributes::
+
+        >>> mock = Mock()
+        >>> mock.method()
+        >>> mock.property.method.attribute()
+        >>> mock.method_calls
+        [('method', (), {}), ('property.method.attribute', (), {})]
+
+
+.. attribute:: Mock._items
+
+    XXXX
+    
+MakeMock
+========
+
+.. function:: MakeMock(magics=[])
+
+XXXX
+    

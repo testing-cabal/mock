@@ -1,0 +1,87 @@
+====================================
+ Mock - Mocking and Testing Library
+====================================
+
+:Author: `Michael Foord <http://www.voidspace.org.uk/python/weblog/index.shtml>`_
+:Version: Mock 0.5.0
+:Date: 2008/XX/XX
+:Homepage: `Mock Homepage`_
+:License: `BSD License`_
+:Support: `Testing in Python Email List <XXXX>`_
+:Contact: fuzzyman@voidspace.org.uk
+
+.. _Mock Homepage: http://www.voidspace.org.uk/python/mock.html
+.. _BSD License: http://www.voidspace.org.uk/python/license.shtml
+
+
+Introduction
+============
+
+There are already several Python mocking libraries available, so why another one?
+
+Most mocking libraries follow the 'record -> replay' pattern of mocking. I
+prefer the 'action -> assertion' pattern, which is more readable and intuitive
+particularly when working with the Python `unittest module
+<http://docs.python.org/lib/module-unittest.html>`_. For a discussion of the
+merits of the two approaches, see `Mocking, Patching, Stubbing: all that Stuff
+<http://www.voidspace.org.uk/python/articles/mocking.shtml>`_.
+
+``mock`` provides a core :class:`mock.Mock` class that is intended to reduce the need to
+create a host of trivial stubs throughout your test suite. After performing an
+action, you can make assertions about which methods / attributes were used and
+arguments they were called with. You can also specify return values and set
+specific attributes in the normal way.
+
+It also provides a :func:`mock.patch` decorator that handles patching module and class
+level attributes within the scope of a test, along with :data:`mock.sentinel` for 
+creating unique objects.
+
+Downloading
+===========
+
+The current version is **0.5.0**, dated XXth November 2008. Mock is still 
+experimental; the API may change. If you find bugs or 
+have suggestions for improvements / extensions then please email me.
+
+* `mock.py (module only) <http://www.voidspace.org.uk/downloads/mock.py>`_
+* `mock-0.5.0.zip (module, tests and documentation) <http://www.voidspace.org.uk/downloads/mock-0.5.0.zip>`_
+* `mock.txt (documentation) <http://www.voidspace.org.uk/python/docs/mock.txt>`_
+* `Google Code Home & Subversion Repository <http://code.google.com/p/mock/>`_
+
+You can checkout the latest development version from the Google Code Subversion 
+repository with the following command:
+
+    ``svn checkout http://mock.googlecode.com/svn/trunk/ mock-read-only``
+
+The are now eggs  (for Python 2.4-2.6) up on the `Mock Cheeseshop Page <http://pypi.python.org/pypi/mock/>`_. 
+If you have setuptools you should be able to install mock with:
+
+    ``easy_install mock``
+
+
+Documentation
+=============
+
+.. toctree::
+   :maxdepth: 2
+   
+   mock
+   patch
+   sentinel
+
+
+User Guide
+==========
+
+.. toctree::
+   :maxdepth: 2
+
+   getting-started
+   examples
+   todo
+   changelog
+
+
+
+
+
