@@ -17,15 +17,6 @@
 Introduction
 ============
 
-There are already several Python mocking libraries available, so why another one?
-
-Most mocking libraries follow the 'record -> replay' pattern of mocking. I
-prefer the 'action -> assertion' pattern, which is more readable and intuitive
-particularly when working with the Python `unittest module
-<http://docs.python.org/lib/module-unittest.html>`_. For a discussion of the
-merits of the two approaches, see `Mocking, Patching, Stubbing: all that Stuff
-<http://www.voidspace.org.uk/python/articles/mocking.shtml>`_.
-
 ``mock`` provides a core :class:`mock.Mock` class that is intended to reduce the need to
 create a host of trivial stubs throughout your test suite. After performing an
 action, you can make assertions about which methods / attributes were used and
@@ -35,6 +26,14 @@ specific attributes in the normal way.
 It also provides a :func:`mock.patch` decorator that handles patching module and class
 level attributes within the scope of a test, along with :data:`mock.sentinel` for 
 creating unique objects.
+
+Most mocking libraries follow the 'record -> replay' pattern of mocking. I
+prefer the 'action -> assertion' pattern, which is more readable and intuitive
+particularly when working with the Python `unittest module
+<http://docs.python.org/lib/module-unittest.html>`_. For a discussion of the
+merits of the two approaches, see `Mocking, Patching, Stubbing: all that Stuff
+<http://www.voidspace.org.uk/python/articles/mocking.shtml>`_.
+
 
 Downloading
 ===========
@@ -59,8 +58,8 @@ If you have setuptools you should be able to install mock with:
     ``easy_install mock``
 
 
-Documentation
-=============
+API Documentation
+=================
 
 .. toctree::
    :maxdepth: 2
@@ -82,6 +81,9 @@ User Guide
    changelog
 
 
+References
+==========
 
+XXXX
 
 
