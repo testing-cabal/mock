@@ -7,16 +7,42 @@
 .. moduleauthor:: Michael Foord <fuzzyman@voidspace.org.uk>
 .. sectionauthor:: Michael Foord <fuzzyman@voidspace.org.uk>
 
+
+``Mock`` is a flexible mock object intended to replace the use of stubs and test doubles throughout your code. Mocks are callable and create attributes as new mocks when you access them [#]_. Accessing the same attribute will always return the same mock. Mocks record how you use them, allowing you to make assertions about what your code has done to them.
+
+The :func:`mock.patch` decorators allow you to easily replace classes in a particular module with a Mock object just for the duration of a test.
+
+
 .. class:: Mock(spec=None, magics=None, side_effect=None, return_value=None, items=None)
 
-    Create a new ``Mock`` object. Mock takes several optional arguments. See initialisation_ for a summary of how these arguments specify the behaviour of the Mock object.
+    Create a new ``Mock`` object. ``Mock`` takes several optional arguments that specify the behaviour of the Mock object:
+
+    * ``spec``: This can be either a list of strings or an existing object (a class or instance) that acts as the specification for the mock object. If you pass in an object then a list of strings is formed by calling dir on the object (excluding unhandled magic attributes and methods). Accessing any attribute  not in this list will raise an ``AttributeError``. If the list contains any supported magic methods then the mock instance returned will have these methods. See `Mocking Magic Methods`_.
+
+    * ``magics``: This can be a list of strings, or a single space separated string, listing the magic (protocol) methods the mock should have. For convenience the method names should not have the leading or trailing double underscores. Currently only container methods are supported. ``magics`` is ignored if the ``spec`` parameter is used.
+    
+      The following two ways of passing in a list of magic methods are equivalent:
+      
+      .. doctest::
+      
+        >>> mock = Mock(magics=['getitem', 'setitem'])
+        >>> mock = Mock(magics='getitem setitem')
+
+    * ``return_value``: The value returned when the mock is called. By default this is a new Mock (created on first access). See the :attr:`Mock.return_value` attribute.
+
+    * ``side_effect``: A function to be called whenever the Mock is called. See the :attr:`Mock.side_effect` attribute. Useful for raising exceptions or dynamically changing return values.
+
+    * ``items``: Used for mocking container objects. See `Mocking Magic Methods`_ and the :attr:`Mock._items` attribute.
+
 
 Methods
 =======
 
 .. method:: Mock.reset()
 
-    The reset method resets all the call attributes on a mock object::
+    The reset method resets all the call attributes on a mock object:
+    
+    .. doctest::
 
         >>> mock = Mock()
         >>> mock('hello')
@@ -27,32 +53,19 @@ Methods
         False
 
     This can be useful where you want to make a series of assertions that reuse the same object. Note that ``reset`` *doesn't* clear the return value, ``side_effect`` or any child attributes. Attributes you have set using normal assignment are also left in place. Child mocks and the return value mock (if any) are reset as well.
+    
+    If you passed in an ``items`` argument when the mock was constructed, or set the :attr:`Mock._items` attribute, to one of the built-in container types (dict, tuple, set, list) then reset will replace the current value with a copy of the original.
 
 
 .. method:: Mock.assert_called_with(*args, **kwargs)
 
-    This method is a convenient way of asserting that calls are made in a particular way::
+    This method is a convenient way of asserting that calls are made in a particular way:
 
+    .. doctest::
+    
         >>> mock = Mock()
         >>> mock.method(1, 2, 3, test='wow')
         >>> mock.method.assert_called_with(1, 2, 3, test='wow')
-
-
-
-Initialisation
-==============
-
-``Mock`` has several optional arguments:
-
-* ``spec``: This can be either a list of strings or takes an existing object as the specification for the mock object. All attributes on the object (whether a class or an instance) are allowed, but accessing any other attributes will raise an ``AttributeError``. Passing in an object as the spec argument is the equivalent of passing in a list of strings to ``method`` with all the attributes on the object.
-
-* ``magics``: XXXX
-
-* ``return_value``: The value returned when the mock is called. By default this is a new Mock (created on first access). See the :attr:`Mock.return_value` attribute.
-
-* ``side_effect``: A function to be called whenever the Mock is called. See the :attr:`Mock.side_effect` attribute.
-
-* ``items``: XXXX
 
 
 Calling
@@ -70,7 +83,9 @@ Attributes
 
 .. attribute:: Mock.called
 
-    A boolean representing whether or not the mock object has been called::
+    A boolean representing whether or not the mock object has been called:
+
+    .. doctest::
 
         >>> mock = Mock()
         >>> mock.called
@@ -82,7 +97,9 @@ Attributes
 
 .. attribute:: Mock.return_value
 
-    Set this to configure the value returned by calling the mock::
+    Set this to configure the value returned by calling the mock:
+
+    .. doctest::
 
         >>> mock = Mock()
         >>> mock.return_value = 'fish'
@@ -163,10 +180,18 @@ Attributes
 
     XXXX
     
+    
+Mocking Magic Methods
+=====================    
+    
+XXXX    
+    
 MakeMock
 ========
 
 .. function:: MakeMock(magics=[])
 
 XXXX
+
+.. [#] The only exceptions are magic methods and attributes (those that have leading and trailing double underscores). Mock doesn't create these but instead of raises an ``AttributeError``. This is because the interpreter will often implicitly request these methods, and gets *very* confused to get a new Mock object when it expects a magic method. This doesn't include the explicitly requested magic methods which are supported in a slightly different way.
     
