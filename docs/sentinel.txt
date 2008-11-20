@@ -2,7 +2,7 @@
  Sentinel
 ==========
 
-.. module:: mock
+.. currentmodule:: mock
 
 .. data:: sentinel
 
