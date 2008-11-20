@@ -2,15 +2,16 @@
  The Mock Class
 ================
 
-.. module:: mock
-   :synopsis: Mock object and testing tool library.
-.. moduleauthor:: Michael Foord <fuzzyman@voidspace.org.uk>
-.. sectionauthor:: Michael Foord <fuzzyman@voidspace.org.uk>
+.. currentmodule:: mock
 
+
+.. testsetup::
+
+    from mock import Mock, sentinel
 
 ``Mock`` is a flexible mock object intended to replace the use of stubs and test doubles throughout your code. Mocks are callable and create attributes as new mocks when you access them [#]_. Accessing the same attribute will always return the same mock. Mocks record how you use them, allowing you to make assertions about what your code has done to them.
 
-The :func:`mock.patch` decorators allow you to easily replace classes in a particular module with a Mock object just for the duration of a test.
+The :func:`mock.patch` decorators makes it easy to temporarily replace classes in a particular module with a Mock object.
 
 
 .. class:: Mock(spec=None, magics=None, side_effect=None, return_value=None, items=None)
@@ -46,6 +47,7 @@ Methods
 
         >>> mock = Mock()
         >>> mock('hello')
+        <mock.Mock object at 0x...>
         >>> mock.called
         True
         >>> mock.reset()
@@ -65,6 +67,7 @@ Methods
     
         >>> mock = Mock()
         >>> mock.method(1, 2, 3, test='wow')
+        <mock.Mock object at 0x...>
         >>> mock.method.assert_called_with(1, 2, 3, test='wow')
 
 
@@ -87,7 +90,7 @@ Attributes
 
     .. doctest::
 
-        >>> mock = Mock()
+        >>> mock = Mock(return_value=None)
         >>> mock.called
         False
         >>> mock()
@@ -106,20 +109,24 @@ Attributes
         >>> mock()
         'fish'
     
-    The default return value is a mock object and you can configure it in the normal way::
+    The default return value is a mock object and you can configure it in the normal way:
+    
+    .. doctest::
 
         >>> mock = Mock()
         >>> mock.return_value.attribute = sentinel.Attribute
         >>> mock.return_value()
+        <mock.Mock object at 0x...>
         >>> mock.return_value.assert_called_with()
 
 
 .. attribute:: Mock.side_effect
 
-    Sometimes when a mock is called you want to raise an exception (to test exception handling of an API) or return values from a sequence instead of a single value. These can be achieved with the ``side_effect`` attribute::
+    Sometimes when a mock is called you want to raise an exception (to test exception handling of an API) or return values from a sequence instead of a single value. These can be achieved with the ``side_effect`` attribute:
+    
+    .. doctest::
 
-        >>> from mock import Mock
-        >>> mock = Mock()
+        >>> mock = Mock(return_value=None)
         >>> def side_effect():
         ...     raise Exception('Boom!')
         ... 
@@ -140,9 +147,11 @@ Attributes
 
 .. attribute:: Mock.call_args
 
-    This is either ``None`` (if the mock hasn't been called), or the arguments that the mock was last called with. This will be in the form of a tuple: the first member is any ordered arguments the mock was called with (or an empty tuple) and the second member is any keyword arguments (or an empty dictionary)::
+    This is either ``None`` (if the mock hasn't been called), or the arguments that the mock was last called with. This will be in the form of a tuple: the first member is any ordered arguments the mock was called with (or an empty tuple) and the second member is any keyword arguments (or an empty dictionary):
+    
+    .. doctest::
 
-        >>> mock = Mock()
+        >>> mock = Mock(return_value=None)
         >>> print mock.call_args
         None
         >>> mock()
@@ -156,36 +165,66 @@ Attributes
 
 .. attribute:: Mock.call_args_list
 
-    This is a list of all the calls made to the mock object in sequence. Before any calls have been made it is an empty list::
+    This is a list of all the calls made to the mock object in sequence. Before any calls have been made it is an empty list:
+    
+    .. doctest::
 
         >>> mock = Mock()
         >>> mock()
+        <mock.Mock object at 0x...>
         >>> mock(3, 4, 5, key='fish', next='w00t!')
+        <mock.Mock object at 0x...>
         >>> mock.call_args_list
         [((), {}), ((3, 4, 5), {'key': 'fish', 'next': 'w00t!'})]
 
 
 .. attribute:: Mock.method_calls
 
-    As well as tracking calls to themselves, mocks also track calls to methods and attributes, and *their* methods and attributes::
+    As well as tracking calls to themselves, mocks also track calls to methods and attributes, and *their* methods and attributes:
+    
+    .. doctest::
 
         >>> mock = Mock()
         >>> mock.method()
+        <mock.Mock object at 0x...>
         >>> mock.property.method.attribute()
+        <mock.Mock object at 0x...>
         >>> mock.method_calls
         [('method', (), {}), ('property.method.attribute', (), {})]
 
 
+.. note::
+
+    If you pass in one of the built-in container types (list, dictionary, tuple or set) as the ``items`` keyword argument, then it is actually a shallow copy of this that is set as the ``_items`` attribute. This is so that :meth:`Mock.reset` can restore ``_items`` to a copy of the original.
+
 .. attribute:: Mock._items
 
-    XXXX
+    Mock objects only have an ``_items`` attribute if they have any of the container magic methods (i.e. were created with an appropriate ``spec`` or ``magics`` argument). The default value for ``_items`` is None, but it will be replaced with any object passed in as the ``items`` keyword argument to the Mock constructor.
     
-    
+.. index:: Magic Methods
+
 Mocking Magic Methods
 =====================    
     
-XXXX    
-    
+Mock is capable of mocking out objects that support some of the Python protocols methods; the magic methods that start and end with double underscores. The currently supported methods are all the methods used by the mapping and sequence protocols (for container objects):
+
+* __getitem__
+* __setitem__
+* __delitem__
+* __iter__
+* __len__
+* __contains__
+* __nonzero__
+
+It supports them by delegating these method calls to an underlying real container object (e.g. a dictionary or list) that you either pass in as the ``items`` keyword argument to the constructor or set as the ``_items`` attribute. You can control how the mock object responds to these methods by controlling what is in the underlying container. The method calls are recorded in the :attr:`Mock.method_calls` attribute, allowing you to make assertions about how it has been used.
+
+Mock objects don't unconditionally implement all of these magic methods though; this could break duck typing in the code under test. Instead Mocks conditionally implement magic methods specified by the ``spec`` or ``magics`` keyword argument. Under the hood this is implemented using the :function:`MakeMock` function, which creates custom subclasses of mock that only 
+
+
+
+(passing in a spec object that has any of these methods or including them in the list of valid attributes),  (a list of magic methods as strings without the leading and trailing double underscores - or as a single string with space separated).
+
+
 MakeMock
 ========
 

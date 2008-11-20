@@ -14,6 +14,10 @@
 .. _BSD License: http://www.voidspace.org.uk/python/license.shtml
 
 
+.. module:: mock
+   :synopsis: Mock object and testing tool library.
+
+
 Introduction
 ============
 
@@ -84,6 +88,10 @@ User Guide
 References
 ==========
 
-XXXX
+Articles and blog entries on testing with Mock:
+
+* `How To Test Django Template Tags <http://techblog.ironfroggy.com/2008/10/how-to-test.html>`_
+* `A presentation on Unit Testing with Mock <http://pypap.blogspot.com/2008/10/newbie-nugget-unit-testing-with-mock.html>`_
+* `Mocking with Django and Google AppEngine <http://michael-a-nelson.blogspot.com/2008/09/mocking-with-django-and-google-app.html>`_
 
 
