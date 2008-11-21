@@ -7,10 +7,10 @@
 :Date: 2008/XX/XX
 :Homepage: `Mock Homepage`_
 :License: `BSD License`_
-:Support: `Testing in Python Email List <XXXX>`_
+:Support: `Testing in Python Email List <http://lists.idyll.org/listinfo/testing-in-python>`_
 :Contact: fuzzyman@voidspace.org.uk
 
-.. _Mock Homepage: http://www.voidspace.org.uk/python/mock.html
+.. _Mock Homepage: http://www.voidspace.org.uk/python/mock/
 .. _BSD License: http://www.voidspace.org.uk/python/license.shtml
 
 
@@ -48,7 +48,6 @@ have suggestions for improvements / extensions then please email me.
 
 * `mock.py (module only) <http://www.voidspace.org.uk/downloads/mock.py>`_
 * `mock-0.5.0.zip (module, tests and documentation) <http://www.voidspace.org.uk/downloads/mock-0.5.0.zip>`_
-* `mock.txt (documentation) <http://www.voidspace.org.uk/python/docs/mock.txt>`_
 * `Google Code Home & Subversion Repository <http://code.google.com/p/mock/>`_
 
 You can checkout the latest development version from the Google Code Subversion 
