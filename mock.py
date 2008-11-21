@@ -4,7 +4,7 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 
 # mock 0.5.0
-# http://www.voidspace.org.uk/python/mock.html
+# http://www.voidspace.org.uk/python/mock/
 
 # Released subject to the BSD License
 # Please see http://www.voidspace.org.uk/python/license.shtml
