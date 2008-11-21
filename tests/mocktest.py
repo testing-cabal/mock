@@ -12,9 +12,9 @@ if not this_dir in sys.path:
 
 if 'mocktest' in sys.modules:
     # Fix for running tests under Wing
-    import UnitTests
+    import tests
     import mocktest
-    UnitTests.mocktest = mocktest
+    tests.mocktest = mocktest
 
 from testcase import TestCase
 from testutils import RunTests

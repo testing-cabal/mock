@@ -8,9 +8,9 @@ import sys
 if not os.getcwd() in sys.path:
     sys.path.append(os.getcwd())
 
-import UnitTests
+import tests
 
 from testutils import MakeSuite, RunTests
 
-tests = MakeSuite(UnitTests)
-RunTests(suite=tests, verbosity=2)
+suite = MakeSuite(tests)
+RunTests(suite=suite, verbosity=2)

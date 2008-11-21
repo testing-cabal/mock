@@ -1,2 +1,2 @@
-python UnitTests\alltests.py
+python tests\alltests.py
 pause

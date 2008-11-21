@@ -56,8 +56,7 @@ class Mock(object):
         self._parent = parent
         self._name = name
         if spec is not None and not isinstance(spec, list):
-            spec = [member for member in dir(spec) if not 
-                       (member.startswith('__') and  member.endswith('__'))]
+            spec = [member for member in dir(spec) if not _is_magic(member)]
         self._methods = spec
         self._children = {}
         self._return_value = return_value
