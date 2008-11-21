@@ -4,6 +4,7 @@
 
 .. currentmodule:: mock
 
+.. contents::
 
 .. testsetup::
 
