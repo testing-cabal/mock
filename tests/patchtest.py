@@ -11,9 +11,9 @@ if this_dir not in sys.path:
 
 if 'patchtest' in sys.modules:
     # Fix for running tests under Wing
-    import UnitTests
+    import tests
     import patchtest
-    UnitTests.patchtest = patchtest
+    tests.patchtest = patchtest
     
 from testcase import TestCase
 from testutils import RunTests
@@ -86,10 +86,10 @@ class PatchTest(TestCase):
             
         self.assertEquals(__main__.something, sentinel.Something, "patch not restored")
                 
-        import UnitTests.patchtest as PTModule
+        import tests.patchtest as PTModule
         
-        @patch('UnitTests.patchtest.something', sentinel.Something2)
-        @patch('UnitTests.patchtest.something_else', sentinel.SomethingElse)
+        @patch('tests.patchtest.something', sentinel.Something2)
+        @patch('tests.patchtest.something_else', sentinel.SomethingElse)
         def test():
             self.assertEquals(PTModule.something, sentinel.Something2, "unpatched")
             self.assertEquals(PTModule.something_else, sentinel.SomethingElse, "unpatched")
@@ -116,9 +116,9 @@ class PatchTest(TestCase):
 
         
     def testPatchClassAttribute(self):
-        import UnitTests.patchtest as PTModule
+        import tests.patchtest as PTModule
 
-        @patch('UnitTests.patchtest.SomeClass.class_attribute', sentinel.ClassAttribute)
+        @patch('tests.patchtest.SomeClass.class_attribute', sentinel.ClassAttribute)
         def test():
             self.assertEquals(PTModule.SomeClass.class_attribute, sentinel.ClassAttribute, "unpatched")
         test()   
@@ -165,7 +165,7 @@ class PatchTest(TestCase):
 
         
     def testPatchWithSpec(self):
-        @patch('UnitTests.patchtest.SomeClass', spec=SomeClass)
+        @patch('tests.patchtest.SomeClass', spec=SomeClass)
         def test(MockSomeClass):
             self.assertEquals(SomeClass, MockSomeClass)
             self.assertTrue(isinstance(SomeClass.wibble, Mock))
@@ -185,7 +185,7 @@ class PatchTest(TestCase):
 
         
     def testPatchWithSpecAsList(self):
-        @patch('UnitTests.patchtest.SomeClass', spec=['wibble'])
+        @patch('tests.patchtest.SomeClass', spec=['wibble'])
         def test(MockSomeClass):
             self.assertEquals(SomeClass, MockSomeClass)
             self.assertTrue(isinstance(SomeClass.wibble, Mock))
@@ -205,7 +205,7 @@ class PatchTest(TestCase):
         
         
     def testPatchWithMagics(self):
-        @patch('UnitTests.patchtest.SomeClass', magics=['getitem', 'setitem'])
+        @patch('tests.patchtest.SomeClass', magics=['getitem', 'setitem'])
         def test(MockSomeClass):
             MockSomeClass[0] = 'broom'
             self.assertEquals(MockSomeClass[0], 'broom')
@@ -225,7 +225,7 @@ class PatchTest(TestCase):
     def testNestedPatchWithSpecAsList(self):
         # regression test for nested decorators
         @patch('__builtin__.open')
-        @patch('UnitTests.patchtest.SomeClass', spec=['wibble'])
+        @patch('tests.patchtest.SomeClass', spec=['wibble'])
         def test(MockSomeClass, MockOpen):
             self.assertEquals(SomeClass, MockSomeClass)
             self.assertTrue(isinstance(SomeClass.wibble, Mock))
@@ -235,7 +235,7 @@ class PatchTest(TestCase):
         
         
     def testPatchWithSpecAsBoolean(self):
-        @patch('UnitTests.patchtest.SomeClass', spec=True)
+        @patch('tests.patchtest.SomeClass', spec=True)
         def test(MockSomeClass):
             self.assertEquals(SomeClass, MockSomeClass)
             # Should not raise attribute error
@@ -247,7 +247,7 @@ class PatchTest(TestCase):
       
         
     def testPatchObjectWithSpecAsBoolean(self):
-        from UnitTests import patchtest
+        from tests import patchtest
         @patch_object(patchtest, 'SomeClass', spec=True)
         def test(MockSomeClass):
             self.assertEquals(SomeClass, MockSomeClass)
