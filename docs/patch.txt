@@ -5,13 +5,6 @@
 
 .. currentmodule:: mock
 
-.. testsetup::
-
-    import os, sys
-    if not os.getcwd() in sys.path:
-        sys.path.append(os.getcwd())
-    from mock import Mock, sentinel, MakeMock
-
 
 The patch decorators are used for patching objects only within the scope of the function they decorate. They automatically handle the unpatching for you, even if exceptions are raised.	   
 
@@ -19,7 +12,7 @@ The patch decorators are used for patching objects only within the scope of the 
 patch
 =====
 
-.. function:: patch(target, new=None)
+.. function:: patch(target, new=None, spec=None, magics=None)
 
 ``patch`` decorates a function. Inside the body of the function, the ``target`` (specified in the form 'PackageName.ModuleName.ClassName') is patched with a ``new`` object. When the function exits the patch is undone.
 
@@ -28,7 +21,7 @@ The target is imported and the specified attribute patched with the new object -
 If ``new`` is omitted, then a new ``Mock`` is created and passed in as an extra argument to the decorated function::
 
    @patch('Package.ModuleName.ClassName')
-   def test_something(self, mockClass):
+   def test_something(self, MockClass):
        # ...
 
 
@@ -54,6 +47,19 @@ When calling with the two argument form you omit the replacement object, and a m
 Nesting Patch Decorators
 ========================
 
-XXXX
+If you want to perform multiple patches then you can simply stack up the decorators.
 
-If you want to perform multiple patches then you can simply stack up the decorators on a function if you particularly feel the need.
+You can stack up multiple patch decorators using this pattern:
+
+::
+
+    @patch('Module.ClassName1')
+    @patch('Module.ClassName2')
+    def testMethod(self, MockClass1, MockClass2):
+        ClassName1()
+        ClassName2()
+        self.assertEquals(MockClass1.called, "ClassName1 not patched")
+        self.assertEquals(MockClass2.called, "ClassName2 not patched")
+
+
+
