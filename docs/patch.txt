@@ -24,12 +24,13 @@ If ``new`` is omitted, then a new ``Mock`` is created and passed in as an extra 
    def test_something(self, MockClass):
        # ...
 
+The ``spec`` and ``magics`` keyword arguments are passed to the ``Mock`` if patch is creating one for you. In addition you can pass ``spec=True``, which causes patch to pass in the object being mocked as the spec object. If you are using patch to mock out a class, then the object you are interested in will probably be the return value of the Mock (the instance it returns when called)
 
 
 patch_object
 ============
 
-.. function:: patch_object(target, attribute, new=None)
+.. function:: patch_object(target, attribute, new=None, spec=None, magics=None)
 
     ``patch_object`` patches named members on objects - usually class or module objects.
 
@@ -42,6 +43,8 @@ When calling with the two argument form you omit the replacement object, and a m
         SomeClass.classmethod(3)
         
         mockMethod.assert_called_with(3) 
+
+``spec`` and ``magics`` have the same meaning as for the patch decorator.
 
 
 Nesting Patch Decorators

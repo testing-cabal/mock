@@ -4,7 +4,7 @@
 
 Contributions and comments welcomed!
 
-Should passing in spec *and* magics raise an exception? (Currently if you do this, XXXX is ignored.)
+Should passing in spec *and* magics raise an exception? (Currently if you do this, magics is ignored.)
 
 Keyword arguments to patch and patch_object to create a 
 comparable or container-like Mock. (cmp, container).
@@ -19,6 +19,13 @@ possible as all children will be mocks rather than magic mocks)
 
 Should attributes (children) on mocks created from MakeMock be plain 'Mock' or from the
 same class as their parent? (currently they are plain mocks)
+
+When mocking a class with ``patch``, passing in ``spec=True`` is not that useful as you 
+typically want to configure the *return values* of the mock (the instances of the class
+you are mocking). ``spec`` and ``magics`` keyword arguments could be stored by the Mock
+and used to create the return value Mock. This would only be a nuisance if your class
+instances are also callable (although we could make it so that the return values of
+instances don't inherit spec or magics.)
 
 Magic methods still to implement (all of them except container methods currently):
 
@@ -38,8 +45,6 @@ in the destructor. This would be useful in itself, but violates TOOWTDI and woul
 for IronPython (non-deterministic calling of destructors).
 
 A context manager version of patch (also violates TOOWTDI but might be a nice pattern),
-
-'spec=True' keyword to patch to use the object it is patching as the spec argument?
 
 There are various disadvantages and things that Mock doesn't (yet) do. 
 
