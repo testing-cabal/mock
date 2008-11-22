@@ -160,9 +160,9 @@ Sometimes you want to mock up a more complex situation, like for example ``mock.
 
     >>> mock = Mock()
     >>> cursor = mock.connection.cursor.return_value
+    >>> cursor.execute.return_value = None
     >>>
     >>> mock.connection.cursor().execute("SELECT 1")
-    <mock.Mock object at 0x...>
     >>> mock.method_calls
     [('connection.cursor', (), {})]
     >>> cursor.method_calls
@@ -238,8 +238,8 @@ If you are patching a module (including ``__builtin__``) then use patch instead 
     ...     return open('filename', 'r')
     ...
     >>> handle = test()
-    >>> self.assertEquals(mock.call_args, (('filename', 'r'), {}), "open not called correctly")
-    >>> self.assertEquals(handle, sentinel.Handle, "incorrect file handle returned")
+    >>> mock.assert_called_with('filename', 'r')
+    >>> assert handle == sentinel.Handle, "incorrect file handle returned"
     
 The module name can be 'dotted', in the form ``package.module`` if needed.
 
