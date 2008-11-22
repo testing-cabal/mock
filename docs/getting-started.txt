@@ -132,9 +132,7 @@ The two decorators are 'patch' and 'patch_object'. 'patch' takes a single string
     test()
 
 
-If you don't want to call the decorated test function yourself, you can add ``apply`` as a decorator on top:
-
-::
+If you don't want to call the decorated test function yourself, you can add ``apply`` as a decorator on top::
 
     @apply
     @patch('Package.Module.attribute', sentinel.Attribute)
@@ -142,19 +140,14 @@ If you don't want to call the decorated test function yourself, you can add ``ap
         # do something
 
 
-A nice pattern is to actually decorate test methods themselves:
-
-::
+A nice pattern is to actually decorate test methods themselves::
 
     @patch('Package.Module.attribute', sentinel.Attribute)
     def testMethod(self):
         # do something
-    {-coloring}
     
 
-If you want to patch with a Mock, you can use ``patch`` with only one argument (or ``patch_object`` with two arguments). The mock will be created for you and passed into the test function / method:
-
-::
+If you want to patch with a Mock, you can use ``patch`` with only one argument (or ``patch_object`` with two arguments). The mock will be created for you and passed into the test function / method::
 
     @patch('Package.Module.Class')
     def testMethod(self, mMckClass):
