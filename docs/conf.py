@@ -152,7 +152,7 @@ htmlhelp_basename = 'Mockdoc'
 #latex_paper_size = 'letter'
 
 # The font size ('10pt', '11pt' or '12pt').
-#latex_font_size = '10pt'
+latex_font_size = '12pt'
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
@@ -176,4 +176,4 @@ latex_documents = [
 #latex_appendices = []
 
 # If false, no module index is generated.
-#latex_use_modindex = True
+latex_use_modindex = False
