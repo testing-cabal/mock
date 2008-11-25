@@ -18,11 +18,10 @@ __all__ = (
     'MakeMock',
     'patch',
     'patch_object',
-    'sentinel',
-    '__version__'
+    'sentinel'
 )
 
-__version__ = '0.5.0'
+__version__ = '0.5.0 alpha'
 
 DEFAULT = object()
 
