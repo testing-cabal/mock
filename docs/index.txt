@@ -6,6 +6,7 @@
 :Version: Mock 0.5.0
 :Date: 2008/XX/XX
 :Homepage: `Mock Homepage`_
+:Documentation: `PDF Documentation </downloads/mock.pdf>`_
 :License: `BSD License`_
 :Support: `Testing in Python Email List <http://lists.idyll.org/listinfo/testing-in-python>`_
 :Contact: fuzzyman@voidspace.org.uk
@@ -41,6 +42,13 @@ merits of the two approaches, see `Mocking, Patching, Stubbing: all that Stuff
 
 Downloading
 ===========
+
+.. note::
+
+    These download links are for a not-yet-released version of Mock. To try version 0.5.0, checkout from
+    SVN or access it via the web at:
+    
+        http://code.google.com/p/mock/source/browse/trunk/mock.py
 
 The current version is **0.5.0**, dated XXth November 2008. Mock is still 
 experimental; the API may change. If you find bugs or 
