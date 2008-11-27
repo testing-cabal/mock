@@ -24,6 +24,9 @@ __all__ = (
 __version__ = '0.5.0 alpha'
 
 DEFAULT = object()
+class OldStyleClass:
+    pass
+ClassType = type(OldStyleClass)
 
 def _is_magic(name):
     return '__%s__' % name[2:-2] == name
@@ -56,6 +59,7 @@ class Mock(object):
         self._name = name
         if spec is not None and not isinstance(spec, list):
             spec = [member for member in dir(spec) if not _is_magic(member)]
+        
         self._methods = spec
         self._children = {}
         self._return_value = return_value
@@ -218,10 +222,15 @@ def _importer(target):
     return thing
 
 
-def _patch(target, attribute, new, spec, magics):
+def _patch(target, attribute, new, spec, magics, create):
         
     def patcher(func):
-        original = getattr(target, attribute)
+        try:
+            original = getattr(target, attribute)
+        except AttributeError:
+            if not create:
+                raise
+            original = DEFAULT
         if hasattr(func, 'restore_list'):
             func.restore_list.append((target, attribute, original))
             func.patch_list.append((target, attribute, new, spec, magics))
@@ -233,17 +242,26 @@ def _patch(target, attribute, new, spec, magics):
         def patched(*args, **keywargs):
             for index, (target, attribute, new, spec, magics) in enumerate(patch_list):
                 if new is DEFAULT:
+                    inherit = False
                     if spec == True:
                         # set spec to the object we are replacing
                         spec = restore_list[index][2]
+                        if isinstance(spec, (type, ClassType)):
+                            inherit = True
                     new = Mock(spec=spec, magics=magics)
                     args += (new,)
+                    if inherit:
+                        # deliberately ignoring magics as we are using spec
+                        new.return_value = Mock(spec=spec)
                 setattr(target, attribute, new)
             try:
                 return func(*args, **keywargs)
             finally:
                 for target, attribute, original in restore_list:
-                    setattr(target, attribute, original)
+                    if original is not DEFAULT:
+                        setattr(target, attribute, original)
+                    else:
+                        delattr(target, attribute)
                     
         patched.restore_list = restore_list
         patched.patch_list = patch_list
@@ -255,17 +273,17 @@ def _patch(target, attribute, new, spec, magics):
     return patcher
 
 
-def patch_object(target, attribute, new=DEFAULT, spec=None, magics=None):
-    return _patch(target, attribute, new, spec, magics)
+def patch_object(target, attribute, new=DEFAULT, spec=None, magics=None, create=False):
+    return _patch(target, attribute, new, spec, magics, create)
 
 
-def patch(target, new=DEFAULT, spec=None, magics=None):
+def patch(target, new=DEFAULT, spec=None, magics=None, create=False):
     try:
         target, attribute = target.rsplit('.', 1)    
     except (TypeError, ValueError):
         raise TypeError("Need a valid target to patch. You supplied: %r" % (target,))
     target = _importer(target)
-    return _patch(target, attribute, new, spec, magics)
+    return _patch(target, attribute, new, spec, magics, create)
 
 
 class SentinelObject(object):

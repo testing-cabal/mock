@@ -257,6 +257,67 @@ class PatchTest(TestCase):
             self.assertRaises(AttributeError, lambda: MockSomeClass.not_wibble)
             
         test()
+        
+    
+    def testPatchClassActsWithSpecIsInherited(self):
+        @patch('tests.patchtest.SomeClass', spec=True)
+        def test(MockSomeClass):
+            instance = MockSomeClass()
+            # Should not raise attribute error
+            instance.wibble
+            
+            self.assertRaises(AttributeError, lambda: instance.not_wibble)
+            
+        test()
+        
+        
+    def testPatchWithCreateMocksNonExistentAttributes(self):
+        @patch('__builtin__.frooble', sentinel.Frooble, create=True)
+        def test():
+            self.assertEquals(frooble, sentinel.Frooble)
+            
+        test()
+        self.assertRaises(NameError, lambda: frooble)
+        
+        
+    def testPatchObjectWithCreateMocksNonExistentAttributes(self):
+        @patch_object(SomeClass, 'frooble', sentinel.Frooble, create=True)
+        def test():
+            self.assertEquals(SomeClass.frooble, sentinel.Frooble)
+            
+        test()
+        self.assertFalse(hasattr(SomeClass, 'frooble'))
+        
+        
+    def testPatchWontCreateByDefault(self):
+        try:
+            @patch('__builtin__.frooble', sentinel.Frooble)
+            def test():
+                self.assertEquals(frooble, sentinel.Frooble)
+                
+            test()
+        except AttributeError:
+            pass
+        else:
+            self.fail('Patching non existent attributes should fail')
+            
+        self.assertRaises(NameError, lambda: frooble)
+        
+        
+    def testPatchObjecWontCreateByDefault(self):
+        try:
+            @patch_object(SomeClass, 'frooble', sentinel.Frooble)
+            def test():
+                self.assertEquals(SomeClass.frooble, sentinel.Frooble)
+                
+            test()
+        except AttributeError:
+            pass
+        else:
+            self.fail('Patching non existent attributes should fail')
+            
+        self.assertFalse(hasattr(SomeClass, 'frooble'))
+        
 
         
 if __name__ == '__main__':

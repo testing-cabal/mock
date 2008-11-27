@@ -2,7 +2,7 @@
  TODO and Limitations
 ======================
 
-Contributions and comments welcomed!
+Contributions, bug reports and comments welcomed!
 
 Should passing in spec *and* magics raise an exception? (Currently if you do this, magics is ignored.)
 
@@ -20,12 +20,10 @@ possible as all children will be mocks rather than magic mocks)
 Should attributes (children) on mocks created from MakeMock be plain 'Mock' or from the
 same class as their parent? (currently they are plain mocks)
 
-When mocking a class with ``patch``, passing in ``spec=True`` is not that useful as you 
-typically want to configure the *return values* of the mock (the instances of the class
-you are mocking). ``spec`` and ``magics`` keyword arguments could be stored by the Mock
-and used to create the return value Mock. This would only be a nuisance if your class
-instances are also callable (although we could make it so that the return values of
-instances don't inherit spec or magics.)
+When mocking a class with ``patch``, passing in ``spec=True``, the mock class has an instance
+created from the same spec. Should this be the default behaviour for mocks anyway (mock return
+values inheriting the spec from their parent), or should it be controlled by an additional
+keyword argument (``inherit``) to the Mock constructor?
 
 Magic methods still to implement (all of them except container methods currently):
 

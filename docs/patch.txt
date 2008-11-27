@@ -12,7 +12,7 @@ The patch decorators are used for patching objects only within the scope of the 
 patch
 =====
 
-.. function:: patch(target, new=None, spec=None, magics=None)
+.. function:: patch(target, new=None, spec=None, magics=None, create=False)
 
 ``patch`` decorates a function. Inside the body of the function, the ``target`` (specified in the form 'PackageName.ModuleName.ClassName') is patched with a ``new`` object. When the function exits the patch is undone.
 
@@ -26,11 +26,12 @@ If ``new`` is omitted, then a new ``Mock`` is created and passed in as an extra 
 
 The ``spec`` and ``magics`` keyword arguments are passed to the ``Mock`` if patch is creating one for you. In addition you can pass ``spec=True``, which causes patch to pass in the object being mocked as the spec object. If you are using patch to mock out a class, then the object you are interested in will probably be the return value of the Mock (the instance it returns when called)
 
+If XXXX
 
 patch_object
 ============
 
-.. function:: patch_object(target, attribute, new=None, spec=None, magics=None)
+.. function:: patch_object(target, attribute, new=None, spec=None, magics=None, create=False)
 
     ``patch_object`` patches named members on objects - usually class or module objects.
 

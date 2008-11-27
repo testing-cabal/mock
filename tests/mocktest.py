@@ -462,6 +462,8 @@ class MockTest(TestCase):
         self.assertTrue(mock._items is items)
         mock.reset()        
         self.assertTrue(mock._items is items)
+       
+        
         
         
 if __name__ == '__main__':
