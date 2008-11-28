@@ -33,7 +33,7 @@ level attributes within the scope of a test, along with :data:`mock.sentinel` fo
 creating unique objects.
 
 Most mocking libraries follow the 'record -> replay' pattern of mocking. I
-prefer the 'action -> assertion' pattern, which is more readable and intuitive
+prefer the 'action -> assertion' pattern, which is more readable and intuitive;
 particularly when working with the Python `unittest module
 <http://docs.python.org/lib/module-unittest.html>`_. For a discussion of the
 merits of the two approaches, see `Mocking, Patching, Stubbing: all that Stuff
@@ -42,13 +42,6 @@ merits of the two approaches, see `Mocking, Patching, Stubbing: all that Stuff
 
 Downloading
 ===========
-
-.. note::
-
-    These download links are for a not-yet-released version of Mock. To try version 0.5.0, checkout from
-    SVN or access it via the web at:
-    
-        http://code.google.com/p/mock/source/browse/trunk/mock.py
 
 The current version is **0.5.0**, dated XXth November 2008. Mock is still 
 experimental; the API may change. If you find bugs or 
@@ -63,8 +56,8 @@ repository with the following command:
 
     ``svn checkout http://mock.googlecode.com/svn/trunk/ mock-read-only``
 
-The are now eggs  (for Python 2.4-2.6) up on the `Mock Cheeseshop Page <http://pypi.python.org/pypi/mock/>`_. 
-If you have setuptools you should be able to install mock with:
+Mock is registered with PyPi (`Mock on PyPi <http://pypi.python.org/pypi/mock/>`_). 
+If you have setuptools you can install mock with:
 
     ``easy_install mock``
 
@@ -100,5 +93,6 @@ Articles and blog entries on testing with Mock:
 * `How To Test Django Template Tags <http://techblog.ironfroggy.com/2008/10/how-to-test.html>`_
 * `A presentation on Unit Testing with Mock <http://pypap.blogspot.com/2008/10/newbie-nugget-unit-testing-with-mock.html>`_
 * `Mocking with Django and Google AppEngine <http://michael-a-nelson.blogspot.com/2008/09/mocking-with-django-and-google-app.html>`_
+
 
 
