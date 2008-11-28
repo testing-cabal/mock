@@ -463,7 +463,11 @@ class MockTest(TestCase):
         mock.reset()        
         self.assertTrue(mock._items is items)
        
-        
+    
+    def testInitialItemsNotACopy(self):
+        items = []
+        mock = Mock(magics='getitem', items=items)
+        self.assertTrue(mock._items is items)
         
         
 if __name__ == '__main__':

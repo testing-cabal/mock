@@ -24,7 +24,11 @@ If ``new`` is omitted, then a new ``Mock`` is created and passed in as an extra 
    def test_something(self, MockClass):
        # ...
 
-The ``spec`` and ``magics`` keyword arguments are passed to the ``Mock`` if patch is creating one for you. In addition you can pass ``spec=True``, which causes patch to pass in the object being mocked as the spec object. If you are using patch to mock out a class, then the object you are interested in will probably be the return value of the Mock (the instance it returns when called)
+The ``spec`` and ``magics`` keyword arguments are passed to the ``Mock`` if patch is creating one for you. 
+
+In addition you can pass ``spec=True``, which causes patch to pass in the object being mocked as the spec object. If you are using patch to mock out a class, then the object you are interested in will probably be the return value of the Mock (the instance it returns when called). Because of this, if you use 'spec=True' and are patching a class (and having patch create a Mock for you) then the object being patched will be used as a spec for both the Mock *and* its return value.
+
+Using the class as a spec object for the created Mock (and return value) means that the Mock will have any appropriate magic methods, and raise an exception if the code attempts to access any attributes that don't exist.
 
 If XXXX
 

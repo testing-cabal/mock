@@ -21,7 +21,7 @@ The :func:`mock.patch` decorators makes it easy to temporarily replace classes i
 
     Create a new ``Mock`` object. ``Mock`` takes several optional arguments that specify the behaviour of the Mock object:
 
-    * ``spec``: This can be either a list of strings or an existing object (a class or instance) that acts as the specification for the mock object. If you pass in an object then a list of strings is formed by calling dir on the object (excluding unhandled magic attributes and methods). Accessing any attribute  not in this list will raise an ``AttributeError``. If the list contains any supported magic methods then the mock instance returned will have these methods. See `Mocking Magic Methods`_.
+    * ``spec``: This can be either a list of strings or an existing object (a class or instance) that acts as the specification for the mock object. If you pass in an object then a list of strings is formed by calling dir on the object (excluding unsupported magic attributes and methods). Accessing any attribute  not in this list will raise an ``AttributeError``. If the list contains any supported magic methods then the mock instance returned will have these methods. See `Mocking Magic Methods`_.
 
     * ``magics``: This can be a list of strings, or a single space separated string, listing the magic (protocol) methods the mock should have. For convenience the method names should not have the leading or trailing double underscores. Currently only container methods are supported. ``magics`` is ignored if the ``spec`` parameter is used.
     
@@ -42,6 +42,18 @@ The :func:`mock.patch` decorators makes it easy to temporarily replace classes i
 Methods
 =======
 
+.. method:: Mock.assert_called_with(*args, **kwargs)
+
+    This method is a convenient way of asserting that calls are made in a particular way:
+
+    .. doctest::
+    
+        >>> mock = Mock()
+        >>> mock.method(1, 2, 3, test='wow')
+        <mock.Mock object at 0x...>
+        >>> mock.method.assert_called_with(1, 2, 3, test='wow')
+
+
 .. method:: Mock.reset()
 
     The reset method resets all the call attributes on a mock object:
@@ -60,18 +72,6 @@ Methods
     This can be useful where you want to make a series of assertions that reuse the same object. Note that ``reset`` *doesn't* clear the return value, ``side_effect`` or any child attributes. Attributes you have set using normal assignment are also left in place. Child mocks and the return value mock (if any) are reset as well.
     
     If you passed in an ``items`` argument when the mock was constructed, or set the :attr:`Mock._items` attribute, to one of the built-in container types (dict, tuple, set, list) then reset will replace the current value with a copy of the original.
-
-
-.. method:: Mock.assert_called_with(*args, **kwargs)
-
-    This method is a convenient way of asserting that calls are made in a particular way:
-
-    .. doctest::
-    
-        >>> mock = Mock()
-        >>> mock.method(1, 2, 3, test='wow')
-        <mock.Mock object at 0x...>
-        >>> mock.method.assert_called_with(1, 2, 3, test='wow')
 
 
 .. index:: __call__
@@ -170,7 +170,7 @@ Attributes
 
 .. attribute:: Mock.call_args_list
 
-    This is a list of all the calls made to the mock object in sequence. Before any calls have been made it is an empty list:
+    This is a list of all the calls made to the mock object in sequence (so the length of the list is the number of times it has been called). Before any calls have been made it is an empty list:
     
     .. doctest::
 
@@ -198,20 +198,29 @@ Attributes
         [('method', (), {}), ('property.method.attribute', (), {})]
 
 
-.. note::
-
-    If you pass in one of the built-in container types (list, dictionary, tuple or set) as the ``items`` keyword argument, then it is actually a shallow copy of this that is set as the ``_items`` attribute. This is so that :meth:`Mock.reset` can restore ``_items`` to a copy of the original.
-
 .. attribute:: Mock._items
 
-    Mock objects only have an ``_items`` attribute if they have any of the container magic methods (i.e. were created with an appropriate ``spec`` or ``magics`` argument). The default value for ``_items`` is None, but it will be replaced with any object passed in as the ``items`` keyword argument to the Mock constructor.
+    Mock objects only have an ``_items`` attribute if they have any of the container magic methods (i.e. were created with an appropriate ``spec`` or ``magics`` argument). The default value for ``_items`` is an empty dictionary, but it will be replaced with any object passed in as the ``items`` keyword argument to the Mock constructor.
+    
     
 .. index:: Magic Methods
 
 Mocking Magic Methods
 =====================    
+        
+.. note::
+
+    By default, unlike other attributes, requesting a magic method (or any attribute starting and ending with a double underscore) from a mock raises an ``AttributeError``. This is because the Python interpreter can get very confused if it requests a magic method and receives a mock object:
     
-Mock is capable of mocking out objects that support some of the Python protocols methods; the magic methods that start and end with double underscores. The currently supported methods are all the methods used by the mapping and sequence protocols (for container objects):
+    .. doctest::
+    
+        >>> mock = Mock()
+        >>> mock.__getitem__
+        Traceback (most recent call last):
+            ...
+        AttributeError: __getitem__
+
+Mock is capable of mocking out objects that support some of the Python protocols methods; the magic methods that start and end with double underscores. The currently supported methods are those used by the mapping and sequence protocols (for container objects):
 
 * __getitem__
 * __setitem__
@@ -221,7 +230,7 @@ Mock is capable of mocking out objects that support some of the Python protocols
 * __contains__
 * __nonzero__
 
-It supports them by delegating these method calls to an underlying real container object (e.g. a dictionary or list) that you either pass in as the ``items`` keyword argument to the constructor or set as the ``_items`` attribute. You can control how the mock object responds to these methods by controlling what is in the underlying container. The method calls are recorded in the :attr:`Mock.method_calls` attribute, allowing you to make assertions about how it has been used.
+It supports them by delegating these method calls to an underlying object, typically a real container like a dictionary or list. You either pass this object in as the ``items`` keyword argument to the Mock constructor, or set it as the ``_items`` attribute on a mock instance. You can control how the mock object responds to these methods by controlling what is in the underlying container. The method calls are recorded in the :attr:`Mock.method_calls` attribute, allowing you to make assertions about how it has been used.
 
 Mock objects don't unconditionally implement all of these magic methods though; this could break duck typing in the code under test. Instead Mocks conditionally implement magic methods specified by the ``spec`` or ``magics`` keyword argument. 
 
@@ -276,6 +285,20 @@ If you want your mock object to have all the supported magic methods then you ca
     >>> set(mock)
     set([1, 2, 3])
 
+The default ``_items`` attribute is an empty dictionary. If you pass in one of the built-in container types as the ``items`` keyword (a dictionary, list, tuple or set) then a shallow copy of it is saved and will be restored if you call :method:`Mock.reset`.
+
+.. doctest::
+
+    >>> mock = Mock(magics='all')
+    >>> mock._items
+    {}
+    
+    >>> mock = Mock(magics='all', items=[1, 2, 3])
+    >>> mock[0] = 'fish'
+    >>> mock.reset()
+    >>> list(mock)
+    [1, 2, 3]
+
 
 MakeMock
 ========
@@ -302,6 +325,7 @@ Like the ``magics`` keyword argument to the Mock constructor, you can pass in th
     []
 
 It's unlikely that you'll need to use ``MakeMock`` directly, Mock uses it for you to provide magic methods when you use the ``spec`` or ``magics`` keyword arguments.
+
 
 -----
 

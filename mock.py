@@ -65,12 +65,14 @@ class Mock(object):
         self._return_value = return_value
         self.side_effect = side_effect
         
+        self.__items = None
+        self.reset()
+        
         if self._has_items():
             if items is None:
                 items = {}
-            self.__items = items
-        
-        self.reset()
+            self._items = items
+            self.__items = _copy(items)
 
         
     def reset(self):
