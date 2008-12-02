@@ -29,7 +29,7 @@ arguments they were called with. You can also specify return values and set
 specific attributes in the normal way.
 
 It also provides a :func:`mock.patch` decorator that handles patching module and class
-level attributes within the scope of a test, along with :data:`mock.sentinel` for 
+level attributes within the scope of a test, along with :const:`mock.sentinel` for 
 creating unique objects.
 
 Most mocking libraries follow the 'record -> replay' pattern of mocking. I

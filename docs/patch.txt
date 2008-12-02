@@ -18,7 +18,9 @@ patch
 
 The target is imported and the specified attribute patched with the new object - so it must be importable from the environment you are calling the decorator from.
 
-If ``new`` is omitted, then a new ``Mock`` is created and passed in as an extra argument to the decorated function::
+If ``new`` is omitted, then a new ``Mock`` is created and passed in as an extra argument to the decorated function:
+
+.. highlight:: python
 
    @patch('Package.ModuleName.ClassName')
    def test_something(self, MockClass):
@@ -28,9 +30,15 @@ The ``spec`` and ``magics`` keyword arguments are passed to the ``Mock`` if patc
 
 In addition you can pass ``spec=True``, which causes patch to pass in the object being mocked as the spec object. If you are using patch to mock out a class, then the object you are interested in will probably be the return value of the Mock (the instance it returns when called). Because of this, if you use 'spec=True' and are patching a class (and having patch create a Mock for you) then the object being patched will be used as a spec for both the Mock *and* its return value.
 
-Using the class as a spec object for the created Mock (and return value) means that the Mock will have any appropriate magic methods, and raise an exception if the code attempts to access any attributes that don't exist.
+Using the class as a spec object for the created Mock (and return value) means that the Mock will have any appropriate magic methods, and raise an exception if the code attempts to access any attributes that don't exist. ::
 
-If XXXX
+    @patch('Package.ModuleName.ClassName')
+    def test_something(self, MockClass):
+        instance = ClassName()
+        self.assertRaises(AttributeError, lambda: instance.fake_attribute)
+
+By default ``patch`` will fail to replace attributes that don't exist. If you pass in 'create=True' and the attribute doesn't exist, patch will create the attribute for you when the patched function is called, and delete it again afterwards. This is useful for writing tests against attributes that your production code creates at runtime. It is off by by default because it can be dangerous. With it switched on you can write passing tests against APIs that don't actually exist!
+
 
 patch_object
 ============
@@ -49,7 +57,7 @@ When calling with the two argument form you omit the replacement object, and a m
         
         mockMethod.assert_called_with(3) 
 
-``spec`` and ``magics`` have the same meaning as for the patch decorator.
+``spec``, ``magics`` and ``create`` have the same meaning as for the patch decorator.
 
 
 Nesting Patch Decorators
@@ -57,9 +65,7 @@ Nesting Patch Decorators
 
 If you want to perform multiple patches then you can simply stack up the decorators.
 
-You can stack up multiple patch decorators using this pattern:
-
-::
+You can stack up multiple patch decorators using this pattern::
 
     @patch('Module.ClassName1')
     @patch('Module.ClassName2')
