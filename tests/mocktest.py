@@ -497,7 +497,8 @@ class MockTest(TestCase):
         self.assertEquals(mock.attribute(), real.attribute())
         self.assertRaises(AttributeError, lambda: mock.fish)
         
-        result = real.attribute.frog(1, 2, fish=3)
+        self.assertNotEqual(mock.attribute, real.attribute)
+        result = mock.attribute.frog(1, 2, fish=3)
         Real.attribute.frog.assert_called_with(1, 2, fish=3)
         self.assertEquals(result, Real.attribute.frog())
         
