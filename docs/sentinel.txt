@@ -29,6 +29,11 @@
 
     Attributes are created on demand when you access them by name. Accessing the same attribute will always return the same object. The objects returned have a sensible repr so that test failure messages are readable.
 
+    
+.. data:: DEFAULT
+
+    The ``DEFAULT`` object is a pre-created sentinel (actually ``sentinel.DEFAULT``). It can be used by :attr:`Mock.side_effect` functions to indicate that the normal
+    return value should be used.
 
 Sentinel Example
 ================

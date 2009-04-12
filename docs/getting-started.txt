@@ -73,7 +73,7 @@ There are various ways of configuring the mock, including setting return values 
 .. doctest::
 
     >>> mock = Mock()
-    >>> def side_effect():
+    >>> def side_effect(*args, **kwargs):
     ...     raise Exception('Boom!')
     ... 
     >>> mock.side_effect = side_effect
@@ -83,8 +83,8 @@ There are various ways of configuring the mock, including setting return values 
     Exception: Boom!
     
     >>> results = [1, 2, 3]
-    >>> def side_effect():
-    ...     mock.return_value = results.pop()
+    >>> def side_effect(*args, **kwargs):
+    ...     return results.pop()
     ... 
     >>> mock.side_effect = side_effect
     >>> mock(), mock(), mock()
