@@ -11,7 +11,7 @@ if not this_dir in sys.path:
 from testcase import TestCase
 from testutils import RunTests
 
-from mock import sentinel
+from mock import sentinel, DEFAULT
 
 
 class SentinelTest(TestCase):
@@ -23,6 +23,10 @@ class SentinelTest(TestCase):
         
     def testSentinelName(self):
         self.assertEquals(str(sentinel.whatever), '<SentinelObject "whatever">', 'sentinel name incorrect')
+        
+    
+    def testDEFAULT(self):
+        self.assertTrue(DEFAULT is sentinel.DEFAULT)
         
 
 

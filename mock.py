@@ -18,12 +18,33 @@ __all__ = (
     'MakeMock',
     'patch',
     'patch_object',
-    'sentinel'
+    'sentinel',
+    'DEFAULT'
 )
 
 __version__ = '0.5.0 alpha'
 
-DEFAULT = object()
+
+class SentinelObject(object):
+    def __init__(self, name):
+        self.name = name
+        
+    def __repr__(self):
+        return '<SentinelObject "%s">' % self.name
+
+
+class Sentinel(object):
+    def __init__(self):
+        self._sentinels = {}
+        
+    def __getattr__(self, name):
+        return self._sentinels.setdefault(name, SentinelObject(name))
+    
+    
+sentinel = Sentinel()
+
+DEFAULT = sentinel.DEFAULT
+
 class OldStyleClass:
     pass
 ClassType = type(OldStyleClass)
@@ -120,13 +141,16 @@ class Mock(object):
                 break
             name = parent._name + '.' + name
             parent = parent._parent
-
+        
+        ret_val = self.return_value
         if self.side_effect is not None:
-            self.side_effect()
+            ret_val = self.side_effect(*args, **kwargs)
+            if ret_val is DEFAULT:
+                ret_val = self.return_value
             
         if self._wraps is not None:
             return self._wraps(*args, **kwargs)
-        return self.return_value
+        return ret_val
     
     
     def __getattr__(self, name):
@@ -315,21 +339,3 @@ def patch(target, new=DEFAULT, spec=None, magics=None, create=False):
     target = _importer(target)
     return _patch(target, attribute, new, spec, magics, create)
 
-
-class SentinelObject(object):
-    def __init__(self, name):
-        self.name = name
-        
-    def __repr__(self):
-        return '<SentinelObject "%s">' % self.name
-
-
-class Sentinel(object):
-    def __init__(self):
-        self._sentinels = {}
-        
-    def __getattr__(self, name):
-        return self._sentinels.setdefault(name, SentinelObject(name))
-    
-    
-sentinel = Sentinel()
