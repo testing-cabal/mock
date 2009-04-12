@@ -6,7 +6,7 @@
 .. currentmodule:: mock
 
 
-The patch decorators are used for patching objects only within the scope of the function they decorate. They automatically handle the unpatching for you, even if exceptions are raised.	   
+The patch decorators are used for patching objects only within the scope of the function they decorate. They automatically handle the unpatching for you, even if exceptions are raise. All of these functions can also be used in with statements.
 
 
 patch
@@ -37,6 +37,13 @@ Using the class as a spec object for the created Mock (and return value) means t
         instance = ClassName()
         self.assertRaises(AttributeError, lambda: instance.fake_attribute)
 
+Patch can be used with the with statement - if this is available in your version of Python. Here the patching applies to the indented block after the with statement. Note that the patched object can always appear after the "as" - even if an object to be patched was specified, though it can be omitted. ::
+
+    with patch('Package.ModuleName.ClassName') as MockClass:
+        instance = ClassName()
+        self.assertRaises(AttributeError, lambda: instance.fake_attribute)
+
+
 By default ``patch`` will fail to replace attributes that don't exist. If you pass in 'create=True' and the attribute doesn't exist, patch will create the attribute for you when the patched function is called, and delete it again afterwards. This is useful for writing tests against attributes that your production code creates at runtime. It is off by by default because it can be dangerous. With it switched on you can write passing tests against APIs that don't actually exist!
 
 
@@ -59,6 +66,9 @@ When calling with the two argument form you omit the replacement object, and a m
 
 ``spec``, ``magics`` and ``create`` have the same meaning as for the patch decorator.
 
+``patch_object`` is also a context manager and can be used with ``with`` statements in the same way
+as ``patch``.
+
 
 Nesting Patch Decorators
 ========================
@@ -76,4 +86,10 @@ You can stack up multiple patch decorators using this pattern::
         self.assertEquals(MockClass2.called, "ClassName2 not patched")
 
 
+Like all context-managers patches can be nested using contextlib's nested function - *every* patching will appear in the tuple after "as". ::
 
+     from contextlib import nested
+     with nested(patch('Package.ModuleName.ClassName'), 
+                 patch('Package.ModuleName.ClassName2', TestUtils.MockClass2)) as (MockClass1, MockClass2):
+          instance = ClassName(ClassName2())
+	  self.assertEquals(instance.f(), "expected")

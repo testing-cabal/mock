@@ -224,56 +224,78 @@ def _importer(target):
     return thing
 
 
-def _patch(target, attribute, new, spec, magics, create):
-        
-    def patcher(func):
-        try:
-            original = getattr(target, attribute)
-        except AttributeError:
-            if not create:
-                raise
-            original = DEFAULT
-        if hasattr(func, 'restore_list'):
-            func.restore_list.append((target, attribute, original))
-            func.patch_list.append((target, attribute, new, spec, magics))
+class _patch(object):
+    def __init__(self, target, attribute, new, spec, magics, create):
+        self.target = target
+        self.attribute = attribute
+        self.new = new
+        self.spec = spec
+        self.magics = magics
+        self.create = create
+
+
+    def __call__(self, func):
+        if hasattr(func, 'patchings'):
+            func.patchings.append(self)
             return func
-        
-        patch_list = [(target, attribute, new, spec, magics)]
-        restore_list = [(target, attribute, original)]
-        
+
         def patched(*args, **keywargs):
-            for index, (target, attribute, new, spec, magics) in enumerate(patch_list):
-                if new is DEFAULT:
-                    inherit = False
-                    if spec == True:
-                        # set spec to the object we are replacing
-                        spec = restore_list[index][2]
-                        if isinstance(spec, (type, ClassType)):
-                            inherit = True
-                    new = Mock(spec=spec, magics=magics)
-                    args += (new,)
-                    if inherit:
-                        # deliberately ignoring magics as we are using spec
-                        new.return_value = Mock(spec=spec)
-                setattr(target, attribute, new)
+            # don't use a with here (backwards compatability with 2.5)
+            extra_args = []
+            for patching in patched.patchings:
+                arg = patching.__enter__()
+                if patching.new is DEFAULT:
+                    extra_args.append(arg)
+            args += tuple(extra_args)
             try:
                 return func(*args, **keywargs)
             finally:
-                for target, attribute, original in restore_list:
-                    if original is not DEFAULT:
-                        setattr(target, attribute, original)
-                    else:
-                        delattr(target, attribute)
-                    
-        patched.restore_list = restore_list
-        patched.patch_list = patch_list
+                for patching in getattr(patched, 'patchings', []):
+                    patching.__exit__()
+
+        patched.patchings = [self]
         patched.__name__ = func.__name__ 
         patched.compat_co_firstlineno = getattr(func, "compat_co_firstlineno", 
                                                 func.func_code.co_firstlineno)
         return patched
-    
-    return patcher
 
+
+    def get_original(self):
+        try:
+            return getattr(self.target, self.attribute)
+        except AttributeError:
+            if not self.create:
+                raise
+            return DEFAULT 
+
+
+    def __enter__(self):
+        new, spec, magics  = self.new, self.spec, self.magics
+        original = self.get_original()
+        if new is DEFAULT:
+            inherit = False
+            if spec == True:
+                # set spec to the object we are replacing
+                spec = original
+                if isinstance(spec, (type, ClassType)):
+                    inherit = True
+            new = Mock(spec=spec, magics=magics)
+            if inherit:
+                # deliberately ignoring magics as we are using spec
+                new.return_value = Mock(spec=spec)
+        self.temp_original = original
+        setattr(self.target, self.attribute, new)
+        return new
+
+
+    def __exit__(self, *_):
+        if self.temp_original is not DEFAULT:
+            setattr(self.target, self.attribute, self.temp_original)
+        else:
+            delattr(self.target, self.attribute)
+        del self.temp_original
+            
+                
 
 def patch_object(target, attribute, new=DEFAULT, spec=None, magics=None, create=False):
     return _patch(target, attribute, new, spec, magics, create)

@@ -5,3 +5,8 @@
 from mocktest import MockTest
 from sentineltest import SentinelTest
 from patchtest import PatchTest
+
+import sys
+if sys.version_info[:2] >= (2, 5):
+    from withtest import WithTest
+del sys

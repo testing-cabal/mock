@@ -2,6 +2,8 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
+
+
 import os
 import sys
 this_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -75,6 +77,22 @@ class PatchTest(TestCase):
         self.assertEquals(Something.next_attribute, sentinel.Original2, "patch not restored")
 
 
+    def testObjectLookupIsQuiteLazy(self):
+        global something
+        original = something
+        @patch('tests.patchtest.something', sentinel.Something2)
+        def test():
+            pass
+        
+        try:
+            something = sentinel.replacement_value
+            test()
+            self.assertEquals(something, sentinel.replacement_value)
+        finally:
+            something = original
+        
+
+
     def testPatch(self):
         import __main__
         __main__.something = sentinel.Something
@@ -93,7 +111,6 @@ class PatchTest(TestCase):
         def test():
             self.assertEquals(PTModule.something, sentinel.Something2, "unpatched")
             self.assertEquals(PTModule.something_else, sentinel.SomethingElse, "unpatched")
-        test()   
         
         self.assertEquals(PTModule.something, sentinel.Something, "patch not restored")
         self.assertEquals(PTModule.something_else, sentinel.SomethingElse, "patch not restored")
@@ -205,21 +222,19 @@ class PatchTest(TestCase):
         
         
     def testPatchWithMagics(self):
+        @apply
         @patch('tests.patchtest.SomeClass', magics=['getitem', 'setitem'])
         def test(MockSomeClass):
             MockSomeClass[0] = 'broom'
             self.assertEquals(MockSomeClass[0], 'broom')
-            
-        test()
 
         
     def testPatchObjectWithMagics(self):
+        @apply
         @patch_object(SomeClass, 'class_attribute', magics=['getitem', 'setitem'])
         def test(MockAttribute):
             SomeClass.class_attribute[0] = 'broom'
             self.assertEquals(SomeClass.class_attribute[0], 'broom')
-            
-        test()
         
     
     def testNestedPatchWithSpecAsList(self):
@@ -230,11 +245,10 @@ class PatchTest(TestCase):
             self.assertEquals(SomeClass, MockSomeClass)
             self.assertTrue(isinstance(SomeClass.wibble, Mock))
             self.assertRaises(AttributeError, lambda: SomeClass.not_wibble)
-            
-        test()
         
         
     def testPatchWithSpecAsBoolean(self):
+        @apply
         @patch('tests.patchtest.SomeClass', spec=True)
         def test(MockSomeClass):
             self.assertEquals(SomeClass, MockSomeClass)
@@ -242,12 +256,11 @@ class PatchTest(TestCase):
             MockSomeClass.wibble
             
             self.assertRaises(AttributeError, lambda: MockSomeClass.not_wibble)
-            
-        test()
       
         
     def testPatchObjectWithSpecAsBoolean(self):
         from tests import patchtest
+        @apply
         @patch_object(patchtest, 'SomeClass', spec=True)
         def test(MockSomeClass):
             self.assertEquals(SomeClass, MockSomeClass)
@@ -255,11 +268,10 @@ class PatchTest(TestCase):
             MockSomeClass.wibble
             
             self.assertRaises(AttributeError, lambda: MockSomeClass.not_wibble)
-            
-        test()
         
     
     def testPatchClassActsWithSpecIsInherited(self):
+        @apply
         @patch('tests.patchtest.SomeClass', spec=True)
         def test(MockSomeClass):
             instance = MockSomeClass()
@@ -267,8 +279,6 @@ class PatchTest(TestCase):
             instance.wibble
             
             self.assertRaises(AttributeError, lambda: instance.not_wibble)
-            
-        test()
         
         
     def testPatchWithCreateMocksNonExistentAttributes(self):
@@ -315,10 +325,9 @@ class PatchTest(TestCase):
             pass
         else:
             self.fail('Patching non existent attributes should fail')
-            
         self.assertFalse(hasattr(SomeClass, 'frooble'))
-        
 
-        
+
+
 if __name__ == '__main__':
     RunTests(PatchTest)
