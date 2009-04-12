@@ -54,7 +54,7 @@ class Mock(object):
     
     def __init__(self, spec=None, magics=None, side_effect=None, 
                  return_value=DEFAULT, name=None, parent=None,
-                 items=None):
+                 items=None, wraps=None):
         self._parent = parent
         self._name = name
         if spec is not None and not isinstance(spec, list):
@@ -64,6 +64,7 @@ class Mock(object):
         self._children = {}
         self._return_value = return_value
         self.side_effect = side_effect
+        self._wraps = wraps
         
         self.__items = None
         self.reset_mock()
@@ -123,6 +124,8 @@ class Mock(object):
         if self.side_effect is not None:
             self.side_effect()
             
+        if self._wraps is not None:
+            return self._wraps(*args, **kwargs)
         return self.return_value
     
     
@@ -134,7 +137,10 @@ class Mock(object):
             raise AttributeError(name)
         
         if name not in self._children:
-            self._children[name] = Mock(parent=self, name=name)
+            wraps = None
+            if self._wraps is not None:
+                wraps = getattr(self._wraps, name)
+            self._children[name] = Mock(parent=self, name=name, wraps=wraps)
             
         return self._children[name]
     
