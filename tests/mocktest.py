@@ -84,7 +84,7 @@ class MockTest(TestCase):
         return_value = mock.return_value
         return_value()
         
-        mock.reset()
+        mock.reset_mock()
         
         self.assertEquals(mock._name, "child", "name incorrectly reset")
         self.assertEquals(mock._parent, parent, "parent incorrectly reset")
@@ -95,7 +95,7 @@ class MockTest(TestCase):
         self.assertEquals(mock.call_args, None, "call_args not reset")
         self.assertEquals(mock.call_args_list, [], "call_args_list not reset")
         self.assertEquals(mock.method_calls, [], 
-                          "method_calls not initialised correctly")
+                          "method_calls not initialised correctly: %r != %r" % (mock.method_calls, []))
         
         self.assertEquals(mock.side_effect, sentinel.SideEffect,
                           "side_effect incorrectly reset")
@@ -115,7 +115,7 @@ class MockTest(TestCase):
         
         result = mock()
         self.assertEquals(mock(), result, "different result from consecutive calls")
-        mock.reset()
+        mock.reset_mock()
         
         ret_val = mock(sentinel.Arg)
         self.assertTrue(mock.called, "called not set")
@@ -140,7 +140,7 @@ class MockTest(TestCase):
         mock.assert_called_with()
         self.assertRaises(AssertionError, mock.assert_called_with, 1)
         
-        mock.reset()
+        mock.reset_mock()
         self.assertRaises(AssertionError, mock.assert_called_with)
         
         mock(1, 2, 3, a='fish', b='nothing')        
@@ -354,7 +354,7 @@ class MockTest(TestCase):
         self.assertEquals(instance.method_calls,
                           [('__len__', (), {})])    
         
-        instance.reset()
+        instance.reset_mock()
         instance._items = 1, 2, 3
         self.assertEquals(len(instance), 3)
         
@@ -368,7 +368,7 @@ class MockTest(TestCase):
         self.assertEquals(instance.method_calls,
                           [('__contains__', (3,), {})])    
         
-        instance.reset()
+        instance.reset_mock()
         instance._items = 1, 2, 3
         self.assertTrue(3 in instance)
         
@@ -382,7 +382,7 @@ class MockTest(TestCase):
         self.assertEquals(instance.method_calls,
                           [('__nonzero__', (), {})])    
         
-        instance.reset()
+        instance.reset_mock()
         instance._items = 1, 2, 3
         self.assertTrue(bool(instance))
         
@@ -416,41 +416,41 @@ class MockTest(TestCase):
         mock = Mock(magics='setitem', items=[1, 2, 4])
         
         mock._items.append('fish')
-        mock.reset()
+        mock.reset_mock()
         self.assertEquals(mock._items, items)
         
         items = [1, 2, 3, 4]
         mock = Mock(magics='getitem', items=items)
         mock._items = object()
-        mock.reset()
+        mock.reset_mock()
         
         self.assertEquals(mock._items, items)
         
         items = (1, 2, 3, 4)
         mock = Mock(magics='getitem', items=items)
         mock._items = object()
-        mock.reset()
+        mock.reset_mock()
         
         self.assertEquals(mock._items, items)
         
         items = {1:2, 2: 3, 3: 4, 4: 5}
         mock = Mock(magics='getitem', items=items)
         mock._items = object()
-        mock.reset()
+        mock.reset_mock()
         
         self.assertEquals(mock._items, items)
                 
         items = set((1, 2, 3, 4))
         mock = Mock(magics='getitem', items=items)
         mock._items = object()
-        mock.reset()
+        mock.reset_mock()
         
         self.assertEquals(mock._items, items)
                 
         items = sentinel.items
         mock = Mock(magics='getitem', items=items)
         mock._items = object()
-        mock.reset()
+        mock.reset_mock()
         
         self.assertEquals(mock._items, items)
         
@@ -460,7 +460,7 @@ class MockTest(TestCase):
         mock = Mock(magics='getitem', items=items)
 
         self.assertTrue(mock._items is items)
-        mock.reset()        
+        mock.reset_mock()        
         self.assertTrue(mock._items is items)
        
     
