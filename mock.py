@@ -66,7 +66,7 @@ class Mock(object):
         self.side_effect = side_effect
         
         self.__items = None
-        self.reset()
+        self.reset_mock()
         
         if self._has_items():
             if items is None:
@@ -75,16 +75,16 @@ class Mock(object):
             self.__items = _copy(items)
 
         
-    def reset(self):
+    def reset_mock(self):
         self.called = False
         self.call_args = None
         self.call_count = 0
         self.call_args_list = []
         self.method_calls = []
         for child in self._children.itervalues():
-            child.reset()
+            child.reset_mock()
         if isinstance(self._return_value, Mock):
-            self._return_value.reset()
+            self._return_value.reset_mock()
         if self._has_items():
             self._items = _copy(self.__items)
     

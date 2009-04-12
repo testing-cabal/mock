@@ -54,9 +54,9 @@ Methods
         >>> mock.method.assert_called_with(1, 2, 3, test='wow')
 
 
-.. method:: Mock.reset()
+.. method:: Mock.reset_mock()
 
-    The reset method resets all the call attributes on a mock object:
+    The reset_mock method resets all the call attributes on a mock object:
     
     .. doctest::
 
@@ -65,7 +65,7 @@ Methods
         <mock.Mock object at 0x...>
         >>> mock.called
         True
-        >>> mock.reset()
+        >>> mock.reset_mock()
         >>> mock.called
         False
 
@@ -285,7 +285,7 @@ If you want your mock object to have all the supported magic methods then you ca
     >>> set(mock)
     set([1, 2, 3])
 
-The default ``_items`` attribute is an empty dictionary. If you pass in one of the built-in container types as the ``items`` keyword (a dictionary, list, tuple or set) then a shallow copy of it is saved and will be restored if you call :method:`Mock.reset`.
+The default ``_items`` attribute is an empty dictionary. If you pass in one of the built-in container types as the ``items`` keyword (a dictionary, list, tuple or set) then a shallow copy of it is saved and will be restored if you call :method:`Mock.reset_mock`.
 
 .. doctest::
 
@@ -295,7 +295,7 @@ The default ``_items`` attribute is an empty dictionary. If you pass in one of t
     
     >>> mock = Mock(magics='all', items=[1, 2, 3])
     >>> mock[0] = 'fish'
-    >>> mock.reset()
+    >>> mock.reset_mock()
     >>> list(mock)
     [1, 2, 3]
 
