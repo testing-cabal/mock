@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2008 Michael Foord
+# Copyright (C) 2007-2009 Michael Foord
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
@@ -76,8 +76,6 @@ class MockTest(TestCase):
             return DEFAULT
         mock = Mock(side_effect=side_effect, return_value=sentinel.RETURN)
         self.assertEqual(mock(), sentinel.RETURN)
-        
-        
         
         
     def testReset(self):

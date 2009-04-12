@@ -4,7 +4,7 @@
 
 :Author: `Michael Foord <http://www.voidspace.org.uk/python/weblog/index.shtml>`_
 :Version: Mock 0.5.0
-:Date: 2008/XX/XX
+:Date: 2009/XX/XX
 :Homepage: `Mock Homepage`_
 :Documentation: `PDF Documentation <http://www.voidspace.org.uk/downloads/mock.pdf>`_
 :License: `BSD License`_
@@ -43,7 +43,7 @@ merits of the two approaches, see `Mocking, Patching, Stubbing: all that Stuff
 Downloading
 ===========
 
-The current version is **0.5.0**, dated XXth November 2008. Mock is still 
+The current version is **0.5.0**, dated XXth November 2009. Mock is still 
 experimental; the API may change. If you find bugs or 
 have suggestions for improvements / extensions then please email me.
 

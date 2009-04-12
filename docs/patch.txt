@@ -18,9 +18,7 @@ patch
 
 The target is imported and the specified attribute patched with the new object - so it must be importable from the environment you are calling the decorator from.
 
-If ``new`` is omitted, then a new ``Mock`` is created and passed in as an extra argument to the decorated function:
-
-.. highlight:: python
+If ``new`` is omitted, then a new ``Mock`` is created and passed in as an extra argument to the decorated function::
 
    @patch('Package.ModuleName.ClassName')
    def test_something(self, MockClass):

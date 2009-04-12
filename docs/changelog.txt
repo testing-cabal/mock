@@ -5,6 +5,9 @@
 2009/XX/XX Version 0.5.0
 ------------------------
 
+* Documentation built with Sphinx.
+* ``side_effect`` is now called with the same arguments as the mock is called with and
+  if returns a non-DEFAULT value that is automatically set as the mock.return_value.
 * ``wraps`` keyword argument used for wrapping objects (and passing calls through to the wrapped object).
 * Mock.reset renamed to Mock.reset_mock, as reset is a common API name.
 * ``patch`` / ``patch_object`` are now context managers and can be used with ``with``.
@@ -12,6 +15,15 @@
   (and unpatch) attributes that don't exist. (Potentially unsafe to use - it can allow
   you to have tests that pass when they are testing an API that doesn't exist - use at
   your own risk!)
+* The methods keyword argument to Mock has been removed and merged with spec. The spec
+  argument can now be a list of methods or an object to take the spec from.
+* Nested patches may now be applied in a different order (created mocks passed 
+  in the opposite order). This is actually a bugfix. 
+* patch and patch_object now take magics and spec keyword arguments. If spec is 
+  passed in as 'True' then the Mock created will take the object it is replacing
+  as its spec object. If the object being replaced is a class, then the return
+  value for the mock will also use the class as a spec.
+  
 * Mock has a new 'magics' keyword arguments - a list (or string separated by whitespace)
   of magic methods that the Mock instance should provide (only container 
   methods available so far).
@@ -19,21 +31,13 @@
   '_items' attribute is set to a copy of this argument. Calling reset sets the _items
   to a new copy of the original items keyword argument. Copies are only used for the
   built-in container types dict, list, tuple, set.
-* The methods keyword argument to Mock has been removed and merged with spec. The spec
-  argument can now be a list of methods or an object to take the spec from.
-* patch and patch_object now take magics and spec keyword arguments. If spec is 
-  passed in as 'True' then the Mock created will take the object it is replacing
-  as its spec object. If the object being replaced is a class, then the return
-  value for the mock will also use the class as a spec.
-* Nested patches may now be applied in a different order (created mocks passed 
-  in the opposite order). This is actually a bugfix.               
 * MakeMock is a Mock class factory. It takes a list of magic methods and creates a 
   MagicMock class (Mock subclass) with the magic methods you specified. Currently
   only container methods are available.
 * Instantiating a Mock with magics / spec will actually create a MagicMock with 
   magic methods from the method / spec list.
 * A Mock created without a spec will not attempt to mock any magic methods / attributes
-  (it will raise an AttributeError instead).
+  (they will raise an AttributeError instead).
 
 
 2008/10/12 Version 0.4.0

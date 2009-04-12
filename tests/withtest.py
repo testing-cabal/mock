@@ -1,3 +1,7 @@
+# Copyright (C) 2007-2009 Michael Foord
+# E-mail: fuzzyman AT voidspace DOT org DOT uk
+# http://www.voidspace.org.uk/python/mock/
+
 from __future__ import with_statement
 
 from testcase import TestCase
