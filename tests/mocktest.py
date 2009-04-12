@@ -53,16 +53,16 @@ class MockTest(TestCase):
     def testSideEffect(self):
         mock = Mock()
         
-        def effect():
+        def effect(*args, **kwargs):
             raise SystemError('kablooie')
         
         mock.side_effect = effect
-        self.assertRaises(SystemError, mock)
-        self.assertTrue(mock.called, "call not recorded")
+        self.assertRaises(SystemError, mock, 1, 2, fish=3)
+        mock.assert_called_with(1, 2, fish=3)
         
         results = [1, 2, 3]
-        def effect():
-            mock.return_value = results.pop()
+        def effect(*args, **kwargs):
+            return results.pop()
         mock.side_effect = effect
         
         self.assertEquals([mock(), mock(), mock()], [3, 2, 1],
@@ -71,6 +71,8 @@ class MockTest(TestCase):
         mock = Mock(side_effect=sentinel.SideEffect)
         self.assertEquals(mock.side_effect, sentinel.SideEffect,
                           "side effect in constructor not used")
+        
+        
         
         
     def testReset(self):
