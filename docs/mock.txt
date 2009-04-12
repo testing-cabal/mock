@@ -17,7 +17,7 @@ The :func:`mock.patch` decorators makes it easy to temporarily replace classes i
 
 .. index:: __init__
 
-.. class:: Mock(spec=None, magics=None, side_effect=None, return_value=None, items=None)
+.. class:: Mock(spec=None, magics=None, side_effect=None, return_value=None, wraps=None, items=None)
 
     Create a new ``Mock`` object. ``Mock`` takes several optional arguments that specify the behaviour of the Mock object:
 
@@ -37,6 +37,8 @@ The :func:`mock.patch` decorators makes it easy to temporarily replace classes i
     * ``side_effect``: A function to be called whenever the Mock is called. See the :attr:`Mock.side_effect` attribute. Useful for raising exceptions or dynamically changing return values.
 
     * ``items``: Used for mocking container objects. See `Mocking Magic Methods`_ and the :attr:`Mock._items` attribute.
+    
+    * ``wraps``: Item for the mock object to wrap. If ``wraps`` is not None then calling the Mock will pass the call through to the wrapped object (returning the real result and ignoring ``return_value``). Attribute access on the mock will return a Mock object that wraps the corresponding attribute of the wrapped object (so attempting to access an attribute that doesn't exist will raise an ``AttributeError``).
 
 
 Methods

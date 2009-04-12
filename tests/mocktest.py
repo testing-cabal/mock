@@ -469,6 +469,34 @@ class MockTest(TestCase):
         mock = Mock(magics='getitem', items=items)
         self.assertTrue(mock._items is items)
         
+    
+    def testWrapsCalls(self):
+        real = Mock()
+        
+        mock = Mock(wraps=real)
+        self.assertEquals(mock(), real())
+        
+        real.reset_mock()
+        
+        mock(1, 2, fish=3)
+        real.assert_called_with(1, 2, fish=3)
+        
+        
+    def testWrapsAttributes(self):
+        class Real(object):
+            attribute = Mock()
+            
+        real = Real()
+        
+        mock = Mock(wraps=real)
+        self.assertEquals(mock.attribute(), real.attribute())
+        self.assertRaises(AttributeError, lambda: mock.fish)
+        
+        result = real.attribute.frog(1, 2, fish=3)
+        Real.attribute.frog.assert_called_with(1, 2, fish=3)
+        self.assertEquals(result, Real.attribute.frog())
+        
+        
         
 if __name__ == '__main__':
     RunTests(MockTest)
