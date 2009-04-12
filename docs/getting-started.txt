@@ -139,6 +139,8 @@ If you don't want to call the decorated test function yourself, you can add ``ap
     def test():
         # do something
 
+(Note that this leaves test == None)
+
 
 A nice pattern is to actually decorate test methods themselves::
 

@@ -3,6 +3,7 @@
 # http://www.voidspace.org.uk/python/mock/
 
 import unittest
+import sys
 from types import ModuleType
 
 
