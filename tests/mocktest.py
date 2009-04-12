@@ -19,7 +19,7 @@ if 'mocktest' in sys.modules:
 from testcase import TestCase
 from testutils import RunTests
 
-from mock import Mock, sentinel, MakeMock
+from mock import Mock, sentinel, MakeMock, DEFAULT
 
 
 
@@ -61,7 +61,7 @@ class MockTest(TestCase):
         mock.assert_called_with(1, 2, fish=3)
         
         results = [1, 2, 3]
-        def effect(*args, **kwargs):
+        def effect():
             return results.pop()
         mock.side_effect = effect
         
@@ -71,6 +71,11 @@ class MockTest(TestCase):
         mock = Mock(side_effect=sentinel.SideEffect)
         self.assertEquals(mock.side_effect, sentinel.SideEffect,
                           "side effect in constructor not used")
+        
+        def side_effect():
+            return DEFAULT
+        mock = Mock(side_effect=side_effect, return_value=sentinel.RETURN)
+        self.assertEqual(mock(), sentinel.RETURN)
         
         
         
