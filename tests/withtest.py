@@ -13,6 +13,9 @@ if not this_dir in sys.path:
 from testcase import TestCase
 from testutils import RunTests
 
+if __name__ == '__main__':
+    sys.modules['withtest'] = sys.modules['__main__']
+
 if 'withtest' in sys.modules:
     # Fix for running tests under Wing
     import tests
