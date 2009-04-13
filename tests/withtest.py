@@ -4,7 +4,20 @@
 
 from __future__ import with_statement
 
+import os
+import sys
+this_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if not this_dir in sys.path:
+    sys.path.insert(0, this_dir)
+
 from testcase import TestCase
+from testutils import RunTests
+
+if 'withtest' in sys.modules:
+    # Fix for running tests under Wing
+    import tests
+    import withtest
+    tests.withtest = withtest
 
 from mock import Mock, patch, patch_object, sentinel
 
@@ -64,4 +77,4 @@ class WithTest(TestCase):
 
 
 if __name__ == '__main__':
-    RunTests(PatchTest)
+    RunTests(WithTest)
