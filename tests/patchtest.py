@@ -10,7 +10,10 @@ this_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if this_dir not in sys.path:
     # Fix for running tests on the Mac 
     sys.path.insert(0, this_dir)
-
+    
+if __name__ == '__main__':
+    sys.modules['patchtest'] = sys.modules['__main__']
+    
 if 'patchtest' in sys.modules:
     # Fix for running tests under Wing
     import tests
