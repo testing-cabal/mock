@@ -5,6 +5,7 @@
 2009/XX/XX Version 0.5.0
 ------------------------
 
+* Made DEFAULT part of the public api.
 * Documentation built with Sphinx.
 * ``side_effect`` is now called with the same arguments as the mock is called with and
   if returns a non-DEFAULT value that is automatically set as the mock.return_value.
