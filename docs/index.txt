@@ -49,6 +49,7 @@ have suggestions for improvements / extensions then please email me.
 
 * `mock.py (module only) <http://www.voidspace.org.uk/downloads/mock.py>`_
 * `mock-0.5.0.zip (module, tests and documentation) <http://www.voidspace.org.uk/downloads/mock-0.5.0.zip>`_
+* `mock documentation as PDF <http://www.voidspace.org.uk/downloads/mock.pdf>`_
 * `Google Code Home & Subversion Repository <http://code.google.com/p/mock/>`_
 
 You can checkout the latest development version from the Google Code Subversion 

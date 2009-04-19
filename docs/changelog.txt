@@ -2,7 +2,7 @@
  CHANGELOG
 ===========
 
-2009/XX/XX Version 0.5.0
+2009/04/17 Version 0.5.0
 ------------------------
 
 * Made DEFAULT part of the public api.
