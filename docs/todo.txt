@@ -4,37 +4,10 @@
 
 Contributions, bug reports and comments welcomed!
 
-Should passing in spec *and* magics raise an exception? (Currently if you do this, magics is ignored.)
-
-Keyword arguments to patch and patch_object to create a 
-comparable or container-like Mock. (cmp, container).
-
-Shuld MakeMock accept a string argument?
-
-Should a failed indexing attempt still be added to 'method_calls'?
-(Currently not.)
-
-Parent method calls if magic methods called on a child? (not currently
-possible as all children will be mocks rather than magic mocks)
-
-Should attributes (children) on mocks created from MakeMock be plain 'Mock' or from the
-same class as their parent? (currently they are plain mocks)
-
 When mocking a class with ``patch``, passing in ``spec=True``, the mock class has an instance
 created from the same spec. Should this be the default behaviour for mocks anyway (mock return
 values inheriting the spec from their parent), or should it be controlled by an additional
 keyword argument (``inherit``) to the Mock constructor?
-
-Magic methods still to implement (all of them except container methods currently):
-
-*    __hash__
-*    comparisons    
-*    numeric
-*    in-place
-*    right hand side
-*    unary operators
-*    context managers - enter, exit   
-*    descriptors - get, set, delete
  
 Docstrings!
 
@@ -42,9 +15,6 @@ Could take a patch keyword argument and auto-do the patching in the constructor 
 in the destructor. This would be useful in itself, but violates TOOWTDI and would be unsafe 
 for IronPython (non-deterministic calling of destructors).
 
-A context manager version of patch (also violates TOOWTDI but might be a nice pattern),
-
 There are various disadvantages and things that Mock doesn't (yet) do. 
 
-* It doesn't wrap objects. If you need to pass calls through to the real object *and* record them then you can't yet do that.
 * ``Mock`` has several attributes. This makes it unsuitable for mocking objects that use these attribute names. A way round this would be to provide ``start`` and ``stop`` (or similar) methods that *hide* these attributes when needed.

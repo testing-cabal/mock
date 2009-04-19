@@ -223,22 +223,6 @@ class PatchTest(TestCase):
             
         test()
         
-        
-    def testPatchWithMagics(self):
-        @apply
-        @patch('tests.patchtest.SomeClass', magics=['getitem', 'setitem'])
-        def test(MockSomeClass):
-            MockSomeClass[0] = 'broom'
-            self.assertEquals(MockSomeClass[0], 'broom')
-
-        
-    def testPatchObjectWithMagics(self):
-        @apply
-        @patch_object(SomeClass, 'class_attribute', magics=['getitem', 'setitem'])
-        def test(MockAttribute):
-            SomeClass.class_attribute[0] = 'broom'
-            self.assertEquals(SomeClass.class_attribute[0], 'broom')
-        
     
     def testNestedPatchWithSpecAsList(self):
         # regression test for nested decorators
