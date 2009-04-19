@@ -43,7 +43,7 @@ merits of the two approaches, see `Mocking, Patching, Stubbing: all that Stuff
 Downloading
 ===========
 
-The current version is **0.5.0**, dated 17th November 2009. Mock is still 
+The current version is **0.5.0**, dated 17th April 2009. Mock is still 
 experimental; the API may change. If you find bugs or 
 have suggestions for improvements / extensions then please email me.
 
