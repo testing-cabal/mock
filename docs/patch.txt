@@ -12,7 +12,7 @@ The patch decorators are used for patching objects only within the scope of the 
 patch
 =====
 
-.. function:: patch(target, new=None, spec=None, magics=None, create=False)
+.. function:: patch(target, new=None, spec=None, create=False)
 
 ``patch`` decorates a function. Inside the body of the function, the ``target`` (specified in the form 'PackageName.ModuleName.ClassName') is patched with a ``new`` object. When the function exits the patch is undone.
 
@@ -24,11 +24,11 @@ If ``new`` is omitted, then a new ``Mock`` is created and passed in as an extra 
    def test_something(self, MockClass):
        # ...
 
-The ``spec`` and ``magics`` keyword arguments are passed to the ``Mock`` if patch is creating one for you. 
+The ``spec`` keyword argument is passed to the ``Mock`` if patch is creating one for you. 
 
 In addition you can pass ``spec=True``, which causes patch to pass in the object being mocked as the spec object. If you are using patch to mock out a class, then the object you are interested in will probably be the return value of the Mock (the instance it returns when called). Because of this, if you use 'spec=True' and are patching a class (and having patch create a Mock for you) then the object being patched will be used as a spec for both the Mock *and* its return value.
 
-Using the class as a spec object for the created Mock (and return value) means that the Mock will have any appropriate magic methods, and raise an exception if the code attempts to access any attributes that don't exist. ::
+Using the class as a spec object for the created Mock (and return value) means that the Mock will raise an exception if the code attempts to access any attributes that don't exist. ::
 
     @patch('Package.ModuleName.ClassName')
     def test_something(self, MockClass):
@@ -48,7 +48,7 @@ By default ``patch`` will fail to replace attributes that don't exist. If you pa
 patch_object
 ============
 
-.. function:: patch_object(target, attribute, new=None, spec=None, magics=None, create=False)
+.. function:: patch_object(target, attribute, new=None, spec=None, reate=False)
 
     ``patch_object`` patches named members on objects - usually class or module objects.
 
@@ -62,7 +62,7 @@ When calling with the two argument form you omit the replacement object, and a m
         
         mockMethod.assert_called_with(3) 
 
-``spec``, ``magics`` and ``create`` have the same meaning as for the patch decorator.
+``spec`` and ``create`` have the same meaning as for the patch decorator.
 
 ``patch_object`` is also a context manager and can be used with ``with`` statements in the same way
 as ``patch``.
