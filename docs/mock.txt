@@ -90,8 +90,22 @@ Attributes
         >>> mock()
         >>> mock.called
         True
-    
 
+.. attribute:: Mock.call_count
+
+    An integer telling you how many times the mock object has been called:
+
+    .. doctest::
+
+        >>> mock = Mock(return_value=None)
+        >>> mock.call_count
+        0
+        >>> mock()
+        >>> mock()
+        >>> mock.call_count
+        2
+        
+        
 .. attribute:: Mock.return_value
 
     Set this to configure the value returned by calling the mock:
