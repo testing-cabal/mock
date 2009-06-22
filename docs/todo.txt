@@ -15,6 +15,4 @@ Could take a patch keyword argument and auto-do the patching in the constructor 
 in the destructor. This would be useful in itself, but violates TOOWTDI and would be unsafe 
 for IronPython (non-deterministic calling of destructors).
 
-There are various disadvantages and things that Mock doesn't (yet) do. 
-
-* ``Mock`` has several attributes. This makes it unsuitable for mocking objects that use these attribute names. A way round this would be to provide ``start`` and ``stop`` (or similar) methods that *hide* these attributes when needed.
+``Mock`` has several attributes. This makes it unsuitable for mocking objects that use these attribute names. A way round this would be to provide ``start`` and ``stop`` (or similar) methods that *hide* these attributes when needed.

@@ -10,11 +10,11 @@ if not this_dir in sys.path:
     sys.path.insert(0, this_dir)
 
 
-if 'mocktest' in sys.modules:
+if 'testmock' in sys.modules:
     # Fix for running tests under Wing
     import tests
-    import mocktest
-    tests.mocktest = mocktest
+    import testmock
+    tests.testmock = testmock
 
 from testcase import TestCase
 from testutils import RunTests

@@ -12,13 +12,13 @@ if this_dir not in sys.path:
     sys.path.insert(0, this_dir)
     
 if __name__ == '__main__':
-    sys.modules['patchtest'] = sys.modules['__main__']
+    sys.modules['testpatch'] = sys.modules['__main__']
     
-if 'patchtest' in sys.modules:
+if 'testpatch' in sys.modules:
     # Fix for running tests under Wing
     import tests
-    import patchtest
-    tests.patchtest = patchtest
+    import testpatch
+    tests.testpatch = testpatch
     
 from testcase import TestCase
 from testutils import RunTests
@@ -83,7 +83,7 @@ class PatchTest(TestCase):
     def testObjectLookupIsQuiteLazy(self):
         global something
         original = something
-        @patch('tests.patchtest.something', sentinel.Something2)
+        @patch('tests.testpatch.something', sentinel.Something2)
         def test():
             pass
         
@@ -93,7 +93,6 @@ class PatchTest(TestCase):
             self.assertEquals(something, sentinel.replacement_value)
         finally:
             something = original
-        
 
 
     def testPatch(self):
@@ -107,10 +106,10 @@ class PatchTest(TestCase):
             
         self.assertEquals(__main__.something, sentinel.Something, "patch not restored")
                 
-        import tests.patchtest as PTModule
+        import tests.testpatch as PTModule
         
-        @patch('tests.patchtest.something', sentinel.Something2)
-        @patch('tests.patchtest.something_else', sentinel.SomethingElse)
+        @patch('tests.testpatch.something', sentinel.Something2)
+        @patch('tests.testpatch.something_else', sentinel.SomethingElse)
         def test():
             self.assertEquals(PTModule.something, sentinel.Something2, "unpatched")
             self.assertEquals(PTModule.something_else, sentinel.SomethingElse, "unpatched")
@@ -136,9 +135,9 @@ class PatchTest(TestCase):
 
         
     def testPatchClassAttribute(self):
-        import tests.patchtest as PTModule
+        import tests.testpatch as PTModule
 
-        @patch('tests.patchtest.SomeClass.class_attribute', sentinel.ClassAttribute)
+        @patch('tests.testpatch.SomeClass.class_attribute', sentinel.ClassAttribute)
         def test():
             self.assertEquals(PTModule.SomeClass.class_attribute, sentinel.ClassAttribute, "unpatched")
         test()   
@@ -185,7 +184,7 @@ class PatchTest(TestCase):
 
         
     def testPatchWithSpec(self):
-        @patch('tests.patchtest.SomeClass', spec=SomeClass)
+        @patch('tests.testpatch.SomeClass', spec=SomeClass)
         def test(MockSomeClass):
             self.assertEquals(SomeClass, MockSomeClass)
             self.assertTrue(isinstance(SomeClass.wibble, Mock))
@@ -205,7 +204,7 @@ class PatchTest(TestCase):
 
         
     def testPatchWithSpecAsList(self):
-        @patch('tests.patchtest.SomeClass', spec=['wibble'])
+        @patch('tests.testpatch.SomeClass', spec=['wibble'])
         def test(MockSomeClass):
             self.assertEquals(SomeClass, MockSomeClass)
             self.assertTrue(isinstance(SomeClass.wibble, Mock))
@@ -227,7 +226,7 @@ class PatchTest(TestCase):
     def testNestedPatchWithSpecAsList(self):
         # regression test for nested decorators
         @patch('__builtin__.open')
-        @patch('tests.patchtest.SomeClass', spec=['wibble'])
+        @patch('tests.testpatch.SomeClass', spec=['wibble'])
         def test(MockSomeClass, MockOpen):
             self.assertEquals(SomeClass, MockSomeClass)
             self.assertTrue(isinstance(SomeClass.wibble, Mock))
@@ -236,7 +235,7 @@ class PatchTest(TestCase):
         
     def testPatchWithSpecAsBoolean(self):
         @apply
-        @patch('tests.patchtest.SomeClass', spec=True)
+        @patch('tests.testpatch.SomeClass', spec=True)
         def test(MockSomeClass):
             self.assertEquals(SomeClass, MockSomeClass)
             # Should not raise attribute error
@@ -246,9 +245,9 @@ class PatchTest(TestCase):
       
         
     def testPatchObjectWithSpecAsBoolean(self):
-        from tests import patchtest
+        from tests import testpatch
         @apply
-        @patch_object(patchtest, 'SomeClass', spec=True)
+        @patch_object(testpatch, 'SomeClass', spec=True)
         def test(MockSomeClass):
             self.assertEquals(SomeClass, MockSomeClass)
             # Should not raise attribute error
@@ -259,7 +258,7 @@ class PatchTest(TestCase):
     
     def testPatchClassActsWithSpecIsInherited(self):
         @apply
-        @patch('tests.patchtest.SomeClass', spec=True)
+        @patch('tests.testpatch.SomeClass', spec=True)
         def test(MockSomeClass):
             instance = MockSomeClass()
             # Should not raise attribute error
@@ -313,6 +312,20 @@ class PatchTest(TestCase):
         else:
             self.fail('Patching non existent attributes should fail')
         self.assertFalse(hasattr(SomeClass, 'frooble'))
+        
+        
+    def testPathWithStaticMethods(self):
+        class Foo(object):
+            @staticmethod
+            def woot():
+                return sentinel.Static
+        
+        @patch_object(Foo, 'woot', lambda: sentinel.Patched)
+        def anonymous():
+            self.assertEquals(Foo.woot(), sentinel.Patched)
+        anonymous()
+        
+        self.assertEquals(Foo.woot(), sentinel.Static)
 
 
 
