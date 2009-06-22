@@ -22,7 +22,7 @@ If ``new`` is omitted, then a new ``Mock`` is created and passed in as an extra 
 
    @patch('Package.ModuleName.ClassName')
    def test_something(self, MockClass):
-       # ...
+       "test something"
 
 The ``spec`` keyword argument is passed to the ``Mock`` if patch is creating one for you. 
 
@@ -90,4 +90,4 @@ Like all context-managers patches can be nested using contextlib's nested functi
      with nested(patch('Package.ModuleName.ClassName'), 
                  patch('Package.ModuleName.ClassName2', TestUtils.MockClass2)) as (MockClass1, MockClass2):
           instance = ClassName(ClassName2())
-	  self.assertEquals(instance.f(), "expected")
+          self.assertEquals(instance.f(), "expected")

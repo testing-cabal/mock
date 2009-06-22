@@ -2,11 +2,11 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
-from mocktest import MockTest
-from sentineltest import SentinelTest
-from patchtest import PatchTest
+from testmock import MockTest
+from testsentinel import SentinelTest
+from testpatch import PatchTest
 
 import sys
 if sys.version_info[:2] >= (2, 5):
-    from withtest import WithTest
+    from testwith import WithTest
 del sys

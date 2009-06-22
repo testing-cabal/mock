@@ -67,7 +67,6 @@ Checking ``call_args_list`` tests how many times the mock was called, and the ar
 Mock for Method Calls on an Object
 ----------------------------------
 
-
 ::
 
     def test_closer_closes_something(self):
