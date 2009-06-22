@@ -23,7 +23,6 @@ __all__ = (
 
 __version__ = '0.5.0'
 
-
 class SentinelObject(object):
     def __init__(self, name):
         self.name = name
@@ -171,6 +170,7 @@ class _patch(object):
         self.new = new
         self.spec = spec
         self.create = create
+        self.has_local = False
 
 
     def __call__(self, func):
@@ -200,6 +200,9 @@ class _patch(object):
 
 
     def get_original(self):
+        if self.attribute in self.target__dict__:
+            self.has_local = True
+            return self.target.__dict__[
         try:
             return getattr(self.target, self.attribute)
         except AttributeError:
@@ -246,3 +249,24 @@ def patch(target, new=DEFAULT, spec=None, create=False):
     target = _importer(target)
     return _patch(target, attribute, new, spec, create)
 
+class _A:
+    pass
+ClassType = type(_A)
+
+def _safe_get_attribute(obj, member):
+    found = []
+    if hasattr(obj, '__dict__') and member in obj.__dict__:
+        found.append((obj.__dict__[member], True))
+        
+    if isinstance(obj, (type, ClassType)):
+        search_order = inspect.getmro(obj)
+    else:
+        search_order = inspect.getmro(obj.__class__)
+
+    for entry in (search_order[0],):
+        if member in entry.__dict__:
+            if hasattr(entry.__dict__[member], '__set__'):
+                return (entry.__dict__[member], False)
+            found.append((entry.__dict__[member], False))
+            return found[0]
+    return None, None

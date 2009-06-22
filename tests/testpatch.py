@@ -338,6 +338,23 @@ class PatchTest(TestCase):
         self.assertEqual(sentinel.Foo, foo)
 
 
+    def testPatchSlots(self):
+        class Foo(object):
+            __slots__ = ('Foo',)
+        
+        foo = Foo()
+        foo.Foo = sentinel.Foo
+        
+        @patch_object(foo, 'Foo', 'Foo')
+        def anonymous():
+            self.assertEqual(sentinel.Foo, 'Foo')
+        anonymous()
+        
+        self.assertEqual(sentinel.Foo, foo)
+        
+        
+
+
 
 if __name__ == '__main__':
     RunTests(PatchTest)
