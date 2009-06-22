@@ -326,6 +326,16 @@ class PatchTest(TestCase):
         anonymous()
         
         self.assertEquals(Foo.woot(), sentinel.Static)
+        
+        
+    def testPatchLocal(self):
+        foo = sentinel.Foo
+        @patch_object(sentinel, 'Foo', 'Foo')
+        def anonymous():
+            self.assertEqual(sentinel.Foo, 'Foo')
+        anonymous()
+        
+        self.assertEqual(sentinel.Foo, foo)
 
 
 
