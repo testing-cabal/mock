@@ -200,21 +200,28 @@ class _patch(object):
 
 
     def get_original(self):
-        if self.attribute in self.target__dict__:
-            self.has_local = True
-            return self.target.__dict__[
-        try:
-            return getattr(self.target, self.attribute)
-        except AttributeError:
-            if not self.create:
-                raise
-            return DEFAULT 
+        target = self.target
+        name = self.attribute
+        
+        if _has_local_attr(target, name):
+            try:
+                original = target.__dict__[name]
+            except AttributeError:
+                # for instances of classes with slots, they have no __dict__
+                original = getattr(target, name)
+        elif hasattr(target, name):
+            original = DEFAULT
+        else:
+            raise Exception("%s does not have the attribute %r" % (target, name))
+        return original
+        
 
 
     def __enter__(self):
         new, spec, = self.new, self.spec
         original = self.get_original()
         if new is DEFAULT:
+            # XXXX what if original is DEFAULT - shouldn't use it as a spec
             inherit = False
             if spec == True:
                 # set spec to the object we are replacing
@@ -248,6 +255,14 @@ def patch(target, new=DEFAULT, spec=None, create=False):
         raise TypeError("Need a valid target to patch. You supplied: %r" % (target,))
     target = _importer(target)
     return _patch(target, attribute, new, spec, create)
+
+
+
+def _has_local_attr(obj, name):
+    try:
+        return name in vars(obj)
+    except TypeError:
+        return hasattr(obj, name)
 
 class _A:
     pass
