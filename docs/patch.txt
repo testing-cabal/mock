@@ -77,7 +77,7 @@ You can stack up multiple patch decorators using this pattern::
 
     @patch('Module.ClassName1')
     @patch('Module.ClassName2')
-    def testMethod(self, MockClass1, MockClass2):
+    def testMethod(self, MockClass2, MockClass1):
         ClassName1()
         ClassName2()
         self.assertEquals(MockClass1.called, "ClassName1 not patched")
