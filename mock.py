@@ -21,7 +21,7 @@ __all__ = (
     'DEFAULT'
 )
 
-__version__ = '0.5.0'
+__version__ = '0.6.0 alpha'
 
 class SentinelObject(object):
     def __init__(self, name):
@@ -115,6 +115,11 @@ class Mock(object):
         
         ret_val = self.return_value
         if self.side_effect is not None:
+            if (isinstance(self.side_effect, Exception) or 
+                isinstance(self.side_effect, (type, ClassType)) and
+                issubclass(self.side_effect, Exception)):
+                raise self.side_effect
+            
             ret_val = self.side_effect(*args, **kwargs)
             if ret_val is DEFAULT:
                 ret_val = self.return_value
@@ -202,21 +207,20 @@ class _patch(object):
     def get_original(self):
         target = self.target
         name = self.attribute
+        create = self.create
         
+        original = DEFAULT
         if _has_local_attr(target, name):
             try:
                 original = target.__dict__[name]
             except AttributeError:
                 # for instances of classes with slots, they have no __dict__
                 original = getattr(target, name)
-        elif hasattr(target, name):
-            original = DEFAULT
-        else:
-            raise Exception("%s does not have the attribute %r" % (target, name))
+        elif not create and not hasattr(target, name):
+            raise AttributeError("%s does not have the attribute %r" % (target, name))
         return original
-        
 
-
+    
     def __enter__(self):
         new, spec, = self.new, self.spec
         original = self.get_original()
@@ -262,26 +266,5 @@ def _has_local_attr(obj, name):
     try:
         return name in vars(obj)
     except TypeError:
+        # objects without a __dict__
         return hasattr(obj, name)
-
-class _A:
-    pass
-ClassType = type(_A)
-
-def _safe_get_attribute(obj, member):
-    found = []
-    if hasattr(obj, '__dict__') and member in obj.__dict__:
-        found.append((obj.__dict__[member], True))
-        
-    if isinstance(obj, (type, ClassType)):
-        search_order = inspect.getmro(obj)
-    else:
-        search_order = inspect.getmro(obj.__class__)
-
-    for entry in (search_order[0],):
-        if member in entry.__dict__:
-            if hasattr(entry.__dict__[member], '__set__'):
-                return (entry.__dict__[member], False)
-            found.append((entry.__dict__[member], False))
-            return found[0]
-    return None, None
