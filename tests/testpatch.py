@@ -320,7 +320,7 @@ class PatchTest(TestCase):
             def woot():
                 return sentinel.Static
         
-        @patch_object(Foo, 'woot', lambda: sentinel.Patched)
+        @patch_object(Foo, 'woot', staticmethod(lambda: sentinel.Patched))
         def anonymous():
             self.assertEquals(Foo.woot(), sentinel.Patched)
         anonymous()
@@ -347,14 +347,11 @@ class PatchTest(TestCase):
         
         @patch_object(foo, 'Foo', 'Foo')
         def anonymous():
-            self.assertEqual(sentinel.Foo, 'Foo')
+            self.assertEqual(foo.Foo, 'Foo')
         anonymous()
         
-        self.assertEqual(sentinel.Foo, foo)
+        self.assertEqual(foo.Foo, sentinel.Foo)
         
-        
-
-
 
 if __name__ == '__main__':
     RunTests(PatchTest)

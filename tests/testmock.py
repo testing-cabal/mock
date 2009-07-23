@@ -249,6 +249,14 @@ class MockTest(TestCase):
         self.assertEquals(result, Real.attribute.frog())
         
         
+    def testExceptionalSideEffect(self):
+        mock = Mock(side_effect=AttributeError)
+        self.assertRaises(AttributeError, mock)
+        
+        mock = Mock(side_effect=AttributeError('foo'))
+        self.assertRaises(AttributeError, mock)
+        
+        
         
 if __name__ == '__main__':
     RunTests(MockTest)
