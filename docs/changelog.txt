@@ -2,11 +2,14 @@
  CHANGELOG
 ===========
 
-2009/06/22 Version 0.6.0
+2009// Version 0.6.0
 ------------------------
 
 * New test layout compatible with test discovery
-* Bugfix: static methods / class methods (etc) now restored correctly
+* Decriptors (static methods / class methods etc) can now be patched and
+  restored correctly
+* Mocks can raise exceptions when called by setting ``side_effect`` to an
+  exception class or instance.
 
 
 2009/04/17 Version 0.5.0
