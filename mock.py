@@ -74,7 +74,6 @@ class Mock(object):
         self.reset_mock()
         
 
-        
     def reset_mock(self):
         self.called = False
         self.call_args = None
