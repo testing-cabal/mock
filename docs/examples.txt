@@ -250,7 +250,7 @@ If you don't want to call the decorated test function yourself, you can add ``ap
     @apply
     @patch('Package.Module.attribute', sentinel.Attribute)
     def test():
-        # do something
+        "do something"
 
 A nice pattern is to actually decorate test methods themselves:
 
