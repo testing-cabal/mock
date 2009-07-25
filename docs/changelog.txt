@@ -2,7 +2,7 @@
  CHANGELOG
 ===========
 
-2009// Version 0.6.0
+2009/07/25 Version 0.6.0
 ------------------------
 
 * New test layout compatible with test discovery
