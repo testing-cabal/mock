@@ -75,8 +75,8 @@ If you want to perform multiple patches then you can simply stack up the decorat
 
 You can stack up multiple patch decorators using this pattern::
 
-    @patch('Module.ClassName1')
-    @patch('Module.ClassName2')
+    @patch('module.ClassName1')
+    @patch('module.ClassName2')
     def testMethod(self, MockClass2, MockClass1):
         ClassName1()
         ClassName2()
@@ -91,3 +91,15 @@ Like all context-managers patches can be nested using contextlib's nested functi
                  patch('Package.ModuleName.ClassName2', TestUtils.MockClass2)) as (MockClass1, MockClass2):
           instance = ClassName(ClassName2())
           self.assertEquals(instance.f(), "expected")
+
+
+Patching Descriptors
+====================
+
+Since version 0.6.0 both patch_ and patch_object_ have been able to correctly patch and restore descriptors;
+class methods, static methods and properties. You should patch these on the *class* rather than an instance::
+
+    @patch('module.ClassName.static'):
+    def testMethod(self, mockStatic):
+        ClassName.static('foo')
+        mockStatic.assert_called_with('foo')
