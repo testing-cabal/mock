@@ -67,16 +67,18 @@ You can also create Mock objects that behave like the class they are intended to
        ...
     AttributeError: object has no attribute 'something_else'
 
-There are various ways of configuring the mock, including setting return values on the mock and its methods. A useful attribute is ``side_effect``. If you set this to a callable then it will be called whenever the mock is called. This allows you to raise an exception or return members of a sequence from repeated calls:
+There are various ways of configuring the mock, including setting return values
+on the mock and its methods. A useful attribute is ``side_effect``. If you set
+this to an exception class or instance then the exception will be raised when
+the mock is called. If you set it to a callable then it will be called whenever
+the mock is called. This allows you to do things like return members of a
+sequence from repeated calls:
 
 
 .. doctest::
 
     >>> mock = Mock()
-    >>> def side_effect(*args, **kwargs):
-    ...     raise Exception('Boom!')
-    ... 
-    >>> mock.side_effect = side_effect
+    >>> mock.side_effect = Exception('Boom!')
     >>> mock()
     Traceback (most recent call last):
       ...
@@ -128,7 +130,7 @@ The two decorators are 'patch' and 'patch_object'. 'patch' takes a single string
     
     @patch('Package.Module.attribute', sentinel.Attribute)
     def test():
-        # do something
+        "do something"
     test()
 
 
@@ -137,7 +139,7 @@ If you don't want to call the decorated test function yourself, you can add ``ap
     @apply
     @patch('Package.Module.attribute', sentinel.Attribute)
     def test():
-        # do something
+        "do something"
 
 (Note that this leaves test == None)
 
@@ -146,12 +148,12 @@ A nice pattern is to actually decorate test methods themselves::
 
     @patch('Package.Module.attribute', sentinel.Attribute)
     def testMethod(self):
-        # do something
+        "do something"
     
 
 If you want to patch with a Mock, you can use ``patch`` with only one argument (or ``patch_object`` with two arguments). The mock will be created for you and passed into the test function / method::
 
     @patch('Package.Module.Class')
     def testMethod(self, mMckClass):
-        # do something
+        "do something"
 
