@@ -7,6 +7,8 @@
 from textwrap import dedent
 from mock import __version__
 
+from distutils.core import setup
+
 setup(
     name = "mock",
     version = __version__,
