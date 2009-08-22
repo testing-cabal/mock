@@ -6,12 +6,12 @@
 ------------------------
 
 * New test layout compatible with test discovery
-* Decriptors (static methods / class methods etc) can now be patched and
+* Descriptors (static methods / class methods etc) can now be patched and
   restored correctly
 * Mocks can raise exceptions when called by setting ``side_effect`` to an
-  exception class or instance.
+  exception class or instance
 * Mocks that wrap objects will not pass on calls to the underlying object if
-  an explicit return_value is set.
+  an explicit return_value is set
 
 
 2009/04/17 Version 0.5.0

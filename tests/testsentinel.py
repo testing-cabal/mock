@@ -9,7 +9,6 @@ if not this_dir in sys.path:
     sys.path.insert(0, this_dir)
 
 from testcase import TestCase
-from testutils import RunTests
 
 from mock import sentinel, DEFAULT
 
@@ -31,4 +30,5 @@ class SentinelTest(TestCase):
 
 
 if __name__ == '__main__':
-    RunTests(SentinelTest)
+    unittest.main()
+    

@@ -6,12 +6,12 @@ from __future__ import with_statement
 
 import os
 import sys
+import unittest
 this_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if not this_dir in sys.path:
     sys.path.insert(0, this_dir)
 
 from testcase import TestCase
-from testutils import RunTests
 
 if __name__ == '__main__':
     sys.modules['testwith'] = sys.modules['__main__']
@@ -80,4 +80,5 @@ class WithTest(TestCase):
 
 
 if __name__ == '__main__':
-    RunTests(WithTest)
+    unittest.main()
+    
