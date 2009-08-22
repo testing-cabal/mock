@@ -231,6 +231,17 @@ class MockTest(TestCase):
         
         mock(1, 2, fish=3)
         real.assert_called_with(1, 2, fish=3)
+
+
+    def testWrapsCallWithNonDefaultReturnValue(self):
+        real = Mock()
+        
+        mock = Mock(wraps=real)
+        mock.return_value = 3
+        
+        self.assertEqual(mock(), 3)
+        self.assertFalse(real.called)
+        
         
         
     def testWrapsAttributes(self):

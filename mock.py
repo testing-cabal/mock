@@ -3,7 +3,7 @@
 # Copyright (C) 2007-2009 Michael Foord
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 
-# mock 0.5.0
+# mock 0.6.0
 # http://www.voidspace.org.uk/python/mock/
 
 # Released subject to the BSD License
@@ -21,7 +21,7 @@ __all__ = (
     'DEFAULT'
 )
 
-__version__ = '0.6.0 alpha'
+__version__ = '0.6.0'
 
 class SentinelObject(object):
     def __init__(self, name):
@@ -112,7 +112,7 @@ class Mock(object):
             name = parent._name + '.' + name
             parent = parent._parent
         
-        ret_val = self.return_value
+        ret_val = DEFAULT
         if self.side_effect is not None:
             if (isinstance(self.side_effect, Exception) or 
                 isinstance(self.side_effect, (type, ClassType)) and
@@ -122,9 +122,11 @@ class Mock(object):
             ret_val = self.side_effect(*args, **kwargs)
             if ret_val is DEFAULT:
                 ret_val = self.return_value
-            
-        if self._wraps is not None:
+        
+        if self._wraps is not None and self._return_value is DEFAULT:
             return self._wraps(*args, **kwargs)
+        if ret_val is DEFAULT:
+            ret_val = self.return_value
         return ret_val
     
     
