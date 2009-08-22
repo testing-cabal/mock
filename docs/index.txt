@@ -16,7 +16,7 @@
 
 
 .. module:: mock
-   :synopsis: Mock object and testing tool library.
+   :synopsis: Mock object and testing library.
 
 
 Introduction
@@ -58,7 +58,7 @@ repository with the following command:
     ``svn checkout http://mock.googlecode.com/svn/trunk/ mock-read-only``
 
 Mock is registered with PyPi (`Mock on PyPi <http://pypi.python.org/pypi/mock/>`_). 
-If you have pip or Distribute you can install mock with:
+If you have pip, setuptools or Distribute you can install mock with:
 
     | ``easy_install mock``
     | ``pip mock``
@@ -99,4 +99,14 @@ Articles and blog entries on testing with Mock:
 * `Mocking with Django and Google AppEngine <http://michael-a-nelson.blogspot.com/2008/09/mocking-with-django-and-google-app.html>`_
 
 
+Tests
+=====
 
+Mock uses the `discover module <http://pypi.python.org/pypi/discover>`_ to
+collect and run its tests. discover.py is included in the subversion repository
+so from a fresh checkout you can execute the following to run all the tests:
+
+   ``python discover.py``
+   
+On Python 2.4 you will see one failure - testwith.py will fail to import as it
+uses the ``with`` statement which is invalid syntax under Python 2.4.
