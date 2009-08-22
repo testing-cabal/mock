@@ -32,8 +32,8 @@ It also provides a :func:`mock.patch` decorator that handles patching module and
 level attributes within the scope of a test, along with :const:`mock.sentinel` for 
 creating unique objects.
 
-Most mocking libraries follow the 'record -> replay' pattern of mocking. I
-prefer the 'action -> assertion' pattern, which is more readable and intuitive;
+Most mocking libraries follow the 'record -> replay' pattern of mocking. Mock
+uses the 'action -> assertion' pattern, which is more readable and intuitive;
 particularly when working with the Python `unittest module
 <http://docs.python.org/lib/module-unittest.html>`_. For a discussion of the
 merits of the two approaches, see `Mocking, Patching, Stubbing: all that Stuff

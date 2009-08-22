@@ -4,6 +4,7 @@
 
 import os
 import sys
+import unittest
 this_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if not this_dir in sys.path:
     # Fix for running tests on the Mac 
@@ -17,10 +18,8 @@ if 'testmock' in sys.modules:
     tests.testmock = testmock
 
 from testcase import TestCase
-from testutils import RunTests
 
 from mock import Mock, sentinel, DEFAULT
-
 
 
 class MockTest(TestCase):
@@ -270,5 +269,5 @@ class MockTest(TestCase):
         
         
 if __name__ == '__main__':
-    RunTests(MockTest)
+    unittest.main()
     

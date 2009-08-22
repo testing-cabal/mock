@@ -6,6 +6,7 @@
 
 import os
 import sys
+import unittest
 this_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if this_dir not in sys.path:
     # Fix for running tests on the Mac 
@@ -21,7 +22,6 @@ if 'testpatch' in sys.modules:
     tests.testpatch = testpatch
     
 from testcase import TestCase
-from testutils import RunTests
 
 from mock import Mock, patch, patch_object, sentinel
 
@@ -351,7 +351,8 @@ class PatchTest(TestCase):
         anonymous()
         
         self.assertEqual(foo.Foo, sentinel.Foo)
-        
 
+        
 if __name__ == '__main__':
-    RunTests(PatchTest)
+    unittest.main()
+    
