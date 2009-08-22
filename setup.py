@@ -5,16 +5,12 @@
 # http://www.voidspace.org.uk/python/mock/
 
 from textwrap import dedent
-from setuptools import setup, find_packages
 from mock import __version__
 
 setup(
     name = "mock",
     version = __version__,
-    packages = [],
     py_modules = ['mock'],
-    include_package_data = False,
-    zip_safe = True,
     
     # metadata for upload to PyPI
     author = "Michael Foord",
