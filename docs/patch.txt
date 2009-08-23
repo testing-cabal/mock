@@ -99,7 +99,7 @@ Patching Descriptors
 Since version 0.6.0 both patch_ and patch_object_ have been able to correctly patch and restore descriptors;
 class methods, static methods and properties. You should patch these on the *class* rather than an instance::
 
-    @patch('module.ClassName.static'):
+    @patch('module.ClassName.static')
     def testMethod(self, mockStatic):
         ClassName.static('foo')
         mockStatic.assert_called_with('foo')
