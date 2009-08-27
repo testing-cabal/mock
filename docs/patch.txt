@@ -48,7 +48,7 @@ By default ``patch`` will fail to replace attributes that don't exist. If you pa
 patch_object
 ============
 
-.. function:: patch_object(target, attribute, new=None, spec=None, reate=False)
+.. function:: patch_object(target, attribute, new=None, spec=None, create=False)
 
     ``patch_object`` patches named members on objects - usually class or module objects.
 
