@@ -61,7 +61,10 @@ class TestMockSignature(TestCase):
         mock.reset()
         
         f2(1, 7)
-        mock.assert_called_with(1, 7)
+        mock.assert_called_with(1, 7
+        
+        f2(b=1, a=7)
+        mock.assert_called_with(7, 1)
         
 
 class TestMagicMock(TestCase):
