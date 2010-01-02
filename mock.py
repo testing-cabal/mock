@@ -21,7 +21,7 @@ __all__ = (
     'DEFAULT'
 )
 
-__version__ = '0.6.0'
+__version__ = '0.7.0'
 
 class SentinelObject(object):
     def __init__(self, name):
