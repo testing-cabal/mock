@@ -9,6 +9,11 @@ extendmock adds additional features to the mock module.
 The mocksignature function creates wrapper functions that call a mock whilst
 preserving the signature of the original function.
 
+Note that when a function signature is mocked with mocksignature it will *always* be
+called with positional arguments and not keyword arguments (except where it
+collects arguments with \*\*). Defaults will explicitly be supplied where the function
+is called with missing arguments (as normal).
+
 MagicMock is a class that adds magic method support to Mock. You add magic methods
 to mock instances in the same way you mock other attributes::
 
@@ -40,7 +45,7 @@ For more examples of how to use mocksignature and MagicMock see the tests.
 
 DELEGATE = MISSING = object()
 
-def getsignature(func, handle_defaults=False):
+def getsignature(func):
     assert inspect.ismethod(func) or inspect.isfunction(func)
     regargs, varargs, varkwargs, defaults = inspect.getargspec(func)
     
@@ -54,16 +59,15 @@ def getsignature(func, handle_defaults=False):
         argnames.append(varargs)
     if varkwargs:
         argnames.append(varkwargs)
-    
-    dd = {}
-    if handle_defaults:
-        dd[formatvalue] = lambda value: ""
-    signature = inspect.formatargspec(regargs, varargs, varkwargs, defaults, **dd)
-    return signature[1:-1]
+    assert '_mock_' not in argnames, ("_mock_ is a reserved argument name, can't mock signatures using _mock_")
+    signature = inspect.formatargspec(regargs, varargs, varkwargs, defaults, formatvalue=lambda value: "")
+    return signature[1:-1], varargs, defaults
 
-def mocksignature(func, mock, handle_defaults=False):
-    signature = getsignature(func, handle_defaults=handle_defaults)
+
+def mocksignature(func, mock):
+    signature = getsignature(func)
     src = "lambda %(signature)s: _mock_(%(signature)s)" % {'signature': signature}
+    
     funcopy = eval(src, dict(_mock_=mock))
     funcopy.__name__ = func.__name__
     funcopy.__doc__ = func.__doc__
@@ -72,8 +76,10 @@ def mocksignature(func, mock, handle_defaults=False):
     funcopy.func_defaults = func.func_defaults
     return funcopy
 
+
 class MagicMock(Mock):
     pass
+
 
 magic_methods = [
     ("lt le gt ge eq ne", NotImplemented),
@@ -93,6 +99,7 @@ magic_methods.extend([
     (numerics, NotImplemented), (inplace, NotImplemented), (right, NotImplemented)
 ])
 
+
 def get_method(name, action):
     def func(self, *args, **kw):
         real = self.__dict__.get(name, MISSING)
@@ -107,10 +114,10 @@ def get_method(name, action):
         return action
     func.__name__ = name
     return func
+
     
 for methods, action in magic_methods:
     for method in methods.split():
         name = '__%s__' % method
         setattr(MagicMock, name, get_method(name, action))
-    
     
