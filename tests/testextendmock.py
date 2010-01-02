@@ -20,6 +20,7 @@ if 'testextendmock' in sys.modules:
 
 from testcase import TestCase
 
+import inspect
 from mock import Mock
 from extendmock import mocksignature, MagicMock
 
@@ -62,10 +63,38 @@ class TestMockSignature(TestCase):
         
         f2(1, 7)
         mock.assert_called_with(1, 7)
+        mock.reset()
         
         f2(b=1, a=7)
         mock.assert_called_with(7, 1)
+        mock.reset()
         
+        a = object()
+        def f(a=a):
+            pass
+        f2 = mocksignature(f, mock)
+        f2()
+        mock.assert_called_with(a)
+        
+    def testIntrospection(self):
+        def f(a, *args, **kwargs):
+            pass
+        f2 = mocksignature(f, f)
+        self.assertEqual(inspect.getargspec(f), inspect.getargspec(f2))
+        
+        def f(a, b=None, c=3, d=object()):
+            pass
+        f2 = mocksignature(f, f)
+        self.assertEqual(inspect.getargspec(f), inspect.getargspec(f2))
+    
+    
+    def testFunctionWithVarArgsAndKwargs(self):
+        def f(a, b=None, *args, **kwargs):
+            return (a, b, args, kwargs)
+        f2 = mocksignature(f, f)
+        self.assertEqual(f2(3, 4, 5, x=6, y=9), (3, 4, (5,), {'x': 6, 'y': 9}))
+        self.assertEqual(f2(3, x=6, y=9, b='a'), (3, 'a', (), {'x': 6, 'y': 9}))
+
 
 class TestMagicMock(TestCase):
     
