@@ -37,6 +37,7 @@ class TestMockSignature(TestCase):
         self.assertEquals(f2('foo'), 3)
         mock.assert_called_with('foo')
     
+    
     def testMethod(self):
         class Foo(object):
             def method(self, a, b):
@@ -48,6 +49,19 @@ class TestMockSignature(TestCase):
         f.method = mocksignature(f.method, mock)
         self.assertEquals(f.method('foo', 'bar'), 3)
         mock.assert_called_with('foo', 'bar')
+
+
+    def testFunctionWithDefaults(self):
+        def f(a, b=None):
+            pass
+        mock = Mock()
+        f2  = mocksignature(f, mock)
+        f2(3)
+        mock.assert_called_with(3, None)
+        mock.reset()
+        
+        f2(1, 7)
+        mock.assert_called_with(1, 7)
         
 
 class TestMagicMock(TestCase):
