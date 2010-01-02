@@ -61,7 +61,7 @@ def getsignature(func):
         argnames.append(varkwargs)
     assert '_mock_' not in argnames, ("_mock_ is a reserved argument name, can't mock signatures using _mock_")
     signature = inspect.formatargspec(regargs, varargs, varkwargs, defaults, formatvalue=lambda value: "")
-    return signature[1:-1], varargs, defaults
+    return signature[1:-1]
 
 
 def mocksignature(func, mock):
