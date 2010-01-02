@@ -1,6 +1,7 @@
 # Copyright (C) 2007-20010 Michael Foord
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
+from __future__ import with_statement
 
 import os
 import sys
@@ -48,8 +49,106 @@ class TestMockSignature(TestCase):
         self.assertEquals(f.method('foo', 'bar'), 3)
         mock.assert_called_with('foo', 'bar')
         
-        
 
+class TestMagicMock(TestCase):
+    
+    def testRepr(self):
+        mock = MagicMock()
+        self.assertEqual(repr(mock), object.__repr__(mock))
+        mock.__repr__ = lambda self: 'foo'
+        self.assertEqual(repr(mock), 'foo')
+    
+    
+    def testDictMethods(self):
+        mock = MagicMock()
+        
+        self.assertRaises(TypeError, lambda: mock['foo'])
+        def _del():
+            del mock['foo']
+        def _set():
+            mock['foo'] = 3
+        self.assertRaises(TypeError, _del)
+        self.assertRaises(TypeError, _set)
+        
+        _dict = {}
+        def getitem(s, name):
+            return _dict[name]    
+        def setitem(s, name, value):
+            _dict[name] = value
+        def delitem(s, name):
+            del _dict[name]
+        
+        mock.__setitem__ = setitem
+        mock.__getitem__ = getitem
+        mock.__delitem__ = delitem
+        
+        self.assertRaises(KeyError, lambda: mock['foo'])
+        mock['foo'] = 'bar'
+        self.assertEquals(_dict, {'foo': 'bar'})
+        self.assertEquals(mock['foo'], 'bar')
+        del mock['foo']
+        self.assertEquals(_dict, {})
+            
+            
+    def testNumeric(self):
+        original = mock = MagicMock()
+        mock.value = 0
+        
+        self.assertEqual(mock.__add__(3), NotImplemented)
+        
+        def add(self, other):
+            mock.value += other
+            return self
+        mock.__add__ = add
+        self.assertEqual(mock + 3, mock)
+        self.assertEqual(mock.value, 3)
+        
+        self.assertEqual(mock.__iadd__(3), NotImplemented)        
+        mock.__iadd__ = add
+        mock += 6
+        self.assertEqual(mock, original)
+        self.assertEqual(mock.value, 9)
+        
+        self.assertEqual(mock.__radd__(3), NotImplemented)
+        mock.__radd__ = add
+        self.assertEqual(7 + mock, mock)
+        self.assertEqual(mock.value, 16)
+    
+    def testHash(self):
+        mock = MagicMock()
+        # test delegation
+        self.assertEqual(hash(mock), Mock.__hash__(mock))
+        
+        def _hash(s):
+            return 3
+        mock.__hash__ = _hash
+        self.assertEqual(hash(mock), 3)
+    
+    def testNonZero(self):
+        m = MagicMock()
+        self.assertTrue(bool(m))
+        
+        nonzero = lambda s: False
+        m.__nonzero__ = nonzero
+        self.assertFalse(bool(m))
+        
+    def testComparison(self):
+        self. assertEqual(MagicMock() < 3, object() < 3)
+        self. assertEqual(MagicMock() > 3, object() > 3)
+        self. assertEqual(MagicMock() <= 3, object() <= 3)
+        self. assertEqual(MagicMock() >= 3, object() >= 3)
+        
+        mock = MagicMock()
+        def comp(s, o):
+            print 'foo'
+            return True
+        mock.__lt__ = mock.__gt__ = mock.__le__ = mock.__ge__ = comp
+        self. assertTrue(MagicMock() < 3)
+        self. assertTrue(MagicMock() > 3)
+        self. assertTrue(MagicMock() <= 3)
+        self. assertTrue(MagicMock() >= 3)
+        
+        
 if __name__ == '__main__':
     unittest.main()
     

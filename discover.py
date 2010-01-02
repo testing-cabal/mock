@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 # Copyright Michael Foord 2009
 # Licensed under the BSD License
 # See: http://pypi.python.org/pypi/discover
