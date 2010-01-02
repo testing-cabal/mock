@@ -57,6 +57,13 @@ class TestMagicMock(TestCase):
         self.assertEqual(repr(mock), object.__repr__(mock))
         mock.__repr__ = lambda self: 'foo'
         self.assertEqual(repr(mock), 'foo')
+
+
+    def testStr(self):
+        mock = MagicMock()
+        self.assertEqual(str(mock), object.__str__(mock))
+        mock.__str__ = lambda self: 'foo'
+        self.assertEqual(str(mock), 'foo')
     
     
     def testDictMethods(self):
@@ -114,6 +121,7 @@ class TestMagicMock(TestCase):
         self.assertEqual(7 + mock, mock)
         self.assertEqual(mock.value, 16)
     
+    
     def testHash(self):
         mock = MagicMock()
         # test delegation
@@ -124,6 +132,7 @@ class TestMagicMock(TestCase):
         mock.__hash__ = _hash
         self.assertEqual(hash(mock), 3)
     
+    
     def testNonZero(self):
         m = MagicMock()
         self.assertTrue(bool(m))
@@ -131,6 +140,7 @@ class TestMagicMock(TestCase):
         nonzero = lambda s: False
         m.__nonzero__ = nonzero
         self.assertFalse(bool(m))
+    
         
     def testComparison(self):
         self. assertEqual(MagicMock() < 3, object() < 3)
@@ -140,15 +150,51 @@ class TestMagicMock(TestCase):
         
         mock = MagicMock()
         def comp(s, o):
-            print 'foo'
             return True
         mock.__lt__ = mock.__gt__ = mock.__le__ = mock.__ge__ = comp
-        self. assertTrue(MagicMock() < 3)
-        self. assertTrue(MagicMock() > 3)
-        self. assertTrue(MagicMock() <= 3)
-        self. assertTrue(MagicMock() >= 3)
+        self. assertTrue(mock < 3)
+        self. assertTrue(mock > 3)
+        self. assertTrue(mock <= 3)
+        self. assertTrue(mock >= 3)
+
+    
+    def testEquality(self):
+        mock = MagicMock()
+        self.assertEqual(mock, mock)
+        self.assertNotEqual(mock, MagicMock())
+        self.assertNotEqual(mock, 3)
         
+        def eq(self, other):
+            return other == 3
+        mock.__eq__ = eq
+        self.assertTrue(mock == 3)
+        self.assertFalse(mock == 4)
         
+        def ne(self, other):
+            return other == 3
+        mock.__ne__ = ne
+        self.assertTrue(mock != 3)
+        self.assertFalse(mock != 4)
+    
+    
+    def testLenContainsIter(self):
+        mock = MagicMock()
+        
+        self.assertRaises(TypeError, len, mock)
+        self.assertRaises(TypeError, iter, mock)
+        self.assertRaises(TypeError, lambda: 'foo' in mock)
+        
+        mock.__len__ = lambda s: 6
+        self.assertEqual(len(mock), 6)
+        
+        mock.__contains__ = lambda s, o: o == 3
+        self.assertTrue(3 in mock)
+        self.assertFalse(6 in mock)
+        
+        mock.__iter__ = lambda s: iter('foobarbaz')
+        self.assertEqual(list(mock), list('foobarbaz'))
+        
+
 if __name__ == '__main__':
     unittest.main()
     
