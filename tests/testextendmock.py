@@ -59,15 +59,15 @@ class TestMockSignature(TestCase):
         f2  = mocksignature(f, mock)
         f2(3)
         mock.assert_called_with(3, None)
-        mock.reset()
+        mock.reset_mock()
         
         f2(1, 7)
         mock.assert_called_with(1, 7)
-        mock.reset()
+        mock.reset_mock()
         
         f2(b=1, a=7)
         mock.assert_called_with(7, 1)
-        mock.reset()
+        mock.reset_mock()
         
         a = object()
         def f(a=a):
