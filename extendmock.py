@@ -25,7 +25,7 @@ magic methods must take self as the first argument.
  
 The only unsupported magic methods (that I'm aware of) are:
 
-* Used by Mock: __init__, __new__, __getattr__, __setattr__, __delattr__
+* Used by Mock: __init__, __new__, __getattr__, __setattr__, __delattr__, __call__
 * Rare: __dir__,
 * Can cause bad interactions with other functionality: 
 
