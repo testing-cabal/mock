@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2009 Michael Foord
+# Copyright (C) 2007-20010 Michael Foord
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
@@ -26,7 +26,10 @@ class SentinelTest(TestCase):
     
     def testDEFAULT(self):
         self.assertTrue(DEFAULT is sentinel.DEFAULT)
-        
+    
+    def testBases(self):
+        # If this doesn't raise an AttributeError then help(mock) is broken
+        self.assertRaises(AttributeError, lambda: sentinel.__bases__)
 
 
 if __name__ == '__main__':
