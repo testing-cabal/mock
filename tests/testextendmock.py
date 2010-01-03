@@ -1,7 +1,6 @@
 # Copyright (C) 2007-20010 Michael Foord
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
-from __future__ import with_statement
 
 import os
 import sys
@@ -22,8 +21,6 @@ from testcase import TestCase
 
 import inspect
 from mock import Mock, mocksignature
-
-MagicMock = Mock
 
 
 class TestMockSignature(TestCase):
@@ -97,24 +94,24 @@ class TestMockSignature(TestCase):
         self.assertEqual(f2(3, x=6, y=9, b='a'), (3, 'a', (), {'x': 6, 'y': 9}))
 
 
-class TestMagicMock(TestCase):
+class TestMockingMagicMethods(TestCase):
     
     def testRepr(self):
-        mock = MagicMock()
+        mock = Mock()
         self.assertEqual(repr(mock), object.__repr__(mock))
         mock.__repr__ = lambda self: 'foo'
         self.assertEqual(repr(mock), 'foo')
 
 
     def testStr(self):
-        mock = MagicMock()
+        mock = Mock()
         self.assertEqual(str(mock), object.__str__(mock))
         mock.__str__ = lambda self: 'foo'
         self.assertEqual(str(mock), 'foo')
     
     
     def testDictMethods(self):
-        mock = MagicMock()
+        mock = Mock()
         
         self.assertRaises(TypeError, lambda: mock['foo'])
         def _del():
@@ -145,7 +142,7 @@ class TestMagicMock(TestCase):
             
             
     def testNumeric(self):
-        original = mock = MagicMock()
+        original = mock = Mock()
         mock.value = 0
         
         self.assertRaises(TypeError, lambda: mock + 3)
@@ -173,7 +170,7 @@ class TestMagicMock(TestCase):
     
     
     def testHash(self):
-        mock = MagicMock()
+        mock = Mock()
         # test delegation
         self.assertEqual(hash(mock), Mock.__hash__(mock))
         
@@ -184,7 +181,7 @@ class TestMagicMock(TestCase):
     
     
     def testNonZero(self):
-        m = MagicMock()
+        m = Mock()
         self.assertTrue(bool(m))
         
         nonzero = lambda s: False
@@ -193,12 +190,12 @@ class TestMagicMock(TestCase):
     
         
     def testComparison(self):
-        self. assertEqual(MagicMock() < 3, object() < 3)
-        self. assertEqual(MagicMock() > 3, object() > 3)
-        self. assertEqual(MagicMock() <= 3, object() <= 3)
-        self. assertEqual(MagicMock() >= 3, object() >= 3)
+        self. assertEqual(Mock() < 3, object() < 3)
+        self. assertEqual(Mock() > 3, object() > 3)
+        self. assertEqual(Mock() <= 3, object() <= 3)
+        self. assertEqual(Mock() >= 3, object() >= 3)
         
-        mock = MagicMock()
+        mock = Mock()
         def comp(s, o):
             return True
         mock.__lt__ = mock.__gt__ = mock.__le__ = mock.__ge__ = comp
@@ -209,9 +206,9 @@ class TestMagicMock(TestCase):
 
     
     def testEquality(self):
-        mock = MagicMock()
+        mock = Mock()
         self.assertEqual(mock, mock)
-        self.assertNotEqual(mock, MagicMock())
+        self.assertNotEqual(mock, Mock())
         self.assertNotEqual(mock, 3)
         
         def eq(self, other):
@@ -228,7 +225,7 @@ class TestMagicMock(TestCase):
     
     
     def testLenContainsIter(self):
-        mock = MagicMock()
+        mock = Mock()
         
         self.assertRaises(TypeError, len, mock)
         self.assertRaises(TypeError, iter, mock)
