@@ -21,8 +21,9 @@ if 'testextendmock' in sys.modules:
 from testcase import TestCase
 
 import inspect
-from mock import Mock
-from extendmock import mocksignature, MagicMock
+from mock import Mock, mocksignature
+
+MagicMock = Mock
 
 
 class TestMockSignature(TestCase):
