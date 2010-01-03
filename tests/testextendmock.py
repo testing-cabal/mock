@@ -147,7 +147,7 @@ class TestMagicMock(TestCase):
         original = mock = MagicMock()
         mock.value = 0
         
-        self.assertEqual(mock.__add__(3), NotImplemented)
+        self.assertRaises(TypeError, lambda: mock + 3)
         
         def add(self, other):
             mock.value += other
@@ -156,13 +156,16 @@ class TestMagicMock(TestCase):
         self.assertEqual(mock + 3, mock)
         self.assertEqual(mock.value, 3)
         
-        self.assertEqual(mock.__iadd__(3), NotImplemented)        
+        del mock.__add__
+        def iadd(mock):
+            mock += 3
+        self.assertRaises(TypeError, iadd, mock)
         mock.__iadd__ = add
         mock += 6
         self.assertEqual(mock, original)
         self.assertEqual(mock.value, 9)
         
-        self.assertEqual(mock.__radd__(3), NotImplemented)
+        self.assertRaises(TypeError, lambda: 3 + mock)
         mock.__radd__ = add
         self.assertEqual(7 + mock, mock)
         self.assertEqual(mock.value, 16)

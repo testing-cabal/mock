@@ -78,46 +78,49 @@ def mocksignature(func, mock):
 
 
 class MagicMock(Mock):
-    pass
+    def __new__(cls, *args, **kw):
+        class MagicMock(cls):
+            # every instance has its own class
+            # so we can create magic methods on the
+            # class without stomping on other mocks
+            pass
+        return Mock.__new__(MagicMock, *args, **kw)
+
+    def __setattr__(self, name, value):
+        if name in _all_magics:
+            method = _all_magics[name]
+            setattr(self.__class__, name, method)
+        return Mock.__setattr__(self, name, value)
+    
+    def __delattr__(self, name):
+        if name in _all_magics and name in self.__class__.__dict__:
+            delattr(self.__class__, name)
+        return Mock.__delattr__(self, name)
 
 
-magic_methods = [
-    ("lt le gt ge eq ne", NotImplemented),
-    ("getitem setitem delitem", TypeError),
-    ("len contains iter", TypeError),
-    ("hash repr str", DELEGATE),
-    ("nonzero", True),
-    ("divmod neg pos abs invert", TypeError),
-    ("complex int long float oct hex index", TypeError)
-]
+magic_methods = (
+    "lt le gt ge eq ne "
+    "getitem setitem delitem "
+    "len contains iter "
+    "hash repr str "
+    "nonzero "
+    "divmod neg pos abs invert "
+    "complex int long float oct hex index "
+)
 
-numerics = "add sub mul div truediv floordiv mod lshift rshift and xor or"
+numerics = "add sub mul div truediv floordiv mod lshift rshift and xor or "
 inplace = ' '.join('i%s' % n for n in numerics.split())
 right = ' '.join('r%s' % n for n in numerics.split())
 
-magic_methods.extend([
-    (numerics, NotImplemented), (inplace, NotImplemented), (right, NotImplemented)
-])
 
-
-def get_method(name, action):
+def get_method(name):
     def func(self, *args, **kw):
-        real = self.__dict__.get(name, MISSING)
-        if real is not MISSING:
-            return real(self, *args, **kw)
-        if action is NotImplemented:
-            return NotImplemented   
-        elif action is TypeError:
-            raise action
-        elif action is DELEGATE:
-            return getattr(Mock, name)(self, *args, **kw)
-        return action
+        return self.__dict__[name](self, *args, **kw)
     func.__name__ = name
     return func
 
-    
-for methods, action in magic_methods:
-    for method in methods.split():
-        name = '__%s__' % method
-        setattr(MagicMock, name, get_method(name, action))
+_all_magics = {}
+for method in sum([methods.split() for methods in [magic_methods, numerics, inplace, right]], []):
+    name = '__%s__' % method 
+    _all_magics[name] = get_method(name)
     
