@@ -11,13 +11,16 @@
 * ``help(mock)`` works now (on the module). Can no longer use ``__bases__``
   as a valid sentinel name
   
-Not considered:
+Not done yet:
 
-* Interaction of magic methods with spec, wraps. Should spec cause all methods to be wrapped with mocksignature perhaps?
+* Interaction of magic methods with spec, wraps. 
+* Should spec cause all methods to be wrapped with mocksignature perhaps? (or another keyword argument perhaps?)
 * Documenting mocking __enter__ and __exit__ 
 * Should magic method calls be tracked in method_calls?
 * Test mocksignature argument to patch
 * Test deleting magic methods
+* Problem with __unicode__ method on Python 2.5 (not called with self)
+* Could change __setattr__ to handle __enter__ and __exit__ on Python 2.5 / 2.6 and __unicode__ on Python 2.5 specially
 
 
 2009/08/22 Version 0.6.0
