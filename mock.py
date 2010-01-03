@@ -88,6 +88,7 @@ class Sentinel(object):
         
     def __getattr__(self, name):
         if name == '__bases__':
+            # Without this help(mock) raises an exception
             raise AttributeError
         return self._sentinels.setdefault(name, SentinelObject(name))
     
