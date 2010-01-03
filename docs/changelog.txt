@@ -16,6 +16,8 @@ Not considered:
 * Interaction of magic methods with spec, wraps. Should spec cause all methods to be wrapped with mocksignature perhaps?
 * Documenting mocking __enter__ and __exit__ 
 * Should magic method calls be tracked in method_calls?
+* Test mocksignature argument to patch
+* Test deleting magic methods
 
 
 2009/08/22 Version 0.6.0

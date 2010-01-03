@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2009 Michael Foord
+# Copyright (C) 2007-2010 Michael Foord
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
@@ -42,7 +42,10 @@ class MockTest(TestCase):
         self.assertNone(mock._parent, "parent not initialised correctly")
         self.assertNone(mock._methods, "methods not initialised correctly")
         self.assertEquals(mock._children, {}, "children not initialised incorrectly")
-        
+    
+    def testUnicodeNotBroken(self):
+        # This used to raise an exception with Python 2.5 and Mock 0.4
+        unicode(Mock())
         
     def testReturnValueInConstructor(self):
         mock = Mock(return_value=None)

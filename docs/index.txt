@@ -3,8 +3,8 @@
 ====================================
 
 :Author: `Michael Foord <http://www.voidspace.org.uk/python/weblog/index.shtml>`_
-:Version: Mock 0.6.0
-:Date: 2009/08/22
+:Version: Mock 0.7.0
+:Date: 2010/01/XX
 :Homepage: `Mock Homepage`_
 :Documentation: `PDF Documentation <http://www.voidspace.org.uk/downloads/mock.pdf>`_
 :License: `BSD License`_
