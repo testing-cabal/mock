@@ -107,7 +107,7 @@ def get_method(name, action):
             return real(self, *args, **kw)
         if action is NotImplemented:
             return NotImplemented   
-        elif isinstance(action, type) and issubclass(action, Exception):
+        elif action is TypeError:
             raise action
         elif action is DELEGATE:
             return getattr(Mock, name)(self, *args, **kw)
