@@ -2,6 +2,15 @@
  CHANGELOG
 ===========
 
+2010/01/XX Version 0.7.0
+------------------------
+
+* Addition of ``mocksignature``
+* Ability to mock magic methods
+* Addition of ``mocksignature`` argument to ``patch`` and ``patchobject``
+* ``help(mock)`` works now (on the module). Can no longer use ``__bases__``
+  as a valid sentinel name.
+
 2009/08/22 Version 0.6.0
 ------------------------
 

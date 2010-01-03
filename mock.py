@@ -15,6 +15,7 @@
 
 __all__ = (
     'Mock',
+    'mocksignature',
     'patch',
     'patch_object',
     'sentinel',
@@ -22,6 +23,56 @@ __all__ = (
 )
 
 __version__ = '0.7.0'
+
+try:
+    import inspect
+except ImportError:
+    # for alternative platforms that
+    # may not have inspect
+    inspect = None
+
+
+# getsignature and mocksignature heavily "inspired" by
+# the decorator module: http://pypi.python.org/pypi/decorator/
+# by Michele Simionato
+
+def _getsignature(func):
+    if inspect is None:
+        raise ImportError('inspect module not available')
+    assert inspect.ismethod(func) or inspect.isfunction(func)
+    regargs, varargs, varkwargs, defaults = inspect.getargspec(func)
+
+    # instance methods need to lose the self argument
+    im_self = getattr(func, 'im_self', None)
+    if im_self is not None:
+        regargs = regargs[1:]
+
+    argnames = list(regargs)
+    if varargs:
+        argnames.append(varargs)
+    if varkwargs:
+        argnames.append(varkwargs)
+    assert '_mock_' not in argnames, ("_mock_ is a reserved argument name, can't mock signatures using _mock_")
+    signature = inspect.formatargspec(regargs, varargs, varkwargs, defaults, formatvalue=lambda value: "")
+    return signature[1:-1]
+
+
+def mocksignature(func, mock):
+    signature = _getsignature(func)
+    src = "lambda %(signature)s: _mock_(%(signature)s)" % {'signature': signature}
+
+    funcopy = eval(src, dict(_mock_=mock))
+    funcopy.__name__ = func.__name__
+    funcopy.__doc__ = func.__doc__
+    funcopy.__dict__.update(func.__dict__)
+    funcopy.__module__ = func.__module__
+    funcopy.func_defaults = func.func_defaults
+    return funcopy
+
+
+def _is_magic(name):
+    return '__%s__' % name[2:-2] == name
+
 
 class SentinelObject(object):
     def __init__(self, name):
@@ -36,6 +87,8 @@ class Sentinel(object):
         self._sentinels = {}
         
     def __getattr__(self, name):
+        if name == '__bases__':
+            raise AttributeError
         return self._sentinels.setdefault(name, SentinelObject(name))
     
     
@@ -47,9 +100,6 @@ class OldStyleClass:
     pass
 ClassType = type(OldStyleClass)
 
-def _is_magic(name):
-    return '__%s__' % name[2:-2] == name
-
 def _copy(value):
     if type(value) in (dict, list, tuple, set):
         return type(value)(value)
@@ -57,7 +107,15 @@ def _copy(value):
 
 
 class Mock(object):
-
+    
+    def __new__(cls, *args, **kw):
+        class Mock(cls):
+            # every instance has its own class
+            # so we can create magic methods on the
+            # class without stomping on other mocks
+            pass
+        return object.__new__(Mock)
+        
     def __init__(self, spec=None, side_effect=None, return_value=DEFAULT, 
                  name=None, parent=None, wraps=None):
         self._parent = parent
@@ -145,7 +203,17 @@ class Mock(object):
             
         return self._children[name]
     
-    
+    def __setattr__(self, name, value):
+        if name in _all_magics:
+            method = _all_magics[name]
+            setattr(self.__class__, name, method)
+        return object.__setattr__(self, name, value)
+
+    def __delattr__(self, name):
+        if name in _all_magics and name in self.__class__.__dict__:
+            delattr(self.__class__, name)
+        return object.__delattr__(self, name)
+        
     def assert_called_with(self, *args, **kwargs):
         assert self.call_args == (args, kwargs), 'Expected: %s\nCalled with: %s' % ((args, kwargs), self.call_args)
         
@@ -170,13 +238,14 @@ def _importer(target):
 
 
 class _patch(object):
-    def __init__(self, target, attribute, new, spec, create):
+    def __init__(self, target, attribute, new, spec, create, mocksignature):
         self.target = target
         self.attribute = attribute
         self.new = new
         self.spec = spec
         self.create = create
         self.has_local = False
+        self.mocksignature = False
 
 
     def __call__(self, func):
@@ -236,8 +305,12 @@ class _patch(object):
             new = Mock(spec=spec)
             if inherit:
                 new.return_value = Mock(spec=spec)
+        new_attr = new
+        if self.mocksignature:
+            new_attr = mocksignature(original, new)
+            
         self.temp_original = original
-        setattr(self.target, self.attribute, new)
+        setattr(self.target, self.attribute, new_attr)
         return new
 
 
@@ -249,18 +322,17 @@ class _patch(object):
         del self.temp_original
             
                 
-def patch_object(target, attribute, new=DEFAULT, spec=None, create=False):
-    return _patch(target, attribute, new, spec, create)
+def patch_object(target, attribute, new=DEFAULT, spec=None, create=False, mocksignature=False):
+    return _patch(target, attribute, new, spec, create, mocksignature)
 
 
-def patch(target, new=DEFAULT, spec=None, create=False):
+def patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False):
     try:
         target, attribute = target.rsplit('.', 1)    
     except (TypeError, ValueError):
         raise TypeError("Need a valid target to patch. You supplied: %r" % (target,))
     target = _importer(target)
-    return _patch(target, attribute, new, spec, create)
-
+    return _patch(target, attribute, new, spec, create, mocksignature)
 
 
 def _has_local_attr(obj, name):
@@ -269,3 +341,29 @@ def _has_local_attr(obj, name):
     except TypeError:
         # objects without a __dict__
         return hasattr(obj, name)
+
+
+magic_methods = (
+    "lt le gt ge eq ne "
+    "getitem setitem delitem "
+    "len contains iter "
+    "hash repr str "
+    "nonzero "
+    "divmod neg pos abs invert "
+    "complex int long float oct hex index "
+)
+
+numerics = "add sub mul div truediv floordiv mod lshift rshift and xor or "
+inplace = ' '.join('i%s' % n for n in numerics.split())
+right = ' '.join('r%s' % n for n in numerics.split()) 
+
+def get_method(name):
+    def func(self, *args, **kw):
+        return self.__dict__[name](self, *args, **kw)
+    func.__name__ = name
+    return func
+
+_all_magics = {}
+for method in ' '.join([magic_methods, numerics, inplace, right]).split():
+    name = '__%s__' % method 
+    _all_magics[name] = get_method(name)
