@@ -1,6 +1,6 @@
 # mock.py
 # Test tools for mocking and patching.
-# Copyright (C) 2007-2009 Michael Foord
+# Copyright (C) 2007-2010 Michael Foord
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 
 # mock 0.6.0
