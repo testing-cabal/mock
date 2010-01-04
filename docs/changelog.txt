@@ -22,6 +22,7 @@ Not done yet:
 * Document the way magic methods are wrapped in __setattr__ so that Python's inconsistent lookup of magic methods
   doesn't matter
 * Document that wrapping is bypassed if the magic method is patched with a Mock
+* document unsupported magic methods (add obsolete ones like getslice / setslice / delslice / cmp / coerce etc?)
 
 2009/08/22 Version 0.6.0
 ------------------------
