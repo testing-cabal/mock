@@ -36,7 +36,7 @@ except ImportError:
 # the decorator module: http://pypi.python.org/pypi/decorator/
 # by Michele Simionato
 
-def _getsignature(func):
+def _getsignature(func, skipfirst):
     if inspect is None:
         raise ImportError('inspect module not available')
     assert inspect.ismethod(func) or inspect.isfunction(func)
@@ -53,6 +53,8 @@ def _getsignature(func):
     if varkwargs:
         argnames.append(varkwargs)
     assert '_mock_' not in argnames, ("_mock_ is a reserved argument name, can't mock signatures using _mock_")
+    if skipfirst:
+        argnames = argnames[1:]
     signature = inspect.formatargspec(regargs, varargs, varkwargs, defaults, formatvalue=lambda value: "")
     return signature[1:-1]
 
@@ -65,13 +67,14 @@ def _copy_func_details(func, funcopy):
     funcopy.func_defaults = func.func_defaults
 
 
-def mocksignature(func, mock):
-    signature = _getsignature(func)
+def mocksignature(func, mock, skipfirst=False):
+    signature = _getsignature(func, skipfirst)
     src = "lambda %(signature)s: _mock_(%(signature)s)" % {'signature': signature}
 
     funcopy = eval(src, dict(_mock_=mock))
     _copy_func_details(func, funcopy)
     return funcopy
+
 
 
 
@@ -211,11 +214,11 @@ class Mock(object):
     
     def __setattr__(self, name, value):
         if name in _all_magics:
-            setattr(self.__class__, name, get_method(name, value))
-            original = value
-            def value(*args, **kw):
-                return original(self, *args, **kw)
-            _copy_func_details(original, value)
+            if not isinstance(value, Mock):
+                setattr(self.__class__, name, get_method(name, value))
+                value = mocksignature(value, value, skipfirst=True)
+            else:
+                setattr(self.__class__, name, value)
         return object.__setattr__(self, name, value)
 
     def __delattr__(self, name):
