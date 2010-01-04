@@ -21,6 +21,7 @@ Not done yet:
 * Test deleting magic methods
 * Document the way magic methods are wrapped in __setattr__ so that Python's inconsistent lookup of magic methods
   doesn't matter.
+* Can we bypass the __setattr__ wrapping if the magic method is being patched with a mock?
 
 2009/08/22 Version 0.6.0
 ------------------------
