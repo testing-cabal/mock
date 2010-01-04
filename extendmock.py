@@ -1,3 +1,5 @@
+# NOTE: merged into moock.py in Mock 0.7
+
 import inspect
 from mock import Mock
 
@@ -123,4 +125,8 @@ _all_magics = {}
 for method in sum([methods.split() for methods in [magic_methods, numerics, inplace, right]], []):
     name = '__%s__' % method 
     _all_magics[name] = get_method(name)
-    
+
+import mock
+if mock.__version__ > '0.6.0':
+    mockssignature = mock.mocksignature
+    MagicMock = mock.Mock
