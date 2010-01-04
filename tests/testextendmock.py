@@ -96,6 +96,31 @@ class TestMockSignature(TestCase):
 
 class TestMockingMagicMethods(TestCase):
     
+    def testDeletingMagicMethods(self):
+        mock = Mock()
+        self.assertFalse(hasattr(mock, '__getitem__'))
+        
+        mock.__getitem__ = Mock()
+        self.assertTrue(hasattr(mock, '__getitem__'))
+        
+        del mock.__getitem__
+        self.assertFalse(hasattr(mock, '__getitem__'))
+    
+    
+    def testMagicMethodWrapping(self):
+        mock = Mock()
+        def f(self, name):
+            return self, 'fish'
+        
+        mock.__getitem__ = f
+        self.assertFalse(mock.__getitem__ is f)
+        self.assertEqual(mock['foo'], (mock, 'fish'))
+        self.assertEqual(inspect.getargspec(mock.__getitem__), inspect.getargspec(f))
+        
+        mock.__getitem__ = mock
+        self.assertTrue(mock.__getitem__ is mock)
+        
+        
     def testRepr(self):
         mock = Mock()
         self.assertEqual(repr(mock), object.__repr__(mock))
