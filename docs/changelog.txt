@@ -15,14 +15,12 @@ Not done yet:
 
 * Interaction of magic methods with spec, wraps. 
 * Should spec cause all methods to be wrapped with mocksignature perhaps? (or another keyword argument perhaps?)
-* Documenting mocking __enter__ and __exit__ 
+* Testing __enter__ and __exit__ 
 * Should magic method calls be tracked in method_calls?
 * Test mocksignature argument to patch
 * Test deleting magic methods
-* Problem with __unicode__ method on Python 2.5 (not called with self)
-* __complex__ method looked up on instance in Python 2.5 / 2.6
-* Could change __setattr__ to handle __enter__ and __exit__ on Python 2.5 / 2.6 and __unicode__ on Python 2.5 specially
-
+* Document the way magic methods are wrapped in __setattr__ so that Python's inconsistent lookup of magic methods
+  doesn't matter.
 
 2009/08/22 Version 0.6.0
 ------------------------

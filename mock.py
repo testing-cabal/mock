@@ -357,7 +357,7 @@ magic_methods = (
     "getitem setitem delitem "
     "len contains iter "
     "hash repr str unicode "
-    "nonzero "
+    "nonzero enter exit "
     "divmod neg pos abs invert "
     "complex int long float oct hex index "
 )
