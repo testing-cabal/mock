@@ -57,17 +57,22 @@ def _getsignature(func):
     return signature[1:-1]
 
 
-def mocksignature(func, mock):
-    signature = _getsignature(func)
-    src = "lambda %(signature)s: _mock_(%(signature)s)" % {'signature': signature}
-
-    funcopy = eval(src, dict(_mock_=mock))
+def _copy_func_details(func, funcopy):
     funcopy.__name__ = func.__name__
     funcopy.__doc__ = func.__doc__
     funcopy.__dict__.update(func.__dict__)
     funcopy.__module__ = func.__module__
     funcopy.func_defaults = func.func_defaults
+
+
+def mocksignature(func, mock):
+    signature = _getsignature(func)
+    src = "lambda %(signature)s: _mock_(%(signature)s)" % {'signature': signature}
+
+    funcopy = eval(src, dict(_mock_=mock))
+    _copy_func_details(func, funcopy)
     return funcopy
+
 
 
 def _is_magic(name):
@@ -206,8 +211,11 @@ class Mock(object):
     
     def __setattr__(self, name, value):
         if name in _all_magics:
-            method = _all_magics[name]
-            setattr(self.__class__, name, method)
+            setattr(self.__class__, name, get_method(name, value))
+            original = value
+            def value(*args, **kw):
+                return original(self, *args, **kw)
+            _copy_func_details(original, value)
         return object.__setattr__(self, name, value)
 
     def __delattr__(self, name):
@@ -348,7 +356,7 @@ magic_methods = (
     "lt le gt ge eq ne "
     "getitem setitem delitem "
     "len contains iter "
-    "hash repr str "
+    "hash repr str unicode "
     "nonzero "
     "divmod neg pos abs invert "
     "complex int long float oct hex index "
@@ -358,13 +366,10 @@ numerics = "add sub mul div truediv floordiv mod lshift rshift and xor or "
 inplace = ' '.join('i%s' % n for n in numerics.split())
 right = ' '.join('r%s' % n for n in numerics.split()) 
 
-def get_method(name):
-    def func(self, *args, **kw):
-        return self.__dict__[name](self, *args, **kw)
-    func.__name__ = name
-    return func
+def get_method(name, func):
+    def method(self, *args, **kw):
+        return func(self, *args, **kw)
+    method.__name__ = name
+    return method
 
-_all_magics = {}
-for method in ' '.join([magic_methods, numerics, inplace, right]).split():
-    name = '__%s__' % method 
-    _all_magics[name] = get_method(name)
+_all_magics = set('__%s__' % method for method in ' '.join([magic_methods, numerics, inplace, right]).split())
