@@ -99,15 +99,22 @@ class TestMockingMagicMethods(TestCase):
     def testRepr(self):
         mock = Mock()
         self.assertEqual(repr(mock), object.__repr__(mock))
-        mock.__repr__ = lambda self: 'foo'
+        mock.__repr__ = lambda s: 'foo'
         self.assertEqual(repr(mock), 'foo')
 
 
     def testStr(self):
         mock = Mock()
         self.assertEqual(str(mock), object.__str__(mock))
-        mock.__str__ = lambda self: 'foo'
+        mock.__str__ = lambda s: 'foo'
         self.assertEqual(str(mock), 'foo')
+    
+    def testUnicode(self):
+        mock = Mock()
+        self.assertEquals(unicode(mock), unicode(str(mock)))
+        
+        mock.__unicode__ = lambda s: u'foo'
+        self.assertEqual(unicode(mock), u'foo')
     
     
     def testDictMethods(self):
