@@ -9,7 +9,8 @@
 * Ability to mock magic methods
 * Addition of ``mocksignature`` argument to ``patch`` and ``patchobject``
 * ``help(mock)`` works now (on the module). Can no longer use ``__bases__``
-  as a valid sentinel name
+  as a valid sentinel name (thanks to Stephen Emslie for reporting and
+  diagnosing this)
   
 Not done yet:
 
