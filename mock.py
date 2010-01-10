@@ -47,14 +47,9 @@ def _getsignature(func, skipfirst):
     if im_self is not None:
         regargs = regargs[1:]
 
-    argnames = list(regargs)
-    if varargs:
-        argnames.append(varargs)
-    if varkwargs:
-        argnames.append(varkwargs)
-    assert '_mock_' not in argnames, ("_mock_ is a reserved argument name, can't mock signatures using _mock_")
+    assert '_mock_' not in regargs, ("_mock_ is a reserved argument name, can't mock signatures using _mock_")
     if skipfirst:
-        argnames = argnames[1:]
+        regargs = regargs[1:]
     signature = inspect.formatargspec(regargs, varargs, varkwargs, defaults, formatvalue=lambda value: "")
     return signature[1:-1]
 
@@ -216,7 +211,9 @@ class Mock(object):
         if name in _all_magics:
             if not isinstance(value, Mock):
                 setattr(self.__class__, name, get_method(name, value))
-                value = mocksignature(value, value, skipfirst=True)
+                original = value
+                real = lambda *args, **kw: original(self, *args, **kw)
+                value = mocksignature(value, real, skipfirst=True)
             else:
                 setattr(self.__class__, name, value)
         return object.__setattr__(self, name, value)
