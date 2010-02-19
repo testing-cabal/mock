@@ -61,7 +61,7 @@ Mock is registered with PyPi (`Mock on PyPi <http://pypi.python.org/pypi/mock/>`
 If you have pip, setuptools or Distribute you can install mock with:
 
     | ``easy_install mock``
-    | ``pip mock``
+    | ``pip install mock``
 
     
 API Documentation
