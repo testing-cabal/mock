@@ -4,7 +4,7 @@
 
 import os
 import sys
-import unittest
+import unittest2
 this_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if not this_dir in sys.path:
     # Fix for running tests on the Mac 
