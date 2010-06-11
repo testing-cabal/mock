@@ -2,7 +2,7 @@
  CHANGELOG
 ===========
 
-2010/01/XX Version 0.7.0
+2010/06/XX Version 0.7.0
 ------------------------
 
 * Addition of ``mocksignature``
@@ -11,7 +11,10 @@
 * ``help(mock)`` works now (on the module). Can no longer use ``__bases__``
   as a valid sentinel name (thanks to Stephen Emslie for reporting and
   diagnosing this)
-  
+* Addition of soft comparisons: call_args, call_args_list and method_calls
+  return now tuple-like objects which compare positively even when empty args
+  or kwargs are skipped.
+
 Not done yet:
 
 * Interaction of magic methods with spec, wraps. 
