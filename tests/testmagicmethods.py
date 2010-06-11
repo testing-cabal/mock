@@ -18,6 +18,7 @@ except NameError:
     # Python 3
     unicode = str
 
+inPy3k = sys.version_info[0] == 3
 
 this_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if not this_dir in sys.path:
@@ -76,6 +77,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
         mock.__str__ = lambda s: 'foo'
         self.assertEqual(str(mock), 'foo')
     
+    @unittest2.skipIf(inPy3k, "no unicode in Python 3")
     def testUnicode(self):
         mock = Mock()
         self.assertEquals(unicode(mock), unicode(str(mock)))
@@ -168,10 +170,12 @@ class TestMockingMagicMethods(unittest2.TestCase):
     
         
     def testComparison(self):
-        self. assertEqual(Mock() < 3, object() < 3)
-        self. assertEqual(Mock() > 3, object() > 3)
-        self. assertEqual(Mock() <= 3, object() <= 3)
-        self. assertEqual(Mock() >= 3, object() >= 3)
+        if not inPy3k:
+            # incomparable in Python 3
+            self. assertEqual(Mock() < 3, object() < 3)
+            self. assertEqual(Mock() > 3, object() > 3)
+            self. assertEqual(Mock() <= 3, object() <= 3)
+            self. assertEqual(Mock() >= 3, object() >= 3)
         
         mock = Mock()
         def comp(s, o):
