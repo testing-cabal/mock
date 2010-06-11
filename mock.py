@@ -241,8 +241,6 @@ class callargs(tuple):
         else:
             other_args, other_kwargs = other[1], other[2]
         return tuple(self) == (other_name, other_args, other_kwargs)
-    def __repr__(self):
-        return "callargs" + tuple.__repr__(self)
 
 def _dot_lookup(thing, comp, import_path):
     try:
