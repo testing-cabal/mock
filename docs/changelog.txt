@@ -16,20 +16,21 @@
 * Addition of soft comparisons: call_args, call_args_list and method_calls
   return now tuple-like objects which compare positively even when empty args
   or kwargs are skipped
-* The tests now require `unittest2 <>`_ to run
+* The tests now require `unittest2 <http://pypi.python.org/pypi/unittest2>`_ to run
 
 Not done yet:
 
-* Interaction of magic methods with spec, wraps. 
-* Should spec cause all methods to be wrapped with mocksignature perhaps? (or another keyword argument perhaps?)
-* Testing __enter__ and __exit__ 
-* Should magic method calls be tracked in method_calls?
 * Test mocksignature argument to patch
 * Test deleting magic methods
+* Interaction of magic methods with spec, wraps
+* Should spec cause all methods to be wrapped with mocksignature perhaps?
+  (or another keyword argument perhaps?) - defer this to an issue
+* Should magic method calls be tracked in method_calls?
 * Document the way magic methods are wrapped in __setattr__ so that Python's inconsistent lookup of magic methods
   doesn't matter
 * Document that wrapping is bypassed if the magic method is patched with a Mock
 * document unsupported magic methods (add obsolete ones like getslice / setslice / delslice / cmp / coerce etc?)
+
 
 2009/08/22 Version 0.6.0
 ------------------------
