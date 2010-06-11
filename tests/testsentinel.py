@@ -4,16 +4,17 @@
 
 import os
 import sys
+
+import unittest2
+
 this_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if not this_dir in sys.path:
     sys.path.insert(0, this_dir)
 
-from testcase import TestCase
-
 from mock import sentinel, DEFAULT
 
 
-class SentinelTest(TestCase):
+class SentinelTest(unittest2.TestCase):
 
     def testSentinels(self):
         self.assertEquals(sentinel.whatever, sentinel.whatever, 'sentinel not stored')

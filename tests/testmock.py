@@ -17,12 +17,10 @@ if 'testmock' in sys.modules:
     import testmock
     tests.testmock = testmock
 
-from testcase import TestCase
-
 from mock import Mock, sentinel, DEFAULT, callargs
 
 
-class MockTest(TestCase):
+class MockTest(unittest2.TestCase):
 
     def testConstructor(self):
         mock = Mock()
@@ -39,8 +37,8 @@ class MockTest(TestCase):
         # Can't use hasattr for this test as it always returns True on a mock...
         self.assertFalse('_items' in mock.__dict__, "default mock should not have '_items' attribute")
         
-        self.assertNone(mock._parent, "parent not initialised correctly")
-        self.assertNone(mock._methods, "methods not initialised correctly")
+        self.assertIsNone(mock._parent, "parent not initialised correctly")
+        self.assertIsNone(mock._methods, "methods not initialised correctly")
         self.assertEquals(mock._children, {}, "children not initialised incorrectly")
     
     def testUnicodeNotBroken(self):
@@ -49,7 +47,7 @@ class MockTest(TestCase):
         
     def testReturnValueInConstructor(self):
         mock = Mock(return_value=None)
-        self.assertNone(mock.return_value, "return value in constructor not honoured")
+        self.assertIsNone(mock.return_value, "return value in constructor not honoured")
         
         
     def testSideEffect(self):
@@ -226,7 +224,7 @@ class MockTest(TestCase):
         
         # this should be allowed
         mock.something
-        self.assertRaisesWithMessage(AttributeError, 
+        self.assertRaisesRegexp(AttributeError, 
                                      "Mock object has no attribute 'something_else'",
                                      lambda: mock.something_else)
 
@@ -242,10 +240,10 @@ class MockTest(TestCase):
             # should work
             mock.x
             mock.y
-            self.assertRaisesWithMessage(AttributeError, 
+            self.assertRaisesRegexp(AttributeError, 
                                          "Mock object has no attribute 'z'",
                                          lambda: mock.z)
-            self.assertRaisesWithMessage(AttributeError, 
+            self.assertRaisesRegexp(AttributeError, 
                                          "Mock object has no attribute '__something__'",
                                          lambda: mock.__something__)
             

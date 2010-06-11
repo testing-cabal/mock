@@ -20,8 +20,6 @@ if 'testpatch' in sys.modules:
     import tests
     import testpatch
     tests.testpatch = testpatch
-    
-from testcase import TestCase
 
 from mock import Mock, patch, patch_object, sentinel
 
@@ -38,7 +36,7 @@ class SomeClass(object):
         pass
 
     
-class PatchTest(TestCase):
+class PatchTest(unittest2.TestCase):
 
     def testSinglePatchObject(self):
         class Something(object):
@@ -59,7 +57,7 @@ class PatchTest(TestCase):
         @apply
         @patch_object(Something, 'attribute', None)
         def test():
-            self.assertNone(Something.attribute, "unpatched")
+            self.assertIsNone(Something.attribute, "unpatched")
             
         self.assertEquals(Something.attribute, sentinel.Original, "patch not restored")
         
@@ -142,7 +140,7 @@ class PatchTest(TestCase):
             self.assertEquals(PTModule.SomeClass.class_attribute, sentinel.ClassAttribute, "unpatched")
         test()   
         
-        self.assertNone(PTModule.SomeClass.class_attribute, "patch not restored")
+        self.assertIsNone(PTModule.SomeClass.class_attribute, "patch not restored")
         
 
     def testPatchObjectWithDefaultMock(self):
