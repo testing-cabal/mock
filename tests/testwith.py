@@ -6,7 +6,14 @@ from __future__ import with_statement
 
 import os
 import sys
-import unittest2
+
+info = sys.version_info
+if info[:3] >= (3, 2, 0) or info[0] == 2 and info[1] >= 7:
+    # for Python 2.7 and 3.2 ordinary unittest is fine
+    import unittest as unittest2
+else:
+    import unittest2
+
 this_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if not this_dir in sys.path:
     sys.path.insert(0, this_dir)
@@ -24,6 +31,35 @@ from mock import Mock, patch, patch_object, sentinel
 
 something  = sentinel.Something
 something_else  = sentinel.SomethingElse
+
+try:
+    from contextlib import nested
+except ImportError:
+    from contextlib import contextmanager
+    @contextmanager
+    def nested(*managers):
+        exits = []
+        vars = []
+        exc = (None, None, None)
+        try:
+            for mgr in managers:
+                exit = mgr.__exit__
+                enter = mgr.__enter__
+                vars.append(enter())
+                exits.append(exit)
+            yield vars
+        except:
+            exc = sys.exc_info()
+        finally:
+            while exits:
+                exit = exits.pop()
+                try:
+                    if exit(*exc):
+                        exc = (None, None, None)
+                except:
+                    exc = sys.exc_info()
+            if exc != (None, None, None):
+                raise exc[1]
 
 
 class WithTest(unittest2.TestCase):
@@ -60,7 +96,6 @@ class WithTest(unittest2.TestCase):
 
 
     def testWithStatementNested(self):
-        from contextlib import nested
         with nested(patch('tests.testwith.something'), 
                     patch('tests.testwith.something_else')) as (mock_something, mock_something_else):
             self.assertEquals(something, mock_something, "unpatched")

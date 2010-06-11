@@ -24,12 +24,16 @@ __all__ = (
 
 __version__ = '0.7.0'
 
+import sys
+
 try:
     import inspect
 except ImportError:
     # for alternative platforms that
     # may not have inspect
     inspect = None
+
+inPy3k = sys.version_info[0] == 3
 
 
 # getsignature and mocksignature heavily "inspired" by
@@ -59,7 +63,11 @@ def _copy_func_details(func, funcopy):
     funcopy.__doc__ = func.__doc__
     funcopy.__dict__.update(func.__dict__)
     funcopy.__module__ = func.__module__
-    funcopy.func_defaults = func.func_defaults
+    if not inPy3k:
+        funcopy.func_defaults = func.func_defaults
+    else:
+        funcopy.__defaults__ = func.__defaults__
+        funcopy.__kwdefaults__ = func.__kwdefaults__
 
 
 def mocksignature(func, mock, skipfirst=False):
@@ -142,7 +150,7 @@ class Mock(object):
         self.call_count = 0
         self.call_args_list = []
         self.method_calls = []
-        for child in self._children.itervalues():
+        for child in self._children.values():
             child.reset_mock()
         if isinstance(self._return_value, Mock):
             self._return_value.reset_mock()
@@ -302,8 +310,10 @@ class _patch(object):
 
         patched.patchings = [self]
         patched.__name__ = func.__name__ 
-        patched.compat_co_firstlineno = getattr(func, "compat_co_firstlineno", 
-                                                func.func_code.co_firstlineno)
+        if hasattr(func, 'func_code'):
+            # not in Python 3
+            patched.compat_co_firstlineno = getattr(func, "compat_co_firstlineno", 
+                                                    func.func_code.co_firstlineno)
         return patched
 
 

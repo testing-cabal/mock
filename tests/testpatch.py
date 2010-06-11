@@ -2,11 +2,17 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
-
-
 import os
 import sys
-import unittest2
+
+info = sys.version_info
+if info[:3] >= (3, 2, 0) or info[0] == 2 and info[1] >= 7:
+    # for Python 2.7 and 3.2 ordinary unittest is fine
+    import unittest as unittest2
+else:
+    import unittest2
+
+
 this_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if this_dir not in sys.path:
     # Fix for running tests on the Mac 
@@ -22,6 +28,15 @@ if 'testpatch' in sys.modules:
     tests.testpatch = testpatch
 
 from mock import Mock, patch, patch_object, sentinel
+
+builtin_string = '__builtin__'
+try:
+    apply
+except NameError:
+    # no apply in Python 3
+    def apply(f, *args, **kw):
+        f(*args, **kw)
+    builtin_string = 'builtins'
 
 
 # for use in the test
@@ -123,7 +138,7 @@ class PatchTest(unittest2.TestCase):
         
         mock = Mock()
         mock.return_value = sentinel.Handle
-        @patch('__builtin__.open', mock)
+        @patch('%s.open' % builtin_string, mock)
         def test():
             self.assertEquals(open('filename', 'r'), sentinel.Handle, "open not patched")
         test()
@@ -223,7 +238,7 @@ class PatchTest(unittest2.TestCase):
     
     def testNestedPatchWithSpecAsList(self):
         # regression test for nested decorators
-        @patch('__builtin__.open')
+        @patch('%s.open' % builtin_string)
         @patch('tests.testpatch.SomeClass', spec=['wibble'])
         def test(MockSomeClass, MockOpen):
             self.assertEquals(SomeClass, MockSomeClass)
@@ -266,7 +281,7 @@ class PatchTest(unittest2.TestCase):
         
         
     def testPatchWithCreateMocksNonExistentAttributes(self):
-        @patch('__builtin__.frooble', sentinel.Frooble, create=True)
+        @patch('%s.frooble' % builtin_string, sentinel.Frooble, create=True)
         def test():
             self.assertEquals(frooble, sentinel.Frooble)
             
@@ -285,7 +300,7 @@ class PatchTest(unittest2.TestCase):
         
     def testPatchWontCreateByDefault(self):
         try:
-            @patch('__builtin__.frooble', sentinel.Frooble)
+            @patch('%s.frooble' % builtin_string, sentinel.Frooble)
             def test():
                 self.assertEquals(frooble, sentinel.Frooble)
                 
