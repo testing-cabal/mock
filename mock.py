@@ -47,7 +47,10 @@ def _getsignature(func, skipfirst):
     regargs, varargs, varkwargs, defaults = inspect.getargspec(func)
 
     # instance methods need to lose the self argument
-    im_self = getattr(func, 'im_self', None)
+    if not inPy3k:
+        im_self = getattr(func, 'im_self', None)
+    else:
+        im_self = getattr(func, '__self__', None)
     if im_self is not None:
         regargs = regargs[1:]
 
