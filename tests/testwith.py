@@ -27,7 +27,7 @@ if 'testwith' in sys.modules:
     import testwith
     tests.testwith = testwith
 
-from mock import Mock, patch, patch_object, sentinel
+from mock import MagicMock, Mock, patch, patch_object, sentinel
 
 something  = sentinel.Something
 something_else  = sentinel.SomethingElse
@@ -121,6 +121,16 @@ class WithTest(unittest2.TestCase):
             self.assertEqual(m, mock.__enter__.return_value)
         mock.__enter__.assert_called_with()
         mock.__exit__.assert_called_with(None, None, None)
+
+    
+    def testContextManagerWithMagicMock(self):
+        mock = MagicMock()
+        
+        with self.assertRaises(TypeError):
+            with mock as m:
+                'foo' + 3
+        mock.__enter__.assert_called_with()
+        self.assertTrue(mock.__exit__.called)
 
 
 if __name__ == '__main__':
