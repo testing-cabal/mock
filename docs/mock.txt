@@ -251,8 +251,22 @@ Attributes
         >>> mock.method_calls
         [('method', (), {}), ('property.method.attribute', (), {})]
 
+    The tuples in method_calls compare in favour even if positional and keyword arguments are skipped.
+
+    .. doctest::
+
+        >>> mock = Mock()
+        >>> mock.method()
+        <mock.Mock object at 0x...>
+        >>> mock.method(1, 2)
+        <mock.Mock object at 0x...>
+        >>> mock.method(a="b")
+        <mock.Mock object at 0x...>
+        >>> mock.method_calls == [('method',),
+                                  ('method', (1, 2)),
+                                  ('method', {"a": "b")]
+        True
 
 -----
 
 .. [#] The only exceptions are magic methods and attributes (those that have leading and trailing double underscores). Mock doesn't create these but instead of raises an ``AttributeError``. This is because the interpreter will often implicitly request these methods, and gets *very* confused to get a new Mock object when it expects a magic method.
-    
