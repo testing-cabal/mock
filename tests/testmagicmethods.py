@@ -4,7 +4,21 @@
 
 import os
 import sys
-import unittest2
+
+info = sys.version_info
+if info[:3] >= (3, 2, 0) or info[0] == 2 and info[1] >= 7:
+    # for Python 2.7 and 3.2 ordinary unittest is fine
+    import unittest as unittest2
+else:
+    import unittest2
+
+try:
+    unicode
+except NameError:
+    # Python 3
+    unicode = str
+
+
 this_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if not this_dir in sys.path:
     # Fix for running tests on the Mac 
@@ -66,8 +80,8 @@ class TestMockingMagicMethods(unittest2.TestCase):
         mock = Mock()
         self.assertEquals(unicode(mock), unicode(str(mock)))
         
-        mock.__unicode__ = lambda s: u'foo'
-        self.assertEqual(unicode(mock), u'foo')
+        mock.__unicode__ = lambda s: unicode('foo')
+        self.assertEqual(unicode(mock), unicode('foo'))
     
     
     def testDictMethods(self):
@@ -146,6 +160,10 @@ class TestMockingMagicMethods(unittest2.TestCase):
         
         nonzero = lambda s: False
         m.__nonzero__ = nonzero
+        
+        # Needed for Python 3
+        m.__bool__ = nonzero
+        
         self.assertFalse(bool(m))
     
         
