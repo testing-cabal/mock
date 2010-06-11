@@ -373,3 +373,17 @@ def get_method(name, func):
     return method
 
 _all_magics = set('__%s__' % method for method in ' '.join([magic_methods, numerics, inplace, right]).split())
+
+
+class MagicMock(Mock):
+    def __init__(self, *args, **kw):
+        Mock.__init__(self, *args, **kw)
+        for entry in _all_magics:
+            # could specify parent?
+            m = Mock()
+            if entry == '__exit__':
+                # so that MagicMock doesn't swallow exceptions
+                # when used in a with statement
+                m.return_value = False
+            setattr(self, entry, m)
+
