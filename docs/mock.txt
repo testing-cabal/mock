@@ -206,7 +206,7 @@ Attributes
 
 .. attribute:: Mock.call_args
 
-    This is either ``None`` (if the mock hasn't been called), or the arguments that the mock was last called with. This will be in the form of a tuple: the first member is any ordered arguments the mock was called with (or an empty tuple) and the second member is any keyword arguments (or an empty dictionary):
+    This is either ``None`` (if the mock hasn't been called), or the arguments that the mock was last called with. This will be in the form of a tuple: the first member is any ordered arguments the mock was called with (or an empty tuple) and the second member is any keyword arguments (or an empty dictionary). The tuple is lenient when comparing against tuples with empty elements skipped.
     
     .. doctest::
 
@@ -216,7 +216,13 @@ Attributes
         >>> mock()
         >>> mock.call_args
         ((), {})
-        >>> 
+        >>> mock.call_args == ()
+        True
+        >>> mock(3, 4)
+        >>> mock.call_args
+        ((3, 4), {})
+        >>> mock.call_args == ((3, 4),)
+        True
         >>> mock(3, 4, 5, key='fish', next='w00t!')
         >>> mock.call_args
         ((3, 4, 5), {'key': 'fish', 'next': 'w00t!'})
@@ -224,7 +230,7 @@ Attributes
 
 .. attribute:: Mock.call_args_list
 
-    This is a list of all the calls made to the mock object in sequence (so the length of the list is the number of times it has been called). Before any calls have been made it is an empty list:
+    This is a list of all the calls made to the mock object in sequence (so the length of the list is the number of times it has been called). Before any calls have been made it is an empty list. Its elements compare "softly" when positional arguments or keyword argument specification is skipped:
     
     .. doctest::
 
@@ -235,6 +241,8 @@ Attributes
         <mock.Mock object at 0x...>
         >>> mock.call_args_list
         [((), {}), ((3, 4, 5), {'key': 'fish', 'next': 'w00t!'})]
+        >>> mock.call_args_list == [(), ((3, 4, 5), {'key': 'fish', 'next': 'w00t!'})]
+        True
 
 
 .. attribute:: Mock.method_calls
