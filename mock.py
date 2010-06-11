@@ -168,7 +168,7 @@ class Mock(object):
         parent = self._parent
         name = self._name
         while parent is not None:
-            parent.method_calls.append((name, args, kwargs))
+            parent.method_calls.append(callargs((name, args, kwargs)))
             if parent._parent is None:
                 break
             name = parent._name + '.' + name
@@ -225,7 +225,24 @@ class Mock(object):
         
     def assert_called_with(self, *args, **kwargs):
         assert self.call_args == (args, kwargs), 'Expected: %s\nCalled with: %s' % ((args, kwargs), self.call_args)
-        
+
+class callargs(tuple):
+    def __eq__(self, other):
+        other_name = other[0]
+        if len(other) == 1:
+            other_args, other_kwargs = (), {}
+        elif len(other) == 2:
+            if isinstance(other[1], tuple):
+                other_args = other[1]
+                other_kwargs = {}
+            else:
+                other_args = ()
+                other_kwargs = other[1]
+        else:
+            other_args, other_kwargs = other[1], other[2]
+        return tuple(self) == (other_name, other_args, other_kwargs)
+    def __repr__(self):
+        return "callargs" + tuple.__repr__(self)
 
 def _dot_lookup(thing, comp, import_path):
     try:

@@ -19,7 +19,7 @@ if 'testmock' in sys.modules:
 
 from testcase import TestCase
 
-from mock import Mock, sentinel, DEFAULT
+from mock import Mock, sentinel, DEFAULT, callargs
 
 
 class MockTest(TestCase):
@@ -188,8 +188,27 @@ class MockTest(TestCase):
                           [("something", (3,), {'fish': None}),
                            ("something_else.something", (6,), {'cake': sentinel.Cake})],
                           "method calls not recorded correctly")
-        
-        
+
+    def testMethodCallsCompareEasily(self):
+        mock = Mock()
+        mock.something()
+        self.assertEquals(mock.method_calls, [('something',)])
+        self.assertEquals(mock.method_calls, [('something', (), {})])
+
+        mock = Mock()
+        mock.something('different')
+        self.assertEquals(mock.method_calls, [('something', ('different',))])
+        self.assertEquals(mock.method_calls, [('something', ('different',), {})])
+
+        mock = Mock()
+        mock.something(x=1)
+        self.assertEquals(mock.method_calls, [('something', {'x': 1})])
+        self.assertEquals(mock.method_calls, [('something', (), {'x': 1})])
+
+        mock = Mock()
+        mock.something('different', some='more')
+        self.assertEquals(mock.method_calls, [('something', ('different',), {'some': 'more'})])
+
     def testOnlyAllowedMethodsExist(self):
         spec = ["something"]
         mock = Mock(spec=spec)
