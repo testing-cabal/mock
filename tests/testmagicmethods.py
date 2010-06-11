@@ -33,7 +33,7 @@ if 'testmagicmethods' in sys.modules:
     tests.testmagicmethods = testmagicmethods
 
 import inspect
-from mock import Mock
+from mock import Mock, MagicMock, _all_magics
 
 
 class TestMockingMagicMethods(unittest2.TestCase):
@@ -49,7 +49,6 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertFalse(hasattr(mock, '__getitem__'))
     
     
-    @unittest2.expectedFailure
     def testMagicMethodWrapping(self):
         mock = Mock()
         def f(self, name):
@@ -58,7 +57,12 @@ class TestMockingMagicMethods(unittest2.TestCase):
         mock.__getitem__ = f
         self.assertFalse(mock.__getitem__ is f)
         self.assertEqual(mock['foo'], (mock, 'fish'))
-        self.assertEqual(inspect.getargspec(mock.__getitem__), inspect.getargspec(f))
+        
+        # When you pull the function back of the *instance*
+        # the first argument (self) is removed
+        def instance_f(name):
+            pass
+        self.assertEqual(inspect.getargspec(mock.__getitem__), inspect.getargspec(instance_f))
         
         mock.__getitem__ = mock
         self.assertTrue(mock.__getitem__ is mock)
@@ -222,7 +226,26 @@ class TestMockingMagicMethods(unittest2.TestCase):
         
         mock.__iter__ = lambda s: iter('foobarbaz')
         self.assertEqual(list(mock), list('foobarbaz'))
+
+
+    def testMagicMock(self):
+        mock = MagicMock()
         
+        mock.__iter__.return_value = iter([1, 2, 3])
+        self.assertEqual(list(mock), [1, 2, 3])
+        
+        if inPy3k:
+            mock.__bool__.return_value = False
+        else:
+            mock.__nonzero__.return_value = False
+            # in Python 3 mock still has a __nonzero__ attribute
+            self.assertFalse(hasattr(mock, '__bool__'))
+        
+        self.assertFalse(bool(mock))
+        
+        for entry in _all_magics:
+            self.assertTrue(hasattr(mock, entry))
+        self.assertFalse(hasattr(mock, '__imaginery__'))
 
 if __name__ == '__main__':
     unittest2.main()
