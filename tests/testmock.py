@@ -137,8 +137,18 @@ class MockTest(TestCase):
         self.assertEquals(mock.call_count, 2, "call_count incorrect")
         self.assertEquals(mock.call_args, ((sentinel.Arg,), {'key': sentinel.KeyArg}), "call_args not set")
         self.assertEquals(mock.call_args_list, [((sentinel.Arg,), {}), ((sentinel.Arg,), {'key': sentinel.KeyArg})], "call_args_list not set")
-        
-    
+
+    def testCallArgsComparison(self):
+        mock = Mock()
+        mock()
+        mock(sentinel.Arg)
+        mock(kw=sentinel.Kwarg)
+        mock(sentinel.Arg, kw=sentinel.Kwarg)
+        self.assertEquals(mock.call_args_list, [(),
+                                                ((sentinel.Arg,),),
+                                                ({"kw": sentinel.Kwarg},),
+                                                ((sentinel.Arg,), {"kw": sentinel.Kwarg})])
+
     def testAssertCalledWith(self):
         mock = Mock()
         mock()
