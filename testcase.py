@@ -2,10 +2,10 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
-import unittest
+import unittest2
 
 
-class TestCase(unittest.TestCase):
+class TestCase(unittest2.TestCase):
         
     def assertTrue(self, actual, message=None):
         if not isinstance(actual, bool) or not actual:

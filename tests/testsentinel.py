@@ -33,5 +33,5 @@ class SentinelTest(TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest2.main()
     

@@ -6,7 +6,7 @@ from __future__ import with_statement
 
 import os
 import sys
-import unittest
+import unittest2
 this_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if not this_dir in sys.path:
     sys.path.insert(0, this_dir)
@@ -91,5 +91,5 @@ class WithTest(TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest2.main()
     
