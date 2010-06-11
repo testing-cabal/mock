@@ -9,24 +9,51 @@ from mock import __version__
 
 from distutils.core import setup
 
+
+NAME = 'mock'
+MODULES = ['mock'],
+DESCRIPTION = 'A Python Mocking and Patching Library for Testing'
+
+URL = "http://www.voidspace.org.uk/python/mock/"
+'http://www.voidspace.org.uk/downloads/mock-%s.zip' % __version__
+
+readme = os.path.join(os.path.dirname(__file__), 'README.txt')
+LONG_DESCRIPTION = open(readme).read()
+
+CLASSIFIERS = [
+    'Development Status :: 4 - Beta',
+    'Environment :: Console',
+    'Intended Audience :: Developers',
+    'License :: OSI Approved :: BSD License',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 2.4',
+    'Programming Language :: Python :: 2.5',
+    'Programming Language :: Python :: 2.6',
+    'Programming Language :: Python :: 2.7',
+    'Operating System :: OS Independent',
+    'Topic :: Software Development :: Libraries',
+    'Topic :: Software Development :: Libraries :: Python Modules',
+    'Topic :: Software Development :: Testing',
+]
+
+AUTHOR = 'Michael Foord'
+AUTHOR_EMAIL = 'michael@voidspace.org.uk'
+KEYWORDS = "testing test mock mocking unittest patching stubs fakes doubles".split(' ')
+
+
 setup(
-    name = "mock",
-    version = __version__,
-    py_modules = ['mock'],
+    name=NAME,
+    version=__version__,
+    py_modules=MODULES,
     
     # metadata for upload to PyPI
-    author = "Michael Foord",
-    author_email = "fuzzyman@voidspace.org.uk",
-    description = "A Python mock object library",
-    long_description = dedent("""\
-    Mock is a flexible mock object intended to replace the use of stubs and test doubles 
-    throughout your code. Mocks are callable and create attributes as new mocks when you 
-    access them. Accessing the same attribute will always return the same mock. Mocks 
-    record how you use them, allowing you to make assertions about what your code has 
-    done to them."""),
-    license = "BSD",
-    keywords = "testing test mock mocking unittest patching stubs",
-    url = "http://www.voidspace.org.uk/python/mock/",
-    download_url = 'http://www.voidspace.org.uk/downloads/mock-%s.zip' % __version__,
-
+    author=AUTHOR,
+    author_email=AUTHOR_EMAIL,
+    description=DESCRIPTION,
+    long_description=LONG_DESCRIPTION,
+    keywords=KEYWORDS,
+    url=URL,
+    download_url=DOWNLOAD_URL,
+    classifiers=CLASSIFIERS,
+    keywords=KEYWORDS
 )
