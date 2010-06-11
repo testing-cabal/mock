@@ -11,8 +11,6 @@ this_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if not this_dir in sys.path:
     sys.path.insert(0, this_dir)
 
-from testcase import TestCase
-
 if __name__ == '__main__':
     sys.modules['testwith'] = sys.modules['__main__']
 
@@ -28,7 +26,7 @@ something  = sentinel.Something
 something_else  = sentinel.SomethingElse
 
 
-class WithTest(TestCase):
+class WithTest(unittest2.TestCase):
     def testWithStatement(self):
         with patch('tests.testwith.something', sentinel.Something2):
             self.assertEquals(something, sentinel.Something2, "unpatched")        

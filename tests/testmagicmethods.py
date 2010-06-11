@@ -17,13 +17,11 @@ if 'testmagicmethods' in sys.modules:
     import testmagicmethods
     tests.testmagicmethods = testmagicmethods
 
-from testcase import TestCase
-
 import inspect
 from mock import Mock
 
 
-class TestMockingMagicMethods(TestCase):
+class TestMockingMagicMethods(unittest2.TestCase):
     
     def testDeletingMagicMethods(self):
         mock = Mock()

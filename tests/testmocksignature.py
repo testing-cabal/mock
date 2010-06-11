@@ -17,13 +17,11 @@ if 'testmocksignature' in sys.modules:
     import testmocksignature
     tests.testmocksignature = testmocksignature
 
-from testcase import TestCase
-
 import inspect
 from mock import Mock, mocksignature
 
 
-class TestMockSignature(TestCase):
+class TestMockSignature(unittest2.TestCase):
 
     def testFunction(self):
         def f(a):
