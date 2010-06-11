@@ -408,6 +408,7 @@ if inPy3k:
     extra = 'bool '
 
 # not including __prepare__, __instancecheck__, __subclasscheck__
+# (as they are metaclass methods)
 
 def get_method(name, func):
     def method(self, *args, **kw):
