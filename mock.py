@@ -394,11 +394,17 @@ magic_methods = (
     "nonzero enter exit "
     "divmod neg pos abs invert "
     "complex int long float oct hex index "
+    "format next dir "
 )
 
 numerics = "add sub mul div truediv floordiv mod lshift rshift and xor or "
 inplace = ' '.join('i%s' % n for n in numerics.split())
 right = ' '.join('r%s' % n for n in numerics.split()) 
+extra = ''
+if inPy3k:
+    extra = 'bool '
+
+# not including __prepare__, __instancecheck__, __subclasscheck__
 
 def get_method(name, func):
     def method(self, *args, **kw):
@@ -406,7 +412,7 @@ def get_method(name, func):
     method.__name__ = name
     return method
 
-_all_magics = set('__%s__' % method for method in ' '.join([magic_methods, numerics, inplace, right]).split())
+_all_magics = set('__%s__' % method for method in ' '.join([magic_methods, numerics, inplace, right, extra]).split())
 
 
 class MagicMock(Mock):
