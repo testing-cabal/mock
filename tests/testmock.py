@@ -148,6 +148,7 @@ class MockTest(TestCase):
                                                 ((sentinel.Arg,),),
                                                 ({"kw": sentinel.Kwarg},),
                                                 ((sentinel.Arg,), {"kw": sentinel.Kwarg})])
+        self.assertEquals(mock.call_args, ((sentinel.Arg,), {"kw": sentinel.Kwarg}))
 
     def testAssertCalledWith(self):
         mock = Mock()
