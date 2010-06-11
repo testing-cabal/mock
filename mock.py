@@ -162,8 +162,8 @@ class Mock(object):
     def __call__(self, *args, **kwargs):
         self.called = True
         self.call_count += 1
-        self.call_args = (args, kwargs)
-        self.call_args_list.append((args, kwargs))
+        self.call_args = callargs((args, kwargs))
+        self.call_args_list.append(callargs((args, kwargs)))
         
         parent = self._parent
         name = self._name
@@ -228,19 +228,28 @@ class Mock(object):
 
 class callargs(tuple):
     def __eq__(self, other):
-        other_name = other[0]
-        if len(other) == 1:
+        if len(self) == 3:
+            if other[0] != self[0]:
+                return False
+            args_kwargs = self[1:]
+            other_args_kwargs = other[1:]
+        else:
+            args_kwargs = tuple(self)
+            other_args_kwargs = other
+
+        if len(other_args_kwargs) == 0:
             other_args, other_kwargs = (), {}
-        elif len(other) == 2:
-            if isinstance(other[1], tuple):
-                other_args = other[1]
+        elif len(other_args_kwargs) == 1:
+            if isinstance(other_args_kwargs[0], tuple):
+                other_args = other_args_kwargs[0]
                 other_kwargs = {}
             else:
                 other_args = ()
-                other_kwargs = other[1]
+                other_kwargs = other_args_kwargs[0]
         else:
-            other_args, other_kwargs = other[1], other[2]
-        return tuple(self) == (other_name, other_args, other_kwargs)
+            other_args, other_kwargs = other_args_kwargs
+
+        return tuple(args_kwargs) == (other_args, other_kwargs)
 
 def _dot_lookup(thing, comp, import_path):
     try:
