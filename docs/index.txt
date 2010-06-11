@@ -102,6 +102,8 @@ Articles and blog entries on testing with Mock:
 Tests
 =====
 
+XXXX unittest2 instead
+
 Mock uses the `discover module <http://pypi.python.org/pypi/discover>`_ to
 collect and run its tests. discover.py is included in the subversion repository
 so from a fresh checkout you can execute the following to run all the tests:
