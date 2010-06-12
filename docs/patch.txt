@@ -105,6 +105,11 @@ function::
 statements in the same way as ``patch``. It can also be used as a class
 decorator with same semantics as ``patch``.
 
+patch_object
+============
+.. deprecated:: 2.6
+   This is the same as ``patch.object``. Use the renamed version now.
+
 
 Nesting Patch Decorators
 ========================
