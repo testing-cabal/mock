@@ -39,7 +39,7 @@ class TestMockSignature(unittest2.TestCase):
         f2  = mocksignature(f, mock)
         self.assertRaises(TypeError, f2)
         mock.return_value = 3
-        self.assertEquals(f2('foo'), 3)
+        self.assertEqual(f2('foo'), 3)
         mock.assert_called_with('foo')
     
     
@@ -52,7 +52,7 @@ class TestMockSignature(unittest2.TestCase):
         mock = Mock()
         mock.return_value = 3
         f.method = mocksignature(f.method, mock)
-        self.assertEquals(f.method('foo', 'bar'), 3)
+        self.assertEqual(f.method('foo', 'bar'), 3)
         mock.assert_called_with('foo', 'bar')
 
 

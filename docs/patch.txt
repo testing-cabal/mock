@@ -80,8 +80,8 @@ You can stack up multiple patch decorators using this pattern::
     def testMethod(self, MockClass2, MockClass1):
         ClassName1()
         ClassName2()
-        self.assertEquals(MockClass1.called, "ClassName1 not patched")
-        self.assertEquals(MockClass2.called, "ClassName2 not patched")
+        self.assertEqual(MockClass1.called, "ClassName1 not patched")
+        self.assertEqual(MockClass2.called, "ClassName2 not patched")
 
 
 Like all context-managers patches can be nested using contextlib's nested function - *every* patching will appear in the tuple after "as". ::
@@ -90,7 +90,7 @@ Like all context-managers patches can be nested using contextlib's nested functi
      with nested(patch('Package.ModuleName.ClassName'), 
                  patch('Package.ModuleName.ClassName2', TestUtils.MockClass2)) as (MockClass1, MockClass2):
           instance = ClassName(ClassName2())
-          self.assertEquals(instance.f(), "expected")
+          self.assertEqual(instance.f(), "expected")
 
 
 Patching Descriptors

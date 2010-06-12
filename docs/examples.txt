@@ -53,12 +53,12 @@ If you want to catch the arguments then there is other information exposed:
         
         real.method()
         
-        self.assertEquals(real.something.call_count, 1, "something called incorrect number of times")
+        self.assertEqual(real.something.call_count, 1, "something called incorrect number of times")
         
         args = ()
         keywargs = {}
-        self.assertEquals(real.something.call_args, (args, keywargs), "something called with incorrect arguments")
-        self.assertEquals(real.something.call_args_list, [(args, keywargs)], 
+        self.assertEqual(real.something.call_args, (args, keywargs), "something called with incorrect arguments")
+        self.assertEqual(real.something.call_args_list, [(args, keywargs)], 
                           "something called with incorrect arguments")
 
 Checking ``call_args_list`` tests how many times the mock was called, and the arguments for each call, in a single assertion.
@@ -258,7 +258,7 @@ A nice pattern is to actually decorate test methods themselves:
 
     @patch_object(SomeClass, 'attribute', sentinel.Attribute)
     def testMethod(self):
-        self.assertEquals(SomeClass.attribute, sentinel.Attribute, "SomeClass not patched")    
+        self.assertEqual(SomeClass.attribute, sentinel.Attribute, "SomeClass not patched")    
     
 If you omit the second argument to ``patch`` (or the third argument to ``patch_object``) then the attribute will be patched with a mock for you. The mock will be passed in as extra argument(s) to the function / method under test:
 
@@ -279,6 +279,6 @@ You can stack up multiple patch decorators using this pattern:
     def testMethod(self, MockClass1, MockClass2):
         ClassName1()
         ClassName2()
-        self.assertEquals(MockClass1.called, "ClassName1 not patched")
-        self.assertEquals(MockClass2.called, "ClassName2 not patched")
+        self.assertEqual(MockClass1.called, "ClassName1 not patched")
+        self.assertEqual(MockClass2.called, "ClassName2 not patched")
 

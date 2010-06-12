@@ -122,10 +122,10 @@ The two decorators are 'patch' and 'patch_object'. 'patch' takes a single string
     original = SomeClass.attribute
     @patch_object(SomeClass, 'attribute', sentinel.Attribute)
     def test():
-        self.assertEquals(SomeClass.attribute, sentinel.Attribute, "class attribute not patched")
+        self.assertEqual(SomeClass.attribute, sentinel.Attribute, "class attribute not patched")
     test()
     
-    self.assertEquals(SomeClass.attribute, original, "attribute not restored")
+    self.assertEqual(SomeClass.attribute, original, "attribute not restored")
     
     
     @patch('Package.Module.attribute', sentinel.Attribute)
