@@ -67,7 +67,6 @@ The following is an example of using magic methods with the ordinary Mock
 class::
 
     >>> from mock import Mock
-    >>> 
     >>> mock = Mock()
     >>> mock.__str__ = Mock()
     >>> mock.__str__.return_value = 'wheeeeee'

@@ -32,10 +32,11 @@ Not done yet:
 * Should spec cause all methods to be wrapped with mocksignature perhaps?
   (or another keyword argument perhaps?) - defer this to an issue
 * Should magic method calls be tracked in method_calls?
-* Document the way magic methods are wrapped in __setattr__ so that Python's inconsistent lookup of magic methods
-  doesn't matter
+* Document the way magic methods are wrapped in __setattr__ so that Python's
+  inconsistent lookup of magic methods doesn't matter
 * Document that wrapping is bypassed if the magic method is patched with a Mock
-* document unsupported magic methods (add obsolete ones like getslice / setslice / delslice / cmp / coerce etc?)
+* document unsupported magic methods (add obsolete ones like getslice / setslice
+  / delslice / cmp / coerce etc?)
 
 
 2009/08/22 Version 0.6.0
