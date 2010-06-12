@@ -371,16 +371,16 @@ class PatchTest(unittest2.TestCase):
 
         class Foo(object):
             def test_method(other_self):
-                self.assertEquals(Something.attribute, sentinel.Patched, "unpatched")
+                self.assertEqual(Something.attribute, sentinel.Patched, "unpatched")
             def not_test_method(other_self):
-                self.assertEquals(Something.attribute, sentinel.Original, "non-test method patched")
+                self.assertEqual(Something.attribute, sentinel.Original, "non-test method patched")
         Foo = patch_object(Something, 'attribute', sentinel.Patched)(Foo)
 
         f = Foo()
         f.test_method()
         f.not_test_method()
 
-        self.assertEquals(Something.attribute, sentinel.Original, "patch not restored")
+        self.assertEqual(Something.attribute, sentinel.Original, "patch not restored")
 
 
     def testPatchClassDecorator(self):
@@ -392,17 +392,17 @@ class PatchTest(unittest2.TestCase):
 
         class Foo(object):
             def test_method(other_self, mock_something):
-                self.assertEquals(__main__.something, mock_something, "unpatched")
+                self.assertEqual(__main__.something, mock_something, "unpatched")
             def not_test_method(other_self):
-                self.assertEquals(__main__.something, sentinel.Something, "non-test method patched")
+                self.assertEqual(__main__.something, sentinel.Something, "non-test method patched")
         Foo = patch('__main__.something')(Foo)
 
         f = Foo()
         f.test_method()
         f.not_test_method()
 
-        self.assertEquals(Something.attribute, sentinel.Original, "patch not restored")
-        self.assertEquals(__main__.something, sentinel.Something, "patch not restored")
+        self.assertEqual(Something.attribute, sentinel.Original, "patch not restored")
+        self.assertEqual(__main__.something, sentinel.Something, "patch not restored")
 
 
 if __name__ == '__main__':
