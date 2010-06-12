@@ -7,6 +7,7 @@
 
 * Addition of ``mocksignature``
 * Ability to mock magic methods
+* Ability to use patch and patch_object as class decorators
 * Addition of ``MagicMock`` class with all magic methods pre-created for you
 * Python 3 compatibility
 * Addition of ``mocksignature`` argument to ``patch`` and ``patch_object``
