@@ -104,14 +104,15 @@ Articles and blog entries on testing with Mock:
 Tests
 =====
 
-Mock uses ``unittest2`` for its own test suite. In order to run it, use the
-``unit2`` script that comes with ``unittest2`` module.
+Mock uses `unittest2 <http://pypi.python.org/pypi/unittest2>`_ for its own
+test suite. In order to run it, use the ``unit2`` script that comes with
+``unittest2`` module.
 
-   ``unit2 discover .``
+   ``unit2 discover``
 
 On Python 2.7 and 3.2 you can use ``unittest`` module from the standard library.
 
-   ``python3.2 -m unittest discover .``
+   ``python3.2 -m unittest discover``
 
 On Python 2.4 you will see one failure - testwith.py will fail to import as it
 uses the ``with`` statement which is invalid syntax under Python 2.4.
