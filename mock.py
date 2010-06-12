@@ -442,7 +442,7 @@ if inPy3k:
 
 # not including __prepare__, __instancecheck__, __subclasscheck__
 # (as they are metaclass methods)
-# Also not including the obsolete __cmp__, __getslice__, __setslice__
+# Also not including the obsolete __cmp__, __getslice__, __setslice__, __coerce__
 
 def get_method(name, func):
     def method(self, *args, **kw):
