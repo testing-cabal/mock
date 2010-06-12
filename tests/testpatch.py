@@ -391,11 +391,11 @@ class PatchTest(unittest2.TestCase):
             attribute = sentinel.Original
 
         class Foo(object):
-            def test_method(other_self):
-                self.assertEquals(__main__.something, sentinel.Something2, "unpatched")
+            def test_method(other_self, mock_something):
+                self.assertEquals(__main__.something, mock_something, "unpatched")
             def not_test_method(other_self):
                 self.assertEquals(__main__.something, sentinel.Something, "non-test method patched")
-        Foo = patch('__main__.something', sentinel.Something2)(Foo)
+        Foo = patch('__main__.something')(Foo)
 
         f = Foo()
         f.test_method()
