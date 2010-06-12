@@ -25,7 +25,6 @@ __all__ = (
 __version__ = '0.7.0 alpha'
 
 import sys
-import types
 
 try:
     import inspect
@@ -35,11 +34,6 @@ except ImportError:
     inspect = None
 
 inPy3k = sys.version_info[0] == 3
-
-if inPy3k:
-    class_types = (type,)
-else:
-    class_types = (type, types.ClassType)
 
 
 # getsignature and mocksignature heavily "inspired" by
@@ -127,6 +121,12 @@ def _copy(value):
     return value
 
 
+if inPy3k:
+    class_types = type
+else:
+    class_types = (type, ClassType)
+
+
 class Mock(object):
     
     def __new__(cls, *args, **kw):
@@ -194,7 +194,7 @@ class Mock(object):
         ret_val = DEFAULT
         if self.side_effect is not None:
             if (isinstance(self.side_effect, Exception) or 
-                isinstance(self.side_effect, (type, ClassType)) and
+                isinstance(self.side_effect, class_types) and
                 issubclass(self.side_effect, Exception)):
                 raise self.side_effect
             
@@ -370,7 +370,7 @@ class _patch(object):
             if spec == True:
                 # set spec to the object we are replacing
                 spec = original
-                if isinstance(spec, (type, ClassType)):
+                if isinstance(spec, class_types):
                     inherit = True
             new = Mock(spec=spec)
             if inherit:
