@@ -64,7 +64,8 @@ methods and they will be called appropriately. The MagicMock class is just a
 Mock variant that has all of the magic methods pre-created for you (well - all
 the useful ones anyway).
 
-The following is an example of using magic methods with the ordinary Mock class::
+The following is an example of using magic methods with the ordinary Mock
+class::
 
     >>> from mock import Mock
     >>> 
