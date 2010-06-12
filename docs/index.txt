@@ -58,8 +58,8 @@ repository with the following command:
 
     ``svn checkout http://mock.googlecode.com/svn/trunk/ mock-read-only``
 
-Mock is registered with PyPi (`Mock on PyPi <http://pypi.python.org/pypi/mock/>`_). 
-If you have pip, setuptools or Distribute you can install mock with:
+Mock is registered with PyPI (`mock on PyPi <http://pypi.python.org/pypi/mock/>`_). 
+If you have pip, setuptools or distribute you can install mock with:
 
     | ``easy_install mock``
     | ``pip install mock``

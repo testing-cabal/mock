@@ -116,9 +116,11 @@ Thanks to Kevin Dangoor for these changes.
 2007/11/30  Version 0.3.0
 -------------------------
 
-Removed ``patch_module``. ``patch`` can now take a string as the first argument for patching modules.
+Removed ``patch_module``. ``patch`` can now take a string as the first
+argument for patching modules.
 
-The third argument to ``patch`` is optional - a mock will be created by default if it is not passed in.
+The third argument to ``patch`` is optional - a mock will be created by
+default if it is not passed in.
 
 
 2007/11/21  Version 0.2.1
@@ -130,7 +132,8 @@ Bug fix, allows reuse of functions decorated with ``patch`` and ``patch_module``
 2007/11/20  Version 0.2.0
 -------------------------
 
-Added ``spec`` keyword argument for creating ``Mock`` objects from a specification object.
+Added ``spec`` keyword argument for creating ``Mock`` objects from a
+specification object.
 
 Added ``patch`` and ``patch_module`` monkey patching decorators.
 
