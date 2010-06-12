@@ -36,6 +36,11 @@ except ImportError:
 
 inPy3k = sys.version_info[0] == 3
 
+if inPy3k:
+    class_types = (type,)
+else:
+    class_types = (type, types.ClassType)
+
 
 # getsignature and mocksignature heavily "inspired" by
 # the decorator module: http://pypi.python.org/pypi/decorator/
@@ -299,8 +304,7 @@ class _patch(object):
 
 
     def __call__(self, func):
-        if isinstance(func, type) or (hasattr(types, "ClassType") and
-                                      isinstance(func, types.ClassType)):
+        if isinstance(func, class_types):
             return self.decorate_class(func)
         else:
             return self.decorate_callable(func)
