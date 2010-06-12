@@ -7,7 +7,7 @@ return values and set needed attributes in the normal way.
 This approach is inspired by the testing patterns used at
 `Resolver Systems <http://www.resolversystems.com/>`_.
 
-mock is tested on Python versions 2.4 - 2.7.
+mock is tested on Python versions 2.4 - 2.7 and Python 3.
 
 The mock module also provides utility functions / objects to assist with
 testing, particularly monkey patching.
@@ -47,10 +47,9 @@ mock (or other object) during the test and restored when the test ends::
         self.assertTrue(MockClass2.called, "ClassName2 not patched")
 
 
-The version of mock.py in `SVN <http://code.google.com/p/mock/source/browse/>`_,
-which will be released as version 0.7, supports the mocking of magic methods and
-also works with Python 3. The easiest way of using magic methods is with the
-``MagicMock`` class. It allows you to do things like::
+Mock now supports the mocking of Python magic methods. The easiest way of
+using magic methods is with the ``MagicMock`` class. It allows you to do
+things like::
 
     >>> from mock import MagicMock
     >>> mock = MagicMock()
@@ -59,10 +58,10 @@ also works with Python 3. The easiest way of using magic methods is with the
     'foobarbaz'
     >>> mock.__str__.assert_called_with()
 
-In 0.7 Mock allows you to assign functions (or other Mock instances) to magic
-methods and they will be called appropriately. The MagicMock class is just a
-Mock variant that has all of the magic methods pre-created for you (well - all
-the useful ones anyway).
+Mock allows you to assign functions (or other Mock instances) to magic methods
+and they will be called appropriately. The MagicMock class is just a Mock
+variant that has all of the magic methods pre-created for you (well - all the
+useful ones anyway).
 
 The following is an example of using magic methods with the ordinary Mock
 class::
