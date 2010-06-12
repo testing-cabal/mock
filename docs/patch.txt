@@ -52,6 +52,12 @@ Patch can be used with the with statement - if this is available in your version
 
 By default ``patch`` will fail to replace attributes that don't exist. If you pass in 'create=True' and the attribute doesn't exist, patch will create the attribute for you when the patched function is called, and delete it again afterwards. This is useful for writing tests against attributes that your production code creates at runtime. It is off by by default because it can be dangerous. With it switched on you can write passing tests against APIs that don't actually exist!
 
+Patch can be also used as a TestCase class decorator. It works by decorating each test method in the class. This reduces the boilerplate code when your test methods share a common patchings set. ::
+
+  @patch('Patch.ModuleName.ClassName')
+  class SomeTest(unittest.TestCase):
+      def test_something(self, MockClass):
+          "test something"
 
 patch_object
 ============
@@ -73,7 +79,8 @@ When calling with the two argument form you omit the replacement object, and a m
 ``spec`` and ``create`` have the same meaning as for the patch decorator.
 
 ``patch_object`` is also a context manager and can be used with ``with`` statements in the same way
-as ``patch``.
+as ``patch``. It can also be used as a class decorator with same semantics as ``patch``.
+
 
 
 Nesting Patch Decorators
