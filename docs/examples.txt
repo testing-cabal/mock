@@ -8,7 +8,7 @@
     if not os.getcwd() in sys.path:
         sys.path.append(os.getcwd())
         
-    from mock import Mock, sentinel, patch, patch_object
+    from mock import Mock, sentinel, patch
 
     class SomeClass(object):
         static_method = None
@@ -220,17 +220,17 @@ is instantiated. Modules and classes are effectively global, so patching on
 them has to be undone after the test or the patch will persist into other
 tests and cause hard to diagnose problems.
 
-The ``patch`` and ``patch_object`` decorators provide a convenient way of
+The ``patch`` and ``patch.object`` decorators provide a convenient way of
 doing this.
 
-``patch_object`` patches attributes on objects within the scope of a function
+``patch.object`` patches attributes on objects within the scope of a function
 they decorate:
 
 .. doctest::
 
     >>> mock = Mock()
     
-    >>> @patch_object(SomeClass, 'class_method', mock) 
+    >>> @patch.object(SomeClass, 'class_method', mock) 
     ... def test():
     ...     SomeClass.class_method()
     ... 
@@ -250,8 +250,8 @@ They can be stacked to perform multiple simultaneous patches:
     >>> mock1 = Mock()
     >>> mock2 = Mock()
     
-    >>> @patch_object(SomeClass, 'class_method', mock1) 
-    ... @patch_object(SomeClass, 'static_method', mock2) 
+    >>> @patch.object(SomeClass, 'class_method', mock1) 
+    ... @patch.object(SomeClass, 'static_method', mock2) 
     ... def test():
     ...     SomeClass.class_method()
     ...     SomeClass.static_method()
@@ -262,7 +262,7 @@ They can be stacked to perform multiple simultaneous patches:
     >>> self.assertTrue(mock2.called, "static_method not called")
 
 If you are patching a module (including ``__builtin__``) then use ``patch``
-instead of ``patch_object``:
+instead of ``patch.object``:
 
 .. doctest::
 
@@ -292,15 +292,15 @@ A nice pattern is to actually decorate test methods themselves:
 
 ::
 
-    @patch_object(SomeClass, 'attribute', sentinel.Attribute)
+    @patch.object(SomeClass, 'attribute', sentinel.Attribute)
     def testMethod(self):
         self.assertEqual(SomeClass.attribute, sentinel.Attribute, "SomeClass not patched")    
     
-If you omit the second argument to ``patch`` (or the third argument to ``patch_object``) then the attribute will be patched with a mock for you. The mock will be passed in as extra argument(s) to the function / method under test:
+If you omit the second argument to ``patch`` (or the third argument to ``patch.object``) then the attribute will be patched with a mock for you. The mock will be passed in as extra argument(s) to the function / method under test:
 
 ::
     
-    @patch_object(SomeClass, 'staticmethod')
+    @patch.object(SomeClass, 'staticmethod')
     def testMethod(self, mockMethod):
         SomeClass.staticmethod()
         self.assertTrue(mockMethod.called, "SomeClass not patched with a mock")
