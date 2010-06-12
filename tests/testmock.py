@@ -24,7 +24,7 @@ if 'testmock' in sys.modules:
     import testmock
     tests.testmock = testmock
 
-from mock import Mock, sentinel, DEFAULT, callargs
+from mock import Mock, sentinel, DEFAULT
 
 try:
     unicode
@@ -282,7 +282,6 @@ class MockTest(unittest2.TestCase):
         
         self.assertEqual(mock(), 3)
         self.assertFalse(real.called)
-        
         
         
     def testWrapsAttributes(self):
