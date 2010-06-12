@@ -7,10 +7,11 @@
 from mock import __version__
 
 from distutils.core import setup
+import os
 
 
 NAME = 'mock'
-MODULES = ['mock'],
+MODULES = ['mock']
 DESCRIPTION = 'A Python Mocking and Patching Library for Testing'
 
 URL = "http://www.voidspace.org.uk/python/mock/"
@@ -39,6 +40,7 @@ AUTHOR = 'Michael Foord'
 AUTHOR_EMAIL = 'michael@voidspace.org.uk'
 KEYWORDS = "testing test mock mocking unittest patching stubs fakes doubles".split(' ')
 
+DOWNLOAD_URL = 'http://www.voidspace.org.uk/downloads/mock-0.7.0.zip'
 
 setup(
     name=NAME,
@@ -54,5 +56,4 @@ setup(
     url=URL,
     download_url=DOWNLOAD_URL,
     classifiers=CLASSIFIERS,
-    keywords=KEYWORDS
 )
