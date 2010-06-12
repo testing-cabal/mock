@@ -299,7 +299,8 @@ class _patch(object):
 
 
     def __call__(self, func):
-        if isinstance(func, types.ClassType) or isinstance(func, type):
+        if isinstance(func, type) or (hasattr(types, "ClassType") and
+                                      isinstance(func, types.ClassType)):
             return self.decorate_class(func)
         else:
             return self.decorate_callable(func)
