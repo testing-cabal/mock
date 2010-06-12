@@ -22,12 +22,12 @@ from mock import sentinel, DEFAULT
 class SentinelTest(unittest2.TestCase):
 
     def testSentinels(self):
-        self.assertEquals(sentinel.whatever, sentinel.whatever, 'sentinel not stored')
+        self.assertEqual(sentinel.whatever, sentinel.whatever, 'sentinel not stored')
         self.assertNotEquals(sentinel.whatever, sentinel.whateverelse, 'sentinel should be unique')
         
         
     def testSentinelName(self):
-        self.assertEquals(str(sentinel.whatever), '<SentinelObject "whatever">', 'sentinel name incorrect')
+        self.assertEqual(str(sentinel.whatever), '<SentinelObject "whatever">', 'sentinel name incorrect')
         
     
     def testDEFAULT(self):

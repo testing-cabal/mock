@@ -84,7 +84,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
     @unittest2.skipIf(inPy3k, "no unicode in Python 3")
     def testUnicode(self):
         mock = Mock()
-        self.assertEquals(unicode(mock), unicode(str(mock)))
+        self.assertEqual(unicode(mock), unicode(str(mock)))
         
         mock.__unicode__ = lambda s: unicode('foo')
         self.assertEqual(unicode(mock), unicode('foo'))
@@ -115,10 +115,10 @@ class TestMockingMagicMethods(unittest2.TestCase):
         
         self.assertRaises(KeyError, lambda: mock['foo'])
         mock['foo'] = 'bar'
-        self.assertEquals(_dict, {'foo': 'bar'})
-        self.assertEquals(mock['foo'], 'bar')
+        self.assertEqual(_dict, {'foo': 'bar'})
+        self.assertEqual(mock['foo'], 'bar')
         del mock['foo']
-        self.assertEquals(_dict, {})
+        self.assertEqual(_dict, {})
             
             
     def testNumeric(self):

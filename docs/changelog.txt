@@ -9,15 +9,16 @@
 * Ability to mock magic methods
 * Addition of ``MagicMock`` class with all magic methods pre-created for you
 * Python 3 compatibility
-* Addition of ``mocksignature`` argument to ``patch`` and ``patchobject``
+* Addition of ``mocksignature`` argument to ``patch`` and ``patch_object``
 * ``help(mock)`` works now (on the module). Can no longer use ``__bases__``
   as a valid sentinel name (thanks to Stephen Emslie for reporting and
   diagnosing this)
 * Addition of soft comparisons: call_args, call_args_list and method_calls
-  return now tuple-like objects which compare positively even when empty args
+  return now tuple-like objects which compare equal even when empty args
   or kwargs are skipped
 * The tests now require `unittest2 <http://pypi.python.org/pypi/unittest2>`_
   to run
+* `Konrad Delong <http://konryd.blogspot.com/>`_ added as co-maintainer
 
 Not done yet:
 

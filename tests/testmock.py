@@ -37,12 +37,12 @@ class MockTest(unittest2.TestCase):
         mock = Mock()
         
         self.assertFalse(mock.called, "called not initialised correctly")
-        self.assertEquals(mock.call_count, 0, "call_count not initialised correctly")
+        self.assertEqual(mock.call_count, 0, "call_count not initialised correctly")
         self.assertTrue(isinstance(mock.return_value, Mock), "return_value not initialised correctly")
         
-        self.assertEquals(mock.call_args, None, "call_args not initialised correctly")
-        self.assertEquals(mock.call_args_list, [], "call_args_list not initialised correctly")
-        self.assertEquals(mock.method_calls, [], 
+        self.assertEqual(mock.call_args, None, "call_args not initialised correctly")
+        self.assertEqual(mock.call_args_list, [], "call_args_list not initialised correctly")
+        self.assertEqual(mock.method_calls, [], 
                           "method_calls not initialised correctly")
         
         # Can't use hasattr for this test as it always returns True on a mock...
@@ -50,7 +50,7 @@ class MockTest(unittest2.TestCase):
         
         self.assertIsNone(mock._parent, "parent not initialised correctly")
         self.assertIsNone(mock._methods, "methods not initialised correctly")
-        self.assertEquals(mock._children, {}, "children not initialised incorrectly")
+        self.assertEqual(mock._children, {}, "children not initialised incorrectly")
     
     def testUnicodeNotBroken(self):
         # This used to raise an exception with Python 2.5 and Mock 0.4
@@ -76,11 +76,11 @@ class MockTest(unittest2.TestCase):
             return results.pop()
         mock.side_effect = effect
         
-        self.assertEquals([mock(), mock(), mock()], [3, 2, 1],
+        self.assertEqual([mock(), mock(), mock()], [3, 2, 1],
                           "side effect not used correctly")
 
         mock = Mock(side_effect=sentinel.SideEffect)
-        self.assertEquals(mock.side_effect, sentinel.SideEffect,
+        self.assertEqual(mock.side_effect, sentinel.SideEffect,
                           "side effect in constructor not used")
         
         def side_effect():
@@ -102,25 +102,25 @@ class MockTest(unittest2.TestCase):
         
         mock.reset_mock()
         
-        self.assertEquals(mock._name, "child", "name incorrectly reset")
-        self.assertEquals(mock._parent, parent, "parent incorrectly reset")
-        self.assertEquals(mock._methods, spec, "methods incorrectly reset")
+        self.assertEqual(mock._name, "child", "name incorrectly reset")
+        self.assertEqual(mock._parent, parent, "parent incorrectly reset")
+        self.assertEqual(mock._methods, spec, "methods incorrectly reset")
         
         self.assertFalse(mock.called, "called not reset")
-        self.assertEquals(mock.call_count, 0, "call_count not reset")
-        self.assertEquals(mock.call_args, None, "call_args not reset")
-        self.assertEquals(mock.call_args_list, [], "call_args_list not reset")
-        self.assertEquals(mock.method_calls, [], 
+        self.assertEqual(mock.call_count, 0, "call_count not reset")
+        self.assertEqual(mock.call_args, None, "call_args not reset")
+        self.assertEqual(mock.call_args_list, [], "call_args_list not reset")
+        self.assertEqual(mock.method_calls, [], 
                           "method_calls not initialised correctly: %r != %r" % (mock.method_calls, []))
         
-        self.assertEquals(mock.side_effect, sentinel.SideEffect,
+        self.assertEqual(mock.side_effect, sentinel.SideEffect,
                           "side_effect incorrectly reset")
-        self.assertEquals(mock.return_value, return_value,
+        self.assertEqual(mock.return_value, return_value,
                           "return_value incorrectly reset")
         self.assertFalse(return_value.called, "return value mock not reset")
-        self.assertEquals(mock._children, {'something': something}, 
+        self.assertEqual(mock._children, {'something': something}, 
                           "children reset incorrectly")
-        self.assertEquals(mock.something, something,
+        self.assertEqual(mock.something, something,
                           "children incorrectly cleared")
         self.assertFalse(mock.something.called, "child not reset")
         
@@ -130,22 +130,22 @@ class MockTest(unittest2.TestCase):
         self.assertTrue(isinstance(mock.return_value, Mock), "Default return_value should be a Mock")
         
         result = mock()
-        self.assertEquals(mock(), result, "different result from consecutive calls")
+        self.assertEqual(mock(), result, "different result from consecutive calls")
         mock.reset_mock()
         
         ret_val = mock(sentinel.Arg)
         self.assertTrue(mock.called, "called not set")
-        self.assertEquals(mock.call_count, 1, "call_count incoreect")
-        self.assertEquals(mock.call_args, ((sentinel.Arg,), {}), "call_args not set")
-        self.assertEquals(mock.call_args_list, [((sentinel.Arg,), {})], "call_args_list not initialised correctly")
+        self.assertEqual(mock.call_count, 1, "call_count incoreect")
+        self.assertEqual(mock.call_args, ((sentinel.Arg,), {}), "call_args not set")
+        self.assertEqual(mock.call_args_list, [((sentinel.Arg,), {})], "call_args_list not initialised correctly")
 
         mock.return_value = sentinel.ReturnValue
         ret_val = mock(sentinel.Arg, key=sentinel.KeyArg)
-        self.assertEquals(ret_val, sentinel.ReturnValue, "incorrect return value")
+        self.assertEqual(ret_val, sentinel.ReturnValue, "incorrect return value")
                           
-        self.assertEquals(mock.call_count, 2, "call_count incorrect")
-        self.assertEquals(mock.call_args, ((sentinel.Arg,), {'key': sentinel.KeyArg}), "call_args not set")
-        self.assertEquals(mock.call_args_list, [((sentinel.Arg,), {}), ((sentinel.Arg,), {'key': sentinel.KeyArg})], "call_args_list not set")
+        self.assertEqual(mock.call_count, 2, "call_count incorrect")
+        self.assertEqual(mock.call_args, ((sentinel.Arg,), {'key': sentinel.KeyArg}), "call_args not set")
+        self.assertEqual(mock.call_args_list, [((sentinel.Arg,), {}), ((sentinel.Arg,), {'key': sentinel.KeyArg})], "call_args_list not set")
 
     def testCallArgsComparison(self):
         mock = Mock()
@@ -153,11 +153,11 @@ class MockTest(unittest2.TestCase):
         mock(sentinel.Arg)
         mock(kw=sentinel.Kwarg)
         mock(sentinel.Arg, kw=sentinel.Kwarg)
-        self.assertEquals(mock.call_args_list, [(),
+        self.assertEqual(mock.call_args_list, [(),
                                                 ((sentinel.Arg,),),
                                                 ({"kw": sentinel.Kwarg},),
                                                 ((sentinel.Arg,), {"kw": sentinel.Kwarg})])
-        self.assertEquals(mock.call_args, ((sentinel.Arg,), {"kw": sentinel.Kwarg}))
+        self.assertEqual(mock.call_args, ((sentinel.Arg,), {"kw": sentinel.Kwarg}))
 
     def testAssertCalledWith(self):
         mock = Mock()
@@ -178,13 +178,13 @@ class MockTest(unittest2.TestCase):
         mock = Mock()
         something = mock.something
         self.assertTrue(isinstance(something, Mock), "attribute isn't a mock")
-        self.assertEquals(mock.something, something, "different attributes returned for same name")
+        self.assertEqual(mock.something, something, "different attributes returned for same name")
         
         # Usage example
         mock = Mock()
         mock.something.return_value = 3
         
-        self.assertEquals(mock.something(), 3, "method returned wrong value")
+        self.assertEqual(mock.something(), 3, "method returned wrong value")
         self.assertTrue(mock.something.called, "method didn't record being called")
         
 
@@ -192,8 +192,8 @@ class MockTest(unittest2.TestCase):
         mock = Mock()
         something = mock.something
         
-        self.assertEquals(something._name, "something", "attribute name not set correctly")
-        self.assertEquals(something._parent, mock, "attribute parent not set correctly")
+        self.assertEqual(something._name, "something", "attribute name not set correctly")
+        self.assertEqual(something._parent, mock, "attribute parent not set correctly")
 
 
     def testMethodCallsRecorded(self):
@@ -201,10 +201,10 @@ class MockTest(unittest2.TestCase):
         mock.something(3, fish=None)
         mock.something_else.something(6, cake=sentinel.Cake)
         
-        self.assertEquals(mock.something_else.method_calls,
+        self.assertEqual(mock.something_else.method_calls,
                           [("something", (6,), {'cake': sentinel.Cake})],
                           "method calls not recorded correctly")
-        self.assertEquals(mock.method_calls,
+        self.assertEqual(mock.method_calls,
                           [("something", (3,), {'fish': None}),
                            ("something_else.something", (6,), {'cake': sentinel.Cake})],
                           "method calls not recorded correctly")
@@ -212,22 +212,22 @@ class MockTest(unittest2.TestCase):
     def testMethodCallsCompareEasily(self):
         mock = Mock()
         mock.something()
-        self.assertEquals(mock.method_calls, [('something',)])
-        self.assertEquals(mock.method_calls, [('something', (), {})])
+        self.assertEqual(mock.method_calls, [('something',)])
+        self.assertEqual(mock.method_calls, [('something', (), {})])
 
         mock = Mock()
         mock.something('different')
-        self.assertEquals(mock.method_calls, [('something', ('different',))])
-        self.assertEquals(mock.method_calls, [('something', ('different',), {})])
+        self.assertEqual(mock.method_calls, [('something', ('different',))])
+        self.assertEqual(mock.method_calls, [('something', ('different',), {})])
 
         mock = Mock()
         mock.something(x=1)
-        self.assertEquals(mock.method_calls, [('something', {'x': 1})])
-        self.assertEquals(mock.method_calls, [('something', (), {'x': 1})])
+        self.assertEqual(mock.method_calls, [('something', {'x': 1})])
+        self.assertEqual(mock.method_calls, [('something', (), {'x': 1})])
 
         mock = Mock()
         mock.something('different', some='more')
-        self.assertEquals(mock.method_calls, [('something', ('different',), {'some': 'more'})])
+        self.assertEqual(mock.method_calls, [('something', ('different',), {'some': 'more'})])
 
     def testOnlyAllowedMethodsExist(self):
         spec = ["something"]
@@ -266,7 +266,7 @@ class MockTest(unittest2.TestCase):
         real = Mock()
         
         mock = Mock(wraps=real)
-        self.assertEquals(mock(), real())
+        self.assertEqual(mock(), real())
         
         real.reset_mock()
         
@@ -292,13 +292,13 @@ class MockTest(unittest2.TestCase):
         real = Real()
         
         mock = Mock(wraps=real)
-        self.assertEquals(mock.attribute(), real.attribute())
+        self.assertEqual(mock.attribute(), real.attribute())
         self.assertRaises(AttributeError, lambda: mock.fish)
         
         self.assertNotEqual(mock.attribute, real.attribute)
         result = mock.attribute.frog(1, 2, fish=3)
         Real.attribute.frog.assert_called_with(1, 2, fish=3)
-        self.assertEquals(result, Real.attribute.frog())
+        self.assertEqual(result, Real.attribute.frog())
         
         
     def testExceptionalSideEffect(self):

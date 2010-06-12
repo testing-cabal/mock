@@ -65,26 +65,26 @@ except ImportError:
 class WithTest(unittest2.TestCase):
     def testWithStatement(self):
         with patch('tests.testwith.something', sentinel.Something2):
-            self.assertEquals(something, sentinel.Something2, "unpatched")        
-        self.assertEquals(something, sentinel.Something)
+            self.assertEqual(something, sentinel.Something2, "unpatched")        
+        self.assertEqual(something, sentinel.Something)
         
     def testWithStatementException(self):
         try:
             with patch('tests.testwith.something', sentinel.Something2):
-                self.assertEquals(something, sentinel.Something2, "unpatched")   
+                self.assertEqual(something, sentinel.Something2, "unpatched")   
                 raise Exception('pow')
         except Exception:
             pass
         else:
             self.fail("patch swallowed exception")
-        self.assertEquals(something, sentinel.Something)
+        self.assertEqual(something, sentinel.Something)
 
 
     def testWithStatementAs(self):
         with patch('tests.testwith.something') as mock_something:
-            self.assertEquals(something, mock_something, "unpatched")        
+            self.assertEqual(something, mock_something, "unpatched")        
             self.assertTrue(isinstance(mock_something, Mock), "patching wrong type")
-        self.assertEquals(something, sentinel.Something)
+        self.assertEqual(something, sentinel.Something)
 
 
     def testPatchObjectWithStatementAs(self):
@@ -92,23 +92,23 @@ class WithTest(unittest2.TestCase):
         original = mock.something
         with patch_object(mock, 'something') as mock_something:
             self.assertNotEquals(mock.something, original, "unpatched")        
-        self.assertEquals(mock.something, original)
+        self.assertEqual(mock.something, original)
 
 
     def testWithStatementNested(self):
         with nested(patch('tests.testwith.something'), 
                     patch('tests.testwith.something_else')) as (mock_something, mock_something_else):
-            self.assertEquals(something, mock_something, "unpatched")
-            self.assertEquals(something_else, mock_something_else, "unpatched")
-        self.assertEquals(something, sentinel.Something)
-        self.assertEquals(something_else, sentinel.SomethingElse)
+            self.assertEqual(something, mock_something, "unpatched")
+            self.assertEqual(something_else, mock_something_else, "unpatched")
+        self.assertEqual(something, sentinel.Something)
+        self.assertEqual(something_else, sentinel.SomethingElse)
 
 
     def testWithStatementSpecified(self):
         with patch('tests.testwith.something', sentinel.Patched) as mock_something:
-            self.assertEquals(something, mock_something, "unpatched")        
-            self.assertEquals(mock_something, sentinel.Patched, "wrong patch")        
-        self.assertEquals(something, sentinel.Something)
+            self.assertEqual(something, mock_something, "unpatched")        
+            self.assertEqual(mock_something, sentinel.Patched, "wrong patch")        
+        self.assertEqual(something, sentinel.Something)
 
     
     def testContextManagerMocking(self):
