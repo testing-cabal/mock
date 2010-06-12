@@ -27,7 +27,7 @@ if 'testwith' in sys.modules:
     import testwith
     tests.testwith = testwith
 
-from mock import MagicMock, Mock, patch, patch_object, sentinel
+from mock import MagicMock, Mock, patch, sentinel
 
 something  = sentinel.Something
 something_else  = sentinel.SomethingElse
@@ -90,7 +90,7 @@ class WithTest(unittest2.TestCase):
     def testPatchObjectWithStatementAs(self):
         mock = Mock()
         original = mock.something
-        with patch_object(mock, 'something') as mock_something:
+        with patch.object(mock, 'something') as mock_something:
             self.assertNotEquals(mock.something, original, "unpatched")        
         self.assertEqual(mock.something, original)
 
