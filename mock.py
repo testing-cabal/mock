@@ -25,6 +25,8 @@ __all__ = (
 __version__ = '0.7.0 alpha'
 
 import sys
+import types
+import warnings
 
 try:
     import inspect
@@ -390,11 +392,14 @@ class _patch(object):
         else:
             delattr(self.target, self.attribute)
         del self.temp_original
-            
-                
-def patch_object(target, attribute, new=DEFAULT, spec=None, create=False, mocksignature=False):
-    return _patch(target, attribute, new, spec, create, mocksignature)
 
+
+def _patch_object(target, attribute, new=DEFAULT, spec=None, create=False, mocksignature=False):
+    return _patch(target, attribute, new, spec, create, mocksignature)
+                
+def patch_object(*args, **kwargs):
+    warnings.warn(('Please use patch.object instead.'), DeprecationWarning, 2)
+    return _patch_object(*args, **kwargs)
 
 def patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False):
     try:
@@ -404,6 +409,7 @@ def patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False):
     target = _importer(target)
     return _patch(target, attribute, new, spec, create, mocksignature)
 
+patch.object = _patch_object
 
 def _has_local_attr(obj, name):
     try:
