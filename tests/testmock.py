@@ -307,7 +307,13 @@ class MockTest(unittest2.TestCase):
         
         mock = Mock(side_effect=AttributeError('foo'))
         self.assertRaises(AttributeError, mock)
+    
+    def testBaseExceptionalSideEffect(self):
+        mock = Mock(side_effect=KeyboardInterrupt)
+        self.assertRaises(KeyboardInterrupt, mock)
         
+        mock = Mock(side_effect=KeyboardInterrupt('foo'))
+        self.assertRaises(KeyboardInterrupt, mock)
         
         
 if __name__ == '__main__':

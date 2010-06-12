@@ -35,6 +35,12 @@ except ImportError:
     # may not have inspect
     inspect = None
 
+try:
+    BaseException
+except NameError:
+    # Python 2.4 compatibility
+    BaseException = Exception
+
 inPy3k = sys.version_info[0] == 3
 
 
@@ -195,9 +201,9 @@ class Mock(object):
         
         ret_val = DEFAULT
         if self.side_effect is not None:
-            if (isinstance(self.side_effect, Exception) or 
+            if (isinstance(self.side_effect, BaseException) or 
                 isinstance(self.side_effect, class_types) and
-                issubclass(self.side_effect, Exception)):
+                issubclass(self.side_effect, BaseException)):
                 raise self.side_effect
             
             ret_val = self.side_effect(*args, **kwargs)

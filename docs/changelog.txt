@@ -17,6 +17,8 @@
 * Addition of soft comparisons: call_args, call_args_list and method_calls
   return now tuple-like objects which compare equal even when empty args
   or kwargs are skipped
+* BUGFIX: ``side_effect`` now works with ``BaseException`` exceptions like
+  ``KeyboardInterrupt``
 * The tests now require `unittest2 <http://pypi.python.org/pypi/unittest2>`_
   to run
 * `Konrad Delong <http://konryd.blogspot.com/>`_ added as co-maintainer
