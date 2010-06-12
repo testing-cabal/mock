@@ -4,7 +4,6 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
-from textwrap import dedent
 from mock import __version__
 
 from distutils.core import setup
