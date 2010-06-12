@@ -30,14 +30,14 @@ In addition you can pass ``spec=True``, which causes patch to pass in the object
 
 Using the class as a spec object for the created Mock (and return value) means that the Mock will raise an exception if the code attempts to access any attributes that don't exist. ::
 
-    @patch('Package.ModuleName.ClassName')
+    @patch('Package.ModuleName.ClassName', spec=True)
     def test_something(self, MockClass):
         instance = ClassName()
         self.assertRaises(AttributeError, lambda: instance.fake_attribute)
 
 Patch can be used with the with statement - if this is available in your version of Python. Here the patching applies to the indented block after the with statement. Note that the patched object can always appear after the "as" - even if an object to be patched was specified, though it can be omitted. ::
 
-    with patch('Package.ModuleName.ClassName') as MockClass:
+    with patch('Package.ModuleName.ClassName', spec=True) as MockClass:
         instance = ClassName()
         self.assertRaises(AttributeError, lambda: instance.fake_attribute)
 
