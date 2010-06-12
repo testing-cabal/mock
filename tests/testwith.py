@@ -90,7 +90,7 @@ class WithTest(unittest2.TestCase):
     def testPatchObjectWithStatementAs(self):
         mock = Mock()
         original = mock.something
-        with patch.object(mock, 'something') as mock_something:
+        with patch.object(mock, 'something'):
             self.assertNotEquals(mock.something, original, "unpatched")        
         self.assertEqual(mock.something, original)
 
@@ -127,7 +127,7 @@ class WithTest(unittest2.TestCase):
         mock = MagicMock()
         
         with self.assertRaises(TypeError):
-            with mock as m:
+            with mock:
                 'foo' + 3
         mock.__enter__.assert_called_with()
         self.assertTrue(mock.__exit__.called)

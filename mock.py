@@ -25,7 +25,6 @@ __all__ = (
 __version__ = '0.7.0 alpha'
 
 import sys
-import types
 import warnings
 
 try:
@@ -88,8 +87,6 @@ def mocksignature(func, mock, skipfirst=False):
     funcopy = eval(src, dict(_mock_=mock))
     _copy_func_details(func, funcopy)
     return funcopy
-
-
 
 
 def _is_magic(name):
@@ -445,6 +442,7 @@ if inPy3k:
 
 # not including __prepare__, __instancecheck__, __subclasscheck__
 # (as they are metaclass methods)
+# Also not including the obsolete __cmp__, __getslice__, __setslice__
 
 def get_method(name, func):
     def method(self, *args, **kw):
@@ -465,5 +463,7 @@ class MagicMock(Mock):
                 # so that MagicMock doesn't swallow exceptions
                 # when used in a with statement
                 m.return_value = False
+            # We could also preconfigure magic methods that have to return
+            # specific types - e.g __int__ must return an integer
             setattr(self, entry, m)
 
