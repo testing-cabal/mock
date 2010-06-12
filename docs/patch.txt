@@ -6,7 +6,10 @@
 .. currentmodule:: mock
 
 
-The patch decorators are used for patching objects only within the scope of the function they decorate. They automatically handle the unpatching for you, even if exceptions are raise. All of these functions can also be used in with statements.
+The patch decorators are used for patching objects only within the scope of
+the function they decorate. They automatically handle the unpatching for you,
+even if exceptions are raise. All of these functions can also be used in with
+statements.
 
 
 patch
@@ -14,11 +17,16 @@ patch
 
 .. function:: patch(target, new=None, spec=None, create=False)
 
-``patch`` decorates a function. Inside the body of the function, the ``target`` (specified in the form 'PackageName.ModuleName.ClassName') is patched with a ``new`` object. When the function exits the patch is undone.
+``patch`` decorates a function. Inside the body of the function, the
+``target`` (specified in the form 'PackageName.ModuleName.ClassName') is
+patched with a ``new`` object. When the function exits the patch is undone.
 
-The target is imported and the specified attribute patched with the new object - so it must be importable from the environment you are calling the decorator from.
+The target is imported and the specified attribute patched with the new object
+- so it must be importable from the environment you are calling the decorator
+from.
 
-If ``new`` is omitted, then a new ``Mock`` is created and passed in as an extra argument to the decorated function::
+If ``new`` is omitted, then a new ``Mock`` is created and passed in as an
+extra argument to the decorated function::
 
    @patch('Package.ModuleName.ClassName')
    def test_something(self, MockClass):
