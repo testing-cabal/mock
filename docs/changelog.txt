@@ -16,7 +16,8 @@
 * Addition of soft comparisons: call_args, call_args_list and method_calls
   return now tuple-like objects which compare positively even when empty args
   or kwargs are skipped
-* The tests now require `unittest2 <http://pypi.python.org/pypi/unittest2>`_ to run
+* The tests now require `unittest2 <http://pypi.python.org/pypi/unittest2>`_
+  to run
 
 Not done yet:
 
