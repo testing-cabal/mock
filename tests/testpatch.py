@@ -12,11 +12,7 @@ if info[:3] >= (3, 2, 0) or info[0] == 2 and info[1] >= 7:
 else:
     import unittest2
 
-try:
-    from warnings import catch_warnings
-except ImportError:
-    catch_warnings = None
-
+import warnings
 
 this_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if this_dir not in sys.path:
@@ -409,9 +405,13 @@ class PatchTest(unittest2.TestCase):
         self.assertEqual(Something.attribute, sentinel.Original, "patch not restored")
         self.assertEqual(__main__.something, sentinel.Something, "patch not restored")
 
-    @unittest2.skipIf(catch_warnings is None, "test requires catch_warnings decorator")
+    @unittest2.skipIf(not hasattr(warnings, 'catch_warnings'), "test requires catch_warnings decorator")
     def testPatchObjectDeprecation(self):
-        with catch_warnings(record=True) as ws:
+        # needed to enable the deprecation warnings
+        warnings.simplefilter('default')
+        from tests.support import examine_warnings
+        @examine_warnings
+        def _examine_warnings(ws):
             patch_object(SomeClass, 'class_attribute', spec=SomeClass)
             warning = ws[0]
             self.assertIs(warning.category, DeprecationWarning)
@@ -419,4 +419,3 @@ class PatchTest(unittest2.TestCase):
 
 if __name__ == '__main__':
     unittest2.main()
-    
