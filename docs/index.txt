@@ -93,7 +93,8 @@ References
 
 Articles and blog entries on testing with Mock:
 
-
+* `Mockity mock mock - some love for the mock module <http://konryd.blogspot.com/2010/05/mockity-mock-mock-some-love-for-mock.html>`_
+* `Python Unit Testing with Mock <http://www.insomnihack.com/?p=194>`_
 * `Python mock testing techniques and tools <http://agiletesting.blogspot.com/2009/07/python-mock-testing-techniques-and.html>`_
 * `How To Test Django Template Tags <http://techblog.ironfroggy.com/2008/10/how-to-test.html>`_
 * `A presentation on Unit Testing with Mock <http://pypap.blogspot.com/2008/10/newbie-nugget-unit-testing-with-mock.html>`_
