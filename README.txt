@@ -5,7 +5,7 @@ attributes were used and arguments they were called with. You can also specify
 return values and set needed attributes in the normal way.
 
 This approach is inspired by the testing patterns used at
-`Resolver Systems <http://www.resolversystems.com/ Resolver Systems>`_.
+`Resolver Systems <http://www.resolversystems.com/>`_.
 
 mock is tested on Python versions 2.4 - 2.7.
 
