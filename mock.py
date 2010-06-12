@@ -25,6 +25,7 @@ __all__ = (
 __version__ = '0.7.0'
 
 import sys
+import types
 
 try:
     import inspect
@@ -292,7 +293,25 @@ class _patch(object):
         self.mocksignature = False
 
 
+    def copy(self):
+        return _patch(self.target, self.attribute, self.new,
+                      self.spec, self.create, self.mocksignature)
+
+
     def __call__(self, func):
+        if isinstance(func, types.ClassType) or isinstance(func, type):
+            return self.decorate_class(func)
+        else:
+            return self.decorate_callable(func)
+
+    def decorate_class(self, klass):
+        for attr in dir(klass):
+            attr_value = getattr(klass, attr)
+            if attr.startswith("test") and hasattr(attr_value, "__call__"):
+                setattr(klass, attr, self.copy()(attr_value))
+        return klass
+
+    def decorate_callable(self, func):
         if hasattr(func, 'patchings'):
             func.patchings.append(self)
             return func
