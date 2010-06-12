@@ -32,25 +32,43 @@ extra argument to the decorated function::
    def test_something(self, MockClass):
        "test something"
 
-The ``spec`` keyword argument is passed to the ``Mock`` if patch is creating one for you. 
+The ``spec`` keyword argument is passed to the ``Mock`` if patch is creating
+one for you.
 
-In addition you can pass ``spec=True``, which causes patch to pass in the object being mocked as the spec object. If you are using patch to mock out a class, then the object you are interested in will probably be the return value of the Mock (the instance it returns when called). Because of this, if you use 'spec=True' and are patching a class (and having patch create a Mock for you) then the object being patched will be used as a spec for both the Mock *and* its return value.
+In addition you can pass ``spec=True``, which causes patch to pass in the
+object being mocked as the spec object. If you are using patch to mock out a
+class, then the object you are interested in will probably be the return value
+of the Mock (the instance it returns when called). Because of this, if you use
+'spec=True' and are patching a class (and having patch create a Mock for you)
+then the object being patched will be used as a spec for both the Mock *and*
+its return value.
 
-Using the class as a spec object for the created Mock (and return value) means that the Mock will raise an exception if the code attempts to access any attributes that don't exist. ::
+Using the class as a spec object for the created Mock (and return value) means
+that the Mock will raise an exception if the code attempts to access any
+attributes that don't exist. ::
 
     @patch('Package.ModuleName.ClassName', spec=True)
     def test_something(self, MockClass):
         instance = ClassName()
         self.assertRaises(AttributeError, lambda: instance.fake_attribute)
 
-Patch can be used with the with statement - if this is available in your version of Python. Here the patching applies to the indented block after the with statement. Note that the patched object can always appear after the "as" - even if an object to be patched was specified, though it can be omitted. ::
+Patch can be used with the with statement - if this is available in your
+version of Python. Here the patching applies to the indented block after the
+with statement. Note that the patched object can always appear after the "as"
+- even if an object to be patched was specified, though it can be omitted. ::
 
     with patch('Package.ModuleName.ClassName', spec=True) as MockClass:
         instance = ClassName()
         self.assertRaises(AttributeError, lambda: instance.fake_attribute)
 
 
-By default ``patch`` will fail to replace attributes that don't exist. If you pass in 'create=True' and the attribute doesn't exist, patch will create the attribute for you when the patched function is called, and delete it again afterwards. This is useful for writing tests against attributes that your production code creates at runtime. It is off by by default because it can be dangerous. With it switched on you can write passing tests against APIs that don't actually exist!
+By default ``patch`` will fail to replace attributes that don't exist. If you
+pass in 'create=True' and the attribute doesn't exist, patch will create the
+attribute for you when the patched function is called, and delete it again
+afterwards. This is useful for writing tests against attributes that your
+production code creates at runtime. It is off by by default because it can be
+dangerous. With it switched on you can write passing tests against APIs that
+don't actually exist!
 
 Patch can be also used as a TestCase class decorator. It works by decorating each test method in the class. This reduces the boilerplate code when your test methods share a common patchings set. ::
 
@@ -64,11 +82,16 @@ patch_object
 
 .. function:: patch_object(target, attribute, new=None, spec=None, create=False)
 
-    ``patch_object`` patches named members on objects - usually class or module objects.
+    ``patch_object`` patches named members on objects - usually class or
+    module objects.
 
-You can either call it with three arguments or two arguments. The three argument form takes the object to be patched, the attribute name and the object to replace the attribute with.
+You can either call it with three arguments or two arguments. The three
+argument form takes the object to be patched, the attribute name and the
+object to replace the attribute with.
 
-When calling with the two argument form you omit the replacement object, and a mock is created for you and passed in as an extra argument to the decorated function::
+When calling with the two argument form you omit the replacement object, and a
+mock is created for you and passed in as an extra argument to the decorated
+function::
 
     @patch_object(SomeClass, 'classmethod')
     def test_something(self, mockMethod):
@@ -78,15 +101,16 @@ When calling with the two argument form you omit the replacement object, and a m
 
 ``spec`` and ``create`` have the same meaning as for the patch decorator.
 
-``patch_object`` is also a context manager and can be used with ``with`` statements in the same way
-as ``patch``. It can also be used as a class decorator with same semantics as ``patch``.
-
+``patch_object`` is also a context manager and can be used with ``with``
+statements in the same way as ``patch``. It can also be used as a class
+decorator with same semantics as ``patch``.
 
 
 Nesting Patch Decorators
 ========================
 
-If you want to perform multiple patches then you can simply stack up the decorators.
+If you want to perform multiple patches then you can simply stack up the
+decorators.
 
 You can stack up multiple patch decorators using this pattern::
 
@@ -99,7 +123,8 @@ You can stack up multiple patch decorators using this pattern::
         self.assertEqual(MockClass2.called, "ClassName2 not patched")
 
 
-Like all context-managers patches can be nested using contextlib's nested function - *every* patching will appear in the tuple after "as". ::
+Like all context-managers patches can be nested using contextlib's nested
+function - *every* patching will appear in the tuple after "as". ::
 
      from contextlib import nested
      with nested(patch('Package.ModuleName.ClassName'), 
@@ -111,8 +136,9 @@ Like all context-managers patches can be nested using contextlib's nested functi
 Patching Descriptors
 ====================
 
-Since version 0.6.0 both patch_ and patch_object_ have been able to correctly patch and restore descriptors;
-class methods, static methods and properties. You should patch these on the *class* rather than an instance::
+Since version 0.6.0 both patch_ and patch_object_ have been able to correctly
+patch and restore descriptors; class methods, static methods and properties.
+You should patch these on the *class* rather than an instance::
 
     @patch('module.ClassName.static')
     def testMethod(self, mockStatic):

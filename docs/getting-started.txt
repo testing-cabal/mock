@@ -34,7 +34,8 @@ Using Mock
     <mock.Mock object at 0x...>
     >>>
 
-Once the mock has been used it has methods and attributes that allow you to make assertions about how it has been used:
+Once the mock has been used it has methods and attributes that allow you to
+make assertions about how it has been used:
 
 .. doctest::
     
@@ -55,7 +56,12 @@ Mocks also record calls made to attributes, their 'child' attributes:
     >>> mock.method_calls
     [('something', (), {})]
     
-You can also create Mock objects that behave like the class they are intended to mock. This is done with the ``spec`` keyword argument, which either takes a list of strings describing the attributes that the mock should have - or you can pass in the object (class or instance) that you are mocking out. Attempting to access an attribute on the mock that isn't in the spec will raise an ``AttributeError``.
+You can also create Mock objects that behave like the class they are intended
+to mock. This is done with the ``spec`` keyword argument, which either takes a
+list of strings describing the attributes that the mock should have - or you
+can pass in the object (class or instance) that you are mocking out.
+Attempting to access an attribute on the mock that isn't in the spec will
+raise an ``AttributeError``.
 
 .. doctest::
 
@@ -112,9 +118,17 @@ Sentinel
 Patch Decorators
 ================
 
-There are also decorators for doing module and class level patching. As modules and classes are effectively globals any patching has to be undone (or it persists into other tests). These decorators do the unpatching for you, making it easier to test with module and class level patching. 
+There are also decorators for doing module and class level patching. As
+modules and classes are effectively globals any patching has to be undone (or
+it persists into other tests). These decorators do the unpatching for you,
+making it easier to test with module and class level patching.
 
-The two decorators are 'patch' and 'patch_object'. 'patch' takes a single string, of the form ``package.module.Class.attribute`` to specify the attribute you are patching. It also optionally takes a value that you want the attribute (or class or whatever) to be replaced with. 'patch_object' takes an object and the name of the attribute you would like patched, plus optionally the value to patch it with.
+The two decorators are 'patch' and 'patch_object'. 'patch' takes a single
+string, of the form ``package.module.Class.attribute`` to specify the
+attribute you are patching. It also optionally takes a value that you want the
+attribute (or class or whatever) to be replaced with. 'patch_object' takes an
+object and the name of the attribute you would like patched, plus optionally
+the value to patch it with.
 
 ::
 
@@ -134,7 +148,8 @@ The two decorators are 'patch' and 'patch_object'. 'patch' takes a single string
     test()
 
 
-If you don't want to call the decorated test function yourself, you can add ``apply`` as a decorator on top::
+If you don't want to call the decorated test function yourself, you can add
+``apply`` as a decorator on top::
 
     @apply
     @patch('Package.Module.attribute', sentinel.Attribute)
@@ -151,7 +166,9 @@ A nice pattern is to actually decorate test methods themselves::
         "do something"
     
 
-If you want to patch with a Mock, you can use ``patch`` with only one argument (or ``patch_object`` with two arguments). The mock will be created for you and passed into the test function / method::
+If you want to patch with a Mock, you can use ``patch`` with only one argument
+(or ``patch_object`` with two arguments). The mock will be created for you and
+passed into the test function / method::
 
     @patch('Package.Module.Class')
     def testMethod(self, mMckClass):
