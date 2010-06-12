@@ -20,7 +20,8 @@
     self = Test('testSomething')
 
 
-For comprehensive examples, see the unit tests included in the full source distribution.
+For comprehensive examples, see the unit tests included in the full source
+distribution.
 
 
 Mock Examples
@@ -29,7 +30,8 @@ Mock Examples
 Mock Patching Methods
 ---------------------
 
-``Mock`` is callable. If it is called then it sets a ``called`` attribute to ``True``.
+``Mock`` is callable. If it is called then it sets a ``called`` attribute to
+``True``.
 
 This example tests that calling ``method`` results in a call to ``something``:
 
@@ -61,7 +63,8 @@ If you want to catch the arguments then there is other information exposed:
         self.assertEqual(real.something.call_args_list, [(args, keywargs)], 
                           "something called with incorrect arguments")
 
-Checking ``call_args_list`` tests how many times the mock was called, and the arguments for each call, in a single assertion.
+Checking ``call_args_list`` tests how many times the mock was called, and the
+arguments for each call, in a single assertion.
 
 
 Mock for Method Calls on an Object
@@ -77,15 +80,21 @@ Mock for Method Calls on an Object
         
         self.assertTrue(mock.close.called, "closer didn't close something")
 
-We don't have to do any work to provide the 'close' method on our mock. Accessing close creates it. So, if 'close' hasn't already been called then accessing it in the test will create it - but ``called`` will be ``False``.
+We don't have to do any work to provide the 'close' method on our mock.
+Accessing close creates it. So, if 'close' hasn't already been called then
+accessing it in the test will create it - but ``called`` will be ``False``.
 
-As ``close`` is a mock object is has all the attributes from the previous example.
+As ``close`` is a mock object is has all the attributes from the previous
+example.
 
 
 Limiting Available Methods
 --------------------------
 
-The disadvantage of the approach above is that *all* method access creates a new mock. This means that you can't tell if any methods were called that shouldn't have been. There are two ways round this. The first is by restricting the methods available on your mock.
+The disadvantage of the approach above is that *all* method access creates a
+new mock. This means that you can't tell if any methods were called that
+shouldn't have been. There are two ways round this. The first is by
+restricting the methods available on your mock.
 
 ::
 
@@ -98,15 +107,20 @@ The disadvantage of the approach above is that *all* method access creates a new
         self.assertTrue(mock.close.called, "closer didn't close something")
         
 
-If ``closer`` calls any methods on ``mock`` *other* than close, then an ``AttributeError`` will be raised.
+If ``closer`` calls any methods on ``mock`` *other* than close, then an
+``AttributeError`` will be raised.
 
 
 Tracking all Method Calls
 -------------------------
 
-An alternative way to verify that only the expected methods have been accessed is to use the ``method_calls`` attribute of the mock. This records all calls to child attributes of the mock - and also to their children.
+An alternative way to verify that only the expected methods have been accessed
+is to use the ``method_calls`` attribute of the mock. This records all calls
+to child attributes of the mock - and also to their children.
 
-This is useful if you have a mock where you expect an attribute method to be called. You could access the attribute directly, but ``method_calls`` provides a convenient way of looking at all method calls:
+This is useful if you have a mock where you expect an attribute method to be
+called. You could access the attribute directly, but ``method_calls`` provides
+a convenient way of looking at all method calls:
 
 .. doctest::
 
@@ -119,7 +133,8 @@ This is useful if you have a mock where you expect an attribute method to be cal
     [('method', (), {}), ('Property.method', (10,), {'x': 53})]
     >>> 
 
-If you make an assertion about ``method_calls`` and any unexpected methods have been called, then the assertion will fail.
+If you make an assertion about ``method_calls`` and any unexpected methods
+have been called, then the assertion will fail.
 
 
 Setting Return Values and Attributes
@@ -152,7 +167,8 @@ If you need an attribute setting on your mock, just do it:
     >>> mock.x
     3
 
-Sometimes you want to mock up a more complex situation, like for example ``mock.connection.cursor().execute("SELECT 1")``:
+Sometimes you want to mock up a more complex situation, like for example
+``mock.connection.cursor().execute("SELECT 1")``:
 
 
 .. doctest::
@@ -171,9 +187,19 @@ Sometimes you want to mock up a more complex situation, like for example ``mock.
 Creating a Mock from an Existing Object
 ---------------------------------------
 
-One problem with over use of mocking is that it couples your tests to the implementation of your mocks rather than your real code. Suppose you have a class that implements ``some_method``. In a test for another class, you provide a mock of this object that *also* provides ``some_method``. If later you refactor the first class, so that it no longer has ``some_method`` - then your tests will continue to pass even though your code is now broken!
+One problem with over use of mocking is that it couples your tests to the
+implementation of your mocks rather than your real code. Suppose you have a
+class that implements ``some_method``. In a test for another class, you
+provide a mock of this object that *also* provides ``some_method``. If later
+you refactor the first class, so that it no longer has ``some_method`` - then
+your tests will continue to pass even though your code is now broken!
 
-``Mock`` allows you to provide an object as a specification for the mock, using the ``spec`` keyword argument. Accessing methods / attributes on the mock that don't exist on your specification object will immediately raise an attribute error. If you change the implementation of your specification, then tests that use that class will start failing immediately without you having to instantiate the class in those tests.
+``Mock`` allows you to provide an object as a specification for the mock,
+using the ``spec`` keyword argument. Accessing methods / attributes on the
+mock that don't exist on your specification object will immediately raise an
+attribute error. If you change the implementation of your specification, then
+tests that use that class will start failing immediately without you having to
+instantiate the class in those tests.
 
 .. doctest::
 
@@ -188,11 +214,17 @@ One problem with over use of mocking is that it couples your tests to the implem
 Patch Decorator Examples
 ========================
 
-A common need in tests is to patch a class attribute or a module attribute, for example patching a builtin or patching a class in a module to test that it is instantiated. Modules and classes are effectively global, so patching on them has to be undone after the test or the patch will persist into other tests and cause hard to diagnose problems.
+A common need in tests is to patch a class attribute or a module attribute,
+for example patching a builtin or patching a class in a module to test that it
+is instantiated. Modules and classes are effectively global, so patching on
+them has to be undone after the test or the patch will persist into other
+tests and cause hard to diagnose problems.
 
-The ``patch`` and ``patch_object`` decorators provide a convenient way of doing this. 
+The ``patch`` and ``patch_object`` decorators provide a convenient way of
+doing this.
 
-``patch_object`` patches attributes on objects within the scope of a function they decorate:
+``patch_object`` patches attributes on objects within the scope of a function
+they decorate:
 
 .. doctest::
 
@@ -206,7 +238,10 @@ The ``patch`` and ``patch_object`` decorators provide a convenient way of doing 
     
     >>> self.assertTrue(mock.called, "class_method not called")
 
-The decorator is applied to a function (called ``test`` above). The patching only applies inside the body of the function. You have to call the function explicitly, this can be useful as the test function can take arguments and be used to implement several tests, it can also return values.
+The decorator is applied to a function (called ``test`` above). The patching
+only applies inside the body of the function. You have to call the function
+explicitly, this can be useful as the test function can take arguments and be
+used to implement several tests, it can also return values.
 
 They can be stacked to perform multiple simultaneous patches:
 
@@ -226,7 +261,8 @@ They can be stacked to perform multiple simultaneous patches:
     >>> self.assertTrue(mock1.called, "class_method not called")
     >>> self.assertTrue(mock2.called, "static_method not called")
 
-If you are patching a module (including ``__builtin__``) then use patch instead of patch_object:
+If you are patching a module (including ``__builtin__``) then use ``patch``
+instead of ``patch_object``:
 
 .. doctest::
 
@@ -242,8 +278,8 @@ If you are patching a module (including ``__builtin__``) then use patch instead 
     
 The module name can be 'dotted', in the form ``package.module`` if needed.
 
-
-If you don't want to call the decorated test function yourself, you can add ``apply`` as a decorator on top:
+If you don't want to call the decorated test function yourself, you can add
+``apply`` as a decorator on top:
 
 ::
 
