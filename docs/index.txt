@@ -23,15 +23,15 @@
 Introduction
 ============
 
-``mock`` provides a core :class:`mock.Mock` class that is intended to reduce the need to
-create a host of trivial stubs throughout your test suite. After performing an
-action, you can make assertions about which methods / attributes were used and
-arguments they were called with. You can also specify return values and set
-specific attributes in the normal way.
+``mock`` provides a core :class:`mock.Mock` class that is intended to reduce
+the need to create a host of trivial stubs throughout your test suite. After
+performing an action, you can make assertions about which methods / attributes
+were used and arguments they were called with. You can also specify return
+values and set specific attributes in the normal way.
 
-It also provides a :func:`mock.patch` decorator that handles patching module and class
-level attributes within the scope of a test, along with :const:`mock.sentinel` for 
-creating unique objects.
+It also provides a :func:`mock.patch` decorator that handles patching module
+and class level attributes within the scope of a test, along with
+:const:`mock.sentinel` for creating unique objects.
 
 Most mocking libraries follow the 'record -> replay' pattern of mocking. Mock
 uses the 'action -> assertion' pattern, which is more readable and intuitive;
