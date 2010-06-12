@@ -123,10 +123,10 @@ modules and classes are effectively globals any patching has to be undone (or
 it persists into other tests). These decorators do the unpatching for you,
 making it easier to test with module and class level patching.
 
-The two decorators are 'patch' and 'patch_object'. 'patch' takes a single
+The two decorators are 'patch' and 'patch.object'. 'patch' takes a single
 string, of the form ``package.module.Class.attribute`` to specify the
 attribute you are patching. It also optionally takes a value that you want the
-attribute (or class or whatever) to be replaced with. 'patch_object' takes an
+attribute (or class or whatever) to be replaced with. 'patch.object' takes an
 object and the name of the attribute you would like patched, plus optionally
 the value to patch it with.
 
@@ -134,7 +134,7 @@ the value to patch it with.
 
     
     original = SomeClass.attribute
-    @patch_object(SomeClass, 'attribute', sentinel.Attribute)
+    @patch.object(SomeClass, 'attribute', sentinel.Attribute)
     def test():
         self.assertEqual(SomeClass.attribute, sentinel.Attribute, "class attribute not patched")
     test()
@@ -167,7 +167,7 @@ A nice pattern is to actually decorate test methods themselves::
     
 
 If you want to patch with a Mock, you can use ``patch`` with only one argument
-(or ``patch_object`` with two arguments). The mock will be created for you and
+(or ``patch.object`` with two arguments). The mock will be created for you and
 passed into the test function / method::
 
     @patch('Package.Module.Class')

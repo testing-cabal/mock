@@ -77,12 +77,12 @@ Patch can be also used as a TestCase class decorator. It works by decorating eac
       def test_something(self, MockClass):
           "test something"
 
-patch_object
+patch.object
 ============
 
-.. function:: patch_object(target, attribute, new=None, spec=None, create=False)
+.. function:: patch.object(target, attribute, new=None, spec=None, create=False)
 
-    ``patch_object`` patches named members on objects - usually class or
+    ``patch.object`` patches named members on objects - usually class or
     module objects.
 
 You can either call it with three arguments or two arguments. The three
@@ -93,7 +93,7 @@ When calling with the two argument form you omit the replacement object, and a
 mock is created for you and passed in as an extra argument to the decorated
 function::
 
-    @patch_object(SomeClass, 'classmethod')
+    @patch.object(SomeClass, 'classmethod')
     def test_something(self, mockMethod):
         SomeClass.classmethod(3)
         
@@ -101,7 +101,7 @@ function::
 
 ``spec`` and ``create`` have the same meaning as for the patch decorator.
 
-``patch_object`` is also a context manager and can be used with ``with``
+``patch.object`` is also a context manager and can be used with ``with``
 statements in the same way as ``patch``. It can also be used as a class
 decorator with same semantics as ``patch``.
 
@@ -136,7 +136,7 @@ function - *every* patching will appear in the tuple after "as". ::
 Patching Descriptors
 ====================
 
-Since version 0.6.0 both patch_ and patch_object_ have been able to correctly
+Since version 0.6.0 both patch_ and patch.object_ have been able to correctly
 patch and restore descriptors; class methods, static methods and properties.
 You should patch these on the *class* rather than an instance::
 
