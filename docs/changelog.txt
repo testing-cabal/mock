@@ -20,7 +20,7 @@
   or kwargs are skipped
 * BUGFIX: ``side_effect`` now works with ``BaseException`` exceptions like
   ``KeyboardInterrupt``
-* BUGFIX: patching the same object twice not restores the patches correctly
+* BUGFIX: patching the same object twice now restores the patches correctly
 * The tests now require `unittest2 <http://pypi.python.org/pypi/unittest2>`_
   to run
 * `Konrad Delong <http://konryd.blogspot.com/>`_ added as co-maintainer
