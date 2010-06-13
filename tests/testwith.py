@@ -133,6 +133,18 @@ class WithTest(unittest2.TestCase):
         self.assertTrue(mock.__exit__.called)
 
 
+    def testWithStatementSameAttribute(self):
+        with patch('tests.testwith.something', sentinel.Patched) as mock_something:
+            self.assertEquals(something, mock_something, "unpatched")
+
+            with patch('tests.testwith.something') as mock_again:
+                self.assertEquals(something, mock_again, "unpatched")
+
+            self.assertEquals(something, mock_something, "restored with wrong instance")
+
+        self.assertEquals(something, sentinel.Something, "not restored")
+
+
 if __name__ == '__main__':
     unittest2.main()
     

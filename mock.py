@@ -337,7 +337,7 @@ class _patch(object):
             try:
                 return func(*args, **keywargs)
             finally:
-                for patching in getattr(patched, 'patchings', []):
+                for patching in reversed(getattr(patched, 'patchings', [])):
                     patching.__exit__()
 
         patched.patchings = [self]
