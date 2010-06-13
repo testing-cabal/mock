@@ -416,6 +416,19 @@ class PatchTest(unittest2.TestCase):
             warning = ws[0]
             self.assertIs(warning.category, DeprecationWarning)
 
+    def testPatchObjectTwice(self):
+        class Something(object):
+            attribute = sentinel.Original
+            next_attribute = sentinel.Original2
+
+        @apply
+        @patch.object(Something, 'attribute', sentinel.Patched)
+        @patch.object(Something, 'attribute', sentinel.Patched)
+        def test():
+            self.assertEquals(Something.attribute, sentinel.Patched, "unpatched")
+
+        self.assertEquals(Something.attribute, sentinel.Original, "patch not restored")
+
 
 if __name__ == '__main__':
     unittest2.main()
