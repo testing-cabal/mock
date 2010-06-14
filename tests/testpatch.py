@@ -410,6 +410,8 @@ class PatchTest(unittest2.TestCase):
         # needed to enable the deprecation warnings
         warnings.simplefilter('default')
         from tests.support import examine_warnings
+
+        @apply
         @examine_warnings
         def _examine_warnings(ws):
             patch_object(SomeClass, 'class_attribute', spec=SomeClass)
