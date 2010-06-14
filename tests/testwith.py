@@ -17,37 +17,10 @@ else:
 
 from mock import MagicMock, Mock, patch, sentinel
 
+from tests.support_with import catch_warnings, nested
+
 something  = sentinel.Something
 something_else  = sentinel.SomethingElse
-
-try:
-    from contextlib import nested
-except ImportError:
-    from contextlib import contextmanager
-    @contextmanager
-    def nested(*managers):
-        exits = []
-        vars = []
-        exc = (None, None, None)
-        try:
-            for mgr in managers:
-                exit = mgr.__exit__
-                enter = mgr.__enter__
-                vars.append(enter())
-                exits.append(exit)
-            yield vars
-        except:
-            exc = sys.exc_info()
-        finally:
-            while exits:
-                exit = exits.pop()
-                try:
-                    if exit(*exc):
-                        exc = (None, None, None)
-                except:
-                    exc = sys.exc_info()
-            if exc != (None, None, None):
-                raise exc[1]
 
 
 class WithTest(unittest2.TestCase):
@@ -84,10 +57,12 @@ class WithTest(unittest2.TestCase):
 
 
     def testWithStatementNested(self):
-        with nested(patch('tests.testwith.something'), 
+        with catch_warnings(record=True):
+            # nested is deprecated in Python 2.7
+            with nested(patch('tests.testwith.something'), 
                     patch('tests.testwith.something_else')) as (mock_something, mock_something_else):
-            self.assertEqual(something, mock_something, "unpatched")
-            self.assertEqual(something_else, mock_something_else, "unpatched")
+                self.assertEqual(something, mock_something, "unpatched")
+                self.assertEqual(something_else, mock_something_else, "unpatched")
         self.assertEqual(something, sentinel.Something)
         self.assertEqual(something_else, sentinel.SomethingElse)
 

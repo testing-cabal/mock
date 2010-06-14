@@ -14,21 +14,8 @@ else:
 
 import warnings
 
-this_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-if this_dir not in sys.path:
-    # Fix for running tests on the Mac 
-    sys.path.insert(0, this_dir)
-    
-if __name__ == '__main__':
-    sys.modules['testpatch'] = sys.modules['__main__']
-    
-if 'testpatch' in sys.modules:
-    # Fix for running tests under Wing
-    import tests
-    import testpatch
-    tests.testpatch = testpatch
-
 from mock import Mock, patch, patch_object, sentinel
+
 
 builtin_string = '__builtin__'
 try:

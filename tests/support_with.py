@@ -1,3 +1,6 @@
+from __future__ import with_statement
+
+import sys
 
 __all__ = ['nested', 'catch_warnings', 'examine_warnings']
 

@@ -12,9 +12,6 @@ if info[:3] >= (3, 2, 0) or info[0] == 2 and info[1] >= 7:
 else:
     import unittest2
 
-this_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-if not this_dir in sys.path:
-    sys.path.insert(0, this_dir)
 
 from mock import sentinel, DEFAULT
 

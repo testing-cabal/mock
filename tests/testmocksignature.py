@@ -13,17 +13,6 @@ if info[:3] >= (3, 2, 0) or info[0] == 2 and info[1] >= 7:
 else:
     import unittest2
 
-this_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-if not this_dir in sys.path:
-    # Fix for running tests on the Mac 
-    sys.path.insert(0, this_dir)
-
-
-if 'testmocksignature' in sys.modules:
-    # Fix for running tests under Wing
-    import tests
-    import testmocksignature
-    tests.testmocksignature = testmocksignature
 
 import inspect
 from mock import Mock, mocksignature
