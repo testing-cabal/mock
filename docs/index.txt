@@ -93,6 +93,7 @@ References
 
 Articles and blog entries on testing with Mock:
 
+* `Mock recipes <http://konryd.blogspot.com/2010/06/mock-recipies.html>`_
 * `Mockity mock mock - some love for the mock module <http://konryd.blogspot.com/2010/05/mockity-mock-mock-some-love-for-mock.html>`_
 * `Python Unit Testing with Mock <http://www.insomnihack.com/?p=194>`_
 * `Python mock testing techniques and tools <http://agiletesting.blogspot.com/2009/07/python-mock-testing-techniques-and.html>`_
@@ -115,4 +116,9 @@ On Python 2.7 and 3.2 you can use ``unittest`` module from the standard library.
    ``python3.2 -m unittest discover``
 
 On Python 2.4 you will see one failure - testwith.py will fail to import as it
-uses the ``with`` statement which is invalid syntax under Python 2.4.
+uses the ``with`` statement which is invalid syntax under Python 2.4. When
+running the tests with Python 2.4, 2.5 or Python 3 you will also have one test
+skipped. On Python 2.4 & 2.5 this is a test that requires ``contextlib.nested``.
+On Python 3 the skipped test is for the ``__unicode__`` magic method which
+doesn't exist in Python 3.
+
