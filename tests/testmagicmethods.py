@@ -20,17 +20,6 @@ except NameError:
 
 inPy3k = sys.version_info[0] == 3
 
-this_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-if not this_dir in sys.path:
-    # Fix for running tests on the Mac 
-    sys.path.insert(0, this_dir)
-
-
-if 'testmagicmethods' in sys.modules:
-    # Fix for running tests under Wing
-    import tests
-    import testmagicmethods
-    tests.testmagicmethods = testmagicmethods
 
 import inspect
 from mock import Mock, MagicMock, _all_magics
