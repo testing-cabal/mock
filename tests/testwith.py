@@ -14,18 +14,6 @@ if info[:3] >= (3, 2, 0) or info[0] == 2 and info[1] >= 7:
 else:
     import unittest2
 
-this_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-if not this_dir in sys.path:
-    sys.path.insert(0, this_dir)
-
-if __name__ == '__main__':
-    sys.modules['testwith'] = sys.modules['__main__']
-
-if 'testwith' in sys.modules:
-    # Fix for running tests under Wing
-    import tests
-    import testwith
-    tests.testwith = testwith
 
 from mock import MagicMock, Mock, patch, sentinel
 

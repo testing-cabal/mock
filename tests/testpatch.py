@@ -405,11 +405,11 @@ class PatchTest(unittest2.TestCase):
         self.assertEqual(Something.attribute, sentinel.Original, "patch not restored")
         self.assertEqual(__main__.something, sentinel.Something, "patch not restored")
 
-    @unittest2.skipIf(not hasattr(warnings, 'catch_warnings'), "test requires catch_warnings decorator")
+    @unittest2.skipUnless(hasattr(warnings, 'catch_warnings'), "test requires catch_warnings decorator")
     def testPatchObjectDeprecation(self):
         # needed to enable the deprecation warnings
         warnings.simplefilter('default')
-        from tests.support import examine_warnings
+        from tests.support_with import examine_warnings
 
         @apply
         @examine_warnings
