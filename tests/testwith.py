@@ -101,6 +101,16 @@ class WithTest(unittest2.TestCase):
 
         self.assertEquals(something, sentinel.Something, "not restored")
 
+    def testWithStatementImbricated(self):
+        with patch('tests.testwith.something') as mock_something:
+            self.assertEquals(something, mock_something, "unpatched")
+            
+            with patch('tests.testwith.something_else') as mock_something_else: 
+                self.assertEquals(something_else, mock_something_else, "unpatched")
+                
+        self.assertEquals(something, sentinel.Something)
+        self.assertEquals(something_else, sentinel.SomethingElse)
+
 
 if __name__ == '__main__':
     unittest2.main()
