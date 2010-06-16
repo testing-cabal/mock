@@ -450,7 +450,7 @@ class PatchTest(unittest2.TestCase):
         self.assertEqual(foo, original)
         
         @apply
-        @patch.dict(foo, ('a', 'b'))
+        @patch.dict(foo, [('a', 'b')])
         def test():
             self.assertEqual(len(foo), 3)
             self.assertEqual(foo['a'], 'b')
