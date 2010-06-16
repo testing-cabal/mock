@@ -412,6 +412,25 @@ class PatchTest(unittest2.TestCase):
 
         self.assertEquals(Something.attribute, sentinel.Original, "patch not restored")
 
-
+    def testPatchDict(self):
+        foo = {'initial': object(), 'other': 'something'}
+        original = foo.copy()
+        
+        @apply
+        @patch.dict(foo)
+        def test():
+            foo['a'] = 3
+            del foo['initial']
+            foo['other'] = 'something else'
+        
+        self.assertEqual(foo, original)
+        
+        @apply
+        @patch.dict(foo, {'a': 'b'})
+        def test():
+            self.assertEqual(foo['a'], 'b')
+        
+        self.assertEqual(foo, original)
+            
 if __name__ == '__main__':
     unittest2.main()
