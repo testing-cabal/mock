@@ -92,24 +92,24 @@ class WithTest(unittest2.TestCase):
 
     def testWithStatementSameAttribute(self):
         with patch('tests.testwith.something', sentinel.Patched) as mock_something:
-            self.assertEquals(something, mock_something, "unpatched")
+            self.assertEqual(something, mock_something, "unpatched")
 
             with patch('tests.testwith.something') as mock_again:
-                self.assertEquals(something, mock_again, "unpatched")
+                self.assertEqual(something, mock_again, "unpatched")
 
-            self.assertEquals(something, mock_something, "restored with wrong instance")
+            self.assertEqual(something, mock_something, "restored with wrong instance")
 
-        self.assertEquals(something, sentinel.Something, "not restored")
+        self.assertEqual(something, sentinel.Something, "not restored")
 
     def testWithStatementImbricated(self):
         with patch('tests.testwith.something') as mock_something:
-            self.assertEquals(something, mock_something, "unpatched")
+            self.assertEqual(something, mock_something, "unpatched")
             
             with patch('tests.testwith.something_else') as mock_something_else: 
-                self.assertEquals(something_else, mock_something_else, "unpatched")
+                self.assertEqual(something_else, mock_something_else, "unpatched")
                 
-        self.assertEquals(something, sentinel.Something)
-        self.assertEquals(something_else, sentinel.SomethingElse)
+        self.assertEqual(something, sentinel.Something)
+        self.assertEqual(something_else, sentinel.SomethingElse)
 
 
 if __name__ == '__main__':

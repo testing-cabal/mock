@@ -408,9 +408,9 @@ class PatchTest(unittest2.TestCase):
         @patch.object(Something, 'attribute', sentinel.Patched)
         @patch.object(Something, 'attribute', sentinel.Patched)
         def test():
-            self.assertEquals(Something.attribute, sentinel.Patched, "unpatched")
+            self.assertEqual(Something.attribute, sentinel.Patched, "unpatched")
 
-        self.assertEquals(Something.attribute, sentinel.Original, "patch not restored")
+        self.assertEqual(Something.attribute, sentinel.Original, "patch not restored")
 
     def testPatchDict(self):
         foo = {'initial': object(), 'other': 'something'}
@@ -428,6 +428,7 @@ class PatchTest(unittest2.TestCase):
         @apply
         @patch.dict(foo, {'a': 'b'})
         def test():
+            self.assertEqual(len(foo), 3)
             self.assertEqual(foo['a'], 'b')
         
         self.assertEqual(foo, original)
