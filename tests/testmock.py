@@ -14,6 +14,7 @@ try:
 except NameError:
     unicode = str
 
+
 class MockTest(unittest2.TestCase):
 
     def testConstructor(self):

@@ -40,6 +40,17 @@ except NameError:
     # Python 2.4 compatibility
     BaseException = Exception
 
+try:
+    from functools import wraps
+except ImportError:
+    # Python 2.4 compatibility
+    def wraps(original):
+        def inner(f):
+            f.__name__ = original.__name__
+            return f
+        return inner
+
+
 inPy3k = sys.version_info[0] == 3
 
 
@@ -326,6 +337,7 @@ class _patch(object):
             func.patchings.append(self)
             return func
 
+        @wraps(func)
         def patched(*args, **keywargs):
             # don't use a with here (backwards compatability with 2.5)
             extra_args = []
@@ -341,7 +353,6 @@ class _patch(object):
                     patching.__exit__()
 
         patched.patchings = [self]
-        patched.__name__ = func.__name__ 
         if hasattr(func, 'func_code'):
             # not in Python 3
             patched.compat_co_firstlineno = getattr(func, "compat_co_firstlineno", 
@@ -414,6 +425,7 @@ def patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False):
 
 def _patch_dict(in_dict, values=()):
     def _decorator(f):
+        @wraps(f)
         def _inner(*args, **kw):
             original = in_dict.copy()
             in_dict.update(values)

@@ -432,6 +432,19 @@ class PatchTest(unittest2.TestCase):
             self.assertEqual(foo['a'], 'b')
         
         self.assertEqual(foo, original)
-            
+    
+    
+    def testNamePreserved(self):
+        foo = {}
+        
+        @patch('tests.testpatch.SomeClass', object())
+        @patch('tests.testpatch.SomeClass', object(), mocksignature=True)
+        @patch.object(SomeClass, object())
+        @patch.dict(foo)
+        def some_name():
+            pass
+        
+        self.assertEqual(some_name.__name__, 'some_name')
+        
 if __name__ == '__main__':
     unittest2.main()
