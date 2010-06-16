@@ -32,6 +32,22 @@ class SomeClass(object):
     def wibble(self):
         pass
 
+class Container(object):
+    def __init__(self):
+        self.values = {}
+
+    def __getitem__(self, name):
+        return self.values[name]
+
+    def __setitem__(self, name, value):
+        self.values[name] = value
+    
+    def __delitem__(self, name):
+        del self.values[name]
+    
+    def __iter__(self):
+        return iter(self.values)
+
     
 class PatchTest(unittest2.TestCase):
 
@@ -433,6 +449,30 @@ class PatchTest(unittest2.TestCase):
         
         self.assertEqual(foo, original)
     
+    def testPatchDictWithContainerObject(self):
+        foo = Container()
+        foo['initial'] = object()
+        foo['other'] =  'something'
+        
+        original = foo.values.copy()
+        
+        @apply
+        @patch.dict(foo)
+        def test():
+            foo['a'] = 3
+            del foo['initial']
+            foo['other'] = 'something else'
+        
+        self.assertEqual(foo.values, original)
+        
+        @apply
+        @patch.dict(foo, {'a': 'b'})
+        def test():
+            self.assertEqual(len(foo.values), 3)
+            self.assertEqual(foo['a'], 'b')
+        
+        self.assertEqual(foo.values, original)
+    
     
     def testNamePreserved(self):
         foo = {}
@@ -448,3 +488,5 @@ class PatchTest(unittest2.TestCase):
         
 if __name__ == '__main__':
     unittest2.main()
+
+    

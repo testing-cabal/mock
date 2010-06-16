@@ -424,14 +424,41 @@ def patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False):
     return _patch(target, attribute, new, spec, create, mocksignature)
 
 def _patch_dict(in_dict, values=()):
+    # support any argument supported by dict(...) constructor
+    values = dict(values)
     def _decorator(f):
         @wraps(f)
         def _inner(*args, **kw):
-            original = in_dict.copy()
-            in_dict.update(values)
+            try:
+                original = in_dict.copy()
+            except AttributeError:
+                # dict like object with no copy method
+                # must support iteration over keys
+                original = {}
+                for key in in_dict:
+                    original[key] = in_dict[key]
+            try:
+                in_dict.update(values)
+            except AttributeError:
+                # dict like object with no update method
+                for key in values:
+                    in_dict[key] = values[key]
+                    
             result = f(*args, **kw)
-            in_dict.clear()
-            in_dict.update(original)
+            
+            try:
+                in_dict.clear()
+            except AttributeError:
+                keys = list(in_dict)
+                for key in keys:
+                    del in_dict[key]
+                
+            try:
+                in_dict.update(original)
+            except AttributeError:
+                for key in original:
+                    in_dict[key] = original[key]
+            
             return result
         return _inner
     return _decorator
