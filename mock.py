@@ -412,7 +412,20 @@ def patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False):
     target = _importer(target)
     return _patch(target, attribute, new, spec, create, mocksignature)
 
+def _patch_dict(in_dict, values=()):
+    def _decorator(f):
+        def _inner(*args, **kw):
+            original = in_dict.copy()
+            in_dict.update(values)
+            result = f(*args, **kw)
+            in_dict.clear()
+            in_dict.update(original)
+            return result
+        return _inner
+    return _decorator
+
 patch.object = _patch_object
+patch.dict = _patch_dict
 
 def _has_local_attr(obj, name):
     try:
