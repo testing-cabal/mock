@@ -516,7 +516,7 @@ def get_method(name, func):
 
 _magics = set('__%s__' % method for method in ' '.join([magic_methods, numerics, inplace, right, extra]).split())
 
-_all_magics = _magics.union(_obsoletes)
+_all_magics = _magics | _obsoletes
 
 class MagicMock(Mock):
     def __init__(self, *args, **kw):
