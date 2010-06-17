@@ -424,6 +424,7 @@ def patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False):
     return _patch(target, attribute, new, spec, create, mocksignature)
 
 def _patch_dict(in_dict, values=(), clear=False):
+    """patch.dict(in_dict, values=(), clear=False)"""
     # support any argument supported by dict(...) constructor
     values = dict(values)
     def _decorator(f):
@@ -502,7 +503,10 @@ if inPy3k:
 
 # not including __prepare__, __instancecheck__, __subclasscheck__
 # (as they are metaclass methods)
-# Also not including the obsolete __cmp__, __getslice__, __setslice__, __coerce__
+
+_obsoletes = set('__%s__' % method for method in [
+    'cmp', 'getslice', 'setslice', 'coerce'
+])
 
 def get_method(name, func):
     def method(self, *args, **kw):
@@ -510,13 +514,14 @@ def get_method(name, func):
     method.__name__ = name
     return method
 
-_all_magics = set('__%s__' % method for method in ' '.join([magic_methods, numerics, inplace, right, extra]).split())
+_magics = set('__%s__' % method for method in ' '.join([magic_methods, numerics, inplace, right, extra]).split())
 
+_all_magics = _magics.union(_obsoletes)
 
 class MagicMock(Mock):
     def __init__(self, *args, **kw):
         Mock.__init__(self, *args, **kw)
-        for entry in _all_magics:
+        for entry in _magics:
             # could specify parent?
             m = Mock()
             if entry == '__exit__':
