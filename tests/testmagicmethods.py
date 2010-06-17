@@ -231,6 +231,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
             self.assertTrue(hasattr(mock, entry))
         self.assertFalse(hasattr(mock, '__imaginery__'))
 
+    @unittest2.skipIf(inPy3k, "no __cmp__ in Python 3")
     def testObsoleteMagicMethods(self):
         mock = MagicMock()
         self.assertRaises(AttributeError, lambda: mock.__cmp__)
