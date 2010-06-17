@@ -520,22 +520,29 @@ _all_magics = _magics | _obsoletes
 
 
 _side_effects = {
-    '__int__': lambda self: 0,
-    '__contains__': lambda self: False,
-    '__len__': lambda self: 0,
-    '__iter__': lambda self: iter([]),
     '__hash__': lambda self: object.__hash__(self),
     '__repr__': lambda self: object.__repr__(self),
     '__str__': lambda self: object.__str__(self),
 }
 
-def _set_side_effect(mock, method, name):
-    func = _side_effects[name]
-    def wrap(*args, **kw):
-        if method._return_value is DEFAULT:
-            return func(mock)
-        return method._return_value
-    method.side_effect = wrap
+_return_values = {
+    '__int__': 0,
+    '__contains__': False,
+    '__len__': 0,
+    '__iter__': iter([]),
+    '__exit__': False,
+}
+
+def _set_return_value(mock, method, name):
+    if name in _side_effects:
+        func = _side_effects[name]
+        def wrap(*args, **kw):
+            if method._return_value is DEFAULT:
+                return func(mock)
+            return method._return_value
+        method.side_effect = wrap
+    elif name in _return_values:
+        method.return_value = _return_values[name]
 
 
 class MagicMock(Mock):
@@ -544,14 +551,6 @@ class MagicMock(Mock):
         for entry in _magics:
             # could specify parent?
             m = Mock()
-            if entry == '__exit__':
-                # so that MagicMock doesn't swallow exceptions
-                # when used in a with statement
-                m.return_value = False
-            # We could also preconfigure magic methods that have to return
-            # specific types - e.g __int__ must return an integer
             setattr(self, entry, m)
-            
-            if entry in _side_effects:
-                _set_side_effect(self, m, entry)
+            _set_return_value(self, m, entry)
 
