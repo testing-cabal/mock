@@ -17,7 +17,7 @@ inPy3k = sys.version_info[0] == 3
 
 
 import inspect
-from mock import Mock, MagicMock, _all_magics
+from mock import Mock, MagicMock, _magics
 
 
 class TestMockingMagicMethods(unittest2.TestCase):
@@ -227,10 +227,18 @@ class TestMockingMagicMethods(unittest2.TestCase):
         
         self.assertFalse(bool(mock))
         
-        for entry in _all_magics:
+        for entry in _magics:
             self.assertTrue(hasattr(mock, entry))
         self.assertFalse(hasattr(mock, '__imaginery__'))
 
+    def testObsoleteMagicMethods(self):
+        mock = MagicMock()
+        self.assertRaises(AttributeError, lambda: mock.__cmp__)
+        
+        mock = Mock()
+        mock.__cmp__ = lambda s, o: 0
+        
+        self.assertEqual(mock, object())
 
 if __name__ == '__main__':
     unittest2.main()
