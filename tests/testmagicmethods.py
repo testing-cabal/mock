@@ -230,6 +230,19 @@ class TestMockingMagicMethods(unittest2.TestCase):
         for entry in _magics:
             self.assertTrue(hasattr(mock, entry))
         self.assertFalse(hasattr(mock, '__imaginery__'))
+    
+    def testMagicMockDefaults(self):
+        mock = MagicMock()
+        self.assertEqual(int(mock), 0)
+        self.assertNotIn(object(), mock)
+        self.assertEqual(len(mock), 0)
+        self.assertEqual(list(mock), [])
+        self.assertEqual(hash(mock), object.__hash__(mock))
+        self.assertEqual(repr(mock), object.__repr__(mock))
+        self.assertEqual(str(mock), object.__str__(mock))
+        
+        # __dir__, 
+        
 
     @unittest2.skipIf(inPy3k, "no __cmp__ in Python 3")
     def testObsoleteMagicMethods(self):

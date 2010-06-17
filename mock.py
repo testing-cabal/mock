@@ -518,6 +518,29 @@ _magics = set('__%s__' % method for method in ' '.join([magic_methods, numerics,
 
 _all_magics = _magics | _obsoletes
 
+
+def __iter__(_, method):
+    if method._return_value is DEFAULT:
+        return iter([])
+    return method.return_value
+
+_side_effects = {
+    '__int__': lambda *_: 0,
+    '__contains__': lambda *_: False,
+    '__len__': lambda *_: 0,
+    '__iter__': __iter__,
+    '__hash__': lambda mock, _: object.__hash__(mock),
+    '__repr__': lambda mock, _: object.__repr__(mock),
+    '__str__': lambda mock, _: object.__str__(mock),
+}
+
+def _set_side_effect(mock, method, name):
+    func = _side_effects[name]
+    def wrap(*args, **kw):
+        return func(mock, method)
+    method.side_effect = wrap
+
+
 class MagicMock(Mock):
     def __init__(self, *args, **kw):
         Mock.__init__(self, *args, **kw)
@@ -531,4 +554,7 @@ class MagicMock(Mock):
             # We could also preconfigure magic methods that have to return
             # specific types - e.g __int__ must return an integer
             setattr(self, entry, m)
+            
+            if entry in _side_effects:
+                _set_side_effect(self, m, entry)
 
