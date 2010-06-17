@@ -231,6 +231,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
             self.assertTrue(hasattr(mock, entry))
         self.assertFalse(hasattr(mock, '__imaginery__'))
 
+
 if __name__ == '__main__':
     unittest2.main()
     
