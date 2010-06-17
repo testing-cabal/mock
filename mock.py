@@ -519,25 +519,22 @@ _magics = set('__%s__' % method for method in ' '.join([magic_methods, numerics,
 _all_magics = _magics | _obsoletes
 
 
-def __iter__(_, method):
-    if method._return_value is DEFAULT:
-        return iter([])
-    return method.return_value
-
 _side_effects = {
-    '__int__': lambda *_: 0,
-    '__contains__': lambda *_: False,
-    '__len__': lambda *_: 0,
-    '__iter__': __iter__,
-    '__hash__': lambda mock, _: object.__hash__(mock),
-    '__repr__': lambda mock, _: object.__repr__(mock),
-    '__str__': lambda mock, _: object.__str__(mock),
+    '__int__': lambda self: 0,
+    '__contains__': lambda self: False,
+    '__len__': lambda self: 0,
+    '__iter__': lambda self: iter([]),
+    '__hash__': lambda self: object.__hash__(self),
+    '__repr__': lambda self: object.__repr__(self),
+    '__str__': lambda self: object.__str__(self),
 }
 
 def _set_side_effect(mock, method, name):
     func = _side_effects[name]
     def wrap(*args, **kw):
-        return func(mock, method)
+        if method._return_value is DEFAULT:
+            return func(mock)
+        return method._return_value
     method.side_effect = wrap
 
 
