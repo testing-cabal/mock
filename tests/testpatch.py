@@ -481,7 +481,57 @@ class PatchTest(unittest2.TestCase):
         
         self.assertEqual(foo.values, original)
     
+    def testPatchDictWithClear(self):
+        foo = {'initial': object(), 'other': 'something'}
+        original = foo.copy()
+        
+        @apply
+        @patch.dict(foo, clear=True)
+        def test():
+            self.assertEqual(foo, {})
+            foo['a'] = 3
+            foo['other'] = 'something else'
+        
+        self.assertEqual(foo, original)
+        
+        @apply
+        @patch.dict(foo, {'a': 'b'}, clear=True)
+        def test():
+            self.assertEqual(foo, {'a': 'b'})
+        
+        self.assertEqual(foo, original)
+        
+        @apply
+        @patch.dict(foo, [('a', 'b')], clear=True)
+        def test():
+            self.assertEqual(foo, {'a': 'b'})
+        
+        self.assertEqual(foo, original)
     
+    
+    def testPatchDictWithContainerObjectAndClear(self):
+        foo = Container()
+        foo['initial'] = object()
+        foo['other'] =  'something'
+        
+        original = foo.values.copy()
+        
+        @apply
+        @patch.dict(foo, clear=True)
+        def test():
+            self.assertEqual(foo.values, {})
+            foo['a'] = 3
+            foo['other'] = 'something else'
+        
+        self.assertEqual(foo.values, original)
+        
+        @apply
+        @patch.dict(foo, {'a': 'b'}, clear=True)
+        def test():
+            self.assertEqual(foo.values, {'a': 'b'})
+        
+        self.assertEqual(foo.values, original)
+
     def testNamePreserved(self):
         foo = {}
         
@@ -493,6 +543,8 @@ class PatchTest(unittest2.TestCase):
             pass
         
         self.assertEqual(some_name.__name__, 'some_name')
+    
+        
         
 if __name__ == '__main__':
     unittest2.main()

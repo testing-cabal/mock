@@ -423,7 +423,7 @@ def patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False):
     target = _importer(target)
     return _patch(target, attribute, new, spec, create, mocksignature)
 
-def _patch_dict(in_dict, values=()):
+def _patch_dict(in_dict, values=(), clear=False):
     # support any argument supported by dict(...) constructor
     values = dict(values)
     def _decorator(f):
@@ -437,6 +437,10 @@ def _patch_dict(in_dict, values=()):
                 original = {}
                 for key in in_dict:
                     original[key] = in_dict[key]
+
+            if clear:
+                _clear_dict(in_dict)
+            
             try:
                 in_dict.update(values)
             except AttributeError:
@@ -446,12 +450,7 @@ def _patch_dict(in_dict, values=()):
                     
             result = f(*args, **kw)
             
-            try:
-                in_dict.clear()
-            except AttributeError:
-                keys = list(in_dict)
-                for key in keys:
-                    del in_dict[key]
+            _clear_dict(in_dict)
                 
             try:
                 in_dict.update(original)
@@ -462,6 +461,15 @@ def _patch_dict(in_dict, values=()):
             return result
         return _inner
     return _decorator
+
+def _clear_dict(in_dict):
+    try:
+        in_dict.clear()
+    except AttributeError:
+        keys = list(in_dict)
+        for key in keys:
+            del in_dict[key]
+
 
 patch.object = _patch_object
 patch.dict = _patch_dict

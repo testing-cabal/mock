@@ -10,7 +10,9 @@
 * Ability to use patch and patch_object as class decorators
 * Renamed ``patch_object`` to ``patch.object`` (``patch_object`` is deprecated)
 * Addition of ``MagicMock`` class with all magic methods pre-created for you
-* Python 3 compatibility
+* Python 3 compatibility (tested with 3.2 but should work with 3.0 & 3.1 as
+  well)
+* Addition of ``patch.dict(...)`` for changing dictionaries during a test
 * Addition of ``mocksignature`` argument to ``patch`` and ``patch_object``
 * ``help(mock)`` works now (on the module). Can no longer use ``__bases__``
   as a valid sentinel name (thanks to Stephen Emslie for reporting and
