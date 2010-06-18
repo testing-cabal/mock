@@ -15,6 +15,7 @@
 
 __all__ = (
     'Mock',
+    'MagicMock',
     'mocksignature',
     'patch',
     'patch_object',
