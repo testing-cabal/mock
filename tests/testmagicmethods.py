@@ -150,10 +150,10 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertTrue(bool(m))
         
         nonzero = lambda s: False
-        m.__nonzero__ = nonzero
-        
-        # Needed for Python 3
-        m.__bool__ = nonzero
+        if not inPy3k:
+            m.__nonzero__ = nonzero
+        else:
+            m.__bool__ = nonzero
         
         self.assertFalse(bool(m))
     
