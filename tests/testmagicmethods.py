@@ -252,12 +252,10 @@ class TestMockingMagicMethods(unittest2.TestCase):
         else:
             self.assertEqual(oct(mock), '0o0')
         self.assertEqual(hex(mock), '0x0')
-            
-        # __dir__, __format__
         
 
     @unittest2.skipIf(inPy3k, "no __cmp__ in Python 3")
-    def testObsoleteMagicMethods(self):
+    def testNonDefaultMagicMethods(self):
         mock = MagicMock()
         self.assertRaises(AttributeError, lambda: mock.__cmp__)
         
