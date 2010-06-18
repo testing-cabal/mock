@@ -234,12 +234,16 @@ class TestMockingMagicMethods(unittest2.TestCase):
     def testMagicMockDefaults(self):
         mock = MagicMock()
         self.assertEqual(int(mock), 0)
+        self.assertEqual(complex(mock), 0j)
+        self.assertEqual(float(mock), 0.0)
         self.assertNotIn(object(), mock)
         self.assertEqual(len(mock), 0)
         self.assertEqual(list(mock), [])
         self.assertEqual(hash(mock), object.__hash__(mock))
         self.assertEqual(repr(mock), object.__repr__(mock))
         self.assertEqual(str(mock), object.__str__(mock))
+        self.assertEqual(unicode(mock), object.__str__(mock))
+        self.assertIsInstance(unicode(mock), unicode)
         
         # __dir__, 
         
