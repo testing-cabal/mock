@@ -507,6 +507,7 @@ if inPy3k:
     extra = 'bool next '
 else:
     extra = 'unicode long nonzero oct hex '
+# __truediv__ and __rtruediv__ not available in Python 3 either
 
 # not including __prepare__, __instancecheck__, __subclasscheck__
 # (as they are metaclass methods)
