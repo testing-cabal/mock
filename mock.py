@@ -499,7 +499,7 @@ magic_methods = (
     "complex int float index "
 )
 
-numerics = "add sub mul div truediv floordiv mod lshift rshift and xor or "
+numerics = "add sub mul div truediv floordiv mod lshift rshift and xor or pow "
 inplace = ' '.join('i%s' % n for n in numerics.split())
 right = ' '.join('r%s' % n for n in numerics.split()) 
 extra = ''
@@ -511,10 +511,12 @@ else:
 
 # not including __prepare__, __instancecheck__, __subclasscheck__
 # (as they are metaclass methods)
+# __del__ is not supported at all as it causes problems if it exists
 
 _non_defaults = set('__%s__' % method for method in [
-    'cmp', 'getslice', 'setslice', 'coerce',
-    'dir', 'format', 'get', 'set', 'delete'
+    'cmp', 'getslice', 'setslice', 'coerce', 'subclasses',
+    'dir', 'format', 'get', 'set', 'delete', 'reversed',
+    'missing', 
 ])
 
 def get_method(name, func):
