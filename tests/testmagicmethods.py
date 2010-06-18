@@ -12,6 +12,7 @@ try:
 except NameError:
     # Python 3
     unicode = str
+    long = int
 
 inPy3k = sys.version_info[0] == 3
 
@@ -236,6 +237,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertEqual(int(mock), 0)
         self.assertEqual(complex(mock), 0j)
         self.assertEqual(float(mock), 0.0)
+        self.assertEqual(long(mock), long(0))
         self.assertNotIn(object(), mock)
         self.assertEqual(len(mock), 0)
         self.assertEqual(list(mock), [])
@@ -244,8 +246,14 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertEqual(str(mock), object.__str__(mock))
         self.assertEqual(unicode(mock), object.__str__(mock))
         self.assertIsInstance(unicode(mock), unicode)
+        self.assertTrue(bool(mock))
+        if not inPy3k:
+            self.assertEqual(oct(mock), '0')
+        else:
+            self.assertEqual(oct(mock), '0o0')
+        self.assertEqual(hex(mock), '0x0')
         
-        # __dir__, 
+        # __dir__, __index__
         
 
     @unittest2.skipIf(inPy3k, "no __cmp__ in Python 3")

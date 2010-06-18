@@ -50,6 +50,12 @@ except ImportError:
             return f
         return inner
 
+try:
+    unicode
+except NameError:
+    # Python 3
+    unicode = str
+    long = int
 
 inPy3k = sys.version_info[0] == 3
 
@@ -488,10 +494,10 @@ magic_methods = (
     "getitem setitem delitem "
     "len contains iter "
     "hash repr str "
-    "nonzero enter exit "
+    "enter exit "
     "divmod neg pos abs invert "
-    "complex int long float oct hex index "
-    "format next dir "
+    "complex int float oct hex index "
+    "format dir "
 )
 
 numerics = "add sub mul div truediv floordiv mod lshift rshift and xor or "
@@ -499,9 +505,9 @@ inplace = ' '.join('i%s' % n for n in numerics.split())
 right = ' '.join('r%s' % n for n in numerics.split()) 
 extra = ''
 if inPy3k:
-    extra = 'bool '
+    extra = 'bool next '
 else:
-    extra = 'unicode '
+    extra = 'unicode long nonzero '
 
 # not including __prepare__, __instancecheck__, __subclasscheck__
 # (as they are metaclass methods)
@@ -536,6 +542,12 @@ _return_values = {
     '__exit__': False,
     '__complex__': 0j,
     '__float__': 0.0,
+    '__bool__': True,
+    '__nonzero__': True,
+    '__oct__': '0',
+    '__hex__': '0x0',
+    '__long__': long(0),
+    '__index__': 0,
 }
 
 def _set_return_value(mock, method, name):
