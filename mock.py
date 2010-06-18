@@ -496,8 +496,7 @@ magic_methods = (
     "hash repr str "
     "enter exit "
     "divmod neg pos abs invert "
-    "complex int float oct hex index "
-    "format dir "
+    "complex int float index "
 )
 
 numerics = "add sub mul div truediv floordiv mod lshift rshift and xor or "
@@ -507,13 +506,14 @@ extra = ''
 if inPy3k:
     extra = 'bool next '
 else:
-    extra = 'unicode long nonzero '
+    extra = 'unicode long nonzero oct hex '
 
 # not including __prepare__, __instancecheck__, __subclasscheck__
 # (as they are metaclass methods)
 
-_obsoletes = set('__%s__' % method for method in [
-    'cmp', 'getslice', 'setslice', 'coerce'
+_non_defaults = set('__%s__' % method for method in [
+    'cmp', 'getslice', 'setslice', 'coerce',
+    'dir', 'format'
 ])
 
 def get_method(name, func):
@@ -524,7 +524,7 @@ def get_method(name, func):
 
 _magics = set('__%s__' % method for method in ' '.join([magic_methods, numerics, inplace, right, extra]).split())
 
-_all_magics = _magics | _obsoletes
+_all_magics = _magics | _non_defaults
 
 
 _side_effects = {
