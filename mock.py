@@ -487,7 +487,7 @@ magic_methods = (
     "lt le gt ge eq ne "
     "getitem setitem delitem "
     "len contains iter "
-    "hash repr str unicode "
+    "hash repr str "
     "nonzero enter exit "
     "divmod neg pos abs invert "
     "complex int long float oct hex index "
@@ -500,6 +500,8 @@ right = ' '.join('r%s' % n for n in numerics.split())
 extra = ''
 if inPy3k:
     extra = 'bool '
+else:
+    extra = 'unicode '
 
 # not including __prepare__, __instancecheck__, __subclasscheck__
 # (as they are metaclass methods)
@@ -523,6 +525,7 @@ _side_effects = {
     '__hash__': lambda self: object.__hash__(self),
     '__repr__': lambda self: object.__repr__(self),
     '__str__': lambda self: object.__str__(self),
+    '__unicode__': lambda self: unicode(object.__str__(self)),
 }
 
 _return_values = {
@@ -531,6 +534,8 @@ _return_values = {
     '__len__': 0,
     '__iter__': iter([]),
     '__exit__': False,
+    '__complex__': 0j,
+    '__float__': 0.0,
 }
 
 def _set_return_value(mock, method, name):
