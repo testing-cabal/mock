@@ -221,9 +221,9 @@ class TestMockingMagicMethods(unittest2.TestCase):
         
         if inPy3k:
             mock.__bool__.return_value = False
+            self.assertFalse(hasattr(mock, '__nonzero__'))
         else:
             mock.__nonzero__.return_value = False
-            # in Python 3 mock still has a __nonzero__ attribute
             self.assertFalse(hasattr(mock, '__bool__'))
         
         self.assertFalse(bool(mock))
@@ -252,8 +252,8 @@ class TestMockingMagicMethods(unittest2.TestCase):
         else:
             self.assertEqual(oct(mock), '0o0')
         self.assertEqual(hex(mock), '0x0')
-        
-        # __dir__, __index__
+            
+        # __dir__, __format__
         
 
     @unittest2.skipIf(inPy3k, "no __cmp__ in Python 3")
