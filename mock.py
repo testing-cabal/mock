@@ -318,7 +318,7 @@ class _patch(object):
         self.spec = spec
         self.create = create
         self.has_local = False
-        self.mocksignature = False
+        self.mocksignature = mocksignature
 
 
     def copy(self):

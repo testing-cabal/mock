@@ -2,10 +2,7 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
-import os
-import sys
-
-from tests.support import unittest2
+from tests.support import unittest2, inPy3k
 
 try:
     unicode
@@ -14,11 +11,9 @@ except NameError:
     unicode = str
     long = int
 
-inPy3k = sys.version_info[0] == 3
-
-
 import inspect
 from mock import Mock, MagicMock, _magics
+
 
 
 class TestMockingMagicMethods(unittest2.TestCase):

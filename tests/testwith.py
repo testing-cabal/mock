@@ -4,9 +4,6 @@
 
 from __future__ import with_statement
 
-import os
-import sys
-
 from tests.support import unittest2
 
 from mock import MagicMock, Mock, patch, sentinel

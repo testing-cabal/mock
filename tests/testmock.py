@@ -2,9 +2,6 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
-import os
-import sys
-
 from tests.support import unittest2
 
 from mock import Mock, sentinel, DEFAULT
@@ -19,7 +16,9 @@ class MockTest(unittest2.TestCase):
 
     def testAll(self):
         # if __all__ is badly defined then import * will raise an error
-        from mock import *
+        # We have to exec it because you can't import * inside a method
+        # in Python 3
+        exec("from mock import *")
         
     def testConstructor(self):
         mock = Mock()
