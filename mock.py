@@ -58,6 +58,12 @@ except NameError:
     unicode = str
     long = int
 
+try:
+    long
+except NameError:
+    # Python 3
+    long = int
+
 inPy3k = sys.version_info[0] == 3
 
 
