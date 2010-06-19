@@ -231,7 +231,8 @@ class TestMockingMagicMethods(unittest2.TestCase):
         for entry in _magics:
             self.assertTrue(hasattr(mock, entry))
         self.assertFalse(hasattr(mock, '__imaginery__'))
-    
+
+
     def testMagicMockDefaults(self):
         mock = MagicMock()
         self.assertEqual(int(mock), 0)
@@ -250,6 +251,8 @@ class TestMockingMagicMethods(unittest2.TestCase):
         if not inPy3k:
             self.assertEqual(oct(mock), '0')
         else:
+            # in Python 3 oct and hex use __index__
+            # so these tests are for __index__ in py3k
             self.assertEqual(oct(mock), '0o0')
         self.assertEqual(hex(mock), '0x0')
         
@@ -263,6 +266,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
         mock.__cmp__ = lambda s, o: 0
         
         self.assertEqual(mock, object())
+
 
 if __name__ == '__main__':
     unittest2.main()

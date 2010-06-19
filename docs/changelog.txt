@@ -7,7 +7,7 @@
 
 * Addition of ``mocksignature``
 * Ability to mock magic methods
-* Ability to use patch and patch_object as class decorators
+* Ability to use patch and patch.object as class decorators
 * Renamed ``patch_object`` to ``patch.object`` (``patch_object`` is deprecated)
 * Addition of ``MagicMock`` class with all magic methods pre-created for you
 * Python 3 compatibility (tested with 3.2 but should work with 3.0 & 3.1 as
@@ -27,19 +27,15 @@
   to run
 * `Konrad Delong <http://konryd.blogspot.com/>`_ added as co-maintainer
 
-Not done yet:
+
+Outstanding issues:
 
 * Test mocksignature argument to patch
-* Test deleting magic methods
 * Interaction of magic methods with spec, wraps
 * Should spec cause all methods to be wrapped with mocksignature perhaps?
   (or another keyword argument perhaps?) - defer this to an issue
 * Should magic method calls be tracked in method_calls?
-* Document the way magic methods are wrapped in __setattr__ so that Python's
-  inconsistent lookup of magic methods doesn't matter
-* Document that wrapping is bypassed if the magic method is patched with a Mock
-* document unsupported magic methods (add obsolete ones like getslice / setslice
-  / delslice / cmp / coerce etc?)
+
 
 
 2009/08/22 Version 0.6.0

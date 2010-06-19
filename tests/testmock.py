@@ -17,6 +17,10 @@ except NameError:
 
 class MockTest(unittest2.TestCase):
 
+    def testAll(self):
+        # if __all__ is badly defined then import * will raise an error
+        from mock import *
+        
     def testConstructor(self):
         mock = Mock()
         
