@@ -99,6 +99,7 @@ class TestMockSignature(unittest2.TestCase):
             mock.f(1, 2, 3)
             
             mock_f.assert_called_with(1, 2, 3)
+            mock.f.mock.assert_called_with(1, 2, 3)
         
         @apply
         @patch('tests.support.SomeClass.wibble', mocksignature=True)
@@ -110,3 +111,4 @@ class TestMockSignature(unittest2.TestCase):
             instance.wibble()
             
             mock_wibble.assert_called_with(instance)
+            instance.wibble.mock.assert_called_with(instance)
