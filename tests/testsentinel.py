@@ -2,9 +2,6 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
-import os
-import sys
-
 from tests.support import unittest2
 
 from mock import sentinel, DEFAULT

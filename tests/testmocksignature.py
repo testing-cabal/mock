@@ -2,13 +2,12 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
-import os
-import sys
-
-from tests.support import unittest2
-
 import inspect
-from mock import Mock, mocksignature
+
+from tests.support import unittest2, apply
+
+from mock import Mock, mocksignature, patch
+
 
 
 class TestMockSignature(unittest2.TestCase):
@@ -80,3 +79,20 @@ class TestMockSignature(unittest2.TestCase):
         f2 = mocksignature(f, f)
         self.assertEqual(f2(3, 4, 5, x=6, y=9), (3, 4, (5,), {'x': 6, 'y': 9}))
         self.assertEqual(f2(3, x=6, y=9, b='a'), (3, 'a', (), {'x': 6, 'y': 9}))
+    
+    
+    def testMockSignatureWithPatch(self):
+        mock = Mock()
+        
+        def f(a, b, c):
+            pass
+        mock.f = f
+        
+        @apply
+        @patch.object(mock, 'f', mocksignature=True)
+        def test(mock_f):
+            self.assertRaises(TypeError, mock.f, 3, 4)
+            self.assertRaises(TypeError, mock.f, 3, 4, 5, 6)
+            mock.f(1, 2, 3)
+            
+            mock_f.assert_called_with(1, 2, 3)

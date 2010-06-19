@@ -2,22 +2,15 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
-import os
-import sys
 import warnings
 
-from tests.support import unittest2
+from tests.support import unittest2, apply, inPy3k
 
 from mock import Mock, patch, patch_object, sentinel
 
-
-builtin_string = '__builtin__'
-try:
-    apply
-except NameError:
-    # no apply in Python 3
-    def apply(f, *args, **kw):
-        f(*args, **kw)
+if not inPy3k:
+    builtin_string = '__builtin__'
+else:
     builtin_string = 'builtins'
 
 
