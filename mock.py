@@ -104,6 +104,16 @@ def _copy_func_details(func, funcopy):
 
 
 def mocksignature(func, mock, skipfirst=False):
+    """
+    mocksignature(func, mock, skipfirst=False)
+    
+    Create a new function with the same signature as `func` that delegates
+    to `mock`. If `skipfirst` is True the first argument is skipped, useful
+    for methods where `self` needs to be omitted from the new function.
+    
+    The mock is set as the `mock` attribute of the returned function for easy
+    access.
+    """
     signature = _getsignature(func, skipfirst)
     src = "lambda %(signature)s: _mock_(%(signature)s)" % {'signature': signature}
 
@@ -126,6 +136,7 @@ class SentinelObject(object):
 
 
 class Sentinel(object):
+    """Access attributes to return a named object, usable as a sentinel."""
     def __init__(self):
         self._sentinels = {}
         
@@ -183,6 +194,7 @@ class Mock(object):
         
 
     def reset_mock(self):
+        "Restore the mock object to its initial state."
         self.called = False
         self.call_args = None
         self.call_count = 0
@@ -201,8 +213,11 @@ class Mock(object):
     
     def __set_return_value(self, value):
         self._return_value = value
-        
-    return_value = property(__get_return_value, __set_return_value)
+    
+    __return_value_doc = "The value to be returned when the mock is called."
+    
+    return_value = property(__get_return_value, __set_return_value,
+                            __return_value_doc)
 
 
     def __call__(self, *args, **kwargs):
@@ -270,9 +285,27 @@ class Mock(object):
         return object.__delattr__(self, name)
         
     def assert_called_with(self, *args, **kwargs):
+        """
+        assert that the mock was called with the specified arguments.
+        
+        Raises an AttributeError if the args and keyword args passed in are
+        different to the last call to the mock.
+        """
         assert self.call_args == (args, kwargs), 'Expected: %s\nCalled with: %s' % ((args, kwargs), self.call_args)
 
+
 class callargs(tuple):
+    """
+    A tuple for holding the results of a call to a mock, either in the form
+    `(args, kwargs)` or `(name, args, kwargs)`.
+    
+    If args or kwargs are empty then a callargs tuple will compare equal to
+    a tuple without those values. This makes comparisons less verbose::
+    
+        callargs('name', (), {}) == ('name',)
+        callargs('name', (1,), {}) == ('name', (1,))
+        callargs((), {'a': 'b'}) == ({'a': 'b'},)
+    """
     def __eq__(self, other):
         if len(self) == 3:
             if other[0] != self[0]:
@@ -422,13 +455,20 @@ class _patch(object):
 
 
 def _patch_object(target, attribute, new=DEFAULT, spec=None, create=False, mocksignature=False):
+    """
+    patch.object(target, attribute, new=DEFAULT, spec=None, create=False, mocksignature=False)
+    """
     return _patch(target, attribute, new, spec, create, mocksignature)
                 
 def patch_object(*args, **kwargs):
+    "A deprecated form of patch.object(...)"
     warnings.warn(('Please use patch.object instead.'), DeprecationWarning, 2)
     return _patch_object(*args, **kwargs)
 
 def patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False):
+    """
+    patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False)
+    """
     try:
         target, attribute = target.rsplit('.', 1)    
     except (TypeError, ValueError):
