@@ -15,6 +15,7 @@ something_else  = sentinel.SomethingElse
 
 
 class WithTest(unittest2.TestCase):
+
     def testWithStatement(self):
         with patch('tests.testwith.something', sentinel.Something2):
             self.assertEqual(something, sentinel.Something2, "unpatched")        

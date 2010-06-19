@@ -4,7 +4,7 @@
 
 import warnings
 
-from tests.support import unittest2, apply, inPy3k
+from tests.support import unittest2, apply, inPy3k, SomeClass
 
 from mock import Mock, patch, patch_object, sentinel
 
@@ -18,12 +18,6 @@ else:
 something  = sentinel.Something
 something_else  = sentinel.SomethingElse
 
-
-class SomeClass(object):
-    class_attribute = None
-    
-    def wibble(self):
-        pass
 
 class Container(object):
     def __init__(self):

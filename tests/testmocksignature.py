@@ -96,3 +96,14 @@ class TestMockSignature(unittest2.TestCase):
             mock.f(1, 2, 3)
             
             mock_f.assert_called_with(1, 2, 3)
+        
+        @apply
+        @patch('tests.support.SomeClass.wibble', mocksignature=True)
+        def test(mock_wibble):
+            from tests.support import SomeClass
+            
+            instance = SomeClass()
+            self.assertRaises(TypeError, instance.wibble, 1)
+            instance.wibble()
+            
+            mock_wibble.assert_called_with(instance)
