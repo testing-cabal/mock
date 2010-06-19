@@ -56,7 +56,6 @@ try:
 except NameError:
     # Python 3
     unicode = str
-    long = int
 
 try:
     long
