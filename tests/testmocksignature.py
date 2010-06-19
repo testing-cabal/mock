@@ -18,10 +18,13 @@ class TestMockSignature(unittest2.TestCase):
         mock = Mock()
         
         f2  = mocksignature(f, mock)
+        self.assertIs(f2.mock, mock)
+        
         self.assertRaises(TypeError, f2)
         mock.return_value = 3
         self.assertEqual(f2('foo'), 3)
         mock.assert_called_with('foo')
+        f2.mock.assert_called_with('foo')
     
     
     def testMethod(self):
