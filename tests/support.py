@@ -9,11 +9,13 @@ else:
 
 
 try:
+    # need to turn it into a local variable or we can't
+    # import it from here under Python 2
     apply = apply
 except NameError:
     # no apply in Python 3
     def apply(f, *args, **kw):
-        f(*args, **kw)
+        return f(*args, **kw)
 
 
 inPy3k = sys.version_info[0] == 3
