@@ -17,3 +17,10 @@ except NameError:
 
 
 inPy3k = sys.version_info[0] == 3
+
+
+class SomeClass(object):
+    class_attribute = None
+    
+    def wibble(self):
+        pass
