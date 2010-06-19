@@ -109,6 +109,7 @@ def mocksignature(func, mock, skipfirst=False):
 
     funcopy = eval(src, dict(_mock_=mock))
     _copy_func_details(func, funcopy)
+    funcopy.mock = mock
     return funcopy
 
 
