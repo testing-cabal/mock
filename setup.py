@@ -40,8 +40,6 @@ AUTHOR = 'Michael Foord'
 AUTHOR_EMAIL = 'michael@voidspace.org.uk'
 KEYWORDS = "testing test mock mocking unittest patching stubs fakes doubles".split(' ')
 
-DOWNLOAD_URL = 'http://www.voidspace.org.uk/downloads/mock-0.7.0.zip'
-
 setup(
     name=NAME,
     version=__version__,
@@ -54,6 +52,5 @@ setup(
     long_description=LONG_DESCRIPTION,
     keywords=KEYWORDS,
     url=URL,
-    download_url=DOWNLOAD_URL,
     classifiers=CLASSIFIERS,
 )
