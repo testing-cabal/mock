@@ -7,6 +7,7 @@
 :Version: Mock 0.7.0
 :Date: 2010/06/XX
 :Homepage: `Mock Homepage`_
+:Download: `Mock on PyPI`_
 :Documentation: `PDF Documentation <http://www.voidspace.org.uk/downloads/mock.pdf>`_
 :License: `BSD License`_
 :Support: `Testing in Python Email List <http://lists.idyll.org/listinfo/testing-in-python>`_
@@ -19,9 +20,6 @@
 .. module:: mock
    :synopsis: Mock object and testing library.
 
-
-Introduction
-============
 
 ``mock`` provides a core :class:`mock.Mock` class that is intended to reduce
 the need to create a host of trivial stubs throughout your test suite. After
@@ -38,6 +36,31 @@ Mock is very easy to use and is designed for use with
 the 'action -> assertion' pattern instead of 'record -> replay' used by many
 mocking frameworks.
 
+
+
+API Documentation
+=================
+
+.. toctree::
+   :maxdepth: 2
+   
+   mock
+   patch
+   sentinel
+   magicmock
+   mocksignature
+
+
+User Guide
+==========
+
+.. toctree::
+   :maxdepth: 2
+
+   getting-started
+   examples
+   todo
+   changelog
 
 
 Installing
@@ -67,29 +90,6 @@ unpacking run:
    ``python setup.py install``
 
     
-API Documentation
-=================
-
-.. toctree::
-   :maxdepth: 2
-   
-   mock
-   patch
-   sentinel
-   magicmock
-
-
-User Guide
-==========
-
-.. toctree::
-   :maxdepth: 2
-
-   getting-started
-   examples
-   todo
-   changelog
-
 
 References
 ==========
