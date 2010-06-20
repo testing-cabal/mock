@@ -29,16 +29,6 @@
 * `Konrad Delong <http://konryd.blogspot.com/>`_ added as co-maintainer
 
 
-Outstanding issues:
-
-* Test mocksignature argument to patch
-* Interaction of magic methods with spec, wraps
-* Should spec cause all methods to be wrapped with mocksignature perhaps?
-  (or another keyword argument perhaps?) - defer this to an issue
-* Should magic method calls be tracked in method_calls?
-
-
-
 2009/08/22 Version 0.6.0
 ------------------------
 

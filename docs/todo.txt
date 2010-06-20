@@ -14,7 +14,13 @@ behaviour for mocks anyway (mock return values inheriting the spec from their
 parent), or should it be controlled by an additional keyword argument
 (``inherit``) to the Mock constructor?
  
-Docstrings!
+More complete docstrings.
+
+Interaction of magic methods with spec, wraps. For example, should spec cause
+all methods to be wrapped with mocksignature perhaps? (or another keyword
+argument perhaps?)
+
+Should magic method calls (including __call__) be tracked in method_calls?
 
 Could take a patch keyword argument and auto-do the patching in the
 constructor and unpatch in the destructor. This would be useful in itself, but
