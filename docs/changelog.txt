@@ -20,6 +20,7 @@
 * Addition of soft comparisons: call_args, call_args_list and method_calls
   return now tuple-like objects which compare equal even when empty args
   or kwargs are skipped
+* Added docstrings.
 * BUGFIX: ``side_effect`` now works with ``BaseException`` exceptions like
   ``KeyboardInterrupt``
 * BUGFIX: patching the same object twice now restores the patches correctly
