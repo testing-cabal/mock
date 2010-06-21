@@ -298,6 +298,10 @@ Attributes
         >>> mock.method_calls == [('method',), ('method', (1, 2)), ('method', {"a": "b"})]
         True
 
+
+The ``Mock`` class has support for mocking magic methods. See `magicmock
+<magicmock.html>`_ for the full details.
+
 -----
 
 .. [#] The only exceptions are magic methods and attributes (those that have

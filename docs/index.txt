@@ -4,7 +4,7 @@
 
 :Author: `Michael Foord <http://www.voidspace.org.uk/python/weblog/index.shtml>`_
 :Co-maintainer: `Konrad Delong <http://konryd.blogspot.com/>`_
-:Version: Mock 0.7.0
+:Version: Mock 0.7.0 beta 1
 :Date: 2010/06/XX
 :Homepage: `Mock Homepage`_
 :Download: `Mock on PyPI`_
@@ -36,6 +36,7 @@ Mock is very easy to use and is designed for use with
 the 'action -> assertion' pattern instead of 'record -> replay' used by many
 mocking frameworks.
 
+mock is tested on Python versions 2.4-2.7 and Python 3.
 
 
 API Documentation
@@ -66,7 +67,7 @@ User Guide
 Installing
 ==========
 
-The current version is **0.7.0**, dated XXXX. Mock is still 
+The current version is **0.7.0 beta 1**, dated XXXX. Mock is still 
 experimental; the API may change. If you find bugs or 
 have suggestions for improvements / extensions then please email me.
 
@@ -120,3 +121,15 @@ On Python 2.7 and 3.2 you can use ``unittest`` module from the standard library.
 
 On Python 2.4 you will see one failure - testwith.py will fail to import as it
 uses the ``with`` statement which is invalid syntax under Python 2.4.
+
+All Python versions except 2.6 & 2.7 will have at least one skip due to
+tests using unsupported functionality, or on Python 3 the tests for unicode
+not being relevant.
+
+
+Older Versions
+==============
+
+Documentation for older versions of mock:
+
+* `mock 0.6.0 <http://www.voidspace.org.uk/python/mock/0.6.0/>`_
