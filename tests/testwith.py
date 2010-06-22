@@ -109,6 +109,11 @@ class WithTest(unittest2.TestCase):
         self.assertEqual(something, sentinel.Something)
         self.assertEqual(something_else, sentinel.SomethingElse)
 
+    def testDictContextManager(self):
+        foo = {}
+        with patch.dict(foo, {'a': 'b'}):
+            self.assertEqual(foo, {'a': 'b'})
+        self.assertEqual(foo, {})
 
 if __name__ == '__main__':
     unittest2.main()
