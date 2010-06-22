@@ -140,9 +140,15 @@ when the test ends.
 
 .. doctest::
 
-    >>> import os
     >>> from mock import patch
-    >>> with patch.dict(os.environ, {'newkey': 'newvalue'}):
+    >>> foo = {}
+    >>> with patch.dict(foo, {'newkey': 'newvalue'}):
+    ...     assert foo == {'newkey': 'newvalue'}
+    ...
+    >>> assert foo == {}
+
+    >>> import os
+    >>> with patch.dict('os.environ', {'newkey': 'newvalue'}):
     ...     print os.environ['newkey']
     ...
     newvalue
