@@ -2,6 +2,7 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
+import os
 import warnings
 
 from tests.support import unittest2, apply, inPy3k, SomeClass
@@ -531,8 +532,27 @@ class PatchTest(unittest2.TestCase):
         
         self.assertEqual(some_name.__name__, 'some_name')
     
+    def testPatchWithException(self):
+        foo = {}
         
+        @patch.dict(foo, {'a': 'b'})
+        def test():
+            raise NameError('Konrad')
+        try:
+            test()
+        except NameError:
+            pass
+        else:
+            self.fail('NameError not raised by test')
         
+        self.assertEqual(foo, {})
+        
+    def testPatchDictWithString(self):
+        @apply
+        @patch.dict('os.env', {'konrad_delong': 'some value'})
+        def test():
+            self.assertIn('konrad_delong', os.env)
+         
 if __name__ == '__main__':
     unittest2.main()
 

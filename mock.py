@@ -480,11 +480,24 @@ def patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False):
     target = _importer(target)
     return _patch(target, attribute, new, spec, create, mocksignature)
 
-def _patch_dict(in_dict, values=(), clear=False):
+class _patch_dict(object):
     """patch.dict(in_dict, values=(), clear=False)"""
-    # support any argument supported by dict(...) constructor
-    values = dict(values)
-    def _decorator(f):
+    
+    def __init__(self, in_dict, values=(), clear=False):
+        self.in_dict = in_dict
+        self.values = values
+        self.clear = clear
+
+    def __call__(self, f):
+        return self.decorate_callable(f)
+    
+    def decorate_callable(self, f):
+        in_dict = self.in_dict
+        values = self.values
+        clear = self.clear
+        
+        # support any argument supported by dict(...) constructor
+        values = dict(values)
         @wraps(f)
         def _inner(*args, **kw):
             try:
@@ -506,19 +519,18 @@ def _patch_dict(in_dict, values=(), clear=False):
                 for key in values:
                     in_dict[key] = values[key]
                     
-            result = f(*args, **kw)
-            
-            _clear_dict(in_dict)
-                
             try:
-                in_dict.update(original)
-            except AttributeError:
-                for key in original:
-                    in_dict[key] = original[key]
+                return f(*args, **kw)
+            finally:
+                _clear_dict(in_dict)
+                    
+                try:
+                    in_dict.update(original)
+                except AttributeError:
+                    for key in original:
+                        in_dict[key] = original[key]
             
-            return result
         return _inner
-    return _decorator
 
 def _clear_dict(in_dict):
     try:
