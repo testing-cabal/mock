@@ -55,7 +55,7 @@ try:
     unicode
 except NameError:
     # Python 3
-    unicode = str
+    basestring = unicode = str
 
 try:
     long
@@ -484,6 +484,8 @@ class _patch_dict(object):
     """patch.dict(in_dict, values=(), clear=False)"""
     
     def __init__(self, in_dict, values=(), clear=False):
+        if isinstance(in_dict, basestring):
+            in_dict = _importer(in_dict)
         self.in_dict = in_dict
         self.values = values
         self.clear = clear

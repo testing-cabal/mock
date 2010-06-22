@@ -549,9 +549,9 @@ class PatchTest(unittest2.TestCase):
         
     def testPatchDictWithString(self):
         @apply
-        @patch.dict('os.env', {'konrad_delong': 'some value'})
+        @patch.dict('os.environ', {'konrad_delong': 'some value'})
         def test():
-            self.assertIn('konrad_delong', os.env)
+            self.assertIn('konrad_delong', os.environ)
          
 if __name__ == '__main__':
     unittest2.main()
