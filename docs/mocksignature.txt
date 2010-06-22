@@ -2,7 +2,7 @@ mocksignature
 =============
 
 A problem with using mock objects to replace real objects in your tests is that
-:class:`Mock` can be *too* flexible. Your code can treat the mock objects in
+:class:`mock.Mock` can be *too* flexible. Your code can treat the mock objects in
 any way and you have to manually check that they were called correctly. If your
 code calls functions or methods with the wrong number of arguments then mocks
 don't complain.
@@ -122,8 +122,8 @@ When you use ``mocksignature`` on instance methods ``self`` isn't included:
 mocksignature argument to patch
 -------------------------------
 
-If you are patching a function with then you can use the ``mocksignature``
-keyword argument to :func:`patch` or :func:`patch.object`.
+If you are patching a function then you can use the ``mocksignature``
+keyword argument to :func:`mock.patch` or :func:`mock.patch.object`.
 
 .. doctest::
 
