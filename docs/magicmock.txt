@@ -106,6 +106,43 @@ and use them in the usual way:
    'result'
 
 By default many of the protocol methods are required to return objects of a
+specific type. These methods are preconfigured with a default return value, so
+that they can be used without you having to do anything if you aren't interested
+in the return value. You can still *set* the return value manually if you want
+to change the default.
+
+Methods and their defaults:
+
+* ``__int__`` : 0
+* ``__contains__`` : False
+* ``__len__`` :0
+* ``__iter__`` : iter([])
+* ``__exit__`` : False
+* ``__complex__`` : 0j
+* ``__float__`` : 0.0
+* ``__bool__`` : True
+* ``__nonzero__`` : True
+* ``__oct__`` : '0'
+* ``__hex__`` : '0x0'
+* ``__long__`` : long(0)
+* ``__index__`` : 0
+* ``__hash__`` : default hash for the mock
+* ``__repr__`` : default repr for the mock
+* ``__str__`` : default str for the mock
+* ``__unicode__`` : default unicode for the mock
+
+For example:
+
+.. doctest::
+
+   >>> from mock import MagicMock
+   >>> mock = MagicMock()
+   >>> int(mock)
+   0
+   >>> len(mock)
+   0
+   >>> hex(mock)
+   '0x0'
 
 
 ``MagicMock`` has all of the supported magic methods configured except for some
