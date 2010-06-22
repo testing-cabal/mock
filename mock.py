@@ -103,17 +103,21 @@ def _copy_func_details(func, funcopy):
         funcopy.__kwdefaults__ = func.__kwdefaults__
 
 
-def mocksignature(func, mock, skipfirst=False):
+def mocksignature(func, mock=None, skipfirst=False):
     """
-    mocksignature(func, mock, skipfirst=False)
+    mocksignature(func, mock=None, skipfirst=False)
     
     Create a new function with the same signature as `func` that delegates
     to `mock`. If `skipfirst` is True the first argument is skipped, useful
     for methods where `self` needs to be omitted from the new function.
     
+    If you don't pass in a `mock` then one will be created for you.
+    
     The mock is set as the `mock` attribute of the returned function for easy
     access.
     """
+    if mock is None:
+        mock = Mock()
     signature = _getsignature(func, skipfirst)
     src = "lambda %(signature)s: _mock_(%(signature)s)" % {'signature': signature}
 
