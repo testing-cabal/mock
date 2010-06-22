@@ -143,6 +143,10 @@ For example:
    0
    >>> hex(mock)
    '0x0'
+   >>> list(mock)
+   []
+   >>> object() in mock
+   False
 
 
 ``MagicMock`` has all of the supported magic methods configured except for some
