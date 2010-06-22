@@ -45,7 +45,7 @@ Basic use
 
 .. doctest::
 
-    >>> from mock import mocksignature
+    >>> from mock import mocksignature, Mock
     >>> def function(a, b, c=None):
     ...     pass
     ... 
@@ -115,10 +115,6 @@ When you use ``mocksignature`` on instance methods ``self`` isn't included:
     >>> instance = SomeClass()
     >>> instance.method = mocksignature(instance.method)
     >>> instance.method.mock.return_value = None
-    >>> instance.method()
-    Traceback (most recent call last):
-      ...
-    TypeError: <lambda>() takes at least 2 arguments (0 given)
     >>> instance.method(1, 2, 3)
     >>> instance.method.mock.assert_called_with(1, 2, 3)
 
@@ -126,8 +122,8 @@ When you use ``mocksignature`` on instance methods ``self`` isn't included:
 mocksignature argument to patch
 -------------------------------
 
-If you are patching a function with :func:`patch` then you can use the
-``mocksignature`` keyword argument to ``patch``.
+If you are patching a function with then you can use the ``mocksignature``
+keyword argument to :func:`patch` or :func:`patch.object`.
 
 .. doctest::
 
@@ -136,5 +132,13 @@ If you are patching a function with :func:`patch` then you can use the
     ...     def method(self, a, b, c=None):
     ...         pass
     ... 
-    >>> @patch.object(SomeClass
+    >>> @patch.object(SomeClass, 'method', mocksignature=True)
+    ... def test(mock_method):
+    ...     instance = SomeClass()
+    ...     mock_method.return_value = None
+    ...     instance.method(1, 2)
+    ...     mock_method.assert_called_with(instance, 1, 2, None)
+    ... 
+    >>> test()
+
 

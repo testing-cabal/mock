@@ -617,6 +617,11 @@ def _set_return_value(mock, method, name):
 
 
 class MagicMock(Mock):
+    """
+    MagicMock is a subclass of :Mock with default implementations
+   of most of the magic methods. You can use MagicMock without having to
+   configure the magic methods yourself.
+   """
     def __init__(self, *args, **kw):
         Mock.__init__(self, *args, **kw)
         for entry in _magics:
