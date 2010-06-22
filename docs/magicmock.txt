@@ -33,6 +33,33 @@ the first argument [#]_.
    >>> str(mock)
    'fooble'
 
+One use case for this is for mocking objects used as context managers in a
+``with`` statement:
+
+.. doctest::
+
+   >>> from mock import Mock
+   >>> mock = Mock()
+   >>> mock.__enter__ = Mock()
+   >>> mock.__exit__ = Mock()
+   >>> mock.__exit__.return_value = False
+   >>> with mock:
+   ...     pass
+   ...
+   >>> mock.__enter__.assert_called_with()
+   >>> mock.__exit__.assert_called_with(None, None, None)
+
+
+The full list of supported magic methods is:
+
+* ``__hash__``, ``__repr__`` and ``__str__``
+* Comparisons: ``__cmp__``, ``__lt__``, ``__gt__``, ``__le__``, ``__ge__``,
+  ``__eq__`` and ``__ne__``
+* Container methods: ``__getitem__``, ``__setitem__``, ``__delitem__``,
+  ``__contains__``, ``__len__`` and ``__iter__``
+* Context manager: ``__enter__`` and ``__exit__``
+* Unary numeric methods: ``__neg__``, ``__pos__`` and ``__invert__``
+
 
 Magic Mock
 ==========
