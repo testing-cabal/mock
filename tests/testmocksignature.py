@@ -25,6 +25,18 @@ class TestMockSignature(unittest2.TestCase):
         self.assertEqual(f2('foo'), 3)
         mock.assert_called_with('foo')
         f2.mock.assert_called_with('foo')
+        
+    def testFunctionWithoutExplicitMock(self):
+        def f(a):
+            pass
+        
+        f2  = mocksignature(f)
+        self.assertIsInstance(f2.mock, Mock)
+        
+        self.assertRaises(TypeError, f2)
+        f2.mock.return_value = 3
+        self.assertEqual(f2('foo'), 3)
+        f2.mock.assert_called_with('foo')
     
     
     def testMethod(self):
