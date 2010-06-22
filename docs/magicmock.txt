@@ -1,0 +1,85 @@
+Mocking Magic Methods
+=====================
+
+:class:`Mock` supports mocking `magic methods
+<http://www.ironpythoninaction.com/magic-methods.html>`_. This allows mock
+objects to replace containers or other objects that implement Python
+protocols.
+
+Because magic methods are looked up differently from normal methods [#]_, this
+support has been specially implemented. This means that only specific magic
+methods are supported. The supported list includes *almost* all of them. If
+there are any missing that you need please let us know!
+
+You mock magic methods by setting the method you are interested in to a function
+or a mock instance. If you are using a function then it *must* take ``self`` as
+the first argument [#]_.
+
+.. doctest::
+
+   >>> from mock import Mock
+   >>> def __str__(self):
+   ...     return 'fooble'
+   ...
+   >>> mock = Mock()
+   >>> mock.__str__ = __str__
+   >>> str(mock)
+   'fooble'
+   
+   >>> from mock import Mock
+   >>> mock = Mock()
+   >>> mock.__str__ = Mock()
+   >>> mock.__str__.return_value = 'fooble'
+   >>> str(mock)
+   'fooble'
+
+
+Magic Mock
+==========
+
+.. class:: MagicMock(*args, **kw)
+
+   ``MagicMock`` is a subclass of :class:`Mock` with default implementations
+   of most of the magic methods. You can use ``MagicMock`` without having to
+   configure the magic methods yourself.
+
+The magic methods are setup with ``Mock`` objects, so you can configure them
+and use them in the usual way:
+
+.. doctest::
+
+   >>> from mock import MagicMock
+   >>> mock = MagicMock()
+   >>> mock[3] = 'fish'
+   >>> mock.__setitem__.assert_called_with(3, 'fish')
+   >>> mock.__getitem__.return_value = 'result'
+   >>> mock[2]
+   'result'
+
+By default many of the protocol methods are required to return objects of a
+
+
+``MagicMock`` has all of the supported magic methods configured except for some
+of the obscure and obsolete ones. You can still set these up if you want.
+
+Magic methods that are supported but not setup by default in ``MagicMock`` are:
+
+* ``__cmp__``
+* ``__getslice__`` and ``__setslice__``
+* ``__coerce__``
+* ``__subclasses__``
+* ``__dir__``
+* ``__format__``
+* ``__get__``, ``__set__`` and ``__delete__``
+* ``__reversed__`` and ``__missing__``
+
+
+
+------------
+
+.. [#] Magic methods *should be* looked up on the class rather than the
+   instance. Different versions of Python are inconsistent about applying this
+   rule. The supported protocol methods should work with all supported versions
+   of Python.
+.. [#] The function is basically hooked up to the class, but each ``Mock``
+   instance is kept isolated from the others.
