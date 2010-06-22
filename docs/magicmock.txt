@@ -1,7 +1,7 @@
 Mocking Magic Methods
 =====================
 
-:class:`Mock` supports mocking `magic methods
+:class:`mock.Mock` supports mocking `magic methods
 <http://www.ironpythoninaction.com/magic-methods.html>`_. This allows mock
 objects to replace containers or other objects that implement Python
 protocols.
@@ -32,6 +32,12 @@ the first argument [#]_.
    >>> mock.__str__.return_value = 'fooble'
    >>> str(mock)
    'fooble'
+   
+   >>> from mock import Mock
+   >>> mock = Mock()
+   >>> mock.__iter__ = Mock(return_value=iter([]))
+   >>> list(mock)
+   []
 
 One use case for this is for mocking objects used as context managers in a
 ``with`` statement:
@@ -167,7 +173,7 @@ Magic methods that are supported but not setup by default in ``MagicMock`` are:
 
 ------------
 
-.. [#] Magic methods *should be* looked up on the class rather than the
+.. [#] Magic methods *should* be looked up on the class rather than the
    instance. Different versions of Python are inconsistent about applying this
    rule. The supported protocol methods should work with all supported versions
    of Python.
