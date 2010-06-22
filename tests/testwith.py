@@ -114,6 +114,14 @@ class WithTest(unittest2.TestCase):
         with patch.dict(foo, {'a': 'b'}):
             self.assertEqual(foo, {'a': 'b'})
         self.assertEqual(foo, {})
+        
+        with self.assertRaises(NameError):
+            with patch.dict(foo, {'a': 'b'}):
+                self.assertEqual(foo, {'a': 'b'})
+                raise NameError('Konrad')
+            
+        self.assertEqual(foo, {})
+
 
 if __name__ == '__main__':
     unittest2.main()

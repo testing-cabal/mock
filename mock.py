@@ -487,11 +487,9 @@ class _patch_dict(object):
         self.in_dict = in_dict
         self.values = values
         self.clear = clear
+        self._original = None
 
     def __call__(self, f):
-        return self.decorate_callable(f)
-    
-    def decorate_callable(self, f):
         in_dict = self.in_dict
         values = self.values
         clear = self.clear
@@ -500,37 +498,59 @@ class _patch_dict(object):
         values = dict(values)
         @wraps(f)
         def _inner(*args, **kw):
-            try:
-                original = in_dict.copy()
-            except AttributeError:
-                # dict like object with no copy method
-                # must support iteration over keys
-                original = {}
-                for key in in_dict:
-                    original[key] = in_dict[key]
-
-            if clear:
-                _clear_dict(in_dict)
-            
-            try:
-                in_dict.update(values)
-            except AttributeError:
-                # dict like object with no update method
-                for key in values:
-                    in_dict[key] = values[key]
-                    
+            self._patch_dict()
             try:
                 return f(*args, **kw)
             finally:
-                _clear_dict(in_dict)
-                    
-                try:
-                    in_dict.update(original)
-                except AttributeError:
-                    for key in original:
-                        in_dict[key] = original[key]
+                self._unpatch_dict()
             
         return _inner
+
+    def __enter__(self):
+        self._patch_dict()
+    
+    def _patch_dict(self):
+        in_dict = self.in_dict
+        values = self.values
+        clear = self.clear
+        
+        try:
+            original = in_dict.copy()
+        except AttributeError:
+            # dict like object with no copy method
+            # must support iteration over keys
+            original = {}
+            for key in in_dict:
+                original[key] = in_dict[key]
+        self._original = original
+        
+        if clear:
+            _clear_dict(in_dict)
+        
+        try:
+            in_dict.update(values)
+        except AttributeError:
+            # dict like object with no update method
+            for key in values:
+                in_dict[key] = values[key]
+                    
+    def _unpatch_dict(self):
+        in_dict = self.in_dict
+        original = self._original
+        
+        _clear_dict(in_dict)
+            
+        try:
+            in_dict.update(original)
+        except AttributeError:
+            for key in original:
+                in_dict[key] = original[key]
+    
+    
+    def __exit__(self, *args):
+        self._unpatch_dict()
+        return False
+
 
 def _clear_dict(in_dict):
     try:
