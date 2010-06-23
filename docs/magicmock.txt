@@ -1,7 +1,9 @@
 Mocking Magic Methods
 =====================
 
-:class:`mock.Mock` supports mocking `magic methods
+.. currentmodule:: mock
+
+:class:`Mock` supports mocking `magic methods
 <http://www.ironpythoninaction.com/magic-methods.html>`_. This allows mock
 objects to replace containers or other objects that implement Python
 protocols.
