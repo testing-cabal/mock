@@ -299,8 +299,8 @@ Attributes
         True
 
 
-The ``Mock`` class has support for mocking magic methods. See `magicmock
-<magicmock.html>`_ for the full details.
+The ``Mock`` class has support for mocking magic methods. See :ref:`magic
+methods` for the full details.
 
 -----
 
