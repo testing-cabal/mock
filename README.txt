@@ -68,8 +68,8 @@ mock (or other object) during the test and restored when the test ends::
     ...     test_module.ClassName1()
     ...     test_module.ClassName2()
     
-    ...     assert MockClass1.called, "ClassName1 not patched"
-    ...     assert MockClass2.called, "ClassName2 not patched"
+    ...     assert MockClass1.called
+    ...     assert MockClass2.called
     ... 
     >>> test()
     
