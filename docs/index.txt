@@ -34,7 +34,7 @@ with :const:`sentinel` for creating unique objects. See the `quick guide`_ for
 some examples of how to use ``Mock``, ``MagicMock`` and ``patch``.
 
 Mock is very easy to use and is designed for use with
-`unittest <http://pypi.python.org/pypi/unittest2 unittest>`_. Mock is based on
+`unittest <http://pypi.python.org/pypi/unittest2>`_. Mock is based on
 the 'action -> assertion' pattern instead of 'record -> replay' used by many
 mocking frameworks.
 
