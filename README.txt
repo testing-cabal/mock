@@ -15,7 +15,7 @@ testing, particularly monkey patching.
 * `Article on mocking, patching and stubbing <http://www.voidspace.org.uk/python/articles/mocking.shtml>`_
 
 Mock is very easy to use and is designed for use with
-`unittest <http://pypi.python.org/pypi/unittest2 unittest>`_. Mock is based on
+`unittest <http://pypi.python.org/pypi/unittest2>`_. Mock is based on
 the 'action -> assertion' pattern instead of 'record -> replay' used by many
 mocking frameworks. See the 
 `mock documentation <http://www.voidspace.org.uk/python/mock/>`_ for full
@@ -134,3 +134,5 @@ your production code if they are called incorrectly::
     ...
    TypeError: <lambda>() takes exactly 3 arguments (1 given)
 
+The distribution contains tests and documentation. The tests require
+`unittest2 <http://pypi.python.org/pypi/unittest2>`_ to run.
