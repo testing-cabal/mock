@@ -22,14 +22,14 @@ to mock instances in the same way you mock other attributes::
     mock = Mock()
     mock.__repr__ = lambda self: 'some string'
 
-Note that functions (or callable objects like a Mock instance) that are used for 
+Note that functions (or callable objects like a Mock instance) that are used for
 magic methods must take self as the first argument.
- 
+
 The only unsupported magic methods (that I'm aware of) are:
 
 * Used by Mock: __init__, __new__, __getattr__, __setattr__, __delattr__, __call__
 * Rare: __dir__,
-* Can cause bad interactions with other functionality: 
+* Can cause bad interactions with other functionality:
 
     - __reversed__, __missing__, __del__, __unicode__, __getattribute__
     - __get__, __set__, __delete__
@@ -50,12 +50,12 @@ DELEGATE = MISSING = object()
 def getsignature(func):
     assert inspect.ismethod(func) or inspect.isfunction(func)
     regargs, varargs, varkwargs, defaults = inspect.getargspec(func)
-    
+
     # instance methods need to lose the self argument
     im_self = getattr(func, 'im_self', None)
     if im_self is not None:
         regargs = regargs[1:]
-        
+
     argnames = list(regargs)
     if varargs:
         argnames.append(varargs)
@@ -69,7 +69,7 @@ def getsignature(func):
 def mocksignature(func, mock):
     signature = getsignature(func)
     src = "lambda %(signature)s: _mock_(%(signature)s)" % {'signature': signature}
-    
+
     funcopy = eval(src, dict(_mock_=mock))
     funcopy.__name__ = func.__name__
     funcopy.__doc__ = func.__doc__
@@ -93,7 +93,7 @@ class MagicMock(Mock):
             method = _all_magics[name]
             setattr(self.__class__, name, method)
         return Mock.__setattr__(self, name, value)
-    
+
     def __delattr__(self, name):
         if name in _all_magics and name in self.__class__.__dict__:
             delattr(self.__class__, name)
@@ -123,7 +123,7 @@ def get_method(name):
 
 _all_magics = {}
 for method in sum([methods.split() for methods in [magic_methods, numerics, inplace, right]], []):
-    name = '__%s__' % method 
+    name = '__%s__' % method
     _all_magics[name] = get_method(name)
 
 import mock

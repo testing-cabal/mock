@@ -49,7 +49,7 @@ setup(
     name=NAME,
     version=__version__,
     py_modules=MODULES,
-    
+
     # metadata for upload to PyPI
     author=AUTHOR,
     author_email=AUTHOR_EMAIL,

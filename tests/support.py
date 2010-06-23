@@ -24,6 +24,6 @@ with_available = sys.version_info[:2] >= (2, 5)
 
 class SomeClass(object):
     class_attribute = None
-    
+
     def wibble(self):
         pass
