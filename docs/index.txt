@@ -4,7 +4,7 @@
 
 :Author: `Michael Foord <http://www.voidspace.org.uk/python/weblog/index.shtml>`_
 :Co-maintainer: `Konrad Delong <http://konryd.blogspot.com/>`_
-:Version: Mock 0.7.0 beta 2
+:Version: Mock 0.7.0
 :Date: 2010/06/23
 :Homepage: `Mock Homepage`_
 :Download: `Mock on PyPI`_
@@ -80,7 +80,7 @@ User Guide
 Installing
 ==========
 
-The current version is **0.7.0 beta 2**, dated 2010/06/23. Mock is still
+The current version is **0.7.0**, dated 2010/06/23. Mock is still
 experimental; the API may change (although we are moving towards a 1.0 release
 when the API will stabilise). If you find bugs or have suggestions for
 improvements / extensions then please contact us.
@@ -264,7 +264,7 @@ On Python 2.7 and 3.2 you can use ``unittest`` module from the standard library.
 
    ``python3.2 -m unittest discover``
 
-On Python 2.4 you will see one failure - testwith.py will fail to import as it
+On Python 2.4 you will see one error - testwith.py will fail to import as it
 uses the ``with`` statement which is invalid syntax under Python 2.4.
 
 On Python 3 the tests for unicode are skipped as they are not relevant.
