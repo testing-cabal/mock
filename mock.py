@@ -106,13 +106,13 @@ def _copy_func_details(func, funcopy):
 def mocksignature(func, mock=None, skipfirst=False):
     """
     mocksignature(func, mock=None, skipfirst=False)
-    
+
     Create a new function with the same signature as `func` that delegates
     to `mock`. If `skipfirst` is True the first argument is skipped, useful
     for methods where `self` needs to be omitted from the new function.
-    
+
     If you don't pass in a `mock` then one will be created for you.
-    
+
     The mock is set as the `mock` attribute of the returned function for easy
     access.
     """
@@ -135,7 +135,7 @@ class SentinelObject(object):
     "A unique, named, sentinel object."
     def __init__(self, name):
         self.name = name
-        
+
     def __repr__(self):
         return '<SentinelObject "%s">' % self.name
 
@@ -144,14 +144,14 @@ class Sentinel(object):
     """Access attributes to return a named object, usable as a sentinel."""
     def __init__(self):
         self._sentinels = {}
-        
+
     def __getattr__(self, name):
         if name == '__bases__':
             # Without this help(mock) raises an exception
             raise AttributeError
         return self._sentinels.setdefault(name, SentinelObject(name))
-    
-    
+
+
 sentinel = Sentinel()
 
 DEFAULT = sentinel.DEFAULT
@@ -184,27 +184,27 @@ class Mock(object):
       you pass in an object then a list of strings is formed by calling dir on
       the object (excluding unsupported magic attributes and methods). Accessing
       any attribute not in this list will raise an ``AttributeError``.
-    
-    * ``side_effect``: A function to be called whenever the Mock is called. See 
-      the :attr:`Mock.side_effect` attribute. Useful for raising exceptions or 
-      dynamically changing return values. The function is called with the same 
-      arguments as the mock, and unless it returns :data:`DEFAULT`, the return 
+
+    * ``side_effect``: A function to be called whenever the Mock is called. See
+      the :attr:`Mock.side_effect` attribute. Useful for raising exceptions or
+      dynamically changing return values. The function is called with the same
+      arguments as the mock, and unless it returns :data:`DEFAULT`, the return
       value of this function is used as the return value.
-      
+
       Alternatively ``side_effect`` can be an exception class or instance. In
       this case the exception will be raised when the mock is called.
 
     * ``return_value``: The value returned when the mock is called. By default
       this is a new Mock (created on first access). See the
       :attr:`Mock.return_value` attribute.
-    
+
     * ``wraps``: Item for the mock object to wrap. If ``wraps`` is not None
       then calling the Mock will pass the call through to the wrapped object
       (returning the real result and ignoring ``return_value``). Attribute
       access on the mock will return a Mock object that wraps the corresponding
       attribute of the wrapped object (so attempting to access an attribute that
       doesn't exist will raise an ``AttributeError``).
-        
+
       If the mock has an explicit ``return_value`` set then calls are not passed
       to the wrapped object and the ``return_value`` is returned instead.
     """
@@ -215,22 +215,22 @@ class Mock(object):
             # class without stomping on other mocks
             pass
         return object.__new__(Mock)
-        
-    def __init__(self, spec=None, side_effect=None, return_value=DEFAULT, 
+
+    def __init__(self, spec=None, side_effect=None, return_value=DEFAULT,
                  name=None, parent=None, wraps=None):
         self._parent = parent
         self._name = name
         if spec is not None and not isinstance(spec, list):
             spec = [member for member in dir(spec) if not _is_magic(member)]
-        
+
         self._methods = spec
         self._children = {}
         self._return_value = return_value
         self.side_effect = side_effect
         self._wraps = wraps
-        
+
         self.reset_mock()
-        
+
 
     def reset_mock(self):
         "Restore the mock object to its initial state."
@@ -243,18 +243,18 @@ class Mock(object):
             child.reset_mock()
         if isinstance(self._return_value, Mock):
             self._return_value.reset_mock()
-        
-    
+
+
     def __get_return_value(self):
         if self._return_value is DEFAULT:
             self._return_value = Mock()
         return self._return_value
-    
+
     def __set_return_value(self, value):
         self._return_value = value
-    
+
     __return_value_doc = "The value to be returned when the mock is called."
-    
+
     return_value = property(__get_return_value, __set_return_value,
                             __return_value_doc)
 
@@ -264,7 +264,7 @@ class Mock(object):
         self.call_count += 1
         self.call_args = callargs((args, kwargs))
         self.call_args_list.append(callargs((args, kwargs)))
-        
+
         parent = self._parent
         name = self._name
         while parent is not None:
@@ -273,40 +273,40 @@ class Mock(object):
                 break
             name = parent._name + '.' + name
             parent = parent._parent
-        
+
         ret_val = DEFAULT
         if self.side_effect is not None:
-            if (isinstance(self.side_effect, BaseException) or 
+            if (isinstance(self.side_effect, BaseException) or
                 isinstance(self.side_effect, class_types) and
                 issubclass(self.side_effect, BaseException)):
                 raise self.side_effect
-            
+
             ret_val = self.side_effect(*args, **kwargs)
             if ret_val is DEFAULT:
                 ret_val = self.return_value
-        
+
         if self._wraps is not None and self._return_value is DEFAULT:
             return self._wraps(*args, **kwargs)
         if ret_val is DEFAULT:
             ret_val = self.return_value
         return ret_val
-    
-    
+
+
     def __getattr__(self, name):
         if self._methods is not None:
             if name not in self._methods:
                 raise AttributeError("Mock object has no attribute '%s'" % name)
         elif _is_magic(name):
             raise AttributeError(name)
-        
+
         if name not in self._children:
             wraps = None
             if self._wraps is not None:
                 wraps = getattr(self._wraps, name)
             self._children[name] = Mock(parent=self, name=name, wraps=wraps)
-            
+
         return self._children[name]
-    
+
     def __setattr__(self, name, value):
         if name in _all_magics:
             if not isinstance(value, Mock):
@@ -322,11 +322,11 @@ class Mock(object):
         if name in _all_magics and name in self.__class__.__dict__:
             delattr(self.__class__, name)
         return object.__delattr__(self, name)
-        
+
     def assert_called_with(self, *args, **kwargs):
         """
         assert that the mock was called with the specified arguments.
-        
+
         Raises an AttributeError if the args and keyword args passed in are
         different to the last call to the mock.
         """
@@ -337,10 +337,10 @@ class callargs(tuple):
     """
     A tuple for holding the results of a call to a mock, either in the form
     `(args, kwargs)` or `(name, args, kwargs)`.
-    
+
     If args or kwargs are empty then a callargs tuple will compare equal to
     a tuple without those values. This makes comparisons less verbose::
-    
+
         callargs('name', (), {}) == ('name',)
         callargs('name', (1,), {}) == ('name', (1,))
         callargs((), {'a': 'b'}) == ({'a': 'b'},)
@@ -440,7 +440,7 @@ class _patch(object):
         patched.patchings = [self]
         if hasattr(func, 'func_code'):
             # not in Python 3
-            patched.compat_co_firstlineno = getattr(func, "compat_co_firstlineno", 
+            patched.compat_co_firstlineno = getattr(func, "compat_co_firstlineno",
                                                     func.func_code.co_firstlineno)
         return patched
 
@@ -449,7 +449,7 @@ class _patch(object):
         target = self.target
         name = self.attribute
         create = self.create
-        
+
         original = DEFAULT
         if _has_local_attr(target, name):
             try:
@@ -461,7 +461,7 @@ class _patch(object):
             raise AttributeError("%s does not have the attribute %r" % (target, name))
         return original
 
-    
+
     def __enter__(self):
         new, spec, = self.new, self.spec
         original = self.get_original()
@@ -479,7 +479,7 @@ class _patch(object):
         new_attr = new
         if self.mocksignature:
             new_attr = mocksignature(original, new)
-            
+
         self.temp_original = original
         setattr(self.target, self.attribute, new_attr)
         return new
@@ -496,15 +496,15 @@ class _patch(object):
 def _patch_object(target, attribute, new=DEFAULT, spec=None, create=False, mocksignature=False):
     """
     patch.object(target, attribute, new=DEFAULT, spec=None, create=False, mocksignature=False)
-    
+
     patch the named member (`attribute`) on an object (`target`) with a mock
     object.
-    
+
     Arguments new, spec, create and mocksignature have the same meaning as for
     patch.
     """
     return _patch(target, attribute, new, spec, create, mocksignature)
-                
+
 def patch_object(*args, **kwargs):
     "A deprecated form of patch.object(...)"
     warnings.warn(('Please use patch.object instead.'), DeprecationWarning, 2)
@@ -518,27 +518,27 @@ def patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False):
     of the function or with statement, the ``target`` (specified in the form
     'PackageName.ModuleName.ClassName') is patched with a ``new`` object. When the
     function/with statement exits the patch is undone.
-    
+
     The target is imported and the specified attribute patched with the new object
     - so it must be importable from the environment you are calling the decorator
     from.
-    
+
     If ``new`` is omitted, then a new ``Mock`` is created and passed in as an
     extra argument to the decorated function.
-    
+
     The ``spec`` keyword argument is passed to the ``Mock`` if patch is creating
     one for you.
-    
+
     In addition you can pass ``spec=True``, which causes patch to pass in the
     object being mocked as the spec object.
-    
+
     If ``mocksignature`` is True then the patch will be done with a function
     created by mocking the one being replaced.
-    
+
     patch.dict(...) and patch.object(...) are available for alternate use-cases.
     """
     try:
-        target, attribute = target.rsplit('.', 1)    
+        target, attribute = target.rsplit('.', 1)
     except (TypeError, ValueError):
         raise TypeError("Need a valid target to patch. You supplied: %r" % (target,))
     target = _importer(target)
@@ -547,24 +547,24 @@ def patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False):
 class _patch_dict(object):
     """
     patch.dict(in_dict, values=(), clear=False)
-    
+
     Patch a dictionary and restore the dictionary to its original state after
     the test.
-    
-    `in_dict` can be a dictionary or a mapping like container. If it is a 
+
+    `in_dict` can be a dictionary or a mapping like container. If it is a
     mapping then it must at least support getting, setting and deleting items
     plus iterating over keys.
 
     `in_dict` can also be a string specifying the name of the dictionary, which
     will then be fetched by importing it.
-    
+
     `values` can be a dictionary of values to set in the dictionary. `values`
     can also be an iterable of ``(key, value)`` pairs.
-    
+
     If `clear` is True then the dictionary will be cleared before the new
     values are set.
     """
-    
+
     def __init__(self, in_dict, values=(), clear=False):
         if isinstance(in_dict, basestring):
             in_dict = _importer(in_dict)
@@ -582,17 +582,17 @@ class _patch_dict(object):
                 return f(*args, **kw)
             finally:
                 self._unpatch_dict()
-            
+
         return _inner
 
     def __enter__(self):
         self._patch_dict()
-    
+
     def _patch_dict(self):
         values = self.values
         in_dict = self.in_dict
         clear = self.clear
-        
+
         try:
             original = in_dict.copy()
         except AttributeError:
@@ -602,30 +602,30 @@ class _patch_dict(object):
             for key in in_dict:
                 original[key] = in_dict[key]
         self._original = original
-        
+
         if clear:
             _clear_dict(in_dict)
-        
+
         try:
             in_dict.update(values)
         except AttributeError:
             # dict like object with no update method
             for key in values:
                 in_dict[key] = values[key]
-                    
+
     def _unpatch_dict(self):
         in_dict = self.in_dict
         original = self._original
-        
+
         _clear_dict(in_dict)
-            
+
         try:
             in_dict.update(original)
         except AttributeError:
             for key in original:
                 in_dict[key] = original[key]
-    
-    
+
+
     def __exit__(self, *args):
         self._unpatch_dict()
         return False
@@ -663,7 +663,7 @@ magic_methods = (
 
 numerics = "add sub mul div truediv floordiv mod lshift rshift and xor or pow "
 inplace = ' '.join('i%s' % n for n in numerics.split())
-right = ' '.join('r%s' % n for n in numerics.split()) 
+right = ' '.join('r%s' % n for n in numerics.split())
 extra = ''
 if inPy3k:
     extra = 'bool next '
@@ -678,7 +678,7 @@ else:
 _non_defaults = set('__%s__' % method for method in [
     'cmp', 'getslice', 'setslice', 'coerce', 'subclasses',
     'dir', 'format', 'get', 'set', 'delete', 'reversed',
-    'missing', 
+    'missing',
 ])
 
 def get_method(name, func):
@@ -740,4 +740,3 @@ class MagicMock(Mock):
             m = Mock()
             setattr(self, entry, m)
             _set_return_value(self, m, entry)
-

@@ -43,14 +43,14 @@ except ImportError:
             self._record = record
             self._module = sys.modules['warnings']
             self._entered = False
-    
+
         def __repr__(self):
             args = []
             if self._record:
                 args.append("record=True")
             name = type(self).__name__
             return "%s(%s)" % (name, ", ".join(args))
-    
+
         def __enter__(self):
             if self._entered:
                 raise RuntimeError("Cannot enter %r twice" % self)
@@ -66,7 +66,7 @@ except ImportError:
                 return log
             else:
                 return None
-    
+
         def __exit__(self, *exc_info):
             if not self._entered:
                 raise RuntimeError("Cannot exit %r without entering first" % self)
