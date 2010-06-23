@@ -34,9 +34,7 @@ how they have been used::
     >>> real.method.assert_called_with(3, 4, 5, key='value')
 
 ``side_effect`` allows you to perform side effects, return different values or
-raise an exception when a mock is called:
-
-.. doctest::
+raise an exception when a mock is called::
 
    >>> from mock import Mock
    >>> mock = Mock(side_effect=KeyError('foo'))
@@ -80,11 +78,9 @@ mock (or other object) during the test and restored when the test ends::
     ...
     >>> mock_method.assert_called_with(1, 2, 3)
 
-There is also :func:`patch.dict` for setting values in a dictionary just
+There is also `patch.dict` for setting values in a dictionary just
 during a scope and restoring the dictionary to its original state when the test
-ends:
-
-.. doctest::
+ends::
 
    >>> foo = {'key': 'value'}
    >>> original = foo.copy()
@@ -119,12 +115,10 @@ class::
     >>> str(mock)
     'wheeeeee'
 
-:func:`mocksignature` is a useful companion to Mock and patch. It creates
+`mocksignature` is a useful companion to Mock and patch. It creates
 copies of functions that delegate to a mock, but have the same signature as the
 original function. This ensures that your mocks will fail in the same way as
-your production code if they are called incorrectly:
-
-.. doctest::
+your production code if they are called incorrectly::
 
    >>> from mock import mocksignature
    >>> def function(a, b, c):
