@@ -132,6 +132,7 @@ def _is_magic(name):
 
 
 class SentinelObject(object):
+    "A unique, named, sentinel object."
     def __init__(self, name):
         self.name = name
         
@@ -172,7 +173,41 @@ else:
 
 
 class Mock(object):
+    """
+    Mock(spec=None, side_effect=None, return_value=DEFAULT, wraps=None)
+
+    Create a new ``Mock`` object. ``Mock`` takes several optional arguments
+    that specify the behaviour of the Mock object:
+
+    * ``spec``: This can be either a list of strings or an existing object (a
+      class or instance) that acts as the specification for the mock object. If
+      you pass in an object then a list of strings is formed by calling dir on
+      the object (excluding unsupported magic attributes and methods). Accessing
+      any attribute not in this list will raise an ``AttributeError``.
     
+    * ``side_effect``: A function to be called whenever the Mock is called. See 
+      the :attr:`Mock.side_effect` attribute. Useful for raising exceptions or 
+      dynamically changing return values. The function is called with the same 
+      arguments as the mock, and unless it returns :data:`DEFAULT`, the return 
+      value of this function is used as the return value.
+      
+      Alternatively ``side_effect`` can be an exception class or instance. In
+      this case the exception will be raised when the mock is called.
+
+    * ``return_value``: The value returned when the mock is called. By default
+      this is a new Mock (created on first access). See the
+      :attr:`Mock.return_value` attribute.
+    
+    * ``wraps``: Item for the mock object to wrap. If ``wraps`` is not None
+      then calling the Mock will pass the call through to the wrapped object
+      (returning the real result and ignoring ``return_value``). Attribute
+      access on the mock will return a Mock object that wraps the corresponding
+      attribute of the wrapped object (so attempting to access an attribute that
+      doesn't exist will raise an ``AttributeError``).
+        
+      If the mock has an explicit ``return_value`` set then calls are not passed
+      to the wrapped object and the ``return_value`` is returned instead.
+    """
     def __new__(cls, *args, **kw):
         class Mock(cls):
             # every instance has its own class
@@ -461,6 +496,12 @@ class _patch(object):
 def _patch_object(target, attribute, new=DEFAULT, spec=None, create=False, mocksignature=False):
     """
     patch.object(target, attribute, new=DEFAULT, spec=None, create=False, mocksignature=False)
+    
+    patch the named member (`attribute`) on an object (`target`) with a mock
+    object.
+    
+    Arguments new, spec, create and mocksignature have the same meaning as for
+    patch.
     """
     return _patch(target, attribute, new, spec, create, mocksignature)
                 
@@ -472,6 +513,29 @@ def patch_object(*args, **kwargs):
 def patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False):
     """
     patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False)
+
+    ``patch`` acts as a function decorator or a context manager. Inside the body
+    of the function or with statement, the ``target`` (specified in the form
+    'PackageName.ModuleName.ClassName') is patched with a ``new`` object. When the
+    function/with statement exits the patch is undone.
+    
+    The target is imported and the specified attribute patched with the new object
+    - so it must be importable from the environment you are calling the decorator
+    from.
+    
+    If ``new`` is omitted, then a new ``Mock`` is created and passed in as an
+    extra argument to the decorated function.
+    
+    The ``spec`` keyword argument is passed to the ``Mock`` if patch is creating
+    one for you.
+    
+    In addition you can pass ``spec=True``, which causes patch to pass in the
+    object being mocked as the spec object.
+    
+    If ``mocksignature`` is True then the patch will be done with a function
+    created by mocking the one being replaced.
+    
+    patch.dict(...) and patch.object(...) are available for alternate use-cases.
     """
     try:
         target, attribute = target.rsplit('.', 1)    
@@ -481,7 +545,25 @@ def patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False):
     return _patch(target, attribute, new, spec, create, mocksignature)
 
 class _patch_dict(object):
-    """patch.dict(in_dict, values=(), clear=False)"""
+    """
+    patch.dict(in_dict, values=(), clear=False)
+    
+    Patch a dictionary and restore the dictionary to its original state after
+    the test.
+    
+    `in_dict` can be a dictionary or a mapping like container. If it is a 
+    mapping then it must at least support getting, setting and deleting items
+    plus iterating over keys.
+
+    `in_dict` can also be a string specifying the name of the dictionary, which
+    will then be fetched by importing it.
+    
+    `values` can be a dictionary of values to set in the dictionary. `values`
+    can also be an iterable of ``(key, value)`` pairs.
+    
+    If `clear` is True then the dictionary will be cleared before the new
+    values are set.
+    """
     
     def __init__(self, in_dict, values=(), clear=False):
         if isinstance(in_dict, basestring):

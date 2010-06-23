@@ -15,11 +15,12 @@ statements.
 patch
 =====
 
-.. function:: patch(target, new=None, spec=None, create=False)
+.. function:: patch(target, new=None, spec=None, create=False, mocksignature=False)
 
-``patch`` decorates a function. Inside the body of the function, the
-``target`` (specified in the form 'PackageName.ModuleName.ClassName') is
-patched with a ``new`` object. When the function exits the patch is undone.
+``patch`` acts as a function decorator or a context manager. Inside the body
+of the function or with statement, the ``target`` (specified in the form
+'PackageName.ModuleName.ClassName') is patched with a ``new`` object. When the
+function/with statement exits the patch is undone.
 
 The target is imported and the specified attribute patched with the new object
 - so it must be importable from the environment you are calling the decorator
@@ -42,6 +43,9 @@ of the Mock (the instance it returns when called). Because of this, if you use
 'spec=True' and are patching a class (and having patch create a Mock for you)
 then the object being patched will be used as a spec for both the Mock *and*
 its return value.
+
+If ``mocksignature`` is True then the patch will be done with a function
+created by mocking the one being replaced.
 
 Using the class as a spec object for the created Mock (and return value) means
 that the Mock will raise an exception if the code attempts to access any
