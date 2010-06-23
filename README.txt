@@ -4,13 +4,15 @@ After performing an action, you can make assertions about which methods /
 attributes were used and arguments they were called with. You can also specify 
 return values and set needed attributes in the normal way.
 
-This approach is inspired by the testing patterns used at
-`Resolver Systems <http://www.resolversystems.com/>`_.
-
 mock is tested on Python versions 2.4-2.7 and Python 3.
 
 The mock module also provides utility functions / objects to assist with
 testing, particularly monkey patching.
+
+* `mock on google code (repository and issue tracker) <http://code.google.com/p/mock/>`_
+* `mock documentation <http://www.voidspace.org.uk/python/mock/>`_
+* `mock on PyPI <http://pypi.python.org/pypi/mock/>`_
+* `Article on mocking, patching and stubbing <http://www.voidspace.org.uk/python/articles/mocking.shtml>`_
 
 Mock is very easy to use and is designed for use with
 `unittest <http://pypi.python.org/pypi/unittest2 unittest>`_. Mock is based on
@@ -50,7 +52,10 @@ raise an exception when a mock is called:
    >>> mock(), mock(), mock()
    (3, 2, 1)
 
-Mock has many other ways you can configure it and control its behaviour.
+Mock has many other ways you can configure it and control its behaviour. For
+example the ``spec`` argument configures the mock to take its specification from
+another object. Attempting to access attributes or methods on the mock that
+don't exist on the spec will fail with an ``AttributeError``.
 
 The ``patch`` decorator / context manager makes it easy to mock classes or
 objects in a module under test. The object you specify will be replaced with a
@@ -114,8 +119,24 @@ class::
     >>> str(mock)
     'wheeeeee'
 
-* `mock on google code (repository and issue tracker) <http://code.google.com/p/mock/>`_
-* `mock documentation <http://www.voidspace.org.uk/python/mock/>`_
-* `mock on PyPI <http://pypi.python.org/pypi/mock/>`_
-* `Article on mocking, patching and stubbing <http://www.voidspace.org.uk/python/articles/mocking.shtml>`_
+:func:`mocksignature` is a useful companion to Mock and patch. It creates
+copies of functions that delegate to a mock, but have the same signature as the
+original function. This ensures that your mocks will fail in the same way as
+your production code if they are called incorrectly:
+
+.. doctest::
+
+   >>> from mock import mocksignature
+   >>> def function(a, b, c):
+   ...     pass
+   ... 
+   >>> function2 = mocksignature(function)
+   >>> function2.mock.return_value = 'fishy'
+   >>> function2(1, 2, 3)
+   'fishy'
+   >>> function2.mock.assert_called_with(1, 2, 3)
+   >>> function2('wrong arguments')
+   Traceback (most recent call last):
+    ...
+   TypeError: <lambda>() takes exactly 3 arguments (1 given)
 
