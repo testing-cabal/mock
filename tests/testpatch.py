@@ -5,7 +5,10 @@
 import os
 import warnings
 
-from tests.support import unittest2, apply, inPy3k, SomeClass
+from tests.support import unittest2, apply, inPy3k, SomeClass, withAvailable
+
+if withAvailable:
+    from tests.support_with import examine_warnings
 
 from mock import Mock, patch, patch_object, sentinel
 
@@ -390,11 +393,10 @@ class PatchTest(unittest2.TestCase):
         self.assertEqual(Something.attribute, sentinel.Original, "patch not restored")
         self.assertEqual(__main__.something, sentinel.Something, "patch not restored")
 
-    @unittest2.skipUnless(hasattr(warnings, 'catch_warnings'), "test requires catch_warnings decorator")
+    @unittest2.skipUnless(withAvailable, "test requires Python >= 2.5")
     def testPatchObjectDeprecation(self):
         # needed to enable the deprecation warnings
         warnings.simplefilter('default')
-        from tests.support_with import examine_warnings
 
         @apply
         @examine_warnings
@@ -554,6 +556,8 @@ class PatchTest(unittest2.TestCase):
             self.assertIn('konrad_delong', os.environ)
     
     def DONTtestPatchDescriptor(self):
+        # would be some effort to fix this - we could special case the
+        # builtin descriptors: classmethod, property, staticmethod
         class Nothing(object):
             foo = None
             

@@ -19,6 +19,7 @@ except NameError:
 
 
 inPy3k = sys.version_info[0] == 3
+withAvailable = sys.version_info[:2] >= (2, 5)
 
 
 class SomeClass(object):
