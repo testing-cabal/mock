@@ -1,19 +1,65 @@
-===========
- CHANGELOG
-===========
+TODO and Limitations
+====================
 
-2010/06/XX Version 0.7.0
-------------------------
+.. currentmodule:: mock
 
-* Addition of ``mocksignature``
+
+Contributions, bug reports and comments welcomed!
+
+Feature requests and bug reports are handled on the issue tracker:
+
+ * `mock module issue tracker <http://code.google.com/p/mock/issues/list>`_
+
+When mocking a class with ``patch``, passing in ``spec=True``, the mock class
+has an instance created from the same spec. Should this be the default
+behaviour for mocks anyway (mock return values inheriting the spec from their
+parent), or should it be controlled by an additional keyword argument
+(``inherit``) to the Mock constructor?
+ 
+More complete docstrings.
+
+Interaction of magic methods with spec, wraps. For example, should spec cause
+all methods to be wrapped with mocksignature perhaps? (or another keyword
+argument perhaps?)
+
+Should magic method calls (including __call__) be tracked in method_calls?
+
+Could take a patch keyword argument and auto-do the patching in the
+constructor and unpatch in the destructor. This would be useful in itself, but
+violates TOOWTDI and would be unsafe for IronPython (non-deterministic calling
+of destructors).
+
+``Mock`` has several attributes. This makes it unsuitable for mocking objects
+that use these attribute names. A way round this would be to provide ``start``
+and ``stop`` (or similar) methods that *hide* these attributes when needed.
+
+
+CHANGELOG
+=========
+
+
+2010/06/XX Version 0.7.0 beta 2
+-------------------------------
+
+* :func:`patch.dict` works as a context manager as well as a decorator
+* ``patch.dict`` takes a string to specify dictionary as well as a dictionary
+  object. If a string is supplied the name specified is imported
+* BUGFIX: ``patch.dict`` restores dictionary even when an exception is raised
+
+
+2010/06/22 Version 0.7.0 beta 1
+-------------------------------
+
+* Addition of :func:`mocksignature`
 * Ability to mock magic methods
 * Ability to use patch and patch.object as class decorators
-* Renamed ``patch_object`` to ``patch.object`` (``patch_object`` is deprecated)
-* Addition of ``MagicMock`` class with all magic methods pre-created for you
+* Renamed ``patch_object`` to :func:`patch.object` (``patch_object`` is
+  deprecated)
+* Addition of :class:`MagicMock` class with all magic methods pre-created for you
 * Python 3 compatibility (tested with 3.2 but should work with 3.0 & 3.1 as
   well)
-* Addition of ``patch.dict(...)`` for changing dictionaries during a test
-* Addition of ``mocksignature`` argument to ``patch`` and ``patch_object``
+* Addition of :func:`patch.dict` for changing dictionaries during a test
+* Addition of ``mocksignature`` argument to ``patch`` and ``patch.object``
 * ``help(mock)`` works now (on the module). Can no longer use ``__bases__``
   as a valid sentinel name (thanks to Stephen Emslie for reporting and
   diagnosing this)
