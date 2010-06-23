@@ -26,26 +26,67 @@ how they have been used::
 
     >>> from mock import Mock
     >>> real = ProductionClass()
-    >>> real.method = Mock()
-    >>> real.method.return_value = 3
-    >>>
+    >>> real.method = Mock(return_value=3)
     >>> real.method(3, 4, 5, key='value')
     3
     >>> real.method.assert_called_with(3, 4, 5, key='value')
+
+``side_effect`` allows you to perform side effects, return different values or
+raise an exception when a mock is called:
+
+.. doctest::
+
+   >>> from mock import Mock
+   >>> mock = Mock(side_effect=KeyError('foo'))
+   >>> mock()
+   Traceback (most recent call last):
+    ...
+   KeyError: 'foo'
+   >>> values = [1, 2, 3]
+   >>> def side_effect():
+   ...     return values.pop()
+   ...      
+   >>> mock.side_effect = side_effect
+   >>> mock(), mock(), mock()
+   (3, 2, 1)
+
+Mock has many other ways you can configure it and control its behaviour.
 
 The ``patch`` decorator / context manager makes it easy to mock classes or
 objects in a module under test. The object you specify will be replaced with a
 mock (or other object) during the test and restored when the test ends::
     
-    @patch('test_module.ClassName1')
-    @patch('test_module.ClassName2')
-    def test_method(self, MockClass1, MockClass2):
-        test_module.ClassName1()
-        test_module.ClassName2()
+   >>> from mock import patch
+    >>> @patch('test_module.ClassName1')
+    ... @patch('test_module.ClassName2')
+    ... def test(MockClass1, MockClass2):
+    ...     test_module.ClassName1()
+    ...     test_module.ClassName2()
     
-        self.assertTrue(MockClass1.called, "ClassName1 not patched")
-        self.assertTrue(MockClass2.called, "ClassName2 not patched")
+    ...     assert MockClass1.called, "ClassName1 not patched"
+    ...     assert MockClass2.called, "ClassName2 not patched"
+    ... 
+    >>> test()
+    
+    >>> with patch.object(ProductionClass, 'method') as mock_method:
+    ...     mock_method.return_value = None
+    ...     real = ProductionClass()
+    ...     real.method(1, 2, 3)
+    ...
+    >>> mock_method.assert_called_with(1, 2, 3)
 
+There is also :func:`patch.dict` for setting values in a dictionary just
+during a scope and restoring the dictionary to its original state when the test
+ends:
+
+.. doctest::
+
+   >>> foo = {'key': 'value'}
+   >>> original = foo.copy()
+   >>> with patch.dict(foo, {'newkey': 'newvalue'}, clear=True):
+   ...     assert foo == {'newkey': 'newvalue'}
+   ...
+   >>> assert foo == original
 
 Mock now supports the mocking of Python magic methods. The easiest way of
 using magic methods is with the ``MagicMock`` class. It allows you to do
