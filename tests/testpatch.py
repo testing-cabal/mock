@@ -5,9 +5,9 @@
 import os
 import warnings
 
-from tests.support import unittest2, apply, inPy3k, SomeClass, withAvailable
+from tests.support import unittest2, apply, inPy3k, SomeClass, with_available
 
-if withAvailable:
+if with_available:
     from tests.support_with import examine_warnings
 
 from mock import Mock, patch, patch_object, sentinel
@@ -393,7 +393,7 @@ class PatchTest(unittest2.TestCase):
         self.assertEqual(Something.attribute, sentinel.Original, "patch not restored")
         self.assertEqual(__main__.something, sentinel.Something, "patch not restored")
 
-    @unittest2.skipUnless(withAvailable, "test requires Python >= 2.5")
+    @unittest2.skipUnless(with_available, "test requires Python >= 2.5")
     def testPatchObjectDeprecation(self):
         # needed to enable the deprecation warnings
         warnings.simplefilter('default')
