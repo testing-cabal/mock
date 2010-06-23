@@ -22,13 +22,13 @@
 .. module:: mock
    :synopsis: Mock object and testing library.
 
-``mock`` provides a core :class:`Mock` class that is intended to reduce
+mock provides a core :class:`Mock` class that is intended to reduce
 the need to create a host of trivial stubs throughout your test suite. After
 performing an action, you can make assertions about which methods / attributes
 were used and arguments they were called with. You can also specify return
 values and set specific attributes in the normal way.
 
-The ``mock`` module also provides a :func:`patch` decorator that handles
+The mock module also provides a :func:`patch` decorator that handles
 patching module and class level attributes within the scope of a test, along
 with :const:`sentinel` for creating unique objects. See the `quick guide`_ for
 some examples of how to use ``Mock``, ``MagicMock`` and ``patch``.
@@ -105,7 +105,6 @@ unpacking run:
    ``python setup.py install``
 
 
-
 Quick Guide
 ===========
 
@@ -160,8 +159,8 @@ mock (or other object) during the test and restored when the test ends:
     ...     test_module.ClassName1()
     ...     test_module.ClassName2()
     
-    ...     assert MockClass1.called, "ClassName1 not patched"
-    ...     assert MockClass2.called, "ClassName2 not patched"
+    ...     assert MockClass1.called
+    ...     assert MockClass2.called
     ... 
     >>> test()
     
