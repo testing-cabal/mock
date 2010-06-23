@@ -23,7 +23,7 @@ __all__ = (
     'DEFAULT'
 )
 
-__version__ = '0.7.0b1'
+__version__ = '0.7.0b2'
 
 import sys
 import warnings
@@ -487,17 +487,12 @@ class _patch_dict(object):
         if isinstance(in_dict, basestring):
             in_dict = _importer(in_dict)
         self.in_dict = in_dict
-        self.values = values
+        # support any argument supported by dict(...) constructor
+        self.values = dict(values)
         self.clear = clear
         self._original = None
 
     def __call__(self, f):
-        in_dict = self.in_dict
-        values = self.values
-        clear = self.clear
-        
-        # support any argument supported by dict(...) constructor
-        values = dict(values)
         @wraps(f)
         def _inner(*args, **kw):
             self._patch_dict()
@@ -512,8 +507,8 @@ class _patch_dict(object):
         self._patch_dict()
     
     def _patch_dict(self):
-        in_dict = self.in_dict
         values = self.values
+        in_dict = self.in_dict
         clear = self.clear
         
         try:

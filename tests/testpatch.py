@@ -552,7 +552,47 @@ class PatchTest(unittest2.TestCase):
         @patch.dict('os.environ', {'konrad_delong': 'some value'})
         def test():
             self.assertIn('konrad_delong', os.environ)
-         
+    
+    def DONTtestPatchDescriptor(self):
+        class Nothing(object):
+            foo = None
+            
+        class Something(object):
+            foo = {}
+            
+            @patch.object(Nothing, 'foo', 2)
+            @classmethod
+            def klass(cls):
+                self.assertIs(cls, Something)
+            
+            @patch.object(Nothing, 'foo', 2)
+            @staticmethod
+            def static(arg):
+                return arg
+            
+            @patch.dict(foo)
+            @classmethod
+            def klass_dict(cls):
+                self.assertIs(cls, Something)
+            
+            @patch.dict(foo)
+            @staticmethod
+            def static_dict(arg):
+                return arg
+        
+        # these will raise exceptions if patching descriptors is broken
+        self.assertEqual(Something.static('f00'), 'f00')
+        Something.klass()
+        self.assertEqual(Something.static_dict('f00'), 'f00')
+        Something.klass_dict()
+        
+        something = Something()
+        self.assertEqual(something.static('f00'), 'f00')
+        something.klass()
+        self.assertEqual(something.static_dict('f00'), 'f00')
+        something.klass_dict()
+
+
 if __name__ == '__main__':
     unittest2.main()
 
