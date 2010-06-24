@@ -213,7 +213,7 @@ class Mock(object):
             # every instance has its own class
             # so we can create magic methods on the
             # class without stomping on other mocks
-            pass
+            __doc__ = cls.__doc__
         return object.__new__(Mock)
 
     def __init__(self, spec=None, side_effect=None, return_value=DEFAULT,
