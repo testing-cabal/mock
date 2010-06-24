@@ -238,12 +238,13 @@ class MockTest(unittest2.TestCase):
             # should work
             mock.x
             mock.y
+            mock.__something__
             self.assertRaisesRegexp(AttributeError,
                                          "Mock object has no attribute 'z'",
                                          lambda: mock.z)
             self.assertRaisesRegexp(AttributeError,
-                                         "Mock object has no attribute '__something__'",
-                                         lambda: mock.__something__)
+                                         "Mock object has no attribute '__foobar__'",
+                                         lambda: mock.__foobar__)
 
         testAttributes(Mock(spec=Something))
         testAttributes(Mock(spec=Something()))

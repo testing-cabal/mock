@@ -221,7 +221,7 @@ class Mock(object):
         self._parent = parent
         self._name = name
         if spec is not None and not isinstance(spec, list):
-            spec = [member for member in dir(spec) if not _is_magic(member)]
+            spec = dir(spec)
 
         self._methods = spec
         self._children = {}
@@ -294,7 +294,7 @@ class Mock(object):
 
     def __getattr__(self, name):
         if self._methods is not None:
-            if name not in self._methods:
+            if name not in self._methods or name in _all_magics:
                 raise AttributeError("Mock object has no attribute '%s'" % name)
         elif _is_magic(name):
             raise AttributeError(name)
@@ -309,6 +309,9 @@ class Mock(object):
 
     def __setattr__(self, name, value):
         if name in _all_magics:
+            if self._methods is not None and name not in self._methods:
+                raise AttributeError("Mock object has no attribute '%s'" % name)
+        
             if not isinstance(value, Mock):
                 setattr(self.__class__, name, get_method(name, value))
                 original = value
@@ -732,9 +735,9 @@ def _set_return_value(mock, method, name):
 class MagicMock(Mock):
     """
     MagicMock is a subclass of :Mock with default implementations
-   of most of the magic methods. You can use MagicMock without having to
-   configure the magic methods yourself.
-   """
+    of most of the magic methods. You can use MagicMock without having to
+    configure the magic methods yourself.
+    """
     def __init__(self, *args, **kw):
         Mock.__init__(self, *args, **kw)
         for entry in _magics:
