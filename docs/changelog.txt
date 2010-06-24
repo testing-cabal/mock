@@ -41,8 +41,9 @@ CHANGELOG
 2010/XX/XX Version 0.7.0
 ------------------------
 
+* Using spec with :class:`MagicMock` only pre-creates magic methods in the spec
 * Setting a magic method on a mock with a ``spec`` can only be done if the
-  spec includes that method
+  spec has that method
 * Improved message for :meth:`Mock.assert_called_with` when the mock has not
   been called at all
 * Improved several docstrings and documentation

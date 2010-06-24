@@ -281,6 +281,11 @@ class TestMockingMagicMethods(unittest2.TestCase):
         def set_int():
             mock.__int__ = Mock(return_value=iter([]))
         self.assertRaises(AttributeError, set_int)
+        
+        mock = MagicMock(spec=Iterable)
+        self.assertEqual(list(mock), [])
+        self.assertRaises(AttributeError, set_int)
+        
 
 
 if __name__ == '__main__':
