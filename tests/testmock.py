@@ -301,6 +301,10 @@ class MockTest(unittest2.TestCase):
         mock = Mock(side_effect=KeyboardInterrupt('foo'))
         self.assertRaises(KeyboardInterrupt, mock)
 
+    def testAssertCalledWithMessage(self):
+        mock = Mock()
+        message = 'Not called'
+        self.assertRaisesRegexp(AssertionError, message, mock.assert_called_with)
 
 if __name__ == '__main__':
     unittest2.main()
