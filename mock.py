@@ -330,6 +330,8 @@ class Mock(object):
         Raises an AttributeError if the args and keyword args passed in are
         different to the last call to the mock.
         """
+        if self.call_args is None:
+            raise AssertionError('Expected: %s\nNot called' % ((args, kwargs),))
         assert self.call_args == (args, kwargs), 'Expected: %s\nCalled with: %s' % ((args, kwargs), self.call_args)
 
 
