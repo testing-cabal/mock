@@ -261,6 +261,26 @@ class TestMockingMagicMethods(unittest2.TestCase):
         mock.__cmp__ = lambda s, o: 0
 
         self.assertEqual(mock, object())
+    
+    def testMagicMethodsAndSpec(self):
+        class Iterable(object):
+            def __iter__(self):
+                pass
+        
+        mock = Mock(spec=Iterable)
+        self.assertRaises(AttributeError, lambda: mock.__iter__)
+        
+        mock.__iter__ = Mock(return_value=iter([]))
+        self.assertEqual(list(mock), [])
+        
+        class NonIterable(object):
+            pass
+        mock = Mock(spec=NonIterable)
+        self.assertRaises(AttributeError, lambda: mock.__iter__)
+        
+        def set_int():
+            mock.__int__ = Mock(return_value=iter([]))
+        self.assertRaises(AttributeError, set_int)
 
 
 if __name__ == '__main__':
