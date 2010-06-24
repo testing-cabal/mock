@@ -737,10 +737,18 @@ class MagicMock(Mock):
     MagicMock is a subclass of :Mock with default implementations
     of most of the magic methods. You can use MagicMock without having to
     configure the magic methods yourself.
+    
+    If you use the ``spec`` argument then *only* magic methods that exist in
+    the spec will be created.
     """
     def __init__(self, *args, **kw):
         Mock.__init__(self, *args, **kw)
-        for entry in _magics:
+        
+        these_magics = _magics
+        if self._methods is not None:
+            these_magics = _magics.intersection(self._methods)
+        
+        for entry in these_magics:
             # could specify parent?
             m = Mock()
             setattr(self, entry, m)

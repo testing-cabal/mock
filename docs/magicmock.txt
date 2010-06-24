@@ -63,6 +63,11 @@ One use case for this is for mocking objects used as context managers in a
 Calls to magic methods do not (yet) appear in :attr:`mock.Mock.method_calls`.
 This may change in a future release.
 
+.. note::
+
+   If you use the ``spec`` keyword argument to create a mock then attempting to
+   set a magic method that isn't in the spec will raise an AttributeError.
+
 The full list of supported magic methods is:
 
 * ``__hash__``, ``__repr__``, ``__str__``, ``__dir__``, ``__format__``
@@ -104,6 +109,9 @@ Magic Mock
    ``MagicMock`` is a subclass of :class:`Mock` with default implementations
    of most of the magic methods. You can use ``MagicMock`` without having to
    configure the magic methods yourself.
+   
+   If you use the ``spec`` argument then *only* magic methods that exist in
+   the spec will be created.
 
 The magic methods are setup with ``Mock`` objects, so you can configure them
 and use them in the usual way:
@@ -160,7 +168,6 @@ For example:
    []
    >>> object() in mock
    False
-
 
 ``MagicMock`` has all of the supported magic methods configured except for some
 of the obscure and obsolete ones. You can still set these up if you want.
