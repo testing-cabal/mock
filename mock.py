@@ -683,7 +683,7 @@ else:
 _non_defaults = set('__%s__' % method for method in [
     'cmp', 'getslice', 'setslice', 'coerce', 'subclasses',
     'dir', 'format', 'get', 'set', 'delete', 'reversed',
-    'missing',
+    'missing', '__reduce__', '__reduce_ex__'
 ])
 
 def get_method(name, func):
