@@ -86,7 +86,8 @@ The full list of supported magic methods is:
 * Numeric conversion methods: ``__complex__``, ``__int__``, ``__float__``,
   ``__index__`` and ``__coerce__``
 * Descriptor methods: ``__get__``, ``__set__`` and ``__delete__``
-* Pickling: ``__reduce__`` and ``__reduce_ex__``
+* Pickling: ``__reduce__``, ``__reduce_ex__``, ``__getinitargs__``,
+  ``__getnewargs__``, ``__getstate__`` and ``__setstate__``
 
   
 The following methods are supported in Python 2 but don't exist in Python 3:
@@ -184,7 +185,9 @@ Magic methods that are supported but not setup by default in ``MagicMock`` are:
 * ``__format__``
 * ``__get__``, ``__set__`` and ``__delete__``
 * ``__reversed__`` and ``__missing__``
-* ``__reduce__`` and ``__reduce_ex__``
+* ``__reduce__``, ``__reduce_ex__``, ``__getinitargs__``, ``__getnewargs__``,
+  ``__getstate__`` and ``__setstate__``
+
 
 
 
