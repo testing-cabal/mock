@@ -217,7 +217,7 @@ class Mock(object):
         return object.__new__(Mock)
 
     def __init__(self, spec=None, side_effect=None, return_value=DEFAULT,
-                 name=None, parent=None, wraps=None):
+                 wraps=None, name=None, parent=None):
         self._parent = parent
         self._name = name
         if spec is not None and not isinstance(spec, list):

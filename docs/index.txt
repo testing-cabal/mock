@@ -22,6 +22,8 @@
 .. module:: mock
    :synopsis: Mock object and testing library.
 
+.. index:: introduction
+
 mock provides a core :class:`Mock` class that is intended to reduce
 the need to create a host of trivial stubs throughout your test suite. After
 performing an action, you can make assertions about which methods / attributes
@@ -31,7 +33,7 @@ values and set specific attributes in the normal way.
 The mock module also provides a :func:`patch` decorator that handles
 patching module and class level attributes within the scope of a test, along
 with :const:`sentinel` for creating unique objects. See the `quick guide`_ for
-some examples of how to use ``Mock``, ``MagicMock`` and ``patch``.
+some examples of how to use :class:`Mock`, :class:`MagicMock` and :func:`patch`.
 
 Mock is very easy to use and is designed for use with
 `unittest <http://pypi.python.org/pypi/unittest2>`_. Mock is based on
@@ -76,6 +78,7 @@ User Guide
    examples
    changelog
 
+.. index:: installing
 
 Installing
 ==========
@@ -89,10 +92,18 @@ improvements / extensions then please contact us.
 * `mock documentation as PDF <http://www.voidspace.org.uk/downloads/mock.pdf>`_
 * `Google Code Home & Subversion Repository <http://code.google.com/p/mock/>`_
 
+.. index:: repository
+.. index:: svn
+
 You can checkout the latest development version from the Google Code Subversion 
 repository with the following command:
 
     ``svn checkout http://mock.googlecode.com/svn/trunk/ mock-read-only``
+
+
+.. index:: pip
+.. index:: easy_install
+.. index:: setuptools
 
 If you have pip, setuptools or distribute you can install mock with:
 
@@ -122,8 +133,8 @@ how they have been used:
     3
     >>> real.method.assert_called_with(3, 4, 5, key='value')
 
-``side_effect`` allows you to perform side effects, return different values or
-raise an exception when a mock is called:
+:attr:`side_effect` allows you to perform side effects, return different
+values or raise an exception when a mock is called:
 
 .. doctest::
 
@@ -236,7 +247,10 @@ your production code if they are called incorrectly:
     ...
    TypeError: <lambda>() takes exactly 3 arguments (1 given)
 
-    
+
+.. index:: references
+.. index:: articles
+
 References
 ==========
 
@@ -251,6 +265,9 @@ Articles and blog entries on testing with Mock:
 * `Mocking with Django and Google AppEngine <http://michael-a-nelson.blogspot.com/2008/09/mocking-with-django-and-google-app.html>`_
 
 
+.. index:: tests
+.. index:: unittest2
+
 Tests
 =====
 
@@ -264,11 +281,15 @@ On Python 2.7 and 3.2 you can use ``unittest`` module from the standard library.
 
    ``python3.2 -m unittest discover``
 
-On Python 2.4 you will see one error - testwith.py will fail to import as it
+On Python 2.4 you will see one error; testwith.py will fail to import as it
 uses the ``with`` statement which is invalid syntax under Python 2.4.
+
+.. index:: Python 3
 
 On Python 3 the tests for unicode are skipped as they are not relevant.
 
+
+.. index:: older versions
 
 Older Versions
 ==============
