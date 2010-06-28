@@ -140,7 +140,7 @@ class TestMockSignature(unittest2.TestCase):
             mock_wibble.assert_called_with(instance)
             instance.wibble.mock.assert_called_with(instance)
     
-    
+    @unittest2.skipUnless(__debug__, 'assert disabled when run with -O/OO')
     def testMockSignatureWithReservedArg(self):
         def f(_mock_):
             pass
