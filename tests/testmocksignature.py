@@ -95,7 +95,24 @@ class TestMockSignature(unittest2.TestCase):
         self.assertEqual(f2(3, 4, 5, x=6, y=9), (3, 4, (5,), {'x': 6, 'y': 9}))
         self.assertEqual(f2(3, x=6, y=9, b='a'), (3, 'a', (), {'x': 6, 'y': 9}))
 
+        def f(*args):
+            pass
+        
+        g = mocksignature(f)
+        g.mock.return_value = 3
+        self.assertEqual(g(1, 2, 'many'), 3)
+        self.assertEqual(g(), 3)
+        self.assertRaises(TypeError, lambda: g(a=None))
+        
+        def f(**kwargs):
+            pass
+        g = mocksignature(f)
+        g.mock.return_value = 3
+        self.assertEqual(g(), 3)
+        self.assertEqual(g(a=None, b=None), 3)
+        self.assertRaises(TypeError, lambda: g(None))
 
+    
     def testMockSignatureWithPatch(self):
         mock = Mock()
 
@@ -133,4 +150,5 @@ class TestMockSignature(unittest2.TestCase):
         def f(_mock_=None):
             pass
         self.assertRaises(AssertionError, lambda: mocksignature(f))
+    
         
