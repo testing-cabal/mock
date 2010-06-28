@@ -9,7 +9,6 @@ from tests.support import unittest2, apply
 from mock import Mock, mocksignature, patch
 
 
-
 class TestMockSignature(unittest2.TestCase):
 
     def testFunction(self):
@@ -97,7 +96,6 @@ class TestMockSignature(unittest2.TestCase):
 
         def f(*args):
             pass
-        
         g = mocksignature(f)
         g.mock.return_value = 3
         self.assertEqual(g(1, 2, 'many'), 3)
@@ -141,6 +139,7 @@ class TestMockSignature(unittest2.TestCase):
 
             mock_wibble.assert_called_with(instance)
             instance.wibble.mock.assert_called_with(instance)
+    
     
     def testMockSignatureWithReservedArg(self):
         def f(_mock_):
