@@ -15,7 +15,6 @@ MODULES = ['mock']
 DESCRIPTION = 'A Python Mocking and Patching Library for Testing'
 
 URL = "http://www.voidspace.org.uk/python/mock/"
-'http://www.voidspace.org.uk/downloads/mock-%s.zip' % __version__
 
 readme = os.path.join(os.path.dirname(__file__), 'README.txt')
 LONG_DESCRIPTION = open(readme).read()
