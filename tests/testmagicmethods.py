@@ -47,7 +47,15 @@ class TestMockingMagicMethods(unittest2.TestCase):
         mock.__getitem__ = mock
         self.assertTrue(mock.__getitem__ is mock)
 
-
+    
+    def testMagicMethodsIsolatedBetweenMocks(self):
+        mock1 = Mock()
+        mock2 = Mock()
+        
+        mock1.__iter__ = Mock(return_value=iter([]))
+        self.assertEqual(list(mock1), [])
+        self.assertRaises(TypeError, lambda: list(mock2))
+        
     def testRepr(self):
         mock = Mock()
         self.assertEqual(repr(mock), object.__repr__(mock))
