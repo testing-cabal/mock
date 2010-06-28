@@ -65,6 +65,11 @@ except NameError:
 
 inPy3k = sys.version_info[0] == 3
 
+if inPy3k:
+    self = '__self__'
+else:
+    self = 'im_self'
+
 
 # getsignature and mocksignature heavily "inspired" by
 # the decorator module: http://pypi.python.org/pypi/decorator/
@@ -77,11 +82,7 @@ def _getsignature(func, skipfirst):
     regargs, varargs, varkwargs, defaults = inspect.getargspec(func)
 
     # instance methods need to lose the self argument
-    if not inPy3k:
-        im_self = getattr(func, 'im_self', None)
-    else:
-        im_self = getattr(func, '__self__', None)
-    if im_self is not None:
+    if getattr(func, self, None) is not None:
         regargs = regargs[1:]
 
     assert '_mock_' not in regargs, ("_mock_ is a reserved argument name, can't mock signatures using _mock_")
