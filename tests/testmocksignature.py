@@ -124,3 +124,13 @@ class TestMockSignature(unittest2.TestCase):
 
             mock_wibble.assert_called_with(instance)
             instance.wibble.mock.assert_called_with(instance)
+    
+    def testMockSignatureWithReservedArg(self):
+        def f(_mock_):
+            pass
+        self.assertRaises(AssertionError, lambda: mocksignature(f))
+
+        def f(_mock_=None):
+            pass
+        self.assertRaises(AssertionError, lambda: mocksignature(f))
+        
