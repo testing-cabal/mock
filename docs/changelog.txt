@@ -64,7 +64,7 @@ CHANGELOG
 
 * Addition of :func:`mocksignature`
 * Ability to mock magic methods
-* Ability to use patch and patch.object as class decorators
+* Ability to use ``patch`` and `patch.object`` as class decorators
 * Renamed ``patch_object`` to :func:`patch.object` (``patch_object`` is
   deprecated)
 * Addition of :class:`MagicMock` class with all magic methods pre-created for you

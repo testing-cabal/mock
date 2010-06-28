@@ -78,9 +78,9 @@ mock (or other object) during the test and restored when the test ends::
     ...
     >>> mock_method.assert_called_with(1, 2, 3)
 
-There is also `patch.dict` for setting values in a dictionary just
-during a scope and restoring the dictionary to its original state when the test
-ends::
+There is also `patch.dict` for setting values in a dictionary just during the
+scope of a test and restoring the dictionary to its original state when the
+test ends::
 
    >>> foo = {'key': 'value'}
    >>> original = foo.copy()
