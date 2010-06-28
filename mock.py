@@ -86,6 +86,10 @@ def _getsignature(func, skipfirst):
         regargs = regargs[1:]
 
     assert '_mock_' not in regargs, ("_mock_ is a reserved argument name, can't mock signatures using _mock_")
+    if varargs is not None:
+        assert '_mock_' not in varargs, ("_mock_ is a reserved argument name, can't mock signatures using _mock_")
+    if varkwargs:
+        assert '_mock_' not in varkwargs, ("_mock_ is a reserved argument name, can't mock signatures using _mock_")
     if skipfirst:
         regargs = regargs[1:]
     signature = inspect.formatargspec(regargs, varargs, varkwargs, defaults, formatvalue=lambda value: "")
