@@ -42,6 +42,8 @@ CHANGELOG
 ------------------------
 
 * Adding pickle methods to the set of supported magic methods
+* Adding ``__trunc__``, ``__ceil__`` and ``__floor__`` to the set of
+  supported magic methods
 * Using spec with :class:`MagicMock` only pre-creates magic methods in the spec
 * Setting a magic method on a mock with a ``spec`` can only be done if the
   spec has that method

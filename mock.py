@@ -670,6 +670,7 @@ magic_methods = (
     "enter exit "
     "divmod neg pos abs invert "
     "complex int float index "
+    "trunc floor ceil "
 )
 
 numerics = "add sub mul div truediv floordiv mod lshift rshift and xor or pow "
@@ -690,7 +691,7 @@ _non_defaults = set('__%s__' % method for method in [
     'cmp', 'getslice', 'setslice', 'coerce', 'subclasses',
     'dir', 'format', 'get', 'set', 'delete', 'reversed',
     'missing', 'reduce', 'reduce_ex', 'getinitargs',
-    'getnewargs', 'getstate', 'setstate'
+    'getnewargs', 'getstate', 'setstate',
 ])
 
 def get_method(name, func):
