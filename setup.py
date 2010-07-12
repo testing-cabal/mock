@@ -6,7 +6,6 @@
 
 from mock import __version__
 
-from distutils.core import setup
 import os
 
 
@@ -44,7 +43,7 @@ AUTHOR = 'Michael Foord'
 AUTHOR_EMAIL = 'michael@voidspace.org.uk'
 KEYWORDS = "testing test mock mocking unittest patching stubs fakes doubles".split(' ')
 
-setup(
+params = dict(
     name=NAME,
     version=__version__,
     py_modules=MODULES,
@@ -58,3 +57,13 @@ setup(
     url=URL,
     classifiers=CLASSIFIERS,
 )
+
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
+else:
+    params['tests_require'] = ['unittest2']
+    params['test_suite'] = 'unittest2.collector'
+
+setup(**params)
