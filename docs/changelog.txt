@@ -52,6 +52,7 @@ CHANGELOG
   - pickle methods
   - ``__trunc__``, ``__ceil__`` and ``__floor__``
 
+* with statement tests now skipped on Python 2.4
 * Improved several docstrings and documentation
 
 
