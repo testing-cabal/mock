@@ -1,6 +1,6 @@
 import sys
 
-if sys.version_info[:2] > (2, 5):
+if sys.version_info[:2] >= (2, 5):
     from tests._testwith import *
 else:
     from tests.support import unittest2
