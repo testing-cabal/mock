@@ -157,7 +157,3 @@ class TestMockSignature(unittest2.TestCase):
         def f(**_mock_):
             pass
         self.assertRaises(AssertionError, lambda: mocksignature(f))
-    
-    
-    
-        
