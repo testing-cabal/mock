@@ -5,7 +5,8 @@
 ##################################################################
 [project attributes]
 proj.directory-list = [{'dirloc': loc('.'),
-                        'excludes': [u'mock.egg-info',
+                        'excludes': [u'htmlcov',
+                                     u'mock.egg-info',
                                      u'tests/__pycache__',
                                      u'build',
                                      u'__pycache__'],
