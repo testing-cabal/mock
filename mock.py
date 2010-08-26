@@ -180,7 +180,7 @@ else:
 
 class Mock(object):
     """
-    Mock(spec=None, side_effect=None, return_value=DEFAULT, wraps=None)
+    Mock(spec=None, side_effect=None, return_value=DEFAULT, wraps=None, name=None)
 
     Create a new ``Mock`` object. ``Mock`` takes several optional arguments
     that specify the behaviour of the Mock object:
@@ -190,6 +190,10 @@ class Mock(object):
       you pass in an object then a list of strings is formed by calling dir on
       the object (excluding unsupported magic attributes and methods). Accessing
       any attribute not in this list will raise an ``AttributeError``.
+
+      If ``spec`` is an object (rather than a list of strings) then
+      `mock.__class__` returns the class of the spec object. This allows mocks
+      to pass `isinstance` tests.
 
     * ``side_effect``: A function to be called whenever the Mock is called. See
       the :attr:`Mock.side_effect` attribute. Useful for raising exceptions or
@@ -213,6 +217,9 @@ class Mock(object):
 
       If the mock has an explicit ``return_value`` set then calls are not passed
       to the wrapped object and the ``return_value`` is returned instead.
+
+    * ``name``: If the mock has a name then it will be used in the repr of the
+      mock. This can be useful for debugging.
     """
     def __new__(cls, *args, **kw):
         # every instance has its own class
@@ -225,9 +232,15 @@ class Mock(object):
                  wraps=None, name=None, parent=None):
         self._parent = parent
         self._name = name
+        _spec_class = None
         if spec is not None and not isinstance(spec, list):
+            if isinstance(spec, type):
+                _spec_class = spec
+            else:
+                _spec_class = spec.__class__
             spec = dir(spec)
 
+        self._spec_class = _spec_class
         self._methods = spec
         self._children = {}
         self._return_value = return_value
@@ -236,6 +249,11 @@ class Mock(object):
 
         self.reset_mock()
 
+    @property
+    def __class__(self):
+        if self._spec_class is None:
+            return type(self)
+        return self._spec_class
 
     def reset_mock(self):
         "Restore the mock object to its initial state."
@@ -259,7 +277,6 @@ class Mock(object):
         self._return_value = value
 
     __return_value_doc = "The value to be returned when the mock is called."
-
     return_value = property(__get_return_value, __set_return_value,
                             __return_value_doc)
 
@@ -325,7 +342,7 @@ class Mock(object):
         while parent is not None:
             name = get_name(parent._name) + '.' + name
             parent = parent._parent
-        return "<%s name=%r id='%s'>" % (self.__class__.__name__, name, id(self))
+        return "<%s name=%r id='%s'>" % (type(self).__name__, name, id(self))
 
     def __setattr__(self, name, value):
         if name in _all_magics:
@@ -333,17 +350,17 @@ class Mock(object):
                 raise AttributeError("Mock object has no attribute '%s'" % name)
         
             if not isinstance(value, Mock):
-                setattr(self.__class__, name, get_method(name, value))
+                setattr(type(self), name, get_method(name, value))
                 original = value
                 real = lambda *args, **kw: original(self, *args, **kw)
                 value = mocksignature(value, real, skipfirst=True)
             else:
-                setattr(self.__class__, name, value)
+                setattr(type(self), name, value)
         return object.__setattr__(self, name, value)
 
     def __delattr__(self, name):
-        if name in _all_magics and name in self.__class__.__dict__:
-            delattr(self.__class__, name)
+        if name in _all_magics and name in type(self).__dict__:
+            delattr(type(self), name)
         return object.__delattr__(self, name)
 
     def assert_called_with(self, *args, **kwargs):
@@ -680,7 +697,7 @@ magic_methods = (
     "lt le gt ge eq ne "
     "getitem setitem delitem "
     "len contains iter "
-    "hash str "
+    "hash str sizeof "
     "enter exit "
     "divmod neg pos abs invert "
     "complex int float index "
@@ -723,6 +740,7 @@ _all_magics = _magics | _non_defaults
 _side_effects = {
     '__hash__': lambda self: object.__hash__(self),
     '__str__': lambda self: object.__str__(self),
+    '__sizeof__': lambda self: object.__sizeof__(self),
     '__unicode__': lambda self: unicode(object.__str__(self)),
 }
 

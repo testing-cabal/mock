@@ -46,6 +46,8 @@ CHANGELOG
   spec has that method
 * Mocks can now be named (`name` argument to constructor) and the name is used
   in the repr
+* Mocks created with a spec can now pass `isinstance` tests (`__class__`
+  returns the type of the spec)
 * Default numeric value for MagicMock is 1 rather than zero (because the
   MagicMock bool defaults to True and 0 is False)
 * Improved message for :meth:`Mock.assert_called_with` when the mock has not
@@ -55,6 +57,7 @@ CHANGELOG
   - ``__getformat__`` and ``__setformat__``
   - pickle methods
   - ``__trunc__``, ``__ceil__`` and ``__floor__``
+  - ``__sizeof__``
 
 * with statement tests now skipped on Python 2.4
 * tests require unittest2 to run on Python 2.7
