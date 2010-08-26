@@ -35,13 +35,21 @@ extra argument to the decorated function::
 
 .. note::
 
-    Patching a class replaces the class with a mock *instance*. If the class
+    Patching a class replaces the class with a Mock *instance*. If the class
     is instantiated in the code under test then it will be the `return_value`
-    of the mock that will be returned when the mocked class is instantiated.
+    of the mock that will be used.
     
     If the class is instantiated multiple times you could use
     :attr:`Mock.side_effect` to return a new mock each time. Alternatively you
     can set the `return_value` to be anything you want.
+    
+    To configure return values on methods of *instances* on the patched class
+    you must do this on the `return_value`. For example::
+    
+        @patch('module.Class')
+        def test(MockClass):
+            instance = MockClass.return_value
+            instance.method.return_value = 'foo'
 
 The ``spec`` keyword argument is passed to the ``Mock`` if patch is creating
 one for you.
