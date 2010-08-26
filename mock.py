@@ -722,25 +722,24 @@ _all_magics = _magics | _non_defaults
 
 _side_effects = {
     '__hash__': lambda self: object.__hash__(self),
-#    '__repr__': lambda self: object.__repr__(self),
     '__str__': lambda self: object.__str__(self),
     '__unicode__': lambda self: unicode(object.__str__(self)),
 }
 
 _return_values = {
-    '__int__': 0,
+    '__int__': 1,
     '__contains__': False,
     '__len__': 0,
     '__iter__': iter([]),
     '__exit__': False,
-    '__complex__': 0j,
-    '__float__': 0.0,
+    '__complex__': 1j,
+    '__float__': 1.0,
     '__bool__': True,
     '__nonzero__': True,
-    '__oct__': '0',
-    '__hex__': '0x0',
-    '__long__': long(0),
-    '__index__': 0,
+    '__oct__': '1',
+    '__hex__': '0x1',
+    '__long__': long(1),
+    '__index__': 1,
 }
 
 def _set_return_value(mock, method, name):

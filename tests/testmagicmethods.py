@@ -238,26 +238,25 @@ class TestMockingMagicMethods(unittest2.TestCase):
 
     def testMagicMockDefaults(self):
         mock = MagicMock()
-        self.assertEqual(int(mock), 0)
-        self.assertEqual(complex(mock), 0j)
-        self.assertEqual(float(mock), 0.0)
-        self.assertEqual(long(mock), long(0))
+        self.assertEqual(int(mock), 1)
+        self.assertEqual(complex(mock), 1j)
+        self.assertEqual(float(mock), 1.0)
+        self.assertEqual(long(mock), long(1))
         self.assertNotIn(object(), mock)
         self.assertEqual(len(mock), 0)
         self.assertEqual(list(mock), [])
         self.assertEqual(hash(mock), object.__hash__(mock))
-        self.assertEqual(repr(mock), object.__repr__(mock))
         self.assertEqual(str(mock), object.__str__(mock))
         self.assertEqual(unicode(mock), object.__str__(mock))
         self.assertIsInstance(unicode(mock), unicode)
         self.assertTrue(bool(mock))
         if not inPy3k:
-            self.assertEqual(oct(mock), '0')
+            self.assertEqual(oct(mock), '1')
         else:
             # in Python 3 oct and hex use __index__
             # so these tests are for __index__ in py3k
-            self.assertEqual(oct(mock), '0o0')
-        self.assertEqual(hex(mock), '0x0')
+            self.assertEqual(oct(mock), '0o1')
+        self.assertEqual(hex(mock), '0x1')
 
 
     @unittest2.skipIf(inPy3k, "no __cmp__ in Python 3")
