@@ -44,6 +44,8 @@ CHANGELOG
 * Using spec with :class:`MagicMock` only pre-creates magic methods in the spec
 * Setting a magic method on a mock with a ``spec`` can only be done if the
   spec has that method
+* Mocks can now be named (`name` argument to constructor) and the name is used
+  in the repr
 * Improved message for :meth:`Mock.assert_called_with` when the mock has not
   been called at all
 * Adding the following to the set of supported magic methods:

@@ -215,12 +215,11 @@ class Mock(object):
       to the wrapped object and the ``return_value`` is returned instead.
     """
     def __new__(cls, *args, **kw):
-        class Mock(cls):
-            # every instance has its own class
-            # so we can create magic methods on the
-            # class without stomping on other mocks
-            __doc__ = cls.__doc__
-        return object.__new__(Mock)
+        # every instance has its own class
+        # so we can create magic methods on the
+        # class without stomping on other mocks
+        new = type(cls.__name__, (cls,), {'__doc__': cls.__doc__})
+        return object.__new__(new)
 
     def __init__(self, spec=None, side_effect=None, return_value=DEFAULT,
                  wraps=None, name=None, parent=None):
@@ -312,6 +311,21 @@ class Mock(object):
             self._children[name] = Mock(parent=self, name=name, wraps=wraps)
 
         return self._children[name]
+
+    def __repr__(self):
+        if self._name is None:
+            return object.__repr__(self)
+    
+        def get_name(name):
+            if name is None:
+                return 'mock'
+            return name
+        parent = self._parent
+        name = self._name
+        while parent is not None:
+            name = get_name(parent._name) + '.' + name
+            parent = parent._parent
+        return '<%s name=%r>' % (self.__class__.__name__, name)
 
     def __setattr__(self, name, value):
         if name in _all_magics:
@@ -666,7 +680,7 @@ magic_methods = (
     "lt le gt ge eq ne "
     "getitem setitem delitem "
     "len contains iter "
-    "hash repr str "
+    "hash str "
     "enter exit "
     "divmod neg pos abs invert "
     "complex int float index "
@@ -692,7 +706,7 @@ _non_defaults = set('__%s__' % method for method in [
     'dir', 'format', 'get', 'set', 'delete', 'reversed',
     'missing', 'reduce', 'reduce_ex', 'getinitargs',
     'getnewargs', 'getstate', 'setstate', 'getformat',
-    'setformat'
+    'setformat', 'repr'
 ])
 
 def get_method(name, func):
@@ -708,7 +722,7 @@ _all_magics = _magics | _non_defaults
 
 _side_effects = {
     '__hash__': lambda self: object.__hash__(self),
-    '__repr__': lambda self: object.__repr__(self),
+#    '__repr__': lambda self: object.__repr__(self),
     '__str__': lambda self: object.__str__(self),
     '__unicode__': lambda self: unicode(object.__str__(self)),
 }
