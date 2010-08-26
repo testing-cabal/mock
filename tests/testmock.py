@@ -48,6 +48,14 @@ class MockTest(unittest2.TestCase):
         self.assertIsNone(mock.return_value, "return value in constructor not honoured")
 
 
+    def testRepr(self):
+        mock = Mock(name='foo')
+        self.assertIn('foo', repr(mock))
+        
+        self.assertIn('foo.bar', repr(mock.bar))
+        self.assertIn('mock.baz', repr(mock().baz))
+
+
     def testSideEffect(self):
         mock = Mock()
 
