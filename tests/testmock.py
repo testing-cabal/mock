@@ -51,6 +51,7 @@ class MockTest(unittest2.TestCase):
     def testRepr(self):
         mock = Mock(name='foo')
         self.assertIn('foo', repr(mock))
+        self.assertIn("'%s'" % id(mock), repr(mock))
         
         self.assertIn('foo.bar', repr(mock.bar))
         self.assertIn('mock.baz', repr(mock().baz))

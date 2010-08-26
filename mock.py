@@ -325,7 +325,7 @@ class Mock(object):
         while parent is not None:
             name = get_name(parent._name) + '.' + name
             parent = parent._parent
-        return '<%s name=%r>' % (self.__class__.__name__, name)
+        return "<%s name=%r id='%s'>" % (self.__class__.__name__, name, id(self))
 
     def __setattr__(self, name, value):
         if name in _all_magics:
