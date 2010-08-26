@@ -107,8 +107,8 @@ repository with the following command:
 
 If you have pip, setuptools or distribute you can install mock with:
 
-    | ``easy_install mock``
-    | ``pip install mock``
+    | ``easy_install -U mock``
+    | ``pip install -U mock``
 
 Alternatively you can download the mock distribution from PyPI and after
 unpacking run:
