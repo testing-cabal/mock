@@ -33,6 +33,16 @@ extra argument to the decorated function::
    def test_something(self, MockClass):
        "test something"
 
+.. note::
+
+    Patching a class replaces the class with a mock *instance*. If the class
+    is instantiated in the code under test then it will be the `return_value`
+    of the mock that will be returned when the mocked class is instantiated.
+    
+    If the class is instantiated multiple times you could use
+    :attr:`Mock.side_effect` to return a new mock each time. Alternatively you
+    can set the `return_value` to be anything you want.
+
 The ``spec`` keyword argument is passed to the ``Mock`` if patch is creating
 one for you.
 
