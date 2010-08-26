@@ -70,7 +70,7 @@ This may change in a future release.
 
 The full list of supported magic methods is:
 
-* ``__hash__``, ``__repr__`` and ``__str__``
+* ``__hash__``, ``__sizeof__``, ``__repr__`` and ``__str__``
 * ``__dir__``, ``__format__`` and ``__subclasses__``
 * ``__floor__``, ``__trunc__`` and ``__ceil__``
 * Comparisons: ``__cmp__``, ``__lt__``, ``__gt__``, ``__le__``, ``__ge__``,
@@ -152,9 +152,9 @@ Methods and their defaults:
 * ``__long__`` : long(1)
 * ``__index__`` : 1
 * ``__hash__`` : default hash for the mock
-* ``__repr__`` : default repr for the mock
 * ``__str__`` : default str for the mock
 * ``__unicode__`` : default unicode for the mock
+* ``__sizeof__``: default sizeof for the mock
 
 For example:
 

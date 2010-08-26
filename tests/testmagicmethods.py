@@ -257,6 +257,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
             # so these tests are for __index__ in py3k
             self.assertEqual(oct(mock), '0o1')
         self.assertEqual(hex(mock), '0x1')
+        # how to test __sizeof__ ?
 
 
     @unittest2.skipIf(inPy3k, "no __cmp__ in Python 3")
