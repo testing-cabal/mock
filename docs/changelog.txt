@@ -59,6 +59,8 @@ CHANGELOG
   - ``__trunc__``, ``__ceil__`` and ``__floor__``
   - ``__sizeof__``
 
+* Added 'build_sphinx' command to setup.py (requires setuptools or distribute)
+  Thanks to Florian Bauer
 * with statement tests now skipped on Python 2.4
 * tests require unittest2 to run on Python 2.7
 * Improved several docstrings and documentation
