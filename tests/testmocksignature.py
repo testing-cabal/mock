@@ -8,7 +8,14 @@ from tests.support import unittest2, apply
 
 from mock import Mock, mocksignature, patch
 
+class Something(object):
+    def __init__(self, foo, bar=10):
+        pass
+    def __call__(self, foo, bar=5):
+        pass
 
+something = Something(1, 2)
+    
 class TestMockSignature(unittest2.TestCase):
 
     def testFunction(self):
@@ -157,3 +164,55 @@ class TestMockSignature(unittest2.TestCase):
         def f(**_mock_):
             pass
         self.assertRaises(AssertionError, lambda: mocksignature(f))
+
+    def testMockSignatureClass(self):
+        MockedSomething = mocksignature(Something)
+        
+        result = MockedSomething(5, 23)
+        self.assertIs(result, MockedSomething.mock.return_value)
+        
+        MockedSomething(1)
+        MockedSomething.mock.assert_caled_with(1, 10)
+        
+        self.assertRaises(TypeError, MockedSomething)
+
+    def testMockSignatureCallable(self):
+        mocked_something = mocksignature(something)
+        
+        result = mocked_something(5, 23)
+        self.assertIs(result, mocked_something.mock.return_value)
+        
+        mocked_something(1)
+        mocked_something.mock.assert_caled_with(1, 5)
+        
+        self.assertRaises(TypeError, mocked_something)
+
+    def testPatchMockSignatureClass(self):
+        original_something = Something
+        something_name = '%s.Something' % __name__
+        @patch(something_name, mocksignature=True)
+        def test(MockSomething):
+            Something(3, 5)
+            MockSomething.assert_called_with(3, 5)
+            
+            Something(6)
+            MockSomething.assert_called_with(6, 10)
+            
+            self.assertRaises(TypeError, Something)
+        test()
+        self.assertIs(Something, original_something)
+
+    def testPatchMockSignatureCallable(self):
+        original_something = something
+        something_name = '%s.something' % __name__
+        @patch(something_name, mocksignature=True)
+        def test(MockSomething):
+            something(3, 4)
+            MockSomething.assert_called_with(3, 4)
+            
+            something(6)
+            MockSomething.assert_called_with(6, 5)
+            
+            self.assertRaises(TypeError, something)
+        test()
+        self.assertIs(something, original_something)

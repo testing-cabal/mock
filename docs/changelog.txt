@@ -46,6 +46,8 @@ CHANGELOG
   spec has that method
 * Mocks can now be named (`name` argument to constructor) and the name is used
   in the repr
+* `mocksignature` can now be used with classes (signature based on `__init__`)
+  and callable objects (signature based on `__call__`)
 * Mocks created with a spec can now pass `isinstance` tests (`__class__`
   returns the type of the spec)
 * Default numeric value for MagicMock is 1 rather than zero (because the
@@ -62,7 +64,7 @@ CHANGELOG
 * Added 'build_sphinx' command to setup.py (requires setuptools or distribute)
   Thanks to Florian Bauer
 * with statement tests now skipped on Python 2.4
-* tests require unittest2 to run on Python 2.7
+* Tests require unittest2 to run on Python 2.7
 * Improved several docstrings and documentation
 
 

@@ -78,7 +78,14 @@ else:
 def _getsignature(func, skipfirst):
     if inspect is None:
         raise ImportError('inspect module not available')
-    assert inspect.ismethod(func) or inspect.isfunction(func)
+
+    if inspect.isclass(func):
+        func = func.__init__
+        # will have a self arg
+        skipfirst = True
+    elif not (inspect.ismethod(func) or inspect.isfunction(func)):
+        func = func.__call__
+
     regargs, varargs, varkwargs, defaults = inspect.getargspec(func)
 
     # instance methods need to lose the self argument
@@ -94,7 +101,7 @@ def _getsignature(func, skipfirst):
     if skipfirst:
         regargs = regargs[1:]
     signature = inspect.formatargspec(regargs, varargs, varkwargs, defaults, formatvalue=lambda value: "")
-    return signature[1:-1]
+    return signature[1:-1], func
 
 
 def _copy_func_details(func, funcopy):
@@ -124,7 +131,7 @@ def mocksignature(func, mock=None, skipfirst=False):
     """
     if mock is None:
         mock = Mock()
-    signature = _getsignature(func, skipfirst)
+    signature, func = _getsignature(func, skipfirst)
     src = "lambda %(signature)s: _mock_(%(signature)s)" % {'signature': signature}
 
     funcopy = eval(src, dict(_mock_=mock))
