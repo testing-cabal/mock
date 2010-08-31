@@ -128,6 +128,12 @@ def mocksignature(func, mock=None, skipfirst=False):
 
     The mock is set as the `mock` attribute of the returned function for easy
     access.
+
+    `mocksignature` can also be used with classes. It copies the signature of
+    the `__init__` method.
+
+    When used with callable objects (instances) it copies the signature of the
+    `__call__` method.
     """
     if mock is None:
         mock = Mock()
@@ -582,7 +588,10 @@ def patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False):
     object being mocked as the spec object.
 
     If ``mocksignature`` is True then the patch will be done with a function
-    created by mocking the one being replaced.
+    created by mocking the one being replaced. If the object being replaced is
+    a class then the signature of `__init__` will be copied. If the object
+    being replaced is a callable object then the signature of `__call__` will
+    be copied.
 
     patch.dict(...) and patch.object(...) are available for alternate use-cases.
     """
