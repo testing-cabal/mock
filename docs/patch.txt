@@ -63,7 +63,10 @@ then the object being patched will be used as a spec for both the Mock *and*
 its return value.
 
 If ``mocksignature`` is True then the patch will be done with a function
-created by mocking the one being replaced.
+created by mocking the one being replaced. If the object being replaced is
+a class then the signature of `__init__` will be copied. If the object
+being replaced is a callable object then the signature of `__call__` will
+be copied.
 
 Using the class as a spec object for the created Mock (and return value) means
 that the Mock will raise an exception if the code attempts to access any

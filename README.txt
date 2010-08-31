@@ -134,5 +134,9 @@ your production code if they are called incorrectly::
     ...
    TypeError: <lambda>() takes exactly 3 arguments (1 given)
 
+`mocksignature` can also be used on classes, where it copies the signature of
+the `__init__` method, and on callable objects where it copies the signature of
+the `__call__` method.
+
 The distribution contains tests and documentation. The tests require
 `unittest2 <http://pypi.python.org/pypi/unittest2>`_ to run.
