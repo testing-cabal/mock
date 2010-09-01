@@ -753,7 +753,7 @@ _magics = set('__%s__' % method for method in ' '.join([magic_methods, numerics,
 _all_magics = _magics | _non_defaults
 
 
-_side_effects = {
+_calculate_return_value = {
     '__hash__': lambda self: object.__hash__(self),
     '__str__': lambda self: object.__str__(self),
     '__sizeof__': lambda self: object.__sizeof__(self),
@@ -777,15 +777,16 @@ _return_values = {
 }
 
 def _set_return_value(mock, method, name):
-    if name in _side_effects:
-        func = _side_effects[name]
-        def wrap(*args, **kw):
-            if method._return_value is DEFAULT:
-                return func(mock)
-            return method._return_value
-        method.side_effect = wrap
-    elif name in _return_values:
-        method.return_value = _return_values[name]
+    return_value = DEFAULT
+    if name in _return_values:
+        return_value = _return_values[name]
+    elif name in _calculate_return_value:
+        try:
+            return_value = _calculate_return_value[name](mock)
+        except AttributeError:
+            return_value = AttributeError(name)
+    if return_value is not DEFAULT:
+        method.return_value = return_value
 
 
 class MagicMock(Mock):
