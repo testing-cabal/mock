@@ -318,9 +318,9 @@ Attributes
         <mock.Mock object at 0x...>
         >>> mock.method(a="b")
         <mock.Mock object at 0x...>
-        >>> mock.method_calls == [('method',), ('method', (1, 2)), ('method', {"a": "b"})]
+        >>> mock.method_calls == [('method',), ('method', (1, 2)),
+        ... ('method', {"a": "b"})]
         True
-
 
 The ``Mock`` class has support for mocking magic methods. See :ref:`magic
 methods` for the full details.
