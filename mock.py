@@ -23,7 +23,7 @@ __all__ = (
     'DEFAULT'
 )
 
-__version__ = '0.7.0 beta 3'
+__version__ = '0.7.0b3'
 
 import sys
 import warnings
