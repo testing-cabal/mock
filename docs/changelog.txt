@@ -40,7 +40,7 @@ CHANGELOG
 =========
 
 
-2010/09/16 Version 0.7.0 beta 3
+2010/09/18 Version 0.7.0 beta 3
 -------------------------------
 
 * Using spec with :class:`MagicMock` only pre-creates magic methods in the spec
