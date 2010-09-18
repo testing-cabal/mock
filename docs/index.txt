@@ -83,13 +83,13 @@ User Guide
 Installing
 ==========
 
-The current version is **0.7.0**, dated 2010/06/23. Mock is still
+The current version is **0.7.0b3**, dated 2010/09/18. Mock is still
 experimental; the API may change (although we are moving towards a 1.0 release
 when the API will stabilise). If you find bugs or have suggestions for
 improvements / extensions then please contact us.
 
 * `mock on PyPI <http://pypi.python.org/pypi/mock>`_
-* `mock documentation as PDF <http://www.voidspace.org.uk/downloads/mock.pdf>`_
+* `mock documentation as PDF <http://www.voidspace.org.uk/downloads/mock-0.7.0b3.pdf>`_
 * `Google Code Home & Subversion Repository <http://code.google.com/p/mock/>`_
 
 .. index:: repository
@@ -280,7 +280,7 @@ test suite. In order to run it, use the ``unit2`` script that comes with
 
    ``unit2 discover``
 
-On Python 2.7 and 3.2 you can use ``unittest`` module from the standard library.
+On Python 3.2 you can use ``unittest`` module from the standard library.
 
    ``python3.2 -m unittest discover``
 
