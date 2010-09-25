@@ -84,7 +84,7 @@ CHANGELOG
 
 * Addition of :func:`mocksignature`
 * Ability to mock magic methods
-* Ability to use ``patch`` and `patch.object`` as class decorators
+* Ability to use ``patch`` and ``patch.object`` as class decorators
 * Renamed ``patch_object`` to :func:`patch.object` (``patch_object`` is
   deprecated)
 * Addition of :class:`MagicMock` class with all magic methods pre-created for you
@@ -95,7 +95,7 @@ CHANGELOG
 * ``help(mock)`` works now (on the module). Can no longer use ``__bases__``
   as a valid sentinel name (thanks to Stephen Emslie for reporting and
   diagnosing this)
-* Addition of soft comparisons: call_args, call_args_list and method_calls
+* Addition of soft comparisons: `call_args`, `call_args_list` and `method_calls`
   return now tuple-like objects which compare equal even when empty args
   or kwargs are skipped
 * Added docstrings.
