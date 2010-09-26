@@ -1,7 +1,7 @@
 mock is a Python module that provides a core Mock class. It is intended to
 reduce the need for creating a host of trivial stubs throughout your test suite.
 After performing an action, you can make assertions about which methods /
-attributes were used and arguments they were called with. You can also specify 
+attributes were used and arguments they were called with. You can also specify
 return values and set needed attributes in the normal way.
 
 mock is tested on Python versions 2.4-2.7 and Python 3.
@@ -18,7 +18,7 @@ testing, particularly monkey patching.
 Mock is very easy to use and is designed for use with
 `unittest <http://pypi.python.org/pypi/unittest2>`_. Mock is based on
 the 'action -> assertion' pattern instead of 'record -> replay' used by many
-mocking frameworks. See the 
+mocking frameworks. See the
 `mock documentation <http://www.voidspace.org.uk/python/mock/>`_ for full
 details.
 
@@ -46,7 +46,7 @@ raise an exception when a mock is called::
    >>> values = [1, 2, 3]
    >>> def side_effect():
    ...     return values.pop()
-   ...      
+   ...
    >>> mock.side_effect = side_effect
    >>> mock(), mock(), mock()
    (3, 2, 1)
@@ -59,19 +59,19 @@ don't exist on the spec will fail with an ``AttributeError``.
 The ``patch`` decorator / context manager makes it easy to mock classes or
 objects in a module under test. The object you specify will be replaced with a
 mock (or other object) during the test and restored when the test ends::
-    
-   >>> from mock import patch
+
+    >>> from mock import patch
     >>> @patch('test_module.ClassName1')
     ... @patch('test_module.ClassName2')
     ... def test(MockClass1, MockClass2):
     ...     test_module.ClassName1()
     ...     test_module.ClassName2()
-    
+
     ...     assert MockClass1.called
     ...     assert MockClass2.called
-    ... 
+    ...
     >>> test()
-    
+
     >>> with patch.object(ProductionClass, 'method') as mock_method:
     ...     mock_method.return_value = None
     ...     real = ProductionClass()
@@ -124,7 +124,7 @@ your production code if they are called incorrectly::
    >>> from mock import mocksignature
    >>> def function(a, b, c):
    ...     pass
-   ... 
+   ...
    >>> function2 = mocksignature(function)
    >>> function2.mock.return_value = 'fishy'
    >>> function2(1, 2, 3)
