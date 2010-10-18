@@ -339,7 +339,7 @@ class MockTest(unittest2.TestCase):
         self.addCleanup(sys.setrecursionlimit, current)
 
         # can't use sys.maxint as this doesn't exist in Python 3
-        sys.setrecursionlimit(2147483647)
+        sys.setrecursionlimit(int(10e8))
         # this segfaults without the fix in place
         copy.copy(Mock())
 
