@@ -23,7 +23,7 @@ __all__ = (
     'DEFAULT'
 )
 
-__version__ = '0.7.0b3'
+__version__ = '0.7.0b4'
 
 import sys
 import warnings
@@ -360,7 +360,10 @@ class Mock(object):
         return "<%s name=%r id='%s'>" % (type(self).__name__, name, id(self))
 
     def __setattr__(self, name, value):
-        if name in _all_magics:
+        if name in _unsupported_magics:
+            msg = 'Attempting to set unsupported magic method %r.' % name
+            raise AttributeError(msg)
+        elif name in _all_magics:
             if self._methods is not None and name not in self._methods:
                 raise AttributeError("Mock object has no attribute '%s'" % name)
 
@@ -754,6 +757,12 @@ _magics = set('__%s__' % method for method in ' '.join([magic_methods, numerics,
 
 _all_magics = _magics | _non_defaults
 
+_unsupported_magics = set([
+    '__getattr__', '__setattr__',
+    '__init__', '__new__', '__prepare__'
+    '__instancecheck__', '__subclasscheck__',
+    '__del__'
+])
 
 _calculate_return_value = {
     '__hash__': lambda self: object.__hash__(self),

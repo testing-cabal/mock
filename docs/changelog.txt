@@ -39,6 +39,13 @@ to a double underscore name.)
 CHANGELOG
 =========
 
+2010/XX/XX Version 0.7.0 beta 4
+-------------------------------
+
+* Attempting to set an unsupported magic method now raises an `AttributeError`
+* BUGFIX: mocks are now copyable (thanks to Ned Batchelder for reporting and
+  diagnosing this)
+
 
 2010/09/18 Version 0.7.0 beta 3
 -------------------------------
@@ -135,9 +142,9 @@ CHANGELOG
   your own risk!)
 * The methods keyword argument to Mock has been removed and merged with spec. The spec
   argument can now be a list of methods or an object to take the spec from.
-* Nested patches may now be applied in a different order (created mocks passed 
-  in the opposite order). This is actually a bugfix. 
-* patch and patch_object now take a spec keyword argument. If spec is 
+* Nested patches may now be applied in a different order (created mocks passed
+  in the opposite order). This is actually a bugfix.
+* patch and patch_object now take a spec keyword argument. If spec is
   passed in as 'True' then the Mock created will take the object it is replacing
   as its spec object. If the object being replaced is a class, then the return
   value for the mock will also use the class as a spec.
@@ -157,7 +164,7 @@ CHANGELOG
     - ``patch_object`` which takes an object and an attribute name to patch
       (plus optionally a value to patch with which defaults to a mock object)
     - ``patch`` which takes a string specifying a target to patch; in the form
-      'package.module.Class.attribute'. (plus optionally a value to 
+      'package.module.Class.attribute'. (plus optionally a value to
       patch with which defaults to a mock object)
 
 * Can now patch objects with ``None``
@@ -165,17 +172,17 @@ CHANGELOG
 * Reset no longer clears children / return value etc - it just resets
   call count and call args. It also calls reset on all children (and
   the return value if it is a mock).
-  
+
 Thanks to Konrad Delong, Kevin Dangoor and others for patches and suggestions.
 
 
 2007/12/03  Version 0.3.1
 -------------------------
 
-``patch`` maintains the name of decorated functions for compatibility with nose 
+``patch`` maintains the name of decorated functions for compatibility with nose
 test autodiscovery.
 
-Tests decorated with ``patch`` that use the two argument form (implicit mock 
+Tests decorated with ``patch`` that use the two argument form (implicit mock
 creation) will receive the mock(s) passed in as extra arguments.
 
 Thanks to Kevin Dangoor for these changes.

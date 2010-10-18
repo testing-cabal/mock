@@ -47,15 +47,15 @@ class TestMockingMagicMethods(unittest2.TestCase):
         mock.__getitem__ = mock
         self.assertTrue(mock.__getitem__ is mock)
 
-    
+
     def testMagicMethodsIsolatedBetweenMocks(self):
         mock1 = Mock()
         mock2 = Mock()
-        
+
         mock1.__iter__ = Mock(return_value=iter([]))
         self.assertEqual(list(mock1), [])
         self.assertRaises(TypeError, lambda: list(mock2))
-        
+
     def testRepr(self):
         mock = Mock()
         self.assertEqual(repr(mock), object.__repr__(mock))
@@ -269,31 +269,40 @@ class TestMockingMagicMethods(unittest2.TestCase):
         mock.__cmp__ = lambda s, o: 0
 
         self.assertEqual(mock, object())
-    
+
     def testMagicMethodsAndSpec(self):
         class Iterable(object):
             def __iter__(self):
                 pass
-        
+
         mock = Mock(spec=Iterable)
         self.assertRaises(AttributeError, lambda: mock.__iter__)
-        
+
         mock.__iter__ = Mock(return_value=iter([]))
         self.assertEqual(list(mock), [])
-        
+
         class NonIterable(object):
             pass
         mock = Mock(spec=NonIterable)
         self.assertRaises(AttributeError, lambda: mock.__iter__)
-        
+
         def set_int():
             mock.__int__ = Mock(return_value=iter([]))
         self.assertRaises(AttributeError, set_int)
-        
+
         mock = MagicMock(spec=Iterable)
         self.assertEqual(list(mock), [])
         self.assertRaises(AttributeError, set_int)
-        
+
+
+    def testSettingUnsupportedMagicMethod(self):
+        mock = MagicMock()
+        def set_setattr():
+            mock.__setattr__ = lambda self, name: None
+        self.assertRaisesRegexp(AttributeError,
+            "Attempting to set unsupported magic method '__setattr__'.",
+            set_setattr
+        )
 
 
 if __name__ == '__main__':
