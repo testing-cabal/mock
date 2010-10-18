@@ -360,6 +360,12 @@ class Mock(object):
         return "<%s name=%r id='%s'>" % (type(self).__name__, name, id(self))
 
     def __setattr__(self, name, value):
+        if not 'method_calls' in self.__dict__:
+            # allow all attribute setting until initialisation is complete
+            return object.__setattr__(self, name, value)
+        if (self._methods is not None and name not in self._methods and name
+            not in _mock_attributes):
+            raise AttributeError("Mock object has no attribute '%s'" % name)
         if name in _unsupported_magics:
             msg = 'Attempting to set unsupported magic method %r.' % name
             raise AttributeError(msg)
@@ -763,6 +769,8 @@ _unsupported_magics = set([
     '__instancecheck__', '__subclasscheck__',
     '__del__'
 ])
+
+_mock_attributes = set(dir(Mock()))
 
 _calculate_return_value = {
     '__hash__': lambda self: object.__hash__(self),
