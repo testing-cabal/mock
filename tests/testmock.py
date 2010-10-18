@@ -4,7 +4,11 @@
 
 from tests.support import unittest2
 
+import copy
+import sys
+
 from mock import Mock, sentinel, DEFAULT
+
 
 try:
     unicode
@@ -52,7 +56,7 @@ class MockTest(unittest2.TestCase):
         mock = Mock(name='foo')
         self.assertIn('foo', repr(mock))
         self.assertIn("'%s'" % id(mock), repr(mock))
-        
+
         self.assertIn('foo.bar', repr(mock.bar))
         self.assertIn('mock.baz', repr(mock().baz))
 
@@ -315,19 +319,29 @@ class MockTest(unittest2.TestCase):
         mock = Mock()
         message = 'Not called'
         self.assertRaisesRegexp(AssertionError, message, mock.assert_called_with)
-    
+
     def testSpecClass(self):
         class X(object):
             pass
-        
+
         mock = Mock(spec=X)
         self.assertTrue(isinstance(mock, X))
 
         mock = Mock(spec=X())
         self.assertTrue(isinstance(mock, X))
-        
+
         self.assertIs(mock.__class__, X)
         self.assertEqual(Mock().__class__.__name__, 'Mock')
+
+
+    def testCopy(self):
+        current = sys.getrecursionlimit()
+        self.addCleanup(sys.setrecursionlimit, current)
+
+        sys.setrecursionlimit(sys.maxint)
+        # this segfaults without the fix in place
+        copy.copy(Mock())
+
 
 if __name__ == '__main__':
     unittest2.main()
