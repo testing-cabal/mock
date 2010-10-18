@@ -30,14 +30,14 @@ the first argument [#]_.
    >>> mock.__str__ = __str__
    >>> str(mock)
    'fooble'
-   
+
    >>> from mock import Mock
    >>> mock = Mock()
    >>> mock.__str__ = Mock()
    >>> mock.__str__.return_value = 'fooble'
    >>> str(mock)
    'fooble'
-   
+
    >>> from mock import Mock
    >>> mock = Mock()
    >>> mock.__iter__ = Mock(return_value=iter([]))
@@ -90,7 +90,7 @@ The full list of supported magic methods is:
 * Pickling: ``__reduce__``, ``__reduce_ex__``, ``__getinitargs__``,
   ``__getnewargs__``, ``__getstate__`` and ``__setstate__``
 
-  
+
 The following methods are supported in Python 2 but don't exist in Python 3:
 
 * ``__unicode__``, ``__long__``, ``__oct__``, ``__hex__`` and ``__nonzero__``
@@ -99,10 +99,12 @@ The following methods are supported in Python 3 but don't exist in Python 2:
 
 * ``__bool__`` and ``__next__``
 
-The following methods exist but are *not* supported as they either can't be
-dynamically set or can cause problems:
+The following methods exist but are *not* supported as they are either in use by
+mock, can't be set dynamically or can cause problems:
 
+* ``__getattr__``, ``__setattr__``, ``__init__`` and ``__new__``
 * ``__prepare__``, ``__instancecheck__``, ``__subclasscheck__``, ``__del__``
+
 
 
 Magic Mock
@@ -113,7 +115,7 @@ Magic Mock
    ``MagicMock`` is a subclass of :class:`Mock` with default implementations
    of most of the magic methods. You can use ``MagicMock`` without having to
    configure the magic methods yourself.
-   
+
    If you use the ``spec`` argument then *only* magic methods that exist in
    the spec will be created.
 
