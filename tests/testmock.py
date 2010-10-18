@@ -334,6 +334,17 @@ class MockTest(unittest2.TestCase):
         self.assertEqual(Mock().__class__.__name__, 'Mock')
 
 
+    def testSettingAttributeWithSpec(self):
+        class X(object):
+            pass
+
+        mock = Mock(spec=X)
+        def set_attr():
+            mock.x = 'foo'
+
+        self.assertRaises(AttributeError, set_attr)
+
+
     def testCopy(self):
         current = sys.getrecursionlimit()
         self.addCleanup(sys.setrecursionlimit, current)
