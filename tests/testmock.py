@@ -69,12 +69,27 @@ class MockTest(unittest2.TestCase):
         self.assertIn('mock.baz', repr(mock().baz))
 
 
-    def DONTtestReprWithSpec(self):
+    def testReprWithSpec(self):
         class X(object):
             pass
 
         mock = Mock(spec=X)
         self.assertIn("spec='X'", repr(mock))
+
+        mock = Mock(spec=X())
+        self.assertIn("spec='X'", repr(mock))
+
+        mock = Mock(spec=X, name='foo')
+        self.assertIn("spec='X'", repr(mock))
+
+        mock = Mock(name='foo')
+        self.assertNotIn("spec", repr(mock))
+
+        mock = Mock()
+        self.assertNotIn("spec", repr(mock))
+
+        mock = Mock(spec=['foo'])
+        self.assertNotIn("spec", repr(mock))
 
 
     def testSideEffect(self):
@@ -346,6 +361,7 @@ class MockTest(unittest2.TestCase):
         mock = Mock(side_effect=AttributeError('foo'))
         self.assertRaises(AttributeError, mock)
 
+
     def testBaseExceptionalSideEffect(self):
         mock = Mock(side_effect=KeyboardInterrupt)
         self.assertRaises(KeyboardInterrupt, mock)
@@ -353,10 +369,12 @@ class MockTest(unittest2.TestCase):
         mock = Mock(side_effect=KeyboardInterrupt('foo'))
         self.assertRaises(KeyboardInterrupt, mock)
 
+
     def testAssertCalledWithMessage(self):
         mock = Mock()
         message = 'Not called'
         self.assertRaisesRegexp(AssertionError, message, mock.assert_called_with)
+
 
     def testSpecClass(self):
         class X(object):

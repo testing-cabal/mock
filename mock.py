@@ -348,19 +348,28 @@ class Mock(object):
         return self._children[name]
 
     def __repr__(self):
-        if self._name is None:
+        if self._name is None and self._spec_class is None:
             return object.__repr__(self)
 
-        def get_name(name):
-            if name is None:
-                return 'mock'
-            return name
-        parent = self._parent
-        name = self._name
-        while parent is not None:
-            name = get_name(parent._name) + '.' + name
-            parent = parent._parent
-        return "<%s name=%r id='%s'>" % (type(self).__name__, name, id(self))
+        name_string = ''
+        spec_string = ''
+        if self._name is not None:
+            def get_name(name):
+                if name is None:
+                    return 'mock'
+                return name
+            parent = self._parent
+            name = self._name
+            while parent is not None:
+                name = get_name(parent._name) + '.' + name
+                parent = parent._parent
+            name_string = ' name=%r' % name
+        if self._spec_class is not None:
+            spec_string = ' spec=%r' % self._spec_class.__name__
+        return "<%s%s%s id='%s'>" % (type(self).__name__,
+                                      name_string,
+                                      spec_string,
+                                      id(self))
 
     def __setattr__(self, name, value):
         if not 'method_calls' in self.__dict__:
