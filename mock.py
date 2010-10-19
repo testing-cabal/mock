@@ -100,7 +100,8 @@ def _getsignature(func, skipfirst):
         assert '_mock_' not in varkwargs, _msg
     if skipfirst:
         regargs = regargs[1:]
-    signature = inspect.formatargspec(regargs, varargs, varkwargs, defaults, formatvalue=lambda value: "")
+    signature = inspect.formatargspec(regargs, varargs, varkwargs, defaults,
+                                      formatvalue=lambda value: "")
     return signature[1:-1], func
 
 
@@ -138,7 +139,9 @@ def mocksignature(func, mock=None, skipfirst=False):
     if mock is None:
         mock = Mock()
     signature, func = _getsignature(func, skipfirst)
-    src = "lambda %(signature)s: _mock_(%(signature)s)" % {'signature': signature}
+    src = "lambda %(signature)s: _mock_(%(signature)s)" % {
+        'signature': signature
+    }
 
     funcopy = eval(src, dict(_mock_=mock))
     _copy_func_details(func, funcopy)
@@ -396,7 +399,10 @@ class Mock(object):
         """
         if self.call_args is None:
             raise AssertionError('Expected: %s\nNot called' % ((args, kwargs),))
-        assert self.call_args == (args, kwargs), 'Expected: %s\nCalled with: %s' % ((args, kwargs), self.call_args)
+        if not self.call_args == (args, kwargs):
+            raise AssertionError(
+                'Expected: %s\nCalled with: %s' % ((args, kwargs), self.call_args)
+            )
 
 
 class callargs(tuple):
