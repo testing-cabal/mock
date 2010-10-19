@@ -1,15 +1,15 @@
-mock is a Python module that provides a core Mock class. It is intended to
-reduce the need for creating a host of trivial stubs throughout your test suite.
-After performing an action, you can make assertions about which methods /
-attributes were used and arguments they were called with. You can also specify
-return values and set needed attributes in the normal way.
+mock is a Python module that provides a core Mock class. It removes the need
+to create a host of stubs throughout your test suite. After performing an
+action, you can make assertions about which methods / attributes were used and
+arguments they were called with. You can also specify return values and set
+needed attributes in the normal way.
 
 mock is tested on Python versions 2.4-2.7 and Python 3.
 
 The mock module also provides utility functions / objects to assist with
 testing, particularly monkey patching.
 
-* `PDF documentation for 0.7.0b3 <http://www.voidspace.org.uk/downloads/mock-0.7.0b3.pdf>`_
+* `PDF documentation for 0.7.0b4 <http://www.voidspace.org.uk/downloads/mock-0.7.0b4.pdf>`_
 * `mock on google code (repository and issue tracker) <http://code.google.com/p/mock/>`_
 * `mock documentation <http://www.voidspace.org.uk/python/mock/>`_
 * `mock on PyPI <http://pypi.python.org/pypi/mock/>`_

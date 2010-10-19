@@ -42,6 +42,7 @@ CHANGELOG
 2010/XX/XX Version 0.7.0 beta 4
 -------------------------------
 
+* `assert_called_with` works with `python -OO`
 * Attempting to *set* an attribute on a class with a spec will raise an
   `AttributeError` if the spec doesn't have that attribute
 * Attempting to set an unsupported magic method now raises an `AttributeError`
