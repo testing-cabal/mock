@@ -61,6 +61,14 @@ class MockTest(unittest2.TestCase):
         self.assertIn('mock.baz', repr(mock().baz))
 
 
+    def DONTtestReprWithSpec(self):
+        class X(object):
+            pass
+
+        mock = Mock(spec=X)
+        self.assertIn("spec='X'", repr(mock))
+
+
     def testSideEffect(self):
         mock = Mock()
 
