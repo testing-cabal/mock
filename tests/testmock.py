@@ -74,13 +74,14 @@ class MockTest(unittest2.TestCase):
             pass
 
         mock = Mock(spec=X)
-        self.assertIn("spec='X'", repr(mock))
+        self.assertIn(" spec='X' ", repr(mock))
 
         mock = Mock(spec=X())
-        self.assertIn("spec='X'", repr(mock))
+        self.assertIn(" spec='X' ", repr(mock))
 
         mock = Mock(spec=X, name='foo')
-        self.assertIn("spec='X'", repr(mock))
+        self.assertIn(" spec='X' ", repr(mock))
+        self.assertIn(" name='foo' ", repr(mock))
 
         mock = Mock(name='foo')
         self.assertNotIn("spec", repr(mock))
