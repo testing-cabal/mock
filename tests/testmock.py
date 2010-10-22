@@ -221,6 +221,29 @@ class MockTest(unittest2.TestCase):
         mock.assert_called_with(1, 2, 3, a='fish', b='nothing')
 
 
+    def testAssertCalledOnceWith(self):
+        mock = Mock()
+        mock()
+
+        # Will raise an exception if it fails
+        mock.assert_called_once_with()
+
+        mock()
+        self.assertRaises(AssertionError, mock.assert_called_once_with)
+
+        mock.reset_mock()
+        self.assertRaises(AssertionError, mock.assert_called_once_with)
+
+        mock('foo', 'bar', baz=2)
+        mock.assert_called_once_with('foo', 'bar', baz=2)
+
+        mock.reset_mock()
+        mock('foo', 'bar', baz=2)
+        self.assertRaises(AssertionError, lambda:
+                          mock.assert_called_once_with('bob', 'bar', baz=2)
+        )
+
+
     def testAttributeAccessReturnsMocks(self):
         mock = Mock()
         something = mock.something

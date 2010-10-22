@@ -42,6 +42,7 @@ CHANGELOG
 2010/XX/XX Version 0.7.0 beta 4
 -------------------------------
 
+* Addition of `assert_called_once_with` method
 * repr of a mock with a spec includes the class name of the spec
 * `assert_called_with` works with `python -OO`
 * Attempting to *set* an attribute on a class with a spec will raise an
