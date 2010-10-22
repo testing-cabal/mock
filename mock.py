@@ -413,6 +413,13 @@ class Mock(object):
                 'Expected: %s\nCalled with: %s' % ((args, kwargs), self.call_args)
             )
 
+    def assert_called_once_with(self, *args, **kwargs):
+        if not self.call_count == 1:
+            msg = ("Expected to be called once. Called %s times." %
+                   self.call_count)
+            raise AssertionError(msg)
+        return self.assert_called_with(*args, **kwargs)
+
 
 class callargs(tuple):
     """
