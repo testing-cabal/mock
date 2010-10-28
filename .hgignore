@@ -1,0 +1,5 @@
+.*\.pyc
+html/
+mock\.egg-info/
+mock\.wpu
+\.tox/
