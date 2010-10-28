@@ -5,6 +5,7 @@
 import os
 import warnings
 
+from tests import support
 from tests.support import unittest2, apply, inPy3k, SomeClass, with_available
 
 if with_available:
@@ -595,6 +596,32 @@ class PatchTest(unittest2.TestCase):
         something.klass()
         self.assertEqual(something.static_dict('f00'), 'f00')
         something.klass_dict()
+
+
+    def DONTtestPatchSpecSet(self):
+        @patch('tests.testpatch.SomeClass', spec=SomeClass, spec_set=True)
+        def test(MockClass):
+            MockClass.z = 'foo'
+
+        self.assertRaises(AssertionError, test)
+
+        @patch.object(support, 'SomeClass', spec=SomeClass, spec_set=True)
+        def test(MockClass):
+            MockClass.z = 'foo'
+
+        self.assertRaises(AssertionError, test)
+        @patch('tests.testpatch.SomeClass', spec_set=True)
+        def test(MockClass):
+            MockClass.z = 'foo'
+
+        self.assertRaises(AssertionError, test)
+
+        @patch.object(support, 'SomeClass', spec_set=True)
+        def test(MockClass):
+            MockClass.z = 'foo'
+
+        self.assertRaises(AssertionError, test)
+
 
 
 if __name__ == '__main__':

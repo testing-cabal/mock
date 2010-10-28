@@ -419,6 +419,9 @@ class MockTest(unittest2.TestCase):
             pass
 
         mock = Mock(spec=X)
+        mock.x = 'foo'
+
+        mock = Mock(spec=X, spec_set=True)
         def set_attr():
             mock.x = 'foo'
 

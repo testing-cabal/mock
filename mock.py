@@ -25,6 +25,9 @@ __all__ = (
 
 __version__ = '0.7.0b4'
 
+__unittest = True
+
+
 import sys
 import warnings
 
@@ -245,7 +248,7 @@ class Mock(object):
         return object.__new__(new)
 
     def __init__(self, spec=None, side_effect=None, return_value=DEFAULT,
-                 wraps=None, name=None, parent=None):
+                 wraps=None, name=None, spec_set=False, parent=None):
         self._parent = parent
         self._name = name
         _spec_class = None
@@ -257,6 +260,7 @@ class Mock(object):
             spec = dir(spec)
 
         self._spec_class = _spec_class
+        self._spec_set = spec_set
         self._methods = spec
         self._children = {}
         self._return_value = return_value
@@ -286,7 +290,7 @@ class Mock(object):
 
     def __get_return_value(self):
         if self._return_value is DEFAULT:
-            self._return_value = Mock()
+            self._return_value = self._get_child_mock()
         return self._return_value
 
     def __set_return_value(self, value):
@@ -343,7 +347,7 @@ class Mock(object):
             wraps = None
             if self._wraps is not None:
                 wraps = getattr(self._wraps, name)
-            self._children[name] = Mock(parent=self, name=name, wraps=wraps)
+            self._children[name] = self._get_child_mock(parent=self, name=name, wraps=wraps)
 
         return self._children[name]
 
@@ -375,8 +379,9 @@ class Mock(object):
         if not 'method_calls' in self.__dict__:
             # allow all attribute setting until initialisation is complete
             return object.__setattr__(self, name, value)
-        if (self._methods is not None and name not in self._methods and name
-            not in self.__dict__ and name != 'return_value'):
+        if (self._spec_set and self._methods is not None and name not in
+            self._methods and name not in self.__dict__ and
+            name != 'return_value'):
             raise AttributeError("Mock object has no attribute '%s'" % name)
         if name in _unsupported_magics:
             msg = 'Attempting to set unsupported magic method %r.' % name
@@ -394,10 +399,12 @@ class Mock(object):
                 setattr(type(self), name, value)
         return object.__setattr__(self, name, value)
 
+
     def __delattr__(self, name):
         if name in _all_magics and name in type(self).__dict__:
             delattr(type(self), name)
         return object.__delattr__(self, name)
+
 
     def assert_called_with(self, *args, **kwargs):
         """
@@ -413,12 +420,19 @@ class Mock(object):
                 'Expected: %s\nCalled with: %s' % ((args, kwargs), self.call_args)
             )
 
+
     def assert_called_once_with(self, *args, **kwargs):
         if not self.call_count == 1:
             msg = ("Expected to be called once. Called %s times." %
                    self.call_count)
             raise AssertionError(msg)
         return self.assert_called_with(*args, **kwargs)
+
+
+    def _get_child_mock(self, **kw):
+        klass = type(self).__mro__[1]
+        return klass(**kw)
+
 
 
 class callargs(tuple):
@@ -477,7 +491,8 @@ def _importer(target):
 
 
 class _patch(object):
-    def __init__(self, target, attribute, new, spec, create, mocksignature):
+    def __init__(self, target, attribute, new, spec, create,
+                    mocksignature, spec_set):
         self.target = target
         self.attribute = attribute
         self.new = new
@@ -485,11 +500,12 @@ class _patch(object):
         self.create = create
         self.has_local = False
         self.mocksignature = mocksignature
+        self.spec_set = spec_set
 
 
     def copy(self):
-        return _patch(self.target, self.attribute, self.new,
-                      self.spec, self.create, self.mocksignature)
+        return _patch(self.target, self.attribute, self.new, self.spec,
+                        self.create, self.mocksignature, self.spec_set)
 
 
     def __call__(self, func):
@@ -551,19 +567,20 @@ class _patch(object):
 
 
     def __enter__(self):
-        new, spec, = self.new, self.spec
+        new, spec, spec_set = self.new, self.spec, self.spec_set
         original = self.get_original()
         if new is DEFAULT:
             # XXXX what if original is DEFAULT - shouldn't use it as a spec
             inherit = False
-            if spec == True:
+            if spec == True or spec_set == True:
                 # set spec to the object we are replacing
-                spec = original
+                if spec in (True, False):
+                    spec = original
                 if isinstance(spec, class_types):
                     inherit = True
-            new = Mock(spec=spec)
+            new = Mock(spec=spec, spec_set=spec_set)
             if inherit:
-                new.return_value = Mock(spec=spec)
+                new.return_value = Mock(spec=spec, spec_set=spec_set)
         new_attr = new
         if self.mocksignature:
             new_attr = mocksignature(original, new)
@@ -581,7 +598,8 @@ class _patch(object):
         del self.temp_original
 
 
-def _patch_object(target, attribute, new=DEFAULT, spec=None, create=False, mocksignature=False):
+def _patch_object(target, attribute, new=DEFAULT, spec=None,
+                      create=False, mocksignature=False, spec_set=False):
     """
     patch.object(target, attribute, new=DEFAULT, spec=None, create=False, mocksignature=False)
 
@@ -591,14 +609,16 @@ def _patch_object(target, attribute, new=DEFAULT, spec=None, create=False, mocks
     Arguments new, spec, create and mocksignature have the same meaning as for
     patch.
     """
-    return _patch(target, attribute, new, spec, create, mocksignature)
+    return _patch(target, attribute, new, spec, create, mocksignature,
+                    spec_set)
 
 def patch_object(*args, **kwargs):
     "A deprecated form of patch.object(...)"
     warnings.warn(('Please use patch.object instead.'), DeprecationWarning, 2)
     return _patch_object(*args, **kwargs)
 
-def patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False):
+def patch(target, new=DEFAULT, spec=None, create=False,
+            mocksignature=False, spec_set=False):
     """
     patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False)
 
@@ -633,7 +653,8 @@ def patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False):
     except (TypeError, ValueError):
         raise TypeError("Need a valid target to patch. You supplied: %r" % (target,))
     target = _importer(target)
-    return _patch(target, attribute, new, spec, create, mocksignature)
+    return _patch(target, attribute, new, spec, create, mocksignature,
+                    spec_set)
 
 class _patch_dict(object):
     """
