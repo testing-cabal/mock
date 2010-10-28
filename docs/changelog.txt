@@ -45,8 +45,10 @@ CHANGELOG
 * Addition of `assert_called_once_with` method
 * repr of a mock with a spec includes the class name of the spec
 * `assert_called_with` works with `python -OO`
-* Attempting to *set* an attribute on a class with a spec will raise an
-  `AttributeError` if the spec doesn't have that attribute
+* New `spec_set` keyword argument to `Mock` and `patch`. If this is set,
+  attempting to *set* an attribute on a mock not on the spec will raise an
+  `AttributeError`
+* Attributes and return value of a `MagicMock` are `MagicMock` objects
 * Attempting to set an unsupported magic method now raises an `AttributeError`
 * BUGFIX: mocks are now copyable (thanks to Ned Batchelder for reporting and
   diagnosing this)

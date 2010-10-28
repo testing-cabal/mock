@@ -305,5 +305,19 @@ class TestMockingMagicMethods(unittest2.TestCase):
         )
 
 
+    def testAttributesAndReturnValue(self):
+        mock = MagicMock()
+        attr = mock.foo
+        def _get_type(obj):
+            # the type of every mock (or magicmock) is a custom subclass
+            # so the real type is the second in the mro
+            return type(obj).__mro__[1]
+        self.assertEqual(_get_type(attr), MagicMock)
+
+        returned = mock()
+        self.assertEqual(_get_type(returned), MagicMock)
+
+
+
 if __name__ == '__main__':
     unittest2.main()
