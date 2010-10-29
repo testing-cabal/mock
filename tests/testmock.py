@@ -416,7 +416,7 @@ class MockTest(unittest2.TestCase):
 
     def testSettingAttributeWithSpec(self):
         class X(object):
-            pass
+            y = 3
 
         mock = Mock(spec=X)
         mock.x = 'foo'
@@ -425,6 +425,11 @@ class MockTest(unittest2.TestCase):
         def set_attr():
             mock.x = 'foo'
 
+        mock.y = 'foo'
+        self.assertRaises(AttributeError, set_attr)
+
+        mock = Mock(spec_set=X)
+        mock.y = 'foo'
         self.assertRaises(AttributeError, set_attr)
 
 
