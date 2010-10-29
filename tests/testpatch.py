@@ -598,30 +598,38 @@ class PatchTest(unittest2.TestCase):
         something.klass_dict()
 
 
-    def DONTtestPatchSpecSet(self):
+    def testPatchSpecSet(self):
         @patch('tests.testpatch.SomeClass', spec=SomeClass, spec_set=True)
         def test(MockClass):
             MockClass.z = 'foo'
 
-        self.assertRaises(AssertionError, test)
+        self.assertRaises(AttributeError, test)
 
         @patch.object(support, 'SomeClass', spec=SomeClass, spec_set=True)
         def test(MockClass):
             MockClass.z = 'foo'
 
-        self.assertRaises(AssertionError, test)
+        self.assertRaises(AttributeError, test)
         @patch('tests.testpatch.SomeClass', spec_set=True)
         def test(MockClass):
             MockClass.z = 'foo'
 
-        self.assertRaises(AssertionError, test)
+        self.assertRaises(AttributeError, test)
 
         @patch.object(support, 'SomeClass', spec_set=True)
         def test(MockClass):
             MockClass.z = 'foo'
 
-        self.assertRaises(AssertionError, test)
+        self.assertRaises(AttributeError, test)
 
+
+    def testSpecSetInherit(self):
+        @patch('tests.testpatch.SomeClass', spec_set=True)
+        def test(MockClass):
+            instance = MockClass()
+            instance.z = 'foo'
+
+        self.assertRaises(AttributeError, test)
 
 
 if __name__ == '__main__':
