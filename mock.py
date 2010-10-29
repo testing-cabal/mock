@@ -576,14 +576,14 @@ class _patch(object):
         if new is DEFAULT:
             # XXXX what if original is DEFAULT - shouldn't use it as a spec
             inherit = False
-            if spec == True:
+            if spec_set == True:
+                spec_set = original
+                if isinstance(spec_set, class_types):
+                    inherit = True
+            elif spec == True:
                 # set spec to the object we are replacing
                 spec = original
                 if isinstance(spec, class_types):
-                    inherit = True
-            elif spec_set == True:
-                spec_set = original
-                if isinstance(spec_set, class_types):
                     inherit = True
             new = Mock(spec=spec, spec_set=spec_set)
             if inherit:
