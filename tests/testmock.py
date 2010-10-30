@@ -419,6 +419,12 @@ class MockTest(unittest2.TestCase):
         self.assertIs(mock.__class__, X)
         self.assertEqual(Mock().__class__.__name__, 'Mock')
 
+        mock = Mock(spec_set=X)
+        self.assertTrue(isinstance(mock, X))
+
+        mock = Mock(spec_set=X())
+        self.assertTrue(isinstance(mock, X))
+
 
     def testSettingAttributeWithSpec(self):
         class X(object):
