@@ -12,6 +12,7 @@
 # serve to show the default value.
 
 import sys, os
+from mock import __version__
 
 # If your extensions are in another directory, add it here. If the directory
 # is relative to the documentation root, use os.path.abspath to make it
@@ -23,7 +24,10 @@ import sys, os
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.doctest']
+extensions = ['sphinx.ext.doctest', 'sphinx.ext.autodoc']
+
+html_theme = 'default'
+html_theme_options = {}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['.templates']
@@ -36,15 +40,15 @@ master_doc = 'index'
 
 # General substitutions.
 project = u'Mock'
-copyright = u'2009-2010, Michael Foord & the mock team'
+copyright = u'2007-2010, Michael Foord & the mock team'
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '0.7.0b4'
+version = __version__[:3]
 # The full version, including alpha/beta/rc tags.
-release = '0.7.0b4'
+release = __version__
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
