@@ -15,102 +15,40 @@ statements.
 patch
 =====
 
-.. function:: patch(target, new=None, spec=None, create=False, mocksignature=False)
-
-``patch`` acts as a function decorator or a context manager. Inside the body
-of the function or with statement, the ``target`` (specified in the form
-'PackageName.ModuleName.ClassName') is patched with a ``new`` object. When the
-function/with statement exits the patch is undone.
-
-The target is imported and the specified attribute patched with the new object
-- so it must be importable from the environment you are calling the decorator
-from.
-
-If ``new`` is omitted, then a new ``Mock`` is created and passed in as an
-extra argument to the decorated function::
-
-   @patch('Package.ModuleName.ClassName')
-   def test_something(self, MockClass):
-       "test something"
+.. autofunction:: patch
 
 .. note::
 
     Patching a class replaces the class with a Mock *instance*. If the class
     is instantiated in the code under test then it will be the `return_value`
     of the mock that will be used.
-    
+
     If the class is instantiated multiple times you could use
     :attr:`Mock.side_effect` to return a new mock each time. Alternatively you
     can set the `return_value` to be anything you want.
-    
+
     To configure return values on methods of *instances* on the patched class
     you must do this on the `return_value`. For example::
-    
+
         @patch('module.Class')
         def test(MockClass):
             instance = MockClass.return_value
             instance.method.return_value = 'foo'
 
-The ``spec`` keyword argument is passed to the ``Mock`` if patch is creating
-one for you.
 
-In addition you can pass ``spec=True``, which causes patch to pass in the
-object being mocked as the spec object. If you are using patch to mock out a
-class, then the object you are interested in will probably be the return value
-of the Mock (the instance it returns when called). Because of this, if you use
-'spec=True' and are patching a class (and having patch create a Mock for you)
-then the object being patched will be used as a spec for both the Mock *and*
-its return value.
-
-If ``mocksignature`` is True then the patch will be done with a function
-created by mocking the one being replaced. If the object being replaced is
-a class then the signature of `__init__` will be copied. If the object
-being replaced is a callable object then the signature of `__call__` will
-be copied.
-
-Using the class as a spec object for the created Mock (and return value) means
-that the Mock will raise an exception if the code attempts to access any
-attributes that don't exist. ::
-
-    @patch('Package.ModuleName.ClassName', spec=True)
-    def test_something(self, MockClass):
-        instance = ClassName()
-        self.assertRaises(AttributeError, lambda: instance.fake_attribute)
-
-Patch can be used with the with statement - if this is available in your
-version of Python. Here the patching applies to the indented block after the
-with statement. Note that the patched object can always appear after the "as"
-- even if an object to be patched was specified, though it can be omitted. ::
-
-    with patch('Package.ModuleName.ClassName', spec=True) as MockClass:
-        instance = ClassName()
-        self.assertRaises(AttributeError, lambda: instance.fake_attribute)
-
-
-By default ``patch`` will fail to replace attributes that don't exist. If you
-pass in 'create=True' and the attribute doesn't exist, patch will create the
-attribute for you when the patched function is called, and delete it again
-afterwards. This is useful for writing tests against attributes that your
-production code creates at runtime. It is off by by default because it can be
-dangerous. With it switched on you can write passing tests against APIs that
-don't actually exist!
-
-Patch can be also used as a TestCase class decorator. It works by decorating each test method in the class. This reduces the boilerplate code when your test methods share a common patchings set. ::
-
-  @patch('Patch.ModuleName.ClassName')
-  class SomeTest(unittest.TestCase):
-      def test_something(self, MockClass):
-          "test something"
 
 patch.object
 ============
 
-.. function:: patch.object(target, attribute, new=None, spec=None, create=False)
+.. function:: patch.object(target, attribute, new=DEFAULT, spec=None, create=False, mocksignature=False, spec_set=None)
 
-    ``patch.object`` patches named members on objects - usually class or
-    module objects.
+    patch the named member (`attribute`) on an object (`target`) with a mock
+    object.
 
-You can either call it with three arguments or two arguments. The three
+    Arguments new, spec, create, mocksignature and spec_set have the same
+    meaning as for patch.
+
+You can either call `patch.object` with three arguments or two arguments. The three
 argument form takes the object to be patched, the attribute name and the
 object to replace the attribute with.
 
@@ -121,8 +59,8 @@ function::
     @patch.object(SomeClass, 'classmethod')
     def test_something(self, mockMethod):
         SomeClass.classmethod(3)
-        
-        mockMethod.assert_called_with(3) 
+
+        mockMethod.assert_called_with(3)
 
 ``spec`` and ``create`` have the same meaning as for the patch decorator.
 
@@ -134,7 +72,7 @@ patch_object
 ============
 
 .. deprecated:: 0.7
-   This is the same as ``patch.object``. Use the renamed version now.
+   This is the same as ``patch.object``. Use the renamed version.
 
 
 patch.dict
@@ -144,20 +82,20 @@ patch.dict
 
     Patch a dictionary and restore the dictionary to its original state after
     the test.
-    
-    `in_dict` can be a dictionary or a mapping like container. If it is a 
+
+    `in_dict` can be a dictionary or a mapping like container. If it is a
     mapping then it must at least support getting, setting and deleting items
     plus iterating over keys.
 
     `in_dict` can also be a string specifying the name of the dictionary, which
     will then be fetched by importing it.
-    
+
     `values` can be a dictionary of values to set in the dictionary. `values`
     can also be an iterable of ``(key, value)`` pairs.
-    
+
     If `clear` is True then the dictionary will be cleared before the new
     values are set.
-    
+
 Like :func:`patch` and :func:`patch.object` ``patch.dict`` can be used as a
 decorator or a context manager. It can be used to add members to a dictionary,
 or simply let a test change a dictionary, and ensure the dictionary is restored
@@ -198,10 +136,10 @@ You can stack up multiple patch decorators using this pattern::
 
 
 Like all context-managers patches can be nested using contextlib's nested
-function - *every* patching will appear in the tuple after "as". ::
+function; *every* patching will appear in the tuple after "as"::
 
      from contextlib import nested
-     with nested(patch('Package.ModuleName.ClassName'), 
+     with nested(patch('Package.ModuleName.ClassName'),
                  patch('Package.ModuleName.ClassName2', TestUtils.MockClass2)) as (MockClass1, MockClass2):
           instance = ClassName(ClassName2())
           self.assertEqual(instance.f(), "expected")
