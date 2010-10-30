@@ -426,7 +426,7 @@ class Mock(object):
         """
         assert that the mock was called with the specified arguments.
 
-        Raises an AttributeError if the args and keyword args passed in are
+        Raises an AssertionError if the args and keyword args passed in are
         different to the last call to the mock.
         """
         if self.call_args is None:
@@ -438,6 +438,10 @@ class Mock(object):
 
 
     def assert_called_once_with(self, *args, **kwargs):
+        """
+        assert that the mock was called exactly once and with the specified
+        arguments.
+        """
         if not self.call_count == 1:
             msg = ("Expected to be called once. Called %s times." %
                    self.call_count)
@@ -645,16 +649,14 @@ def patch_object(*args, **kwargs):
 def patch(target, new=DEFAULT, spec=None, create=False,
             mocksignature=False, spec_set=None):
     """
-    patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False,
-          spec_set=None)
-
-    ``patch`` acts as a function decorator or a context manager. Inside the
-    body of the function or with statement, the ``target`` (specified in the
-    form 'PackageName.ModuleName.ClassName') is patched with a ``new`` object.
-    When the function/with statement exits the patch is undone.
+    ``patch`` acts as a function decorator, class decorator or a context
+    manager. Inside the body of the function or with statement, the ``target``
+    (specified in the form `'PackageName.ModuleName.ClassName'`) is patched
+    with a ``new`` object. When the function/with statement exits the patch is
+    undone.
 
     The target is imported and the specified attribute patched with the new
-    object - so it must be importable from the environment you are calling the
+    object, so it must be importable from the environment you are calling the
     decorator from.
 
     If ``new`` is omitted, then a new ``Mock`` is created and passed in as an
@@ -672,7 +674,25 @@ def patch(target, new=DEFAULT, spec=None, create=False,
     being replaced is a callable object then the signature of `__call__` will
     be copied.
 
-    patch.dict(...) and patch.object(...) are available for alternate
+    By default ``patch`` will fail to replace attributes that don't exist. If
+    you pass in 'create=True' and the attribute doesn't exist, patch will
+    create the attribute for you when the patched function is called, and
+    delete it again afterwards. This is useful for writing tests against
+    attributes that your production code creates at runtime. It is off by by
+    default because it can be dangerous. With it switched on you can write
+    passing tests against APIs that don't actually exist!
+
+    Patch can be used as a TestCase class decorator. It works by
+    decorating each test method in the class. This reduces the boilerplate
+    code when your test methods share a common patchings set.
+
+    Patch can be used with the with statement, if this is available in your
+    version of Python. Here the patching applies to the indented block after
+    the with statement. If you use "as" then the patched object will be bound
+    to the name after the "as"; very useful if `patch` is creating a mock
+    object for you.
+
+    `patch.dict(...)` and `patch.object(...)` are available for alternate
     use-cases.
     """
     try:
@@ -686,8 +706,6 @@ def patch(target, new=DEFAULT, spec=None, create=False,
 
 class _patch_dict(object):
     """
-    patch.dict(in_dict, values=(), clear=False)
-
     Patch a dictionary and restore the dictionary to its original state after
     the test.
 
