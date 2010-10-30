@@ -181,9 +181,11 @@ sentinel = Sentinel()
 
 DEFAULT = sentinel.DEFAULT
 
+
 class OldStyleClass:
     pass
 ClassType = type(OldStyleClass)
+
 
 def _copy(value):
     if type(value) in (dict, list, tuple, set):
@@ -251,6 +253,7 @@ class Mock(object):
         new = type(cls.__name__, (cls,), {'__doc__': cls.__doc__})
         return object.__new__(new)
 
+
     def __init__(self, spec=None, side_effect=None, return_value=DEFAULT,
                  wraps=None, name=None, spec_set=False, parent=None):
         self._parent = parent
@@ -277,11 +280,13 @@ class Mock(object):
 
         self.reset_mock()
 
+
     @property
     def __class__(self):
         if self._spec_class is None:
             return type(self)
         return self._spec_class
+
 
     def reset_mock(self):
         "Restore the mock object to its initial state."
@@ -359,6 +364,7 @@ class Mock(object):
 
         return self._children[name]
 
+
     def __repr__(self):
         if self._name is None and self._spec_class is None:
             return object.__repr__(self)
@@ -385,6 +391,7 @@ class Mock(object):
                                       name_string,
                                       spec_string,
                                       id(self))
+
 
     def __setattr__(self, name, value):
         if not 'method_calls' in self.__dict__:
@@ -482,6 +489,7 @@ class callargs(tuple):
 
         return tuple(args_kwargs) == (other_args, other_kwargs)
 
+
 def _dot_lookup(thing, comp, import_path):
     try:
         return getattr(thing, comp)
@@ -525,12 +533,14 @@ class _patch(object):
         else:
             return self.decorate_callable(func)
 
+
     def decorate_class(self, klass):
         for attr in dir(klass):
             attr_value = getattr(klass, attr)
             if attr.startswith("test") and hasattr(attr_value, "__call__"):
                 setattr(klass, attr, self.copy()(attr_value))
         return klass
+
 
     def decorate_callable(self, func):
         if hasattr(func, 'patchings'):
