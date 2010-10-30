@@ -201,7 +201,8 @@ else:
 
 class Mock(object):
     """
-    Mock(spec=None, side_effect=None, return_value=DEFAULT, wraps=None, name=None)
+    Mock(spec=None, side_effect=None, return_value=DEFAULT, wraps=None,
+         name=None, spec_set=None)
 
     Create a new ``Mock`` object. ``Mock`` takes several optional arguments
     that specify the behaviour of the Mock object:
@@ -255,11 +256,11 @@ class Mock(object):
 
 
     def __init__(self, spec=None, side_effect=None, return_value=DEFAULT,
-                 wraps=None, name=None, spec_set=False, parent=None):
+                    wraps=None, name=None, spec_set=None, parent=None):
         self._parent = parent
         self._name = name
         _spec_class = None
-        if spec_set not in (True, False):
+        if spec_set is not None:
             spec = spec_set
             spec_set = True
 
@@ -623,10 +624,10 @@ class _patch(object):
 
 
 def _patch_object(target, attribute, new=DEFAULT, spec=None,
-                      create=False, mocksignature=False, spec_set=False):
+                      create=False, mocksignature=False, spec_set=None):
     """
     patch.object(target, attribute, new=DEFAULT, spec=None, create=False,
-                 mocksignature=False, spec_set=False)
+                 mocksignature=False, spec_set=None)
 
     patch the named member (`attribute`) on an object (`target`) with a mock
     object.
@@ -645,10 +646,10 @@ def patch_object(*args, **kwargs):
 
 
 def patch(target, new=DEFAULT, spec=None, create=False,
-            mocksignature=False, spec_set=False):
+            mocksignature=False, spec_set=None):
     """
     patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False,
-          spec_set=False)
+          spec_set=None)
 
     ``patch`` acts as a function decorator or a context manager. Inside the
     body of the function or with statement, the ``target`` (specified in the
