@@ -270,6 +270,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
 
         self.assertEqual(mock, object())
 
+
     def testMagicMethodsAndSpec(self):
         class Iterable(object):
             def __iter__(self):
@@ -291,6 +292,31 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertRaises(AttributeError, set_int)
 
         mock = MagicMock(spec=Iterable)
+        self.assertEqual(list(mock), [])
+        self.assertRaises(AttributeError, set_int)
+
+
+    def testMagicMethodsAndSpecSet(self):
+        class Iterable(object):
+            def __iter__(self):
+                pass
+
+        mock = Mock(spec_set=Iterable)
+        self.assertRaises(AttributeError, lambda: mock.__iter__)
+
+        mock.__iter__ = Mock(return_value=iter([]))
+        self.assertEqual(list(mock), [])
+
+        class NonIterable(object):
+            pass
+        mock = Mock(spec_set=NonIterable)
+        self.assertRaises(AttributeError, lambda: mock.__iter__)
+
+        def set_int():
+            mock.__int__ = Mock(return_value=iter([]))
+        self.assertRaises(AttributeError, set_int)
+
+        mock = MagicMock(spec_set=Iterable)
         self.assertEqual(list(mock), [])
         self.assertRaises(AttributeError, set_int)
 
