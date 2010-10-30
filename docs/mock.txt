@@ -20,57 +20,13 @@ assertions about what your code has done to them.
 The :func:`mock.patch` decorators makes it easy to temporarily replace classes
 in a particular module with a Mock object.
 
+.. index:: side_effect
+.. index:: return_value
+.. index:: wraps
+.. index:: name
+.. index:: spec
 
-.. class:: Mock(spec=None, side_effect=None, return_value=DEFAULT, wraps=None, name=None)
-
-    Create a new ``Mock`` object. ``Mock`` takes several optional arguments
-    that specify the behaviour of the Mock object:
-
-    .. index:: spec
-    
-    * ``spec``: This can be either a list of strings or an existing object (a
-      class or instance) that acts as the specification for the mock object. If
-      you pass in an object then a list of strings is formed by calling dir on
-      the object (excluding magic methods and attributes). Accessing
-      any attribute not in this list will raise an ``AttributeError``.
-
-      If ``spec`` is an object (rather than a list of strings) then
-      `mock.__class__` returns the class of the spec object. This allows mocks
-      to pass `isinstance` tests.
-    
-    .. index:: side_effect
-
-    * ``side_effect``: A function to be called whenever the Mock is called. See 
-      the :attr:`Mock.side_effect` attribute. Useful for raising exceptions or 
-      dynamically changing return values. The function is called with the same 
-      arguments as the mock, and unless it returns :data:`DEFAULT`, the return 
-      value of this function is used as the return value.
-      
-      Alternatively ``side_effect`` can be an exception class or instance. In
-      this case the exception will be raised when the mock is called.
-
-    .. index:: return_value
-
-    * ``return_value``: The value returned when the mock is called. By default
-      this is a new Mock (created on first access). See the
-      :attr:`Mock.return_value` attribute.
-
-    .. index:: wraps
-
-    * ``wraps``: Item for the mock object to wrap. If ``wraps`` is not None
-      then calling the Mock will pass the call through to the wrapped object
-      (returning the real result and ignoring ``return_value``). Attribute
-      access on the mock will return a Mock object that wraps the corresponding
-      attribute of the wrapped object (so attempting to access an attribute that
-      doesn't exist will raise an ``AttributeError``).
-        
-      If the mock has an explicit ``return_value`` set then calls are not passed
-      to the wrapped object and the ``return_value`` is returned instead.
-
-    .. index:: name
-
-    * ``name``: If the mock has a name then it will be used in the repr of the
-      mock. This can be useful for debugging.
+.. autoclass:: Mock
 
 Methods
 =======
@@ -81,7 +37,7 @@ Methods
     particular way:
 
     .. doctest::
-    
+
         >>> mock = Mock()
         >>> mock.method(1, 2, 3, test='wow')
         <mock.Mock object at 0x...>
@@ -91,7 +47,7 @@ Methods
 .. method:: Mock.reset_mock()
 
     The reset_mock method resets all the call attributes on a mock object:
-    
+
     .. doctest::
 
         >>> mock = Mock(return_value=None)
@@ -156,8 +112,8 @@ Attributes
         >>> mock()
         >>> mock.call_count
         2
-        
-        
+
+
 .. attribute:: Mock.return_value
 
     Set this to configure the value returned by calling the mock:
@@ -168,10 +124,10 @@ Attributes
         >>> mock.return_value = 'fish'
         >>> mock()
         'fish'
-    
+
     The default return value is a mock object and you can configure it in the
     normal way:
-    
+
     .. doctest::
 
         >>> mock = Mock()
@@ -186,15 +142,15 @@ Attributes
 
     This can either be a function to be called when the mock is called, or an
     exception (class or instance) to be raised.
-    
+
     If you pass in a function it will be called with same arguments as the mock
     and unless the mock returns the :data:`DEFAULT` singleton the mock will return
     whatever the function returns. If the function returns default then the
     mock will return its normal value (from the :attr:`Mock.return_value`.
-    
+
     An example of a mock that raises an exception (to test exception handling of
     an API):
-    
+
     .. doctest::
 
         >>> mock = Mock()
@@ -205,14 +161,14 @@ Attributes
         Exception: Boom!
 
     Using ``side_effect`` to return a sequence of values:
-    
+
     .. doctest::
 
         >>> mock = Mock()
         >>> results = [1, 2, 3]
         >>> def side_effect(*args, **kwargs):
         ...     return results.pop()
-        ... 
+        ...
         >>> mock.side_effect = side_effect
         >>> mock(), mock(), mock()
         (3, 2, 1)
@@ -222,14 +178,14 @@ Attributes
     whatever it returns is used as the return value for the call. The
     exception is if it returns :data:`DEFAULT`, in which case the normal
     :attr:`Mock.return_value` is used.
-    
+
     .. doctest::
 
         >>> from mock import Mock, DEFAULT
         >>> mock = Mock(return_value=3)
         >>> def side_effect(*args, **kwargs):
         ...     return DEFAULT
-        ... 
+        ...
         >>> mock.side_effect = side_effect
         >>> mock()
         3
@@ -241,7 +197,7 @@ Attributes
     the first member is any ordered arguments the mock was called with (or an
     empty tuple) and the second member is any keyword arguments (or an empty
     dictionary).
-    
+
     .. doctest::
 
         >>> mock = Mock(return_value=None)
@@ -263,7 +219,7 @@ Attributes
 
     The tuple is lenient when comparing against tuples with empty
     elements skipped. This can make tests less verbose:
-    
+
     .. doctest::
 
         >>> mock = Mock(return_value=None)
@@ -277,7 +233,7 @@ Attributes
     the length of the list is the number of times it has been called). Before
     any calls have been made it is an empty list. Its elements compare
     "softly" when positional arguments or keyword arguments are skipped:
-    
+
     .. doctest::
 
         >>> mock = Mock(return_value=None)
@@ -295,7 +251,7 @@ Attributes
 
     As well as tracking calls to themselves, mocks also track calls to methods
     and attributes, and *their* methods and attributes:
-    
+
     .. doctest::
 
         >>> mock = Mock()

@@ -4,7 +4,7 @@
 
 :Author: `Michael Foord <http://www.voidspace.org.uk/python/weblog/index.shtml>`_
 :Co-maintainer: `Konrad Delong <http://konryd.blogspot.com/>`_
-:Version: Mock 0.7.0 beta 4
+:Version: |release|
 :Date: 2010/09/18
 :Homepage: `Mock Homepage`_
 :Download: `Mock on PyPI`_
@@ -83,22 +83,22 @@ User Guide
 Installing
 ==========
 
-The current version is **0.7.0b3**, dated 2010/09/18. Mock is still
+The current version is |release|, dated 2010/10/30. Mock is still
 experimental; the API may change (although we are moving towards a 1.0 release
 when the API will stabilise). If you find bugs or have suggestions for
 improvements / extensions then please contact us.
 
 * `mock on PyPI <http://pypi.python.org/pypi/mock>`_
-* `mock documentation as PDF <http://www.voidspace.org.uk/downloads/mock-0.7.0b3.pdf>`_
-* `Google Code Home & Subversion Repository <http://code.google.com/p/mock/>`_
+* `mock documentation as PDF <http://www.voidspace.org.uk/downloads/mock-0.7.0b4.pdf>`_
+* `Google Code Home & Mercurial Repository <http://code.google.com/p/mock/>`_
 
 .. index:: repository
-.. index:: svn
+.. index:: hg
 
-You can checkout the latest development version from the Google Code Subversion
+You can checkout the latest development version from the Google Code Mercurial
 repository with the following command:
 
-    ``svn checkout http://mock.googlecode.com/svn/trunk/ mock-read-only``
+    ``hg clone https://mock.googlecode.com/hg/ mock``
 
 
 .. index:: pip

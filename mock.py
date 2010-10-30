@@ -201,9 +201,6 @@ else:
 
 class Mock(object):
     """
-    Mock(spec=None, side_effect=None, return_value=DEFAULT, wraps=None,
-         name=None, spec_set=None)
-
     Create a new ``Mock`` object. ``Mock`` takes several optional arguments
     that specify the behaviour of the Mock object:
 
