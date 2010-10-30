@@ -214,6 +214,10 @@ class Mock(object):
       `mock.__class__` returns the class of the spec object. This allows mocks
       to pass `isinstance` tests.
 
+    * ``spec_set``: A stricter variant of ``spec``. If used attempting to *set*
+       or get an attribute on the mock that isn't on the object passed as
+       ``spec_set`` will raise an ``AttributeError``.
+
     * ``side_effect``: A function to be called whenever the Mock is called. See
       the :attr:`Mock.side_effect` attribute. Useful for raising exceptions or
       dynamically changing return values. The function is called with the same
@@ -611,44 +615,48 @@ class _patch(object):
 def _patch_object(target, attribute, new=DEFAULT, spec=None,
                       create=False, mocksignature=False, spec_set=False):
     """
-    patch.object(target, attribute, new=DEFAULT, spec=None, create=False, mocksignature=False)
+    patch.object(target, attribute, new=DEFAULT, spec=None, create=False,
+                 mocksignature=False, spec_set=False)
 
     patch the named member (`attribute`) on an object (`target`) with a mock
     object.
 
-    Arguments new, spec, create and mocksignature have the same meaning as for
-    patch.
+    Arguments new, spec, create, mocksignature and spec_set have the same
+    meaning as for patch.
     """
     return _patch(target, attribute, new, spec, create, mocksignature,
                     spec_set)
+
 
 def patch_object(*args, **kwargs):
     "A deprecated form of patch.object(...)"
     warnings.warn(('Please use patch.object instead.'), DeprecationWarning, 2)
     return _patch_object(*args, **kwargs)
 
+
 def patch(target, new=DEFAULT, spec=None, create=False,
             mocksignature=False, spec_set=False):
     """
-    patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False)
+    patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False,
+          spec_set=False)
 
-    ``patch`` acts as a function decorator or a context manager. Inside the body
-    of the function or with statement, the ``target`` (specified in the form
-    'PackageName.ModuleName.ClassName') is patched with a ``new`` object. When the
-    function/with statement exits the patch is undone.
+    ``patch`` acts as a function decorator or a context manager. Inside the
+    body of the function or with statement, the ``target`` (specified in the
+    form 'PackageName.ModuleName.ClassName') is patched with a ``new`` object.
+    When the function/with statement exits the patch is undone.
 
-    The target is imported and the specified attribute patched with the new object
-    - so it must be importable from the environment you are calling the decorator
-    from.
+    The target is imported and the specified attribute patched with the new
+    object - so it must be importable from the environment you are calling the
+    decorator from.
 
     If ``new`` is omitted, then a new ``Mock`` is created and passed in as an
     extra argument to the decorated function.
 
-    The ``spec`` keyword argument is passed to the ``Mock`` if patch is creating
-    one for you.
+    The ``spec`` and ``spec_set`` keyword arguments are passed to the ``Mock``
+    if patch is creating one for you.
 
-    In addition you can pass ``spec=True``, which causes patch to pass in the
-    object being mocked as the spec object.
+    In addition you can pass ``spec=True`` or ``spec_set=True``, which causes
+    patch to pass in the object being mocked as the spec/spec_set object.
 
     If ``mocksignature`` is True then the patch will be done with a function
     created by mocking the one being replaced. If the object being replaced is
@@ -656,7 +664,8 @@ def patch(target, new=DEFAULT, spec=None, create=False,
     being replaced is a callable object then the signature of `__call__` will
     be copied.
 
-    patch.dict(...) and patch.object(...) are available for alternate use-cases.
+    patch.dict(...) and patch.object(...) are available for alternate
+    use-cases.
     """
     try:
         target, attribute = target.rsplit('.', 1)
@@ -665,6 +674,7 @@ def patch(target, new=DEFAULT, spec=None, create=False,
     target = _importer(target)
     return _patch(target, attribute, new, spec, create, mocksignature,
                     spec_set)
+
 
 class _patch_dict(object):
     """
@@ -764,6 +774,7 @@ def _clear_dict(in_dict):
 
 patch.object = _patch_object
 patch.dict = _patch_dict
+
 
 def _has_local_attr(obj, name):
     try:
@@ -865,8 +876,10 @@ class MagicMock(Mock):
     of most of the magic methods. You can use MagicMock without having to
     configure the magic methods yourself.
 
-    If you use the ``spec`` argument then *only* magic methods that exist in
-    the spec will be created.
+    If you use the ``spec`` or ``spec_set`` arguments then *only* magic
+    methods that exist in the spec will be created.
+
+    Attributes and the return value of a `MagicMock` will also be `MagicMocks`.
     """
     def __init__(self, *args, **kw):
         Mock.__init__(self, *args, **kw)
