@@ -79,6 +79,12 @@ class MockTest(unittest2.TestCase):
         mock = Mock(spec=X())
         self.assertIn(" spec='X' ", repr(mock))
 
+        mock = Mock(spec_set=X)
+        self.assertIn(" spec_set='X' ", repr(mock))
+
+        mock = Mock(spec_set=X())
+        self.assertIn(" spec_set='X' ", repr(mock))
+
         mock = Mock(spec=X, name='foo')
         self.assertIn(" spec='X' ", repr(mock))
         self.assertIn(" name='foo' ", repr(mock))
@@ -396,8 +402,8 @@ class MockTest(unittest2.TestCase):
 
     def testAssertCalledWithMessage(self):
         mock = Mock()
-        message = 'Not called'
-        self.assertRaisesRegexp(AssertionError, message, mock.assert_called_with)
+        self.assertRaisesRegexp(AssertionError, 'Not called',
+                                mock.assert_called_with)
 
 
     def testSpecClass(self):
