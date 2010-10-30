@@ -42,9 +42,9 @@ copyright = u'2009-2010, Michael Foord & the mock team'
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '0.7.0b3'
+version = '0.7.0b4'
 # The full version, including alpha/beta/rc tags.
-release = '0.7.0b3'
+release = '0.7.0b4'
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
