@@ -624,8 +624,8 @@ class _patch(object):
         del self.temp_original
 
 
-def _patch_object(target, attribute, new=DEFAULT, spec=None,
-                      create=False, mocksignature=False, spec_set=None):
+def _patch_object(target, attribute, new=DEFAULT, spec=None, create=False,
+                  mocksignature=False, spec_set=None):
     """
     patch.object(target, attribute, new=DEFAULT, spec=None, create=False,
                  mocksignature=False, spec_set=None)
@@ -637,7 +637,7 @@ def _patch_object(target, attribute, new=DEFAULT, spec=None,
     meaning as for patch.
     """
     return _patch(target, attribute, new, spec, create, mocksignature,
-                    spec_set)
+                  spec_set)
 
 
 def patch_object(*args, **kwargs):
@@ -698,10 +698,10 @@ def patch(target, new=DEFAULT, spec=None, create=False,
     try:
         target, attribute = target.rsplit('.', 1)
     except (TypeError, ValueError):
-        raise TypeError("Need a valid target to patch. You supplied: %r" % (target,))
+        raise TypeError("Need a valid target to patch. You supplied: %r" %
+                        (target,))
     target = _importer(target)
-    return _patch(target, attribute, new, spec, create, mocksignature,
-                    spec_set)
+    return _patch(target, attribute, new, spec, create, mocksignature, spec_set)
 
 
 class _patch_dict(object):
@@ -732,6 +732,7 @@ class _patch_dict(object):
         self.clear = clear
         self._original = None
 
+
     def __call__(self, f):
         @wraps(f)
         def _inner(*args, **kw):
@@ -743,8 +744,10 @@ class _patch_dict(object):
 
         return _inner
 
+
     def __enter__(self):
         self._patch_dict()
+
 
     def _patch_dict(self):
         values = self.values
@@ -770,6 +773,7 @@ class _patch_dict(object):
             # dict like object with no update method
             for key in values:
                 in_dict[key] = values[key]
+
 
     def _unpatch_dict(self):
         in_dict = self.in_dict
@@ -843,11 +847,13 @@ _non_defaults = set('__%s__' % method for method in [
     'setformat', 'repr'
 ])
 
+
 def get_method(name, func):
     def method(self, *args, **kw):
         return func(self, *args, **kw)
     method.__name__ = name
     return method
+
 
 _magics = set('__%s__' % method for method in ' '.join([magic_methods, numerics, inplace, right, extra]).split())
 
@@ -882,6 +888,7 @@ _return_values = {
     '__long__': long(1),
     '__index__': 1,
 }
+
 
 def _set_return_value(mock, method, name):
     return_value = DEFAULT
