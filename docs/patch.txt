@@ -36,7 +36,6 @@ patch
             instance.method.return_value = 'foo'
 
 
-
 patch.object
 ============
 

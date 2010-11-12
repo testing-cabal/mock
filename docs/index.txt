@@ -5,7 +5,7 @@
 :Author: `Michael Foord <http://www.voidspace.org.uk/python/weblog/index.shtml>`_
 :Co-maintainer: `Konrad Delong <http://konryd.blogspot.com/>`_
 :Version: |release|
-:Date: 2010/09/18
+:Date: 2010/11/12
 :Homepage: `Mock Homepage`_
 :Download: `Mock on PyPI`_
 :Documentation: `PDF Documentation <http://www.voidspace.org.uk/downloads/mock-0.7.0b4.pdf>`_
@@ -83,7 +83,7 @@ User Guide
 Installing
 ==========
 
-The current version is |release|, dated 2010/10/30. Mock is still
+The current version is |release|, dated 2010/11/12. Mock is still
 experimental; the API may change (although we are moving towards a 1.0 release
 when the API will stabilise). If you find bugs or have suggestions for
 improvements / extensions then please contact us.
@@ -279,6 +279,11 @@ test suite. In order to run it, use the ``unit2`` script that comes with
 ``unittest2`` module on a checkout of the source repository:
 
    ``unit2 discover``
+
+If you have `setuptools <http://pypi.python.org/pypi/distribute>`_ as well as
+unittest2 you can run:
+
+   ``python setup.py test``
 
 On Python 3.2 you can use ``unittest`` module from the standard library.
 
