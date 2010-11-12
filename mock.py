@@ -621,8 +621,8 @@ class _patch(object):
             if original is DEFAULT and not self.create:
                 # for mocking signature on methods with
                 # patch.object(...)
-                original = getattr(self.target, self.attribute)
-            new_attr = mocksignature(original, new)
+                original_for_sig = getattr(self.target, self.attribute)
+            new_attr = mocksignature(original_for_sig, new)
 
         self.temp_original = original
         setattr(self.target, self.attribute, new_attr)
@@ -635,6 +635,9 @@ class _patch(object):
         else:
             delattr(self.target, self.attribute)
         del self.temp_original
+
+    start = __enter__
+    stop = __exit__
 
 
 def _patch_object(target, attribute, new=DEFAULT, spec=None, create=False,
@@ -804,6 +807,9 @@ class _patch_dict(object):
     def __exit__(self, *args):
         self._unpatch_dict()
         return False
+
+    start = __enter__
+    stop = __exit__
 
 
 def _clear_dict(in_dict):
