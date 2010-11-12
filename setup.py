@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/env python
 
 # Copyright (C) 2007-2010 Michael Foord & the mock team
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
@@ -41,7 +41,8 @@ CLASSIFIERS = [
 
 AUTHOR = 'Michael Foord'
 AUTHOR_EMAIL = 'michael@voidspace.org.uk'
-KEYWORDS = "testing test mock mocking unittest patching stubs fakes doubles".split(' ')
+KEYWORDS = ("testing test mock mocking unittest patching "
+            "stubs fakes doubles").split(' ')
 
 params = dict(
     name=NAME,
