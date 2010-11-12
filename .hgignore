@@ -3,3 +3,5 @@ html/
 mock\.egg-info/
 mock\.wpu
 \.tox/
+build
+dist
