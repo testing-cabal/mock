@@ -627,8 +627,43 @@ class PatchTest(unittest2.TestCase):
         self.assertRaises(AttributeError, test)
 
 
-    def DONTtestPatchStartStop(self):
-        patcher = patch()
+    def testPatchStartStop(self):
+        original = something
+        patcher = patch('%s.something' % __name__)
+        self.assertIs(something, original)
+        mock = patcher.start()
+        self.assertIsNot(mock, original)
+        try:
+            self.assertIs(something, mock)
+        finally:
+            patcher.stop()
+        self.assertIs(something, original)
+
+
+    def testPatchObjectStartStop(self):
+        original = something
+        patcher = patch.object(PTModule, 'something')
+        self.assertIs(something, original)
+        mock = patcher.start()
+        self.assertIsNot(mock, original)
+        try:
+            self.assertIs(something, mock)
+        finally:
+            patcher.stop()
+        self.assertIs(something, original)
+
+
+    def testPatchDictStartStop(self):
+        d = {'foo': 'bar'}
+        original = d.copy()
+        patcher = patch.dict(d, [('spam', 'eggs')], clear=True)
+        self.assertEqual(d, original)
+
+        patcher.start()
+        self.assertEqual(d, {'spam': 'eggs'})
+
+        patcher.stop()
+        self.assertEqual(d, original)
 
 
 if __name__ == '__main__':
