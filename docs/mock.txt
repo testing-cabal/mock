@@ -262,7 +262,7 @@ Attributes
         >>> mock.method_calls
         [('method', (), {}), ('property.method.attribute', (), {})]
 
-    The tuples in method_calls compare in favour even if positional and
+    The tuples in method_calls compare equal even if empty positional and
     keyword arguments are skipped.
 
     .. doctest::
