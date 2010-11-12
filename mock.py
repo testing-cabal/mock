@@ -617,6 +617,11 @@ class _patch(object):
                 new.return_value = Mock(spec=spec, spec_set=spec_set)
         new_attr = new
         if self.mocksignature:
+            original_for_sig = original
+            if original is DEFAULT and not self.create:
+                # for mocking signature on methods with
+                # patch.object(...)
+                original = getattr(self.target, self.attribute)
             new_attr = mocksignature(original, new)
 
         self.temp_original = original
@@ -819,6 +824,7 @@ def _has_local_attr(obj, name):
         return name in vars(obj)
     except TypeError:
         # objects without a __dict__
+        # XXX could check in the class __dict__
         return hasattr(obj, name)
 
 
