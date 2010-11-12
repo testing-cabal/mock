@@ -58,6 +58,7 @@ CHANGELOG
 * Attributes and return value of a `MagicMock` are `MagicMock` objects
 * Attempting to set an unsupported magic method now raises an `AttributeError`
 * `patch.dict` works as a class decorator
+* Switched from subversion to mercurial for source code control
 * BUGFIX: mocks are now copyable (thanks to Ned Batchelder for reporting and
   diagnosing this)
 * BUGFIX: `spec=True` works with old style classes
