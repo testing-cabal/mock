@@ -44,7 +44,7 @@ itself is garbage collected. This is tricky to get right though.
 CHANGELOG
 =========
 
-2010/XX/XX Version 0.7.0 beta 4
+2010/11/12 Version 0.7.0 beta 4
 -------------------------------
 
 * patchers (`patch`, `patch.object` and `patch.dict`) have start and stop
