@@ -666,6 +666,38 @@ class PatchTest(unittest2.TestCase):
         self.assertEqual(d, original)
 
 
+    def testPatchDictClassDecorator(self):
+        this = self
+        d = {'spam': 'eggs'}
+        original = d.copy()
+
+        class Test(object):
+            def test_first(self):
+                this.assertEqual(d, {'foo': 'bar'})
+            def test_second(self):
+                this.assertEqual(d, {'foo': 'bar'})
+
+        Test = patch.dict(d, {'foo': 'bar'}, clear=True)(Test)
+        self.assertEqual(d, original)
+
+        test = Test()
+
+        test.test_first()
+        self.assertEqual(d, original)
+
+        test.test_second()
+        self.assertEqual(d, original)
+
+        test = Test()
+
+        test.test_first()
+        self.assertEqual(d, original)
+
+        test.test_second()
+        self.assertEqual(d, original)
+
+
+
 if __name__ == '__main__':
     unittest2.main()
 

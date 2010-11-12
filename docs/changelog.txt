@@ -35,6 +35,11 @@ and ``stop`` (or similar) methods that *hide* these attributes when needed.
 externally on mocks when building `method_calls` names and so can't be changed
 to a double underscore name.)
 
+If a patch is started using `patch.start` and then not stopped correctly, due
+to a bug in the test code, then the unpatching is not done. Using weak
+references it would be possible to detect and fix this when the patch object
+itself is garbage collected. This is tricky to get right though.
+
 
 CHANGELOG
 =========
@@ -52,6 +57,7 @@ CHANGELOG
   `AttributeError`
 * Attributes and return value of a `MagicMock` are `MagicMock` objects
 * Attempting to set an unsupported magic method now raises an `AttributeError`
+* `patch.dict` works as a class decorator
 * BUGFIX: mocks are now copyable (thanks to Ned Batchelder for reporting and
   diagnosing this)
 * BUGFIX: `spec=True` works with old style classes
