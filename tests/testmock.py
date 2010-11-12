@@ -2,7 +2,7 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
-from tests.support import unittest2
+from tests.support import unittest2, inPy3k
 
 import copy
 import sys
@@ -449,6 +449,43 @@ class MockTest(unittest2.TestCase):
         sys.setrecursionlimit(int(10e8))
         # this segfaults without the fix in place
         copy.copy(Mock())
+
+
+    @unittest2.skipIf(inPy3k, "no old style classes in Python 3")
+    def testSpecOldStyleClasses(self):
+        class Foo:
+            bar = 7
+
+        mock = Mock(spec=Foo)
+        mock.bar = 6
+        self.assertRaises(AttributeError, lambda: mock.foo)
+
+        mock = Mock(spec=Foo())
+        mock.bar = 6
+        self.assertRaises(AttributeError, lambda: mock.foo)
+
+
+    @unittest2.skipIf(inPy3k, "no old style classes in Python 3")
+    def testSpecSetOldStyleClasses(self):
+        class Foo:
+            bar = 7
+
+        mock = Mock(spec_set=Foo)
+        mock.bar = 6
+        self.assertRaises(AttributeError, lambda: mock.foo)
+
+        def _set():
+            mock.foo = 3
+        self.assertRaises(AttributeError, _set)
+
+        mock = Mock(spec_set=Foo())
+        mock.bar = 6
+        self.assertRaises(AttributeError, lambda: mock.foo)
+
+        def _set():
+            mock.foo = 3
+        self.assertRaises(AttributeError, _set)
+
 
 
 if __name__ == '__main__':

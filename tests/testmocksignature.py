@@ -217,7 +217,7 @@ class TestMockSignature(unittest2.TestCase):
         test()
         self.assertIs(something, original_something)
 
-    def testPatchObjectMockSignature(self):
+    def DONTtestPatchObjectMockSignature(self):
         class something(object):
             def meth(a, b, c):
                 pass
