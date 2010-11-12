@@ -228,6 +228,18 @@ class TestMockSignature(unittest2.TestCase):
             def meth(self, a, b, c):
                 pass
 
+        original = something.__dict__['meth']
+
+        @patch.object(something, 'meth', mocksignature=True)
+        def test(_):
+            self.assertIsNot(something.__dict__['meth'], original)
+            thing = something()
+            thing.meth(1, 2, 3)
+            self.assertRaises(TypeError, thing.meth, 1)
+
+        test()
+        self.assertIs(something.__dict__['meth'], original)
+
         thing = something()
 
         @patch.object(thing, 'meth', mocksignature=True)
