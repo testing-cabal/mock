@@ -642,12 +642,12 @@ class PatchTest(unittest2.TestCase):
 
     def testPatchObjectStartStop(self):
         original = something
-        patcher = patch.object(PTModule, 'something')
+        patcher = patch.object(PTModule, 'something', 'foo')
         self.assertIs(something, original)
-        mock = patcher.start()
-        self.assertIsNot(mock, original)
+        replaced = patcher.start()
+        self.assertEqual(replaced, 'foo')
         try:
-            self.assertIs(something, mock)
+            self.assertIs(something, replaced)
         finally:
             patcher.stop()
         self.assertIs(something, original)
