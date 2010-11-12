@@ -242,12 +242,14 @@ class TestMockSignature(unittest2.TestCase):
 
         thing = something()
 
+        original = thing.meth
         @patch.object(thing, 'meth', mocksignature=True)
         def test(_):
             thing.meth(1, 2, 3)
             self.assertRaises(TypeError, thing.meth, 1)
 
         test()
+        self.assertEqual(thing.meth, original)
 
         # when patching instance methods using mocksignatures we
         # replace the bound method with an instance attribute on
