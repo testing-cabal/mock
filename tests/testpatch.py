@@ -3,6 +3,7 @@
 # http://www.voidspace.org.uk/python/mock/
 
 import os
+import sys
 import warnings
 
 from tests import support
@@ -17,6 +18,8 @@ if not inPy3k:
     builtin_string = '__builtin__'
 else:
     builtin_string = 'builtins'
+
+PTModule = sys.modules[__name__]
 
 
 # for use in the test
@@ -99,17 +102,12 @@ class PatchTest(unittest2.TestCase):
 
 
     def testPatch(self):
-        import __main__
-        __main__.something = sentinel.Something
-
         @apply
-        @patch('__main__.something', sentinel.Something2)
+        @patch('%s.something' % __name__, sentinel.Something2)
         def test():
-            self.assertEqual(__main__.something, sentinel.Something2, "unpatched")
+            self.assertEqual(PTModule.something, sentinel.Something2, "unpatched")
 
-        self.assertEqual(__main__.something, sentinel.Something, "patch not restored")
-
-        import tests.testpatch as PTModule
+        self.assertEqual(PTModule.something, sentinel.Something, "patch not restored")
 
         @patch('tests.testpatch.something', sentinel.Something2)
         @patch('tests.testpatch.something_else', sentinel.SomethingElse)
@@ -374,25 +372,22 @@ class PatchTest(unittest2.TestCase):
 
 
     def testPatchClassDecorator(self):
-        import __main__
-        __main__.something = sentinel.Something
-
         class Something(object):
             attribute = sentinel.Original
 
         class Foo(object):
             def test_method(other_self, mock_something):
-                self.assertEqual(__main__.something, mock_something, "unpatched")
+                self.assertEqual(PTModule.something, mock_something, "unpatched")
             def not_test_method(other_self):
-                self.assertEqual(__main__.something, sentinel.Something, "non-test method patched")
-        Foo = patch('__main__.something')(Foo)
+                self.assertEqual(PTModule.something, sentinel.Something, "non-test method patched")
+        Foo = patch('%s.something' % __name__)(Foo)
 
         f = Foo()
         f.test_method()
         f.not_test_method()
 
         self.assertEqual(Something.attribute, sentinel.Original, "patch not restored")
-        self.assertEqual(__main__.something, sentinel.Something, "patch not restored")
+        self.assertEqual(PTModule.something, sentinel.Something, "patch not restored")
 
     @unittest2.skipUnless(with_available, "test requires Python >= 2.5")
     def testPatchObjectDeprecation(self):
@@ -630,6 +625,10 @@ class PatchTest(unittest2.TestCase):
             instance.z = 'foo'
 
         self.assertRaises(AttributeError, test)
+
+
+    def DONTtestPatchStartStop(self):
+        patcher = patch()
 
 
 if __name__ == '__main__':
