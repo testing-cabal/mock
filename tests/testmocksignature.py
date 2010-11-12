@@ -147,6 +147,7 @@ class TestMockSignature(unittest2.TestCase):
             mock_wibble.assert_called_with(instance)
             instance.wibble.mock.assert_called_with(instance)
 
+
     @unittest2.skipUnless(__debug__, 'assert disabled when run with -O/OO')
     def testMockSignatureWithReservedArg(self):
         def f(_mock_):
@@ -165,6 +166,7 @@ class TestMockSignature(unittest2.TestCase):
             pass
         self.assertRaises(AssertionError, lambda: mocksignature(f))
 
+
     def testMockSignatureClass(self):
         MockedSomething = mocksignature(Something)
 
@@ -176,6 +178,7 @@ class TestMockSignature(unittest2.TestCase):
 
         self.assertRaises(TypeError, MockedSomething)
 
+
     def testMockSignatureCallable(self):
         mocked_something = mocksignature(something)
 
@@ -186,6 +189,7 @@ class TestMockSignature(unittest2.TestCase):
         mocked_something.mock.assert_caled_with(1, 5)
 
         self.assertRaises(TypeError, mocked_something)
+
 
     def testPatchMockSignatureClass(self):
         original_something = Something
@@ -202,6 +206,7 @@ class TestMockSignature(unittest2.TestCase):
         test()
         self.assertIs(Something, original_something)
 
+
     def testPatchMockSignatureCallable(self):
         original_something = something
         something_name = '%s.something' % __name__
@@ -217,9 +222,10 @@ class TestMockSignature(unittest2.TestCase):
         test()
         self.assertIs(something, original_something)
 
-    def DONTtestPatchObjectMockSignature(self):
+
+    def testPatchObjectMockSignature(self):
         class something(object):
-            def meth(a, b, c):
+            def meth(self, a, b, c):
                 pass
 
         thing = something()
@@ -227,6 +233,12 @@ class TestMockSignature(unittest2.TestCase):
         @patch.object(thing, 'meth', mocksignature=True)
         def test(_):
             thing.meth(1, 2, 3)
-            self.assertRaises(thing.meth, 1)
+            self.assertRaises(TypeError, thing.meth, 1)
 
         test()
+
+        # when patching instance methods using mocksignatures we
+        # replace the bound method with an instance attribute on
+        # unpatching. This is technically incorrect but will
+        # almost never cause any problems...
+        #self.assertNotIn('meth', something.__dict__)
