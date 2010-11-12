@@ -214,9 +214,9 @@ class Mock(object):
       `mock.__class__` returns the class of the spec object. This allows mocks
       to pass `isinstance` tests.
 
-    * ``spec_set``: A stricter variant of ``spec``. If used attempting to *set*
-       or get an attribute on the mock that isn't on the object passed as
-       ``spec_set`` will raise an ``AttributeError``.
+    * ``spec_set``: A stricter variant of ``spec``. If used, attempting to *set*
+      or get an attribute on the mock that isn't on the object passed as
+      ``spec_set`` will raise an ``AttributeError``.
 
     * ``side_effect``: A function to be called whenever the Mock is called. See
       the :attr:`Mock.side_effect` attribute. Useful for raising exceptions or
