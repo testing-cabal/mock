@@ -259,6 +259,7 @@ References
 
 Articles and blog entries on testing with Mock:
 
+* `Mocking patterns: chained calls, partial mocking and open as context manager <http://www.voidspace.org.uk/python/weblog/arch_d7_2010_10_02.shtml#e1188>`_
 * `Mock recipes <http://konryd.blogspot.com/2010/06/mock-recipies.html>`_
 * `Mockity mock mock - some love for the mock module <http://konryd.blogspot.com/2010/05/mockity-mock-mock-some-love-for-mock.html>`_
 * `Python Unit Testing with Mock <http://www.insomnihack.com/?p=194>`_
