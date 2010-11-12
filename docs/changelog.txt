@@ -53,7 +53,8 @@ CHANGELOG
 * BUGFIX: mocks are now copyable (thanks to Ned Batchelder for reporting and
   diagnosing this)
 * BUGFIX: `spec=True` works with old style classes
-* BUGFIX: `mocksignature=True` works with `patch.object`
+* BUGFIX: `mocksignature=True` can now patch instance methods via
+  `patch.object`
 
 
 2010/09/18 Version 0.7.0 beta 3
