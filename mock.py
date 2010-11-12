@@ -73,14 +73,6 @@ if inPy3k:
 else:
     self = 'im_self'
 
-class Foo:
-    pass
-
-if inPy3k:
-    class_types = (type,)
-else:
-    class_types = (type, type(Foo))
-
 
 # getsignature and mocksignature heavily "inspired" by
 # the decorator module: http://pypi.python.org/pypi/decorator/
