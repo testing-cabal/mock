@@ -125,14 +125,17 @@ decorators.
 
 You can stack up multiple patch decorators using this pattern::
 
-    @patch('module.ClassName1')
     @patch('module.ClassName2')
-    def testMethod(self, MockClass2, MockClass1):
+    @patch('module.ClassName1')
+    def testMethod(self, MockClass1, MockClass2):
         ClassName1()
         ClassName2()
         self.assertEqual(MockClass1.called, "ClassName1 not patched")
         self.assertEqual(MockClass2.called, "ClassName2 not patched")
 
+Note that the decorators are applied from the bottom upwards. This is the
+standard way that Python applies decorators. The order of the created mocks
+passed into your test function matches this order.
 
 Like all context-managers patches can be nested using contextlib's nested
 function; *every* patching will appear in the tuple after "as"::

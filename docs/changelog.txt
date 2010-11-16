@@ -44,6 +44,59 @@ itself is garbage collected. This is tricky to get right though.
 CHANGELOG
 =========
 
+2010/XX/XX Version 0.7.0
+------------------------
+
+Changes since beta 4:
+
+
+Full set of changes since 0.6.0:
+
+* Ability to mock magic methods with `Mock` and addition of `MagicMock`
+  with pre-created magic methods
+* Addition of `mocksignature`
+* Addition of `mocksignature` argument to `patch` and `patch.object`
+* Addition of `patch.dict` for changing dictionaries during a test
+* Ability to use `patch`, `patch.object` and `patch.dict` as class decorators
+* Renamed ``patch_object`` to `patch.object` (``patch_object`` is
+  deprecated)
+* Addition of soft comparisons: `call_args`, `call_args_list` and `method_calls`
+  now return tuple-like objects which compare equal even when empty args
+  or kwargs are skipped
+* patchers (`patch`, `patch.object` and `patch.dict`) have start and stop
+  methods
+* Addition of `assert_called_once_with` method
+* Mocks can now be named (`name` argument to constructor) and the name is used
+  in the repr
+* repr of a mock with a spec includes the class name of the spec
+* `assert_called_with` works with `python -OO`
+* New `spec_set` keyword argument to `Mock` and `patch`. If this is set,
+  attempting to *set* an attribute on a mock not on the spec will raise an
+  `AttributeError`
+* Mocks created with a spec can now pass `isinstance` tests (`__class__`
+  returns the type of the spec)
+* Improved failure message for `Mock.assert_called_with` when the mock
+  has not been called at all
+* BUGFIX: mocks are now copyable (thanks to Ned Batchelder for reporting and
+  diagnosing this)
+* BUGFIX: `spec=True` works with old style classes
+* BUGFIX: ``help(mock)`` works now (on the module). Can no longer use ``__bases__``
+  as a valid sentinel name (thanks to Stephen Emslie for reporting and
+  diagnosing this)
+* BUGFIX: ``side_effect`` now works with ``BaseException`` exceptions like
+  ``KeyboardInterrupt``
+* BUGFIX: patching the same object twice now restores the patches correctly
+* Python 3 compatibility (tested with 3.2 but should work with 3.0 & 3.1 as
+  well)
+* with statement tests now skipped on Python 2.4
+* Tests require unittest2 to run
+* Improved several docstrings and documentation
+* Added 'build_sphinx' command to setup.py (requires setuptools or distribute)
+  Thanks to Florian Bauer
+* Switched from subversion to mercurial for source code control
+* `Konrad Delong <http://konryd.blogspot.com/>`_ added as co-maintainer
+
+
 2010/11/12 Version 0.7.0 beta 4
 -------------------------------
 
@@ -122,7 +175,7 @@ CHANGELOG
   as a valid sentinel name (thanks to Stephen Emslie for reporting and
   diagnosing this)
 * Addition of soft comparisons: `call_args`, `call_args_list` and `method_calls`
-  return now tuple-like objects which compare equal even when empty args
+  now return tuple-like objects which compare equal even when empty args
   or kwargs are skipped
 * Added docstrings.
 * BUGFIX: ``side_effect`` now works with ``BaseException`` exceptions like
