@@ -72,11 +72,12 @@ Full set of changes since 0.6.0:
   in the repr
 * repr of a mock with a spec includes the class name of the spec
 * `assert_called_with` works with `python -OO`
-* New `spec_set` keyword argument to `Mock` and `patch`. If this is set,
+* New `spec_set` keyword argument to `Mock` and `patch`. If used,
   attempting to *set* an attribute on a mock not on the spec will raise an
   `AttributeError`
 * Mocks created with a spec can now pass `isinstance` tests (`__class__`
   returns the type of the spec)
+* Added docstrings to all objects
 * Improved failure message for `Mock.assert_called_with` when the mock
   has not been called at all
 * BUGFIX: mocks are now copyable (thanks to Ned Batchelder for reporting and
@@ -90,7 +91,6 @@ Full set of changes since 0.6.0:
 * BUGFIX: patching the same object twice now restores the patches correctly
 * with statement tests now skipped on Python 2.4
 * Tests require unittest2 to run
-* Improved several docstrings and documentation
 * Added 'build_sphinx' command to setup.py (requires setuptools or distribute)
   Thanks to Florian Bauer
 * Switched from subversion to mercurial for source code control
@@ -105,7 +105,7 @@ Full set of changes since 0.6.0:
 * Addition of `assert_called_once_with` method
 * repr of a mock with a spec includes the class name of the spec
 * `assert_called_with` works with `python -OO`
-* New `spec_set` keyword argument to `Mock` and `patch`. If this is set,
+* New `spec_set` keyword argument to `Mock` and `patch`. If used,
   attempting to *set* an attribute on a mock not on the spec will raise an
   `AttributeError`
 * Attributes and return value of a `MagicMock` are `MagicMock` objects
