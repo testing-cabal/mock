@@ -58,6 +58,8 @@ Full set of changes since 0.6.0:
 * Addition of `mocksignature` argument to `patch` and `patch.object`
 * Addition of `patch.dict` for changing dictionaries during a test
 * Ability to use `patch`, `patch.object` and `patch.dict` as class decorators
+* Python 3 compatibility (tested with 3.2 but should work with 3.0 & 3.1 as
+  well)
 * Renamed ``patch_object`` to `patch.object` (``patch_object`` is
   deprecated)
 * Addition of soft comparisons: `call_args`, `call_args_list` and `method_calls`
@@ -86,8 +88,6 @@ Full set of changes since 0.6.0:
 * BUGFIX: ``side_effect`` now works with ``BaseException`` exceptions like
   ``KeyboardInterrupt``
 * BUGFIX: patching the same object twice now restores the patches correctly
-* Python 3 compatibility (tested with 3.2 but should work with 3.0 & 3.1 as
-  well)
 * with statement tests now skipped on Python 2.4
 * Tests require unittest2 to run
 * Improved several docstrings and documentation
