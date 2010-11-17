@@ -52,14 +52,13 @@ Changes since beta 4:
 
 Full set of changes since 0.6.0:
 
+* Python 3 compatibility
 * Ability to mock magic methods with `Mock` and addition of `MagicMock`
   with pre-created magic methods
 * Addition of `mocksignature` and `mocksignature` argument to `patch` and
   `patch.object`
 * Addition of `patch.dict` for changing dictionaries during a test
 * Ability to use `patch`, `patch.object` and `patch.dict` as class decorators
-* Python 3 compatibility (tested with 3.2 but should work with 3.0 & 3.1 as
-  well)
 * Renamed ``patch_object`` to `patch.object` (``patch_object`` is
   deprecated)
 * Addition of soft comparisons: `call_args`, `call_args_list` and `method_calls`
