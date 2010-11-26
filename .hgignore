@@ -6,3 +6,4 @@ mock\.wpu
 build
 dist
 latex
+.*\$py\.class
