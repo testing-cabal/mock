@@ -49,6 +49,8 @@ CHANGELOG
 
 Changes since beta 4:
 
+* Tested with jython, pypy and Python 3.2, 3.1 and 3.0
+
 
 Full set of changes since 0.6.0:
 
@@ -89,7 +91,9 @@ Full set of changes since 0.6.0:
   ``KeyboardInterrupt``
 * BUGFIX: patching the same object twice now restores the patches correctly
 * with statement tests now skipped on Python 2.4
-* Tests require unittest2 to run
+* Tests require unittest2 (or unittest2-py3k) to run
+* Tested with `tox <http://pypi.python.org/pypi/tox>`_ on Python 2.4 - 3.2,
+  jython and pypy
 * Added 'build_sphinx' command to setup.py (requires setuptools or distribute)
   Thanks to Florian Bauer
 * Switched from subversion to mercurial for source code control
