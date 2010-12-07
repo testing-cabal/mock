@@ -21,6 +21,18 @@ else:
 
 PTModule = sys.modules[__name__]
 
+def _getProxy(obj, get_only=True):
+    class Proxy(object):
+        def __getattr__(self, name):
+            return getattr(obj, name)
+    if not get_only:
+        def __setattr__(self, name, value):
+            setattr(obj, name, value)
+        def __delattr__(self, name):
+            delattr(obj, name)
+        Proxy.__setattr__ = __setattr__
+        Proxy.__delattr__ = __delattr__
+    return Proxy()
 
 # for use in the test
 something  = sentinel.Something
@@ -695,6 +707,42 @@ class PatchTest(unittest2.TestCase):
 
         test.test_second()
         self.assertEqual(d, original)
+
+
+    def testGetOnlyProxy(self):
+        class Something(object):
+            foo = 'foo'
+        class SomethingElse:
+            foo = 'foo'
+
+        for thing in Something, SomethingElse, Something(), SomethingElse:
+            proxy = _getProxy(thing)
+
+            @patch.object(proxy, 'foo', 'bar')
+            def test():
+                self.assertEqual(proxy.foo, 'bar')
+            test()
+            self.assertEqual(proxy.foo, 'foo')
+            self.assertEqual(thing.foo, 'foo')
+            self.assertNotIn('foo', proxy.__dict__)
+
+
+    def testGetSetDeleteProxy(self):
+        class Something(object):
+            foo = 'foo'
+        class SomethingElse:
+            foo = 'foo'
+
+        for thing in Something, SomethingElse, Something(), SomethingElse:
+            proxy = _getProxy(Something, get_only=False)
+
+            @patch.object(proxy, 'foo', 'bar')
+            def test():
+                self.assertEqual(proxy.foo, 'bar')
+            test()
+            self.assertEqual(proxy.foo, 'foo')
+            self.assertEqual(thing.foo, 'foo')
+            self.assertNotIn('foo', proxy.__dict__)
 
 
 

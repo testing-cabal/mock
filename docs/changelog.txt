@@ -50,7 +50,8 @@ CHANGELOG
 Changes since beta 4:
 
 * Tested with jython, pypy and Python 3.2, 3.1 and 3.0
-
+* Bugfix: `mock.patch` now works correctly with certain types of objects that
+  proxy attribute access, like the django settings object.
 
 Full set of changes since 0.6.0:
 
