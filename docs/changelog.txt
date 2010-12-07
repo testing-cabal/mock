@@ -50,8 +50,8 @@ CHANGELOG
 Changes since beta 4:
 
 * Tested with jython, pypy and Python 3.2, 3.1 and 3.0
-* Bugfix: `mock.patch` now works correctly with certain types of objects that
-  proxy attribute access, like the django settings object.
+* BUGFIX: `mock.patch` now works correctly with certain types of objects that
+  proxy attribute access, like the django settings object
 
 Full set of changes since 0.6.0:
 
@@ -82,6 +82,8 @@ Full set of changes since 0.6.0:
 * Added docstrings to all objects
 * Improved failure message for `Mock.assert_called_with` when the mock
   has not been called at all
+* BUGFIX: `mock.patch` now works correctly with certain types of objects that
+  proxy attribute access, like the django settings object
 * BUGFIX: mocks are now copyable (thanks to Ned Batchelder for reporting and
   diagnosing this)
 * BUGFIX: `spec=True` works with old style classes
