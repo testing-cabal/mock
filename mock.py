@@ -575,23 +575,26 @@ class _patch(object):
     def get_original(self):
         target = self.target
         name = self.attribute
-        create = self.create
 
         original = DEFAULT
-        if _has_local_attr(target, name):
-            try:
-                original = target.__dict__[name]
-            except AttributeError:
-                # for instances of classes with slots, they have no __dict__
-                original = getattr(target, name)
-        elif not create and not hasattr(target, name):
+        local = False
+
+        try:
+            original = target.__dict__[name]
+        except (AttributeError, KeyError):
+            original = getattr(target, name, DEFAULT)
+        else:
+            local = True
+
+        if not self.create and original is DEFAULT:
             raise AttributeError("%s does not have the attribute %r" % (target, name))
-        return original
+        return original, local
 
 
     def __enter__(self):
+        """Perform the patch."""
         new, spec, spec_set = self.new, self.spec, self.spec_set
-        original = self.get_original()
+        original, local = self.get_original()
         if new is DEFAULT:
             # XXXX what if original is DEFAULT - shouldn't use it as a spec
             inherit = False
@@ -609,24 +612,26 @@ class _patch(object):
                 new.return_value = Mock(spec=spec, spec_set=spec_set)
         new_attr = new
         if self.mocksignature:
-            original_for_sig = original
-            if original is DEFAULT and not self.create:
-                # for mocking signature on methods with
-                # patch.object(...)
-                original_for_sig = getattr(self.target, self.attribute)
-            new_attr = mocksignature(original_for_sig, new)
+            new_attr = mocksignature(original, new)
 
         self.temp_original = original
+        self.is_local = local
         setattr(self.target, self.attribute, new_attr)
         return new
 
 
     def __exit__(self, *_):
-        if self.temp_original is not DEFAULT:
+        """Undo the patch."""
+        if self.is_local and self.temp_original is not DEFAULT:
             setattr(self.target, self.attribute, self.temp_original)
         else:
             delattr(self.target, self.attribute)
+            if not self.create and not hasattr(self.target, self.attribute):
+                # needed for proxy objects like django settings
+                setattr(self.target, self.attribute, self.temp_original)
+
         del self.temp_original
+        del self.is_local
 
     start = __enter__
     stop = __exit__
@@ -766,10 +771,12 @@ class _patch_dict(object):
 
 
     def __enter__(self):
+        """Patch the dict."""
         self._patch_dict()
 
 
     def _patch_dict(self):
+        """Unpatch the dict."""
         values = self.values
         in_dict = self.in_dict
         clear = self.clear
