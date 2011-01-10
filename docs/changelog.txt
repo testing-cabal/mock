@@ -44,12 +44,14 @@ itself is garbage collected. This is tricky to get right though.
 CHANGELOG
 =========
 
-2010/XX/XX Version 0.7.0
+2011/XX/XX Version 0.7.0
 ------------------------
 
 Changes since beta 4:
 
-* Tested with jython, pypy and Python 3.2, 3.1 and 3.0
+* Tested with jython, pypy and Python 3.2 and 3.1
+* Decorated functions / methods have their docstring and `__module__`
+  preserved on Python 2.4
 * BUGFIX: `mock.patch` now works correctly with certain types of objects that
   proxy attribute access, like the django settings object
 
@@ -82,6 +84,8 @@ Full set of changes since 0.6.0:
 * Added docstrings to all objects
 * Improved failure message for `Mock.assert_called_with` when the mock
   has not been called at all
+* Decorated functions / methods have their docstring and `__module__`
+  preserved on Python 2.4.
 * BUGFIX: `mock.patch` now works correctly with certain types of objects that
   proxy attribute access, like the django settings object
 * BUGFIX: mocks are now copyable (thanks to Ned Batchelder for reporting and
@@ -96,7 +100,7 @@ Full set of changes since 0.6.0:
 * with statement tests now skipped on Python 2.4
 * Tests require unittest2 (or unittest2-py3k) to run
 * Tested with `tox <http://pypi.python.org/pypi/tox>`_ on Python 2.4 - 3.2,
-  jython and pypy
+  jython and pypy (excluding 3.0)
 * Added 'build_sphinx' command to setup.py (requires setuptools or distribute)
   Thanks to Florian Bauer
 * Switched from subversion to mercurial for source code control

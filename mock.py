@@ -23,7 +23,7 @@ __all__ = (
     'DEFAULT'
 )
 
-__version__ = '0.7.0b4'
+__version__ = '0.7.0rc1'
 
 __unittest = True
 
@@ -51,6 +51,8 @@ except ImportError:
     def wraps(original):
         def inner(f):
             f.__name__ = original.__name__
+            f.__doc__ = original.__doc__
+            f.__module__ = original.__module__
             return f
         return inner
 
