@@ -40,7 +40,7 @@ master_doc = 'index'
 
 # General substitutions.
 project = u'Mock'
-copyright = u'2007-2010, Michael Foord & the mock team'
+copyright = u'2007-2011, Michael Foord & the mock team'
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
