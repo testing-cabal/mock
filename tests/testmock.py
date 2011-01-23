@@ -163,6 +163,12 @@ class MockTest(unittest2.TestCase):
                           "children incorrectly cleared")
         self.assertFalse(mock.something.called, "child not reset")
 
+    def test_reset_mock_recursion(self):
+        mock = Mock()
+        mock.return_value = mock
+
+        # used to cause recursion
+        mock.reset_mock()
 
     def testCall(self):
         mock = Mock()

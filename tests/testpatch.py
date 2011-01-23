@@ -144,7 +144,7 @@ class PatchTest(unittest2.TestCase):
         test()
         test()
 
-        self.assertNotEquals(open, mock, "patch not restored")
+        self.assertNotEqual(open, mock, "patch not restored")
 
 
     def testPatchClassAttribute(self):
@@ -184,8 +184,8 @@ class PatchTest(unittest2.TestCase):
 
 
             # A hack to test that new mocks are passed the second time
-            self.assertNotEquals(outerMock1, mock1, "unexpected value for mock1")
-            self.assertNotEquals(outerMock2, mock2, "unexpected value for mock1")
+            self.assertNotEqual(outerMock1, mock1, "unexpected value for mock1")
+            self.assertNotEqual(outerMock2, mock2, "unexpected value for mock1")
             return mock1, mock2
 
         outerMock1 = None
