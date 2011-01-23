@@ -11,7 +11,7 @@ class SentinelTest(unittest2.TestCase):
 
     def testSentinels(self):
         self.assertEqual(sentinel.whatever, sentinel.whatever, 'sentinel not stored')
-        self.assertNotEquals(sentinel.whatever, sentinel.whateverelse, 'sentinel should be unique')
+        self.assertNotEqual(sentinel.whatever, sentinel.whateverelse, 'sentinel should be unique')
 
 
     def testSentinelName(self):

@@ -298,7 +298,8 @@ class Mock(object):
         for child in self._children.values():
             child.reset_mock()
         if isinstance(self._return_value, Mock):
-            self._return_value.reset_mock()
+            if not self._return_value is self:
+                self._return_value.reset_mock()
 
 
     def __get_return_value(self):

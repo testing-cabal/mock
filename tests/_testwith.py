@@ -44,7 +44,7 @@ class WithTest(unittest2.TestCase):
         mock = Mock()
         original = mock.something
         with patch.object(mock, 'something'):
-            self.assertNotEquals(mock.something, original, "unpatched")
+            self.assertNotEqual(mock.something, original, "unpatched")
         self.assertEqual(mock.something, original)
 
 

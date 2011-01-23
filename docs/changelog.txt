@@ -54,6 +54,8 @@ Changes since beta 4:
   preserved on Python 2.4
 * BUGFIX: `mock.patch` now works correctly with certain types of objects that
   proxy attribute access, like the django settings object
+* BUGFIX: `reset_mock` caused infinite recursion when a mock is set as its own
+  return value
 
 Full set of changes since 0.6.0:
 
@@ -96,6 +98,8 @@ Full set of changes since 0.6.0:
   diagnosing this)
 * BUGFIX: ``side_effect`` now works with ``BaseException`` exceptions like
   ``KeyboardInterrupt``
+* BUGFIX: `reset_mock` caused infinite recursion when a mock is set as its own
+  return value
 * BUGFIX: patching the same object twice now restores the patches correctly
 * with statement tests now skipped on Python 2.4
 * Tests require unittest2 (or unittest2-py3k) to run
