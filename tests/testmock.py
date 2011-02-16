@@ -412,6 +412,14 @@ class MockTest(unittest2.TestCase):
                                 mock.assert_called_with)
 
 
+    def test__name__(self):
+        mock = Mock()
+        self.assertRaises(AttributeError, lambda: mock.__name__)
+
+        mock.__name__ = 'foo'
+        self.assertEqual(mock.__name__, 'foo')
+
+
     def testSpecClass(self):
         class X(object):
             pass

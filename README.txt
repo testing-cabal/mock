@@ -9,11 +9,11 @@ mock is tested on Python versions 2.4-2.7 and Python 3.
 The mock module also provides utility functions / objects to assist with
 testing, particularly monkey patching.
 
-* `PDF documentation for 0.7.0b4 <http://www.voidspace.org.uk/downloads/mock-0.7.0b4.pdf>`_
+* `PDF documentation for 0.7.0rc1 <http://www.voidspace.org.uk/downloads/mock-0.7.0rc1.pdf>`_
 * `mock on google code (repository and issue tracker) <http://code.google.com/p/mock/>`_
 * `mock documentation <http://www.voidspace.org.uk/python/mock/>`_
 * `mock on PyPI <http://pypi.python.org/pypi/mock/>`_
-* `Article on mocking, patching and stubbing <http://www.voidspace.org.uk/python/articles/mocking.shtml>`_
+* `Mailing list (testing-in-python@lists.idyll.org) <http://lists.idyll.org/listinfo/testing-in-python>`_
 
 Mock is very easy to use and is designed for use with
 `unittest <http://pypi.python.org/pypi/unittest2>`_. Mock is based on

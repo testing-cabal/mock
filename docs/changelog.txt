@@ -44,8 +44,8 @@ itself is garbage collected. This is tricky to get right though.
 CHANGELOG
 =========
 
-2011/XX/XX Version 0.7.0
-------------------------
+2011/02/16 Version 0.7.0 RC 1
+-----------------------------
 
 Changes since beta 4:
 
