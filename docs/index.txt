@@ -5,7 +5,7 @@
 :Author: `Michael Foord <http://www.voidspace.org.uk/python/weblog/index.shtml>`_
 :Co-maintainer: `Konrad Delong <http://konryd.blogspot.com/>`_
 :Version: |release|
-:Date: 2010/11/12
+:Date: 2011/02/17
 :Homepage: `Mock Homepage`_
 :Download: `Mock on PyPI`_
 :Documentation: `PDF Documentation <http://www.voidspace.org.uk/downloads/mock-0.7.0rc1.pdf>`_
