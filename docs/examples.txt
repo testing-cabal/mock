@@ -305,13 +305,14 @@ The module name can be 'dotted', in the form ``package.module`` if needed.
 If you don't want to call the decorated test function yourself, you can add
 ``apply`` as a decorator on top:
 
-::
+.. doctest::
 
-    @apply
-    @patch('package.module.ClassName.attribute', sentinel.attribute)
-    def test():
-        from package.module import ClassName
-        assert ClassName.attribute == sentinel.attribute
+    >>> @patch('package.module.ClassName.attribute', sentinel.attribute)
+    ... def test():
+    ...     from package.module import ClassName
+    ...     assert ClassName.attribute == sentinel.attribute
+    ...
+    >>> test()
 
 A nice pattern is to actually decorate test methods themselves:
 
