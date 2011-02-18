@@ -47,8 +47,8 @@ patch.object
     Arguments new, spec, create, mocksignature and spec_set have the same
     meaning as for patch.
 
-You can either call `patch.object` with three arguments or two arguments. The three
-argument form takes the object to be patched, the attribute name and the
+You can either call `patch.object` with three arguments or two arguments. The
+three argument form takes the object to be patched, the attribute name and the
 object to replace the attribute with.
 
 When calling with the two argument form you omit the replacement object, and a
