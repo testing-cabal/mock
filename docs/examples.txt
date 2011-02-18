@@ -4,7 +4,7 @@
 
 .. testsetup::
 
-    import os, sys, unittest
+    import os, sys
     if not os.getcwd() in sys.path:
         sys.path.append(os.getcwd())
 
@@ -13,6 +13,9 @@
     class SomeClass(object):
         static_method = None
         class_method = None
+
+    sys.modules['package'] = package = Mock()
+    sys.modules['package.module'] = package.module
 
 
 For comprehensive examples, see the unit tests included in the full source
@@ -25,8 +28,8 @@ Mock Examples
 Mock Patching Methods
 ---------------------
 
-``Mock`` is callable. If it is called then it sets a ``called`` attribute to
-``True``.
+`Mock` objects are callable. If they are called then the ``called`` attribute is
+set to `True`.
 
 This example tests that calling ``method`` results in a call to ``something``:
 
@@ -45,8 +48,9 @@ This example tests that calling ``method`` results in a call to ``something``:
     >>> real.something.called
     True
 
-If you want to catch the arguments to make assertions about them this
-information, and more, is exposed:
+If you want access to the actual arguments the mock was called with, for example
+to make assertions about the arguments themselves, then this information is
+available.
 
 .. doctest::
 
@@ -63,7 +67,7 @@ Checking ``call_args_list`` tests how many times the mock was called, and the
 arguments for each call, in a single assertion.
 
 If the mock has only been called once then you can use
-:method:`Mock.assert_called_once_with`:
+:meth:`Mock.assert_called_once_with`:
 
 .. doctest::
 
@@ -74,7 +78,7 @@ If the mock has only been called once then you can use
 
 If you don't care how many times an object has been called, but are just
 interested in the most recent call, then you can use
-:method:`Mock.assert_called_with`:
+:meth:`Mock.assert_called_with`:
 
 .. doctest::
 
@@ -100,7 +104,7 @@ Mock for Method Calls on an Object
 
 We don't have to do any work to provide the 'close' method on our mock.
 Accessing close creates it. So, if 'close' hasn't already been called then
-accessing it in the test will create it, but :method:`Mock.assert_called_with`
+accessing it in the test will create it, but :meth:`Mock.assert_called_with`
 will raise a failure exception.
 
 As ``close`` is a mock object is has all the attributes from the previous
@@ -255,6 +259,8 @@ they decorate:
     ...     SomeClass.class_method()
     ...
     >>> test()
+    >>> mock.assert_called_with()
+    >>> assert mock.call_count == 1
     >>> assert mock.called
 
 The decorator is applied to a function (called ``test`` above). The patching
@@ -302,9 +308,10 @@ If you don't want to call the decorated test function yourself, you can add
 ::
 
     @apply
-    @patch('Package.Module.attribute', sentinel.Attribute)
+    @patch('package.module.ClassName.attribute', sentinel.attribute)
     def test():
-        "do something"
+        from package.module import ClassName
+        assert ClassName.attribute == sentinel.attribute
 
 A nice pattern is to actually decorate test methods themselves:
 
