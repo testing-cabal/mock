@@ -14,11 +14,6 @@
         static_method = None
         class_method = None
 
-    class Test(unittest.TestCase):
-        def testSomething(self):
-            pass
-    self = Test('testSomething')
-
 
 For comprehensive examples, see the unit tests included in the full source
 distribution.
@@ -91,19 +86,22 @@ interested in the most recent call, then you can use
 Mock for Method Calls on an Object
 ----------------------------------
 
-::
+.. doctest::
 
-    def test_closer_closes_something(self):
-        real = ProductionClass()
-        mock = Mock()
+    >>> class ProductionClass(object):
+    ...     def closer(self, something):
+    ...         something.close()
+    ...
+    >>> real = ProductionClass()
+    >>> mock = Mock()
+    >>> real.closer(mock)
+    >>> mock.close.assert_called_with()
 
-        real.closer(mock)
-
-        self.assertTrue(mock.close.called, "closer didn't close something")
 
 We don't have to do any work to provide the 'close' method on our mock.
 Accessing close creates it. So, if 'close' hasn't already been called then
-accessing it in the test will create it - but ``called`` will be ``False``.
+accessing it in the test will create it, but :method:`Mock.assert_called_with`
+will raise a failure exception.
 
 As ``close`` is a mock object is has all the attributes from the previous
 example.
@@ -117,16 +115,15 @@ new mock. This means that you can't tell if any methods were called that
 shouldn't have been. There are two ways round this. The first is by
 restricting the methods available on your mock.
 
-::
+.. doctest::
 
-    def test_closer_closes_something(self):
-        real = ProductionClass()
-        mock = Mock(spec=['close'])
-
-        real.closer(mock)
-
-        self.assertTrue(mock.close.called, "closer didn't close something")
-
+    >>> mock = Mock(spec=['close'])
+    >>> real.closer(mock)
+    >>> mock.close.assert_called_with()
+    >>> mock.foo
+    Traceback (most recent call last):
+      ...
+    AttributeError: Mock object has no attribute 'foo'
 
 If ``closer`` calls any methods on ``mock`` *other* than close, then an
 ``AttributeError`` will be raised.
@@ -156,6 +153,8 @@ a convenient way of looking at all method calls:
 
 If you make an assertion about ``method_calls`` and any unexpected methods
 have been called, then the assertion will fail.
+
+
 
 
 Setting Return Values and Attributes
@@ -256,8 +255,7 @@ they decorate:
     ...     SomeClass.class_method()
     ...
     >>> test()
-
-    >>> self.assertTrue(mock.called, "class_method not called")
+    >>> assert mock.called
 
 The decorator is applied to a function (called ``test`` above). The patching
 only applies inside the body of the function. You have to call the function
@@ -274,13 +272,12 @@ They can be stacked to perform multiple simultaneous patches:
     >>> @patch.object(SomeClass, 'class_method', mock1)
     ... @patch.object(SomeClass, 'static_method', mock2)
     ... def test():
-    ...     SomeClass.class_method()
-    ...     SomeClass.static_method()
+    ...     SomeClass.class_method('foo')
+    ...     SomeClass.static_method('bar')
     ...
     >>> test()
-
-    >>> self.assertTrue(mock1.called, "class_method not called")
-    >>> self.assertTrue(mock2.called, "static_method not called")
+    >>> mock1.assert_called_once_with('foo')
+    >>> mock2.assert_called_once_with('bar')
 
 If you are patching a module (including ``__builtin__``) then use ``patch``
 instead of ``patch.object``:
