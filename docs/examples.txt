@@ -7,7 +7,7 @@
     import os, sys, unittest
     if not os.getcwd() in sys.path:
         sys.path.append(os.getcwd())
-        
+
     from mock import Mock, sentinel, patch
 
     class SomeClass(object):
@@ -35,36 +35,57 @@ Mock Patching Methods
 
 This example tests that calling ``method`` results in a call to ``something``:
 
-::
+.. doctest::
 
-    def test_method_calls_something(self):
-        real = ProductionClass()
-        real.something = Mock()
-        
-        real.method()
-        
-        self.assertTrue(real.something.called, "method didn't call something")
-    
-If you want to catch the arguments then there is other information exposed:
+    >>> from mock import Mock
+    >>> class ProductionClass(object):
+    ...     def method(self):
+    ...         self.something()
+    ...     def something(self):
+    ...         pass
+    ...
+    >>> real = ProductionClass()
+    >>> real.something = Mock()
+    >>> real.method()
+    >>> real.something.called
+    True
 
-::
+If you want to catch the arguments to make assertions about them this
+information, and more, is exposed:
 
-    def test_method_calls_something(self):
-        real = ProductionClass()
-        real.something = Mock()
-        
-        real.method()
-        
-        self.assertEqual(real.something.call_count, 1, "something called incorrect number of times")
-        
-        args = ()
-        keywargs = {}
-        self.assertEqual(real.something.call_args, (args, keywargs), "something called with incorrect arguments")
-        self.assertEqual(real.something.call_args_list, [(args, keywargs)], 
-                          "something called with incorrect arguments")
+.. doctest::
+
+    >>> real = ProductionClass()
+    >>> real.something = Mock()
+    >>> real.method()
+    >>> real.something.call_count
+    1
+    >>> args, kwargs = (), {}
+    >>> assert real.something.call_args == (args, kwargs)
+    >>> assert real.something.call_args_list == [(args, kwargs)]
 
 Checking ``call_args_list`` tests how many times the mock was called, and the
 arguments for each call, in a single assertion.
+
+If the mock has only been called once then you can use
+:method:`Mock.assert_called_once_with`:
+
+.. doctest::
+
+    >>> real = ProductionClass()
+    >>> real.something = Mock()
+    >>> real.method()
+    >>> real.something.assert_called_once_with()
+
+If you don't care how many times an object has been called, but are just
+interested in the most recent call, then you can use
+:method:`Mock.assert_called_with`:
+
+.. doctest::
+
+    >>> mock = Mock(return_value=None)
+    >>> mock(1, 2, 3)
+    >>> mock.assert_called_with(1, 2, 3)
 
 
 Mock for Method Calls on an Object
@@ -75,9 +96,9 @@ Mock for Method Calls on an Object
     def test_closer_closes_something(self):
         real = ProductionClass()
         mock = Mock()
-        
+
         real.closer(mock)
-        
+
         self.assertTrue(mock.close.called, "closer didn't close something")
 
 We don't have to do any work to provide the 'close' method on our mock.
@@ -101,11 +122,11 @@ restricting the methods available on your mock.
     def test_closer_closes_something(self):
         real = ProductionClass()
         mock = Mock(spec=['close'])
-        
+
         real.closer(mock)
-        
+
         self.assertTrue(mock.close.called, "closer didn't close something")
-        
+
 
 If ``closer`` calls any methods on ``mock`` *other* than close, then an
 ``AttributeError`` will be raised.
@@ -131,7 +152,7 @@ a convenient way of looking at all method calls:
     <mock.Mock object at 0x...>
     >>> mock.method_calls
     [('method', (), {}), ('Property.method', (10,), {'x': 53})]
-    >>> 
+    >>>
 
 If you make an assertion about ``method_calls`` and any unexpected methods
 have been called, then the assertion will fail.
@@ -229,13 +250,13 @@ they decorate:
 .. doctest::
 
     >>> mock = Mock()
-    
-    >>> @patch.object(SomeClass, 'class_method', mock) 
+
+    >>> @patch.object(SomeClass, 'class_method', mock)
     ... def test():
     ...     SomeClass.class_method()
-    ... 
+    ...
     >>> test()
-    
+
     >>> self.assertTrue(mock.called, "class_method not called")
 
 The decorator is applied to a function (called ``test`` above). The patching
@@ -249,15 +270,15 @@ They can be stacked to perform multiple simultaneous patches:
 
     >>> mock1 = Mock()
     >>> mock2 = Mock()
-    
-    >>> @patch.object(SomeClass, 'class_method', mock1) 
-    ... @patch.object(SomeClass, 'static_method', mock2) 
+
+    >>> @patch.object(SomeClass, 'class_method', mock1)
+    ... @patch.object(SomeClass, 'static_method', mock2)
     ... def test():
     ...     SomeClass.class_method()
     ...     SomeClass.static_method()
-    ... 
+    ...
     >>> test()
-    
+
     >>> self.assertTrue(mock1.called, "class_method not called")
     >>> self.assertTrue(mock2.called, "static_method not called")
 
@@ -268,14 +289,14 @@ instead of ``patch.object``:
 
     >>> mock = Mock()
     >>> mock.return_value = sentinel.Handle
-    >>> @patch('__builtin__.open', mock) 
+    >>> @patch('__builtin__.open', mock)
     ... def test():
     ...     return open('filename', 'r')
     ...
     >>> handle = test()
     >>> mock.assert_called_with('filename', 'r')
     >>> assert handle == sentinel.Handle, "incorrect file handle returned"
-    
+
 The module name can be 'dotted', in the form ``package.module`` if needed.
 
 If you don't want to call the decorated test function yourself, you can add
@@ -294,12 +315,12 @@ A nice pattern is to actually decorate test methods themselves:
 
     @patch.object(SomeClass, 'attribute', sentinel.Attribute)
     def testMethod(self):
-        self.assertEqual(SomeClass.attribute, sentinel.Attribute, "SomeClass not patched")    
-    
+        self.assertEqual(SomeClass.attribute, sentinel.Attribute, "SomeClass not patched")
+
 If you omit the second argument to ``patch`` (or the third argument to ``patch.object``) then the attribute will be patched with a mock for you. The mock will be passed in as extra argument(s) to the function / method under test:
 
 ::
-    
+
     @patch.object(SomeClass, 'staticmethod')
     def testMethod(self, mockMethod):
         SomeClass.staticmethod()
