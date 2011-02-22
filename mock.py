@@ -889,7 +889,10 @@ def get_method(name, func):
     return method
 
 
-_magics = set('__%s__' % method for method in ' '.join([magic_methods, numerics, inplace, right, extra]).split())
+_magics = set(
+    '__%s__' % method for method in
+    ' '.join([magic_methods, numerics, inplace, right, extra]).split()
+)
 
 _all_magics = _magics | _non_defaults
 
