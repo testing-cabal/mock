@@ -318,17 +318,16 @@ If you don't want to call the decorated test function yourself, you can add
     ...
     >>> test()
 
-A nice pattern is to actually decorate test methods themselves:
-
-::
+A nice pattern is to actually decorate test methods themselves::
 
     @patch.object(SomeClass, 'attribute', sentinel.Attribute)
     def testMethod(self):
         self.assertEqual(SomeClass.attribute, sentinel.Attribute, "SomeClass not patched")
 
-If you omit the second argument to ``patch`` (or the third argument to ``patch.object``) then the attribute will be patched with a mock for you. The mock will be passed in as extra argument(s) to the function / method under test:
-
-::
+If you omit the second argument to ``patch`` (or the third argument to
+``patch.object``) then the attribute will be patched with a mock for you. The
+mock will be passed in as extra argument(s) to the function / method under
+test::
 
     @patch.object(SomeClass, 'staticmethod')
     def testMethod(self, mockMethod):
@@ -336,9 +335,7 @@ If you omit the second argument to ``patch`` (or the third argument to ``patch.o
         self.assertTrue(mockMethod.called, "SomeClass not patched with a mock")
 
 
-You can stack up multiple patch decorators using this pattern:
-
-::
+You can stack up multiple patch decorators using this pattern::
 
     @patch('module.ClassName1')
     @patch('module.ClassName2')
