@@ -10,6 +10,7 @@
     if not os.getcwd() in sys.path:
         sys.path.append(os.getcwd())
 
+    import unittest
     from mock import Mock, sentinel, patch
 
     class SomeClass(object):
@@ -153,29 +154,31 @@ the value to patch it with.
     >>> test()
 
 
-If you don't want to call the decorated test function yourself, you can add
-``apply`` as a decorator on top::
 
-    @apply
-    @patch('Package.Module.attribute', sentinel.attribute)
-    def test():
-        "do something"
+A nice pattern is to actually decorate test methods themselves:
 
-(Note that this leaves test == None)
+.. doctest::
 
+    >>> class MyTest(unittest.TestCase):
+    ...     @patch.object(SomeClass, 'attribute', sentinel.attribute)
+    ...     def test_something(self):
+    ...         self.assertEqual(SomeClass.attribute, sentinel.attribute)
+    ...
+    >>> original = SomeClass.attribute
+    >>> MyTest('test_something').test_something()
+    >>> assert SomeClass.attribute == original
 
-A nice pattern is to actually decorate test methods themselves::
-
-    @patch('Package.Module.attribute', sentinel.Attribute)
-    def testMethod(self):
-        "do something"
-
-
-If you want to patch with a Mock, you can use ``patch`` with only one argument
+If you want to patch with a Mock, you can use `patch` with only one argument
 (or ``patch.object`` with two arguments). The mock will be created for you and
-passed into the test function / method::
+passed into the test function / method:
 
-    @patch('Package.Module.Class')
-    def testMethod(self, mMckClass):
-        "do something"
+.. doctest::
+
+    >>> class MyTest(unittest.TestCase):
+    ...     @patch.object(SomeClass, 'static_method')
+    ...     def test_something(self, mock_method):
+    ...         SomeClass.static_method()
+    ...         mock_method.assert_called_with()
+    ...
+    >>> MyTest('test_something').test_something()
 

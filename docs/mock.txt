@@ -153,6 +153,16 @@ Attributes
         <mock.Mock object at 0x...>
         >>> mock.return_value.assert_called_with()
 
+    `return_value` can also be set in the constructor:
+
+    .. doctest::
+
+        >>> mock = Mock(return_value=3)
+        >>> mock.return_value
+        3
+        >>> mock()
+        3
+
 
 .. attribute:: Mock.side_effect
 
@@ -198,7 +208,6 @@ Attributes
 
     .. doctest::
 
-        >>> from mock import Mock, DEFAULT
         >>> mock = Mock(return_value=3)
         >>> def side_effect(*args, **kwargs):
         ...     return DEFAULT
@@ -206,6 +215,18 @@ Attributes
         >>> mock.side_effect = side_effect
         >>> mock()
         3
+
+    `side_effect` can be set in the constructor. Here's an example that adds one
+    to the value the mock is called with and returns it:
+
+    .. doctest::
+
+        >>> side_effect = lambda value: value + 1
+        >>> mock = Mock(side_effect=side_effect)
+        >>> mock(3)
+        4
+        >>> mock(-8)
+        -7
 
 .. attribute:: Mock.call_args
 

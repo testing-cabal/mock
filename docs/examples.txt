@@ -347,7 +347,10 @@ test:
     ...
     >>> MyTest('test_something').test_something()
 
-You can stack up multiple patch decorators using this pattern::
+You can stack up multiple patch decorators using this pattern:
+
+.. doctest::
+
     >>> class MyTest(unittest.TestCase):
     ...     @patch('package.module.ClassName1')
     ...     @patch('package.module.ClassName2')
