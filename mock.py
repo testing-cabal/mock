@@ -244,7 +244,8 @@ class Mock(object):
       to the wrapped object and the ``return_value`` is returned instead.
 
     * ``name``: If the mock has a name then it will be used in the repr of the
-      mock. This can be useful for debugging.
+      mock. This can be useful for debugging. The name is propagated to child
+      mocks.
     """
     def __new__(cls, *args, **kw):
         # every instance has its own class
