@@ -296,7 +296,7 @@ Attributes
         True
 
 The ``Mock`` class has support for mocking magic methods. See :ref:`magic
-methods` for the full details.
+methods <magic-methods>` for the full details.
 
 -----
 
