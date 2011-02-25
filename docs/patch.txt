@@ -5,6 +5,20 @@
 
 .. currentmodule:: mock
 
+.. testsetup::
+
+    import os, sys
+    if not os.getcwd() in sys.path:
+        sys.path.append(os.getcwd())
+
+    from mock import Mock, sentinel, patch
+    import unittest
+
+    class SomeClass(object):
+        static_method = None
+        class_method = None
+        attribute = None
+
 
 The patch decorators are used for patching objects only within the scope of
 the function they decorate. They automatically handle the unpatching for you,
@@ -53,13 +67,16 @@ object to replace the attribute with.
 
 When calling with the two argument form you omit the replacement object, and a
 mock is created for you and passed in as an extra argument to the decorated
-function::
+function:
 
-    @patch.object(SomeClass, 'classmethod')
-    def test_something(self, mockMethod):
-        SomeClass.classmethod(3)
+.. doctest::
 
-        mockMethod.assert_called_with(3)
+    >>> @patch.object(SomeClass, 'class_method')
+    ... def test(mock_method):
+    ...     SomeClass.class_method(3)
+    ...     mock_method.assert_called_with(3)
+    ...
+    >>> test()
 
 ``spec`` and ``create`` have the same meaning as for the patch decorator.
 
