@@ -9,11 +9,16 @@
     import os, sys
     if not os.getcwd() in sys.path:
         sys.path.append(os.getcwd())
-        
-    from mock import Mock, sentinel
-    
-    class ProductionClass(object):
-        pass
+
+    from mock import Mock, sentinel, patch
+
+    class SomeClass(object):
+        static_method = None
+        class_method = None
+        attribute = None
+
+    sys.modules['package'] = package = Mock(name='package')
+    sys.modules['package.module'] = package.module
 
 
 Using Mock
@@ -27,9 +32,9 @@ Using Mock
 .. doctest::
 
     >>> from mock import Mock
-    >>> real = ProductionClass()
+    >>> real = SomeClass()
     >>> real.method = Mock()
-    >>> 
+    >>>
     >>> real.method(3, 4, 5, key='value')
     <mock.Mock object at 0x...>
     >>>
@@ -38,7 +43,7 @@ Once the mock has been used it has methods and attributes that allow you to
 make assertions about how it has been used:
 
 .. doctest::
-    
+
     >>> real.method.assert_called_with(3, 4, 5, key='value')
     >>> real.method.called
     True
@@ -55,7 +60,7 @@ Mocks also record calls made to attributes, their 'child' attributes:
     <mock.Mock object at 0x...>
     >>> mock.method_calls
     [('something', (), {})]
-    
+
 You can also create Mock objects that behave like the class they are intended
 to mock. This is done with the ``spec`` keyword argument, which either takes a
 list of strings describing the attributes that the mock should have - or you
@@ -89,11 +94,11 @@ sequence from repeated calls:
     Traceback (most recent call last):
       ...
     Exception: Boom!
-    
+
     >>> results = [1, 2, 3]
     >>> def side_effect(*args, **kwargs):
     ...     return results.pop()
-    ... 
+    ...
     >>> mock.side_effect = side_effect
     >>> mock(), mock(), mock()
     (3, 2, 1)
@@ -107,9 +112,8 @@ Sentinel
 .. doctest::
 
     >>> from mock import sentinel
-    >>> real = ProductionClass()
+    >>> real = SomeClass()
     >>> real.method = Mock()
-    >>> 
     >>> real.method.return_value = sentinel.return_value
     >>> real.method()
     <SentinelObject "return_value">
@@ -123,36 +127,37 @@ modules and classes are effectively globals any patching has to be undone (or
 it persists into other tests). These decorators do the unpatching for you,
 making it easier to test with module and class level patching.
 
-The two decorators are 'patch' and 'patch.object'. 'patch' takes a single
-string, of the form ``package.module.Class.attribute`` to specify the
+The two decorators are `patch` and `patch.object`. `patch` takes a single
+string, of the form `package.module.Class.attribute` to specify the
 attribute you are patching. It also optionally takes a value that you want the
 attribute (or class or whatever) to be replaced with. 'patch.object' takes an
 object and the name of the attribute you would like patched, plus optionally
 the value to patch it with.
 
-::
+.. doctest::
 
-    
-    original = SomeClass.attribute
-    @patch.object(SomeClass, 'attribute', sentinel.Attribute)
-    def test():
-        self.assertEqual(SomeClass.attribute, sentinel.Attribute, "class attribute not patched")
-    test()
-    
-    self.assertEqual(SomeClass.attribute, original, "attribute not restored")
-    
-    
-    @patch('Package.Module.attribute', sentinel.Attribute)
-    def test():
-        "do something"
-    test()
+
+    >>> original = SomeClass.attribute
+    >>> @patch.object(SomeClass, 'attribute', sentinel.attribute)
+    ... def test():
+    ...     assert SomeClass.attribute == sentinel.attribute
+    ...
+    >>> test()
+    >>> assert SomeClass.attribute == original
+
+    >>> @patch('package.module.attribute', sentinel.attribute)
+    ... def test():
+    ...     from package.module import attribute
+    ...     assert attribute is sentinel.attribute
+    ...
+    >>> test()
 
 
 If you don't want to call the decorated test function yourself, you can add
 ``apply`` as a decorator on top::
 
     @apply
-    @patch('Package.Module.attribute', sentinel.Attribute)
+    @patch('Package.Module.attribute', sentinel.attribute)
     def test():
         "do something"
 
@@ -164,7 +169,7 @@ A nice pattern is to actually decorate test methods themselves::
     @patch('Package.Module.attribute', sentinel.Attribute)
     def testMethod(self):
         "do something"
-    
+
 
 If you want to patch with a Mock, you can use ``patch`` with only one argument
 (or ``patch.object`` with two arguments). The mock will be created for you and
