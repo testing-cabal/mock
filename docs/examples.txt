@@ -16,7 +16,7 @@
         class_method = None
         attribute = None
 
-    sys.modules['package'] = package = Mock()
+    sys.modules['package'] = package = Mock(name='package')
     sys.modules['package.module'] = package.module
 
 
