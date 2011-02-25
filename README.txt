@@ -63,7 +63,7 @@ mock (or other object) during the test and restored when the test ends::
     >>> from mock import patch
     >>> @patch('test_module.ClassName1')
     ... @patch('test_module.ClassName2')
-    ... def test(MockClass1, MockClass2):
+    ... def test(MockClass2, MockClass1):
     ...     test_module.ClassName1()
     ...     test_module.ClassName2()
 
@@ -71,6 +71,16 @@ mock (or other object) during the test and restored when the test ends::
     ...     assert MockClass2.called
     ...
     >>> test()
+
+.. note::
+
+   When you nest patch decorators the mocks are passed in to the decorated
+   function in the same order they applied (the normal *python* order that
+   decorators are applied). This means from the bottom up, so in the example
+   above the mock for `test_module.ClassName2` is passed in first.
+
+As well as a decorator `patch` can be used as a context manager in a with
+statement::
 
     >>> with patch.object(ProductionClass, 'method') as mock_method:
     ...     mock_method.return_value = None

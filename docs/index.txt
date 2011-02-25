@@ -184,6 +184,8 @@ mock (or other object) during the test and restored when the test ends:
    decorators are applied). This means from the bottom up, so in the example
    above the mock for `test_module.ClassName2` is passed in first.
 
+As well as a decorator `patch` can be used as a context manager in a with
+statement:
 
     >>> with patch.object(ProductionClass, 'method') as mock_method:
     ...     mock_method.return_value = None
