@@ -348,15 +348,14 @@ test:
     >>> MyTest('test_something').test_something()
 
 You can stack up multiple patch decorators using this pattern::
-
-    @patch('module.ClassName1')
-    @patch('module.ClassName2')
-    def test_method(self, MockClass1, MockClass2):
-        module.ClassName1()
-        module.ClassName2()
-        self.assertTrue(MockClass1.called, "ClassName1 not patched")
-        self.assertTrue(MockClass2.called, "ClassName2 not patched")
-
+    >>> class MyTest(unittest.TestCase):
+    ...     @patch('package.module.ClassName1')
+    ...     @patch('package.module.ClassName2')
+    ...     def test_something(self, MockClass2, MockClass1):
+    ...         self.assertTrue(package.module.ClassName1 is MockClass1)
+    ...         self.assertTrue(package.module.ClassName2 is MockClass2)
+    ...
+    >>> MyTest('test_something').test_something()
 
 When you nest patch decorators the mocks are passed in to the decorated
 function in the same order they applied (the normal *python* order that
