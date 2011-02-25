@@ -19,6 +19,9 @@
         class_method = None
         attribute = None
 
+    sys.modules['package'] = package = Mock(name='package')
+    sys.modules['package.module'] = package.module
+
 
 The patch decorators are used for patching objects only within the scope of
 the function they decorate. They automatically handle the unpatching for you,
