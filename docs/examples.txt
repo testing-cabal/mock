@@ -9,6 +9,7 @@
         sys.path.append(os.getcwd())
 
     from mock import Mock, sentinel, patch
+    import unittest
 
     class SomeClass(object):
         static_method = None
@@ -322,13 +323,10 @@ A nice pattern is to actually decorate test methods themselves:
 
 .. doctest::
 
-    >>> from mock import patch, sentinel
-    >>> from unittest import TestCase
-    >>>
-    >>> class MyTest(TestCase):
-    ...  @patch.object(SomeClass, 'attribute', sentinel.attribute)
-    ...  def test_something(self):
-    ...   self.assertEqual(SomeClass.attribute, sentinel.attribute)
+    >>> class MyTest(unittest.TestCase):
+    ...     @patch.object(SomeClass, 'attribute', sentinel.attribute)
+    ...     def test_something(self):
+    ...         self.assertEqual(SomeClass.attribute, sentinel.attribute)
     ...
     >>> original = SomeClass.attribute
     >>> MyTest('test_something').test_something()
@@ -337,13 +335,17 @@ A nice pattern is to actually decorate test methods themselves:
 If you omit the second argument to ``patch`` (or the third argument to
 ``patch.object``) then the attribute will be patched with a mock for you. The
 mock will be passed in as extra argument(s) to the function / method under
-test::
+test:
 
-    @patch.object(SomeClass, 'staticmethod')
-    def testMethod(self, mockMethod):
-        SomeClass.staticmethod()
-        self.assertTrue(mockMethod.called, "SomeClass not patched with a mock")
+.. doctest::
 
+    >>> class MyTest(unittest.TestCase):
+    ...     @patch.object(SomeClass, 'static_method')
+    ...     def test_something(self, mock_method):
+    ...         SomeClass.static_method()
+    ...         mock_method.assert_called_with()
+    ...
+    >>> MyTest('test_something').test_something()
 
 You can stack up multiple patch decorators using this pattern::
 
@@ -355,3 +357,8 @@ You can stack up multiple patch decorators using this pattern::
         self.assertTrue(MockClass1.called, "ClassName1 not patched")
         self.assertTrue(MockClass2.called, "ClassName2 not patched")
 
+
+When you nest patch decorators the mocks are passed in to the decorated
+function in the same order they applied (the normal *python* order that
+decorators are applied). This means from the bottom up, so in the example
+above the mock for `test_module.ClassName2` is passed in first.
