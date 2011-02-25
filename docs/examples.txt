@@ -13,6 +13,7 @@
     class SomeClass(object):
         static_method = None
         class_method = None
+        attribute = None
 
     sys.modules['package'] = package = Mock()
     sys.modules['package.module'] = package.module
@@ -159,8 +160,6 @@ If you make an assertion about ``method_calls`` and any unexpected methods
 have been called, then the assertion will fail.
 
 
-
-
 Setting Return Values and Attributes
 ------------------------------------
 
@@ -304,10 +303,7 @@ instead of ``patch.object``:
     >>> mock.assert_called_with('filename', 'r')
     >>> assert handle == sentinel.file_handle, "incorrect file handle returned"
 
-The module name can be 'dotted', in the form ``package.module`` if needed.
-
-If you don't want to call the decorated test function yourself, you can add
-``apply`` as a decorator on top:
+The module name can be 'dotted', in the form ``package.module`` if needed:
 
 .. doctest::
 
@@ -318,11 +314,25 @@ If you don't want to call the decorated test function yourself, you can add
     ...
     >>> test()
 
-A nice pattern is to actually decorate test methods themselves::
 
-    @patch.object(SomeClass, 'attribute', sentinel.Attribute)
-    def testMethod(self):
-        self.assertEqual(SomeClass.attribute, sentinel.Attribute, "SomeClass not patched")
+If you don't want to call the decorated test function yourself, you can add
+``apply`` as a decorator on top.
+
+A nice pattern is to actually decorate test methods themselves:
+
+.. doctest::
+
+    >>> from mock import patch, sentinel
+    >>> from unittest import TestCase
+    >>>
+    >>> class MyTest(TestCase):
+    ...  @patch.object(SomeClass, 'attribute', sentinel.attribute)
+    ...  def test_something(self):
+    ...   self.assertEqual(SomeClass.attribute, sentinel.attribute)
+    ...
+    >>> original = SomeClass.attribute
+    >>> MyTest('test_something').test_something()
+    >>> assert SomeClass.attribute == original
 
 If you omit the second argument to ``patch`` (or the third argument to
 ``patch.object``) then the attribute will be patched with a mock for you. The
