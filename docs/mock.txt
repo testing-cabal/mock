@@ -305,4 +305,4 @@ methods` for the full details.
        instead of raises an ``AttributeError``. This is because the interpreter
        will often implicitly request these methods, and gets *very* confused to
        get a new Mock object when it expects a magic method. If you need magic
-       method support see :ref:`magic methods`.
+       method support see :ref:`magic methods <magic-methods>`.

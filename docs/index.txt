@@ -187,6 +187,8 @@ mock (or other object) during the test and restored when the test ends:
 As well as a decorator `patch` can be used as a context manager in a with
 statement:
 
+.. doctest::
+
     >>> with patch.object(ProductionClass, 'method') as mock_method:
     ...     mock_method.return_value = None
     ...     real = ProductionClass()
@@ -208,7 +210,7 @@ ends:
    ...
    >>> assert foo == original
 
-Mock supports the mocking of Python :ref:`magic methods`. The
+Mock supports the mocking of Python :ref:`magic methods <magic-methods>`. The
 easiest way of using magic methods is with the :class:`MagicMock` class. It
 allows you to do things like:
 
