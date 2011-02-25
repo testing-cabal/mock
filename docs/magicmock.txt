@@ -1,5 +1,5 @@
 
-.. _label: magic methods
+.. _magic-methods:
 
 Mocking Magic Methods
 =====================
