@@ -200,11 +200,11 @@ Attributes
         >>> mock(), mock(), mock()
         (3, 2, 1)
 
-    The side_effect function is called with the same arguments as the mock (so
+    The `side_effect` function is called with the same arguments as the mock (so
     it is wise for it to take arbitrary args and keyword arguments) and
     whatever it returns is used as the return value for the call. The
-    exception is if it returns :data:`DEFAULT`, in which case the normal
-    :attr:`Mock.return_value` is used.
+    exception is if `side_effect` returns :data:`DEFAULT`, in which case the
+    normal :attr:`Mock.return_value` is used.
 
     .. doctest::
 

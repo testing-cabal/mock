@@ -251,7 +251,7 @@ standard way that Python applies decorators. The order of the created mocks
 passed into your test function matches this order.
 
 Like all context-managers patches can be nested using contextlib's nested
-function; *every* patching will appear in the tuple after "as"::
+function; *every* patching will appear in the tuple after "as":
 
 .. doctest::
 
