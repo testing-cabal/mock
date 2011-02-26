@@ -152,13 +152,21 @@ decorators.
 
 You can stack up multiple patch decorators using this pattern::
 
-    @patch('module.ClassName2')
-    @patch('module.ClassName1')
-    def testMethod(self, MockClass1, MockClass2):
-        ClassName1()
-        ClassName2()
-        self.assertEqual(MockClass1.called, "ClassName1 not patched")
-        self.assertEqual(MockClass2.called, "ClassName2 not patched")
+.. doctest::
+
+    >>> @patch.object(SomeClass, 'class_method')
+    ... @patch.object(SomeClass, 'static_method')
+    ... def test(mock1, mock2):
+    ...     assert SomeClass.static_method is mock1
+    ...     assert SomeClass.class_method is mock2
+    ...     SomeClass.static_method('foo')
+    ...     SomeClass.class_method('bar')
+    ...     return mock1, mock2
+    ...
+    >>> mock1, mock2 = test()
+    >>> mock1.assert_called_once_with('foo')
+    >>> mock2.assert_called_once_with('bar')
+
 
 Note that the decorators are applied from the bottom upwards. This is the
 standard way that Python applies decorators. The order of the created mocks
@@ -167,21 +175,23 @@ passed into your test function matches this order.
 Like all context-managers patches can be nested using contextlib's nested
 function; *every* patching will appear in the tuple after "as"::
 
-     from contextlib import nested
-     with nested(patch('Package.ModuleName.ClassName'),
-                 patch('Package.ModuleName.ClassName2', TestUtils.MockClass2)) as (MockClass1, MockClass2):
-          instance = ClassName(ClassName2())
-          self.assertEqual(instance.f(), "expected")
+.. doctest::
 
+    >>> from contextlib import nested
+    >>> with nested(
+    ...         patch('package.module.ClassName1'),
+    ...         patch('package.module.ClassName2')
+    ...     ) as (MockClass1, MockClass2):
+    ...     from package import module
+    ...     assert module.ClassName1 is MockClass1
+    ...     assert module.ClassName2 is MockClass2
+    ...
 
 Patching Descriptors
 ====================
 
 Since version 0.6.0 both patch_ and patch.object_ have been able to correctly
 patch and restore descriptors; class methods, static methods and properties.
-You should patch these on the *class* rather than an instance::
+You should patch these on the *class* rather than an instance.
 
-    @patch('module.ClassName.static')
-    def testMethod(self, mockStatic):
-        ClassName.static('foo')
-        mockStatic.assert_called_with('foo')
+Since version 0.7.0 patch_ and patch.object_ work correctly
