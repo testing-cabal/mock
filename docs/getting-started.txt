@@ -123,6 +123,12 @@ Sentinel
 Patch Decorators
 ================
 
+.. note::
+
+   With `patch` it matters that you patch objects in the namespace where they
+   are looked up. This is normally straightforward, but for a quick guide
+   read :ref:`where to patch <where-to-patch>`.
+
 There are also decorators for doing module and class level patching. As
 modules and classes are effectively globals any patching has to be undone (or
 it persists into other tests). These decorators do the unpatching for you,

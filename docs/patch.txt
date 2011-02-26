@@ -29,14 +29,14 @@ the function they decorate. They automatically handle the unpatching for you,
 even if exceptions are raise. All of these functions can also be used in with
 statements or as class decorators.
 
+
+patch
+=====
+
 .. note::
 
     `patch` is straightforward to use. The key is to do the patching in the
     right namespace. See the section `where to patch`_.
-
-
-patch
-=====
 
 .. autofunction:: patch
 
