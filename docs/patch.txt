@@ -187,11 +187,13 @@ function; *every* patching will appear in the tuple after "as"::
     ...     assert module.ClassName2 is MockClass2
     ...
 
-Patching Descriptors
-====================
+Patching Descriptors and Proxy Objects
+======================================
 
 Since version 0.6.0 both patch_ and patch.object_ have been able to correctly
 patch and restore descriptors; class methods, static methods and properties.
 You should patch these on the *class* rather than an instance.
 
-Since version 0.7.0 patch_ and patch.object_ work correctly
+Since version 0.7.0 patch_ and patch.object_ work correctly with some objects
+that proxy attribute access, like the `django setttings object
+<http://www.voidspace.org.uk/python/weblog/arch_d7_2010_12_04.shtml#e1198>`_.
