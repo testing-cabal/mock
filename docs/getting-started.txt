@@ -62,6 +62,18 @@ Mocks also record calls made to attributes, their 'child' attributes:
     >>> mock.method_calls
     [('something', (), {})]
 
+It can be useful to give your mocks a name. The name is shown in the repr of
+the mock and can be helpful when the mock appears in test failure messages. The
+name is also propagated to attributes or methods of the mock:
+
+.. doctest::
+
+    >>> mock = Mock(name='foo')
+    >>> mock
+    <Mock name='foo' id='...'>
+    >>> mock.method
+    <Mock name='foo.method' id='...'>
+
 You can also create Mock objects that behave like the class they are intended
 to mock. This is done with the ``spec`` keyword argument, which either takes a
 list of strings describing the attributes that the mock should have - or you
