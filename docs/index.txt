@@ -274,16 +274,24 @@ References
 Articles and blog entries on testing with Mock:
 
 * `Mocking Django <http://www.mattjmorrison.com/blog/mocking-django>`_
-* `Checking multiple calls with mock and coping with mutable arguments <http://www.voidspace.org.uk/python/weblog/arch_d7_2010_11_20.shtml#e1197>`_
-* `Mocking unbound methods and properties <http://www.voidspace.org.uk/python/weblog/arch_d7_2010_11_20.shtml#e1196>`_
-* `Mocking patterns: chained calls, partial mocking and open as context manager <http://www.voidspace.org.uk/python/weblog/arch_d7_2010_10_02.shtml#e1188>`_
+* `Checking multiple calls with mock and coping with mutable arguments
+  <http://www.voidspace.org.uk/python/weblog/arch_d7_2010_11_20.shtml#e1197>`_
+* `Mocking unbound methods and properties
+  <http://www.voidspace.org.uk/python/weblog/arch_d7_2010_11_20.shtml#e1196>`_
+* `Mocking patterns: chained calls, partial mocking and open as context manager
+  <http://www.voidspace.org.uk/python/weblog/arch_d7_2010_10_02.shtml#e1188>`_
 * `Mock recipes <http://konryd.blogspot.com/2010/06/mock-recipies.html>`_
-* `Mockity mock mock - some love for the mock module <http://konryd.blogspot.com/2010/05/mockity-mock-mock-some-love-for-mock.html>`_
+* `Mockity mock mock - some love for the mock module
+  <http://konryd.blogspot.com/2010/05/mockity-mock-mock-some-love-for-mock.html>`_
 * `Python Unit Testing with Mock <http://www.insomnihack.com/?p=194>`_
-* `Python mock testing techniques and tools <http://agiletesting.blogspot.com/2009/07/python-mock-testing-techniques-and.html>`_
-* `How To Test Django Template Tags <http://techblog.ironfroggy.com/2008/10/how-to-test.html>`_
-* `A presentation on Unit Testing with Mock <http://pypap.blogspot.com/2008/10/newbie-nugget-unit-testing-with-mock.html>`_
-* `Mocking with Django and Google AppEngine <http://michael-a-nelson.blogspot.com/2008/09/mocking-with-django-and-google-app.html>`_
+* `Python mock testing techniques and tools
+  <http://agiletesting.blogspot.com/2009/07/python-mock-testing-techniques-and.html>`_
+* `How To Test Django Template Tags
+  <http://techblog.ironfroggy.com/2008/10/how-to-test.html>`_
+* `A presentation on Unit Testing with Mock
+  <http://pypap.blogspot.com/2008/10/newbie-nugget-unit-testing-with-mock.html>`_
+* `Mocking with Django and Google AppEngine
+  <http://michael-a-nelson.blogspot.com/2008/09/mocking-with-django-and-google-app.html>`_
 
 
 .. index:: tests
@@ -307,12 +315,11 @@ On Python 3.2 you can use ``unittest`` module from the standard library.
 
    ``python3.2 -m unittest discover``
 
-On Python 2.4 you will see one error; testwith.py will fail to import as it
-uses the ``with`` statement which is invalid syntax under Python 2.4.
-
 .. index:: Python 3
 
-On Python 3 the tests for unicode are skipped as they are not relevant.
+On Python 3 the tests for unicode are skipped as they are not relevant. On
+Python 2.4 tests that use the with statements are skipped as the with statement
+is invalid syntax on Python 2.4.
 
 
 .. index:: older versions

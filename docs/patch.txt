@@ -29,6 +29,11 @@ the function they decorate. They automatically handle the unpatching for you,
 even if exceptions are raise. All of these functions can also be used in with
 statements or as class decorators.
 
+.. note::
+
+    `patch` is straightforward to use. The key is to do the patching in the
+    right namespace. See the section `where to patch`_.
+
 
 patch
 =====
@@ -263,6 +268,13 @@ function; *every* patching will appear in the tuple after "as":
     ...     assert package.module.ClassName1 is MockClass1
     ...     assert package.module.ClassName2 is MockClass2
     ...
+
+
+Where to patch
+==============
+
+
+
 
 Patching Descriptors and Proxy Objects
 ======================================

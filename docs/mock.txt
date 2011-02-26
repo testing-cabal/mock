@@ -170,10 +170,11 @@ Attributes
     This can either be a function to be called when the mock is called, or an
     exception (class or instance) to be raised.
 
-    If you pass in a function it will be called with same arguments as the mock
-    and unless the mock returns the :data:`DEFAULT` singleton the mock will return
-    whatever the function returns. If the function returns default then the
-    mock will return its normal value (from the :attr:`Mock.return_value`.
+    If you pass in a function it will be called with same arguments as the
+    mock and unless the function returns the :data:`DEFAULT` singleton the
+    call to the mock will then return whatever the function returns. If the
+    function returns :data:`DEFAULT` then the mock will return its normal
+    value (from the :attr:`Mock.return_value`.
 
     An example of a mock that raises an exception (to test exception handling of
     an API):
