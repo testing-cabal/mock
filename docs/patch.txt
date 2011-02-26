@@ -26,7 +26,7 @@
 The patch decorators are used for patching objects only within the scope of
 the function they decorate. They automatically handle the unpatching for you,
 even if exceptions are raise. All of these functions can also be used in with
-statements.
+statements or as class decorators.
 
 
 patch
@@ -45,12 +45,19 @@ patch
     can set the `return_value` to be anything you want.
 
     To configure return values on methods of *instances* on the patched class
-    you must do this on the `return_value`. For example::
+    you must do this on the `return_value`. For example:
 
-        @patch('module.Class')
-        def test(MockClass):
-            instance = MockClass.return_value
-            instance.method.return_value = 'foo'
+    .. doctest::
+
+        >>> @patch('package.module.Class')
+        ... def test(MockClass):
+        ...     instance = MockClass.return_value
+        ...     instance.method.return_value = 'foo'
+        ...     from package.module import Class
+        ...     assert Class() is instance
+        ...     assert Class().method() == 'foo'
+        ...
+        >>> test()
 
 
 patch.object
