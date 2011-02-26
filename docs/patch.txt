@@ -13,6 +13,7 @@
 
     from mock import Mock, sentinel, patch
     import unittest
+    import unittest2
 
     class SomeClass(object):
         static_method = None
@@ -144,6 +145,80 @@ when the test ends.
     >>> assert 'newkey' not in os.environ
 
 
+patch methods: start and stop
+=============================
+
+All three patchers have `start` and `stop` methods. These make it simpler to do
+patching in `setUp` methods or where you want to do multiple patches without
+nesting decorators or with statements.
+
+To use them call `patch`, `patch.object` or `patch.dict` as normal and keep a
+reference to the returned `patcher` object. You can then call `start` to put
+the patch in place and `stop` to undo it.
+
+If you are using `patch` to create a mock for you then it will be returned by
+the call to `patcher.start`.
+
+.. doctest::
+
+    >>> patcher = patch('package.module.ClassName')
+    >>> from package import module
+    >>> original = module.ClassName
+    >>> new_mock = patcher.start()
+    >>> assert module.ClassName is not original
+    >>> assert module.ClassName is new_mock
+    >>> patcher.stop()
+    >>> assert module.ClassName is original
+    >>> assert module.ClassName is not new_mock
+
+
+A typical use case for this might be for doing multiple patches in the `setUp`
+method of a `TestCase`:
+
+.. doctest::
+
+    >>> class MyTest(unittest.TestCase):
+    ...     def setUp(self):
+    ...         self.patcher1 = patch('package.module.Class1')
+    ...         self.patcher2 = patch('package.module.Class2')
+    ...         self.MockClass1 = self.patcher1.start()
+    ...         self.MockClass2 = self.patcher2.start()
+    ...
+    ...     def tearDown(self):
+    ...         self.patcher1.stop()
+    ...         self.patcher2.stop()
+    ...
+    ...     def test_something(self):
+    ...         assert package.module.Class1 is self.MockClass1
+    ...         assert package.module.Class2 is self.MockClass2
+    ...
+    >>> MyTest('test_something').run()
+
+.. caution::
+
+    If you use this technique you must ensure that the patching is "undone" by
+    calling `stop`. This can be fiddlier than you might think, because if an
+    exception is raised in the setUp then tearDown is not called. `unittest2
+    <http://pypi.python.org/pypi/unittest2>`_ cleanup functions make this
+    easier
+
+    .. doctest::
+
+        >>> class MyTest(unittest2.TestCase):
+        ...     def setUp(self):
+        ...         self.patcher = patch('package.module.Class')
+        ...         self.MockClass = self.patcher.start()
+        ...         self.addCleanup(self.patcher.stop)
+        ...
+        ...     def test_something(self):
+        ...         assert package.module.Class is self.MockClass
+        ...
+        >>> MyTest('test_something').run()
+
+In fact `start` and `stop` are just aliases for the context manager
+`__enter__` and `__exit__` methods.
+
+
 Nesting Patch Decorators
 ========================
 
@@ -182,9 +257,8 @@ function; *every* patching will appear in the tuple after "as"::
     ...         patch('package.module.ClassName1'),
     ...         patch('package.module.ClassName2')
     ...     ) as (MockClass1, MockClass2):
-    ...     from package import module
-    ...     assert module.ClassName1 is MockClass1
-    ...     assert module.ClassName2 is MockClass2
+    ...     assert package.module.ClassName1 is MockClass1
+    ...     assert package.module.ClassName2 is MockClass2
     ...
 
 Patching Descriptors and Proxy Objects
