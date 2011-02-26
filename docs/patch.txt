@@ -200,7 +200,7 @@ method of a `TestCase`:
     calling `stop`. This can be fiddlier than you might think, because if an
     exception is raised in the setUp then tearDown is not called. `unittest2
     <http://pypi.python.org/pypi/unittest2>`_ cleanup functions make this
-    easier
+    easier.
 
     .. doctest::
 
@@ -214,6 +214,9 @@ method of a `TestCase`:
         ...         assert package.module.Class is self.MockClass
         ...
         >>> MyTest('test_something').run()
+
+    As an added bonus you no longer need to keep a reference to the `patcher`
+    object.
 
 In fact `start` and `stop` are just aliases for the context manager
 `__enter__` and `__exit__` methods.
