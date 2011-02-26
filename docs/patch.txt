@@ -206,9 +206,9 @@ method of a `TestCase`:
 
         >>> class MyTest(unittest2.TestCase):
         ...     def setUp(self):
-        ...         self.patcher = patch('package.module.Class')
-        ...         self.MockClass = self.patcher.start()
-        ...         self.addCleanup(self.patcher.stop)
+        ...         patcher = patch('package.module.Class')
+        ...         self.MockClass = patcher.start()
+        ...         self.addCleanup(patcher.stop)
         ...
         ...     def test_something(self):
         ...         assert package.module.Class is self.MockClass
