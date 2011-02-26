@@ -150,7 +150,7 @@ Nesting Patch Decorators
 If you want to perform multiple patches then you can simply stack up the
 decorators.
 
-You can stack up multiple patch decorators using this pattern::
+You can stack up multiple patch decorators using this pattern:
 
 .. doctest::
 
