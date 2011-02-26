@@ -411,7 +411,7 @@ class Mock(object):
                 raise AttributeError("Mock object has no attribute '%s'" % name)
 
             if not isinstance(value, Mock):
-                setattr(type(self), name, get_method(name, value))
+                setattr(type(self), name, _get_method(name, value))
                 original = value
                 real = lambda *args, **kw: original(self, *args, **kw)
                 value = mocksignature(value, real, skipfirst=True)
@@ -883,7 +883,8 @@ _non_defaults = set('__%s__' % method for method in [
 ])
 
 
-def get_method(name, func):
+def _get_method(name, func):
+    "Turns a callable object (like a mock) into a real function"
     def method(self, *args, **kw):
         return func(self, *args, **kw)
     method.__name__ = name
