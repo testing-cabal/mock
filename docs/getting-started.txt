@@ -85,7 +85,7 @@ raise an ``AttributeError``.
 
     >>> mock = Mock(spec=['something'])
     >>> mock.something()
-    <Mock name='mock.something' id='...'>
+    <mock.Mock object at 0x...>
     >>> mock.something_else()
     Traceback (most recent call last):
        ...
