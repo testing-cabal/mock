@@ -414,3 +414,9 @@ When you nest patch decorators the mocks are passed in to the decorated
 function in the same order they applied (the normal *python* order that
 decorators are applied). This means from the bottom up, so in the example
 above the mock for `test_module.ClassName2` is passed in first.
+
+
+patch as a context manager
+--------------------------
+
+`patch`, `patch.object` and `patch.dict` can all be used as
