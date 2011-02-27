@@ -60,6 +60,9 @@ Herman Sheremetyev.
 
     The examples for mock here assume version 0.7.0.
 
+    Also note that `python-mock` hasn't had a release in six years and `pMock`
+    won't import under Python 2.6 or more recent due to using the reserved
+    word "with" as a function.
 
 Simple fake object
 ~~~~~~~~~~~~~~~~~~
