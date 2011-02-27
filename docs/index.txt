@@ -340,4 +340,26 @@ Documentation for older versions of mock:
 Terminology
 ===========
 
-XXX
+Terminology for objects used to replace other ones can be confusing. Terms
+like double, fake, mock, stub, and spy are all used with varying meanings.
+
+In `classic mock terminology
+<http://xunitpatterns.com/Mocks,%20Fakes,%20Stubs%20and%20Dummies.html>`_
+:class:`mock.Mock` is a `spy <http://xunitpatterns.com/Test%20Spy.html>`_ that
+allows for *post-mortem* examination. This is what I call the "action ->
+assertion" pattern of testing.
+
+I'm not however a fan of this "statically typed mocking terminology" promulgated
+by `Martin Fowler <http://martinfowler.com/articles/mocksArentStubs.html>`_. It
+confuses usage patterns with implementation and prevents you from using natural
+terminology when discussing mocking.
+
+I much prefer duck typing, if an object used in your test suite looks like a
+mock object and quacks like a mock object then its fine to call it a mock no
+matter what the implementation looks like.
+
+This terminology is perhaps more useful in less capable languages where
+different usage patterns will *require* different implementations.
+`mock.Mock()` is capable of being used in most of the different roles
+described by Fowler, except (annoyingly / frustratingly / ironically) a Mock
+itself!
