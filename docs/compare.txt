@@ -180,7 +180,7 @@ Creating partial mocks
     mox.Verify(mock)
 
     # python-mock
-    mock = mock.Mock({"some_method", "value"}, SomeObject)
+    mock = mock.Mock({"some_method": "value"}, SomeObject)
     assertEqual("value", mock.some_method())
     mock.mockCheckCall(self, 0, "some_method")
 
