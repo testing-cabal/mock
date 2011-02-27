@@ -18,7 +18,7 @@
 
     def grob(val):
         "First frob and then clear val"
-        frob(val)
+        mymodule.frob(val)
         val.clear()
 
     mymodule.frob = frob
@@ -339,7 +339,7 @@ a helper function that pops the last argument of the call args list and
 decrements the call count. This allows you to make asserts as a series of
 calls to `assert_called_with` followed by a `pop_last_call`.
 
-.. code-block:: python
+.. doctest::
 
     >>> def pop_last_call(mock):
     ...     if not mock.call_count:
@@ -416,27 +416,24 @@ example I'm using *another* mock to store the arguments so that I can use the
 mock methods for doing the assertion. Again a helper function sets this up for
 me.
 
-.. code-block:: python
+.. doctest::
 
-    from mock import Mock, DEFAULT
-    from copy import deepcopy
-
-    def copy_call_args(mock):
-        new_mock = Mock()
-        def side_effect(*args, **kwargs):
-            args = deepcopy(args)
-            kwargs = deepcopy(kwargs)
-            new_mock(*args, **kwargs)
-            return DEFAULT
-        mock.side_effect = side_effect
-        return new_mock
-
-.. code-block:: pycon
-
-    >>> with patch('%s.frob' % __name__) as mock_frob:
+    >>> from copy import deepcopy
+    >>> from mock import patch, DEFAULT
+    >>> def copy_call_args(mock):
+    ...     new_mock = Mock()
+    ...     def side_effect(*args, **kwargs):
+    ...         args = deepcopy(args)
+    ...         kwargs = deepcopy(kwargs)
+    ...         new_mock(*args, **kwargs)
+    ...         return DEFAULT
+    ...     mock.side_effect = side_effect
+    ...     return new_mock
+    ...
+    >>> with patch('mymodule.frob') as mock_frob:
     ...     new_mock = copy_call_args(mock_frob)
     ...     val = set([6])
-    ...     grob(val)
+    ...     mymodule.grob(val)
     ...
     >>> new_mock.assert_called_with(set([6]))
     >>> new_mock.call_args
