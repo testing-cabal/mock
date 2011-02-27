@@ -44,20 +44,13 @@ itself is garbage collected. This is tricky to get right though.
 CHANGELOG
 =========
 
-2011/02/16 Version 0.7.0 RC 1
------------------------------
+2011/02/XX Version 0.7.0
+------------------------
 
-Changes since beta 4:
+No API changes since 0.7.0 rc1. Many documentation changes including a stylish
+new `Sphinx theme <https://github.com/coordt/ADCtheme/>`_.
 
-* Tested with jython, pypy and Python 3.2 and 3.1
-* Decorated functions / methods have their docstring and `__module__`
-  preserved on Python 2.4
-* BUGFIX: `mock.patch` now works correctly with certain types of objects that
-  proxy attribute access, like the django settings object
-* BUGFIX: `reset_mock` caused infinite recursion when a mock is set as its own
-  return value
-
-Full set of changes since 0.6.0:
+The full set of changes since 0.6.0 are:
 
 * Python 3 compatibility
 * Ability to mock magic methods with `Mock` and addition of `MagicMock`
@@ -109,6 +102,20 @@ Full set of changes since 0.6.0:
   Thanks to Florian Bauer
 * Switched from subversion to mercurial for source code control
 * `Konrad Delong <http://konryd.blogspot.com/>`_ added as co-maintainer
+
+
+2011/02/16 Version 0.7.0 RC 1
+-----------------------------
+
+Changes since beta 4:
+
+* Tested with jython, pypy and Python 3.2 and 3.1
+* Decorated functions / methods have their docstring and `__module__`
+  preserved on Python 2.4
+* BUGFIX: `mock.patch` now works correctly with certain types of objects that
+  proxy attribute access, like the django settings object
+* BUGFIX: `reset_mock` caused infinite recursion when a mock is set as its own
+  return value
 
 
 2010/11/12 Version 0.7.0 beta 4
