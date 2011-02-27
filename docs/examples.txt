@@ -465,8 +465,12 @@ me.
 Mocking multiple calls
 ======================
 
-Handling code that needs to behave
-The way I did this was with a `side_effect` function that replaces itself. The
+Handling code that needs to behave differently on subsequent calls during the
+test can be tricky. For example you may have a function that needs to raise
+an exception the first time it is called but returns a response on the second
+call (testing retry behaviour).
+
+One approach is to use a :attr:`side_effect` function that replaces itself. The
 first time it is called the `side_effect` sets a new `side_effect` that will
 be used for the second call. It then raises an exception:
 
@@ -487,7 +491,8 @@ be used for the second call. It then raises an exception:
     'response'
     >>> mock.assert_called_with('second')
 
-Another perfectly valid way (suggested by my colleague Michael Nelson - aka noodles - after I'd already implemented the solution above) would be to pop return values from a list. If the return value is an exception, raise it instead of returning it:
+Another perfectly valid way would be to pop return values from a list. If the
+return value is an exception, raise it instead of returning it:
 
 .. doctest::
 
