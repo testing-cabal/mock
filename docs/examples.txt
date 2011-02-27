@@ -423,7 +423,7 @@ me.
 .. doctest::
 
     >>> from copy import deepcopy
-    >>> from mock import patch, DEFAULT
+    >>> from mock import Mock, patch, DEFAULT
     >>> def copy_call_args(mock):
     ...     new_mock = Mock()
     ...     def side_effect(*args, **kwargs):
