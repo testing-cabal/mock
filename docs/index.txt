@@ -76,6 +76,7 @@ User Guide
 
    getting-started
    examples
+   compare
    changelog
 
 .. index:: installing
@@ -335,3 +336,8 @@ Documentation for older versions of mock:
 
 * `mock 0.6.0 <http://www.voidspace.org.uk/python/mock/0.6.0/>`_
 
+
+Terminology
+===========
+
+XXX
