@@ -363,3 +363,6 @@ different usage patterns will *require* different implementations.
 `mock.Mock()` is capable of being used in most of the different roles
 described by Fowler, except (annoyingly / frustratingly / ironically) a Mock
 itself!
+
+How about a simpler definition: a "mock object" is an object used to replace a
+real one in a system under test.

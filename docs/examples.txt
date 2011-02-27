@@ -68,6 +68,17 @@ available.
 Checking ``call_args_list`` tests how many times the mock was called, and the
 arguments for each call, in a single assertion.
 
+From 0.7.0 you can omit empty args and keyword args, which makes comparisons
+less verbose:
+
+.. doctest::
+
+    >>> real = ProductionClass()
+    >>> real.something = Mock()
+    >>> real.method()
+    >>> assert real.something.call_args == ()
+    >>> assert real.something.call_args_list == [()]
+
 If the mock has only been called once then you can use
 :meth:`Mock.assert_called_once_with`:
 
@@ -134,6 +145,22 @@ restricting the methods available on your mock.
 If ``closer`` calls any methods on ``mock`` *other* than close, then an
 ``AttributeError`` will be raised.
 
+When you use `spec` it is still possible to set arbitrary attributes on the mock
+object. For a stronger form that only allows you to *set* attributes that are in
+the spec you can use `spec_set` instead:
+
+.. doctest::
+
+    >>> mock = Mock(spec=['close'])
+    >>> mock.foo = 3
+    >>> mock.foo
+    3
+    >>> mock = Mock(spec_set=['close'])
+    >>> mock.foo = 3
+    Traceback (most recent call last):
+      ...
+    AttributeError: Mock object has no attribute 'foo'
+
 
 Tracking all Method Calls
 -------------------------
@@ -155,10 +182,21 @@ a convenient way of looking at all method calls:
     <mock.Mock object at 0x...>
     >>> mock.method_calls
     [('method', (), {}), ('Property.method', (10,), {'x': 53})]
-    >>>
 
 If you make an assertion about ``method_calls`` and any unexpected methods
 have been called, then the assertion will fail.
+
+Again, from 0.7.0, empty arguments and keyword arguments can be omitted for
+less verbose comparisons:
+
+.. doctest::
+
+    >>> mock = Mock()
+    >>> mock.method1()
+    <mock.Mock object at 0x...>
+    >>> mock.method2()
+    <mock.Mock object at 0x...>
+    >>> assert mock.method_calls == [('method1',), ('method2',)]
 
 
 Setting Return Values and Attributes
@@ -180,6 +218,14 @@ Of course you can do the same for methods on the mock:
     >>> mock = Mock()
     >>> mock.method.return_value = 3
     >>> mock.method()
+    3
+
+The return value can also be set in the constructor:
+
+.. doctest::
+
+    >>> mock = Mock(return_value=3)
+    >>> mock()
     3
 
 If you need an attribute setting on your mock, just do it:
@@ -233,6 +279,10 @@ instantiate the class in those tests.
     Traceback (most recent call last):
        ...
     AttributeError: object has no attribute 'old_method'
+
+Again, if you want a stronger form of specification that prevents the setting
+of arbitrary attributes as well as the getting of them then you can use
+`spec_set` instead of `spec`.
 
 
 Patch Decorator Examples
