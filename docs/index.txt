@@ -279,12 +279,6 @@ References
 Articles and blog entries on testing with Mock:
 
 * `Mocking Django <http://www.mattjmorrison.com/blog/mocking-django>`_
-* `Checking multiple calls with mock and coping with mutable arguments
-  <http://www.voidspace.org.uk/python/weblog/arch_d7_2010_11_20.shtml#e1197>`_
-* `Mocking unbound methods and properties
-  <http://www.voidspace.org.uk/python/weblog/arch_d7_2010_11_20.shtml#e1196>`_
-* `Mocking patterns: chained calls, partial mocking and open as context manager
-  <http://www.voidspace.org.uk/python/weblog/arch_d7_2010_10_02.shtml#e1188>`_
 * `Mock recipes <http://konryd.blogspot.com/2010/06/mock-recipies.html>`_
 * `Mockity mock mock - some love for the mock module
   <http://konryd.blogspot.com/2010/05/mockity-mock-mock-some-love-for-mock.html>`_
