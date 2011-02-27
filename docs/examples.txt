@@ -8,6 +8,7 @@
 
     import sys
     from mock import MagicMock, Mock, patch
+    from datetime import date
 
     BackendProvider = Mock()
     sys.modules['mymodule'] = mymodule = Mock(name='mymodule')
@@ -23,6 +24,7 @@
 
     mymodule.frob = frob
     mymodule.grob = grob
+    mymodule.date = date
 
 Here are some more examples for some slightly more advanced scenarios than in
 the :ref:`getting started <getting-started>` guide.
@@ -135,6 +137,8 @@ constructed and returned by `side_effect`.
     >>> with patch('mymodule.date') as mock_date:
     ...     mock_date.today.return_value = date(2010, 10, 8)
     ...     mock_date.side_effect = lambda *args, **kw: date(*args, **kw)
+    ...     assert mymodule.date.today() == date(2010, 10, 8)
+    ...     assert mymodule.date(2009, 6, 8) == date(2009, 6, 8)
     ...
 
 Note that we don't patch `datetime.date` globally, we patch `date` in the
