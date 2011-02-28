@@ -840,15 +840,6 @@ patch.object = _patch_object
 patch.dict = _patch_dict
 
 
-def _has_local_attr(obj, name):
-    try:
-        return name in vars(obj)
-    except TypeError:
-        # objects without a __dict__
-        # XXX could check in the class __dict__
-        return hasattr(obj, name)
-
-
 magic_methods = (
     "lt le gt ge eq ne "
     "getitem setitem delitem "
