@@ -197,6 +197,17 @@ the spec you can use `spec_set` instead:
       ...
     AttributeError: Mock object has no attribute 'foo'
 
+Mock objects that use a class or an instance as a `spec` or `spec_set` are able
+to pass `isintance` tests:
+
+.. doctest::
+
+    >>> mock = Mock(spec=SomeClass)
+    >>> isinstance(mock, SomeClass)
+    True
+    >>> mock = Mock(spec_set=SomeClass())
+    >>> isinstance(mock, SomeClass)
+    True
 
 Tracking all Method Calls
 -------------------------
@@ -345,8 +356,6 @@ sequence from repeated calls:
     >>> mock.side_effect = side_effect
     >>> mock(), mock(), mock()
     (3, 2, 1)
-
-
 
 
 Sentinel
