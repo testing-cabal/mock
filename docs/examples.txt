@@ -7,12 +7,12 @@
 .. testsetup::
 
     import sys
+    import unittest
     from mock import MagicMock, Mock, patch
     from datetime import date
 
     BackendProvider = Mock()
     sys.modules['mymodule'] = mymodule = Mock(name='mymodule')
-
 
     def frob(val):
         pass
@@ -209,6 +209,63 @@ function in the module under test instead of patching it globally:
     <mock.Mock object at 0x...>
     >>> file_handle = mock_open.return_value.__enter__.return_value
     >>> file_handle.write.assert_called_with('something')
+
+
+Applying the same patch to every test method
+============================================
+
+If you want several patches in place for multiple test methods the obvious way
+is to apply the patch
+
+
+.. doctest::
+
+    >>> @patch('mymodule.SomeClass')
+    ... class MyTest(unittest.TestCase):
+    ...     def test_one(self, MockSomeClass):
+    ...         self.assertTrue(mymodule.SomeClass is MockSomeClass)
+    ...     def test_two(self, MockSomeClass):
+    ...         self.assertTrue(mymodule.SomeClass is MockSomeClass)
+    ...
+    >>> MyTest('test_one').run()
+    >>> MyTest('test_two').run()
+
+
+the addition of start and stop methods to patch objects. This is useful where
+you are doing the same patching on a whole bunch of test methods - it allows
+you to move the patching into your setUp and tearDown methods. (In 0.7.0 you
+can also use patch as a class decorator, which has a similar effect but
+requires Python 2.6):
+
+::
+
+    class MyTest(unittest.TestCase):
+        def setUp(self):
+            self.patcher = patch('mymodule.foo')
+            self.mock_foo = self.patcher.start()
+
+        def tearDown(self):
+            self.patcher.stop()
+
+If you use this technique you must ensure that the patching is "undone" by
+calling stop. This can be fiddlier than you might think, because if an
+exception is raised in the setUp then tearDown is not called. unittest2
+cleanup functions make this easier:
+
+::
+
+    from mock import patch
+    import unittest2 as unittest
+
+    class MyTest(unittest.TestCase):
+        def setUp(self):
+            patcher = patch('mymodule.foo')
+            self.addCleanup(patcher.stop)
+
+            self.mock_foo = patcher.start()
+
+In fact `start` and `stop` are just aliases for the context manager
+`__enter__` and `__exit__` methods, but calling them directly is ugly.
 
 
 Mocking Unbound Methods
