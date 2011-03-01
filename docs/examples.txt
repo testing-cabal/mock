@@ -6,23 +6,19 @@
 
 .. testsetup::
 
-    import sys
-    import unittest
+    import sys, unittest, unittest2
     from mock import MagicMock, Mock, patch
     from datetime import date
 
     BackendProvider = Mock()
     sys.modules['mymodule'] = mymodule = Mock(name='mymodule')
 
-    def frob(val):
-        pass
-
     def grob(val):
         "First frob and then clear val"
         mymodule.frob(val)
         val.clear()
 
-    mymodule.frob = frob
+    mymodule.frob = lambda val: val
     mymodule.grob = grob
     mymodule.date = date
 
@@ -261,25 +257,24 @@ you to move the patching into your `setUp` and `tearDown` methods.
     ...
     >>> MyTest('test_foo').run()
 
-
 If you use this technique you must ensure that the patching is "undone" by
-calling stop. This can be fiddlier than you might think, because if an
-exception is raised in the setUp then tearDown is not called. unittest2
-cleanup functions make this easier:
+calling `stop`. This can be fiddlier than you might think, because if an
+exception is raised in the setUp then tearDown is not called. `unittest2
+<http://pypi.python.org/pypi/unittest2>`_ cleanup functions make this simpler:
 
-::
 
-    from mock import patch
-    import unittest2 as unittest
+.. doctest::
 
-    class MyTest(unittest.TestCase):
-        def setUp(self):
-            patcher = patch('mymodule.foo')
-            self.addCleanup(patcher.stop)
-            self.mock_foo = patcher.start()
-
-In fact `start` and `stop` are just aliases for the context manager
-`__enter__` and `__exit__` methods, but calling them directly is ugly.
+    >>> class MyTest(unittest2.TestCase):
+    ...     def setUp(self):
+    ...         patcher = patch('mymodule.foo')
+    ...         self.addCleanup(patcher.stop)
+    ...         self.mock_foo = patcher.start()
+    ...
+    ...     def test_foo(self):
+    ...         self.assertTrue(mymodule.foo is self.mock_foo)
+    ...
+    >>> MyTest('test_foo').run()
 
 
 Mocking Unbound Methods
