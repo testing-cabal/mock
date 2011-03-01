@@ -225,10 +225,13 @@ with `test`:
 
     >>> @patch('mymodule.SomeClass')
     ... class MyTest(unittest.TestCase):
+    ...
     ...     def test_one(self, MockSomeClass):
     ...         self.assertTrue(mymodule.SomeClass is MockSomeClass)
+    ...
     ...     def test_two(self, MockSomeClass):
     ...         self.assertTrue(mymodule.SomeClass is MockSomeClass)
+    ...
     ...     def not_a_test(self):
     ...         return 'something'
     ...
