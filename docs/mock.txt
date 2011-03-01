@@ -11,6 +11,9 @@
         sys.path.append(os.getcwd())
     from mock import Mock, sentinel, DEFAULT
 
+    class SomeClass:
+        pass
+
 ``Mock`` is a flexible mock object intended to replace the use of stubs and
 test doubles throughout your code. Mocks are callable and create attributes as
 new mocks when you access them [#]_. Accessing the same attribute will always
@@ -27,6 +30,19 @@ in a particular module with a Mock object.
 .. index:: spec
 
 .. autoclass:: Mock
+
+Mock objects that use a class or an instance as a `spec` or `spec_set` are able
+to pass `isintance` tests:
+
+.. doctest::
+
+    >>> mock = Mock(spec=SomeClass)
+    >>> isinstance(mock, SomeClass)
+    True
+    >>> mock = Mock(spec_set=SomeClass())
+    >>> isinstance(mock, SomeClass)
+    True
+
 
 Methods
 =======
