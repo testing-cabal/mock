@@ -150,6 +150,8 @@ when the test ends.
     >>> assert 'newkey' not in os.environ
 
 
+.. _start-and-stop:
+
 patch methods: start and stop
 =============================
 

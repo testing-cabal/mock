@@ -137,6 +137,7 @@ constructed and returned by `side_effect`.
     >>> with patch('mymodule.date') as mock_date:
     ...     mock_date.today.return_value = date(2010, 10, 8)
     ...     mock_date.side_effect = lambda *args, **kw: date(*args, **kw)
+    ...
     ...     assert mymodule.date.today() == date(2010, 10, 8)
     ...     assert mymodule.date(2009, 6, 8) == date(2009, 6, 8)
     ...
@@ -241,22 +242,25 @@ with `test`:
     >>> MyTest('test_two').not_a_test()
     'something'
 
+An alternative way of managing patches is to use the
+:ref:`start and stop <start-and-stop>` methods of patch. These allow
+you to move the patching into your `setUp` and `tearDown` methods.
 
-the addition of start and stop methods to patch objects. This is useful where
-you are doing the same patching on a whole bunch of test methods - it allows
-you to move the patching into your setUp and tearDown methods. (In 0.7.0 you
-can also use patch as a class decorator, which has a similar effect but
-requires Python 2.6):
+.. doctest::
 
-::
+    >>> class MyTest(unittest.TestCase):
+    ...     def setUp(self):
+    ...         self.patcher = patch('mymodule.foo')
+    ...         self.mock_foo = self.patcher.start()
+    ...
+    ...     def test_foo(self):
+    ...         self.assertTrue(mymodule.foo is self.mock_foo)
+    ...
+    ...     def tearDown(self):
+    ...         self.patcher.stop()
+    ...
+    >>> MyTest('test_foo').run()
 
-    class MyTest(unittest.TestCase):
-        def setUp(self):
-            self.patcher = patch('mymodule.foo')
-            self.mock_foo = self.patcher.start()
-
-        def tearDown(self):
-            self.patcher.stop()
 
 If you use this technique you must ensure that the patching is "undone" by
 calling stop. This can be fiddlier than you might think, because if an
@@ -272,7 +276,6 @@ cleanup functions make this easier:
         def setUp(self):
             patcher = patch('mymodule.foo')
             self.addCleanup(patcher.stop)
-
             self.mock_foo = patcher.start()
 
 In fact `start` and `stop` are just aliases for the context manager
