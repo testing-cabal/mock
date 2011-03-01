@@ -351,7 +351,6 @@ mock has a nice API for making assertions about how your mock objects are used.
 
 .. doctest::
 
-    >>> from mock import Mock
     >>> mock = Mock()
     >>> mock.foo_bar.return_value = None
     >>> mock.foo_bar('baz', spam='eggs')
