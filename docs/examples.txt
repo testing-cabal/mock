@@ -1,6 +1,9 @@
 ==========
  Examples
 ==========
+----------------------------------------
+ Advanced or unusual patterns with mock
+----------------------------------------
 
 .. currentmodule:: mock
 

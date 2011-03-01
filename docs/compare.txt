@@ -32,13 +32,25 @@ These are:
 * `flexmock <http://pypi.python.org/pypi/flexmock>`_
 * `mox <http://pypi.python.org/pypi/mox>`_
 * `Mocker <http://niemeyer.net/mocker>`_
-* `pMock <http://pmock.sourceforge.net/>`_
-* `python-mock <http://python-mock.sourceforge.net/>`_
+* `dingus <http://pypi.python.org/pypi/dingus>`_
 
 Mocking frameworks not yet represented here are
-`MiniMock <http://pypi.python.org/pypi/MiniMock>`_,
-`dingus <http://pypi.python.org/pypi/dingus>`_ and
+`MiniMock <http://pypi.python.org/pypi/MiniMock>`_ and
 `fudge <http://pypi.python.org/pypi/fudge>`_.
+
+`pMock <http://pmock.sourceforge.net/>`_ (last release 2004 and doesn't import
+in recent versions of Python) and
+`python-mock <http://python-mock.sourceforge.net/>`_ (last release 2005) are
+intentionally omitted.
+
+.. note::
+
+    A more up to date, and tested for all mock libraries (only the mock
+    examples on this page can be executed as doctests) version of this
+    comparison is maintained by Gary Bernhardt:
+
+    * `Python Mock Library Comparison
+      <http://garybernhardt.github.com/python-mock-comparison/>`_
 
 This comparison is by no means complete, and also may not be fully idiomatic
 for all the libraries represented. *Please* contribute corrections, missing
@@ -48,7 +60,8 @@ tracker <https://code.google.com/p/mock/issues/list>`_.
 This comparison page was originally created by the `Mox project
 <https://code.google.com/p/pymox/wiki/MoxComparison>`_ and then extended for
 `flexmock and mock <http://has207.github.com/flexmock/compare.html>`_ by
-Herman Sheremetyev.
+Herman Sheremetyev. Dingus examples written by `Gary Bernhadt
+<http://garybernhardt.github.com/python-mock-comparison/>`_.
 
 .. note::
 
@@ -56,13 +69,11 @@ Herman Sheremetyev.
     *framework* rather than a library like mock. The tasks shown naturally
     exemplify tasks that frameworks are good at and not the ones they make
     harder. In particular you can take a `Mock` or `MagicMock` object and use
-    it in any way you want with no up-front configuration.
+    it in any way you want with no up-front configuration. The same is also
+    true for Dingus.
 
     The examples for mock here assume version 0.7.0.
 
-    Also note that `python-mock` hasn't had a release in six years and `pMock`
-    won't import under Python 2.6 or more recent due to using the reserved
-    word "with" as a function.
 
 Simple fake object
 ~~~~~~~~~~~~~~~~~~
@@ -91,19 +102,6 @@ Simple fake object
     assertEqual("calculated value", mock.some_method())
     assertEqual("value", mock.some_attribute)
 
-    # python-mock
-    mymock = mock.Mock( {"some_method": "calculated value"})
-    mymock.some_attribute = "value"
-    assertEqual("calculated value", mymock.some_method())
-    assertEqual("value", mock.some_attribute)
-
-    # pMock
-    mock = pmock.Mock()
-    mock.some_attribute = "value"
-    mock.expects().some_method().will(pmock.return_value("calculated value"))
-    assertEqual("value", mock.some_method())
-    assertEqual("value", mock.some_attribute)
-
     # Mocker
     mock = mocker.mock()
     mock.some_method()
@@ -112,6 +110,14 @@ Simple fake object
     mock.some_attribute = "value"
     assertEqual("calculated value", mock.some_method())
     assertEqual("value", mock.some_attribute)
+
+::
+
+    >>> # Dingus
+    >>> my_dingus = dingus.Dingus(some_attribute="value",
+    ...                           some_method__returns="calculated value")
+    >>> assertEqual("calculated value", my_dingus.some_method())
+    >>> assertEqual("value", my_dingus.some_attribute)
 
 
 Simple mock
@@ -139,17 +145,6 @@ Simple mock
     assertEqual("value", mock.some_method())
     mox.Verify(mock)
 
-    # python-mock
-    mymock = mock.Mock( {"some_method" : "value"})
-    assertEqual("value", mymock.some_method())
-    mock.mockCheckCall(self, 0, "some_method")
-
-    # pMock
-    mock = pmock.Mock()
-    mock.expects(pmock.once()).some_method().will(pmock.return_value("value"))
-    assertEqual("value", mock.some_method())
-    mock.verify()
-
     # Mocker
     mock = mocker.mock()
     mock.some_method()
@@ -158,6 +153,13 @@ Simple mock
     assertEqual("value", mock.some_method())
     mocker.verify()
 
+::
+
+    >>> # Dingus
+    >>> my_dingus = dingus.Dingus(some_method__returns="value")
+    >>> assertEqual("value", my_dingus.some_method())
+    >>> assert my_dingus.some_method.calls().once()
+
 
 Creating partial mocks
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -165,9 +167,8 @@ Creating partial mocks
 .. doctest::
 
     >>> # mock
-    >>> my_mock = mock.Mock(spec=SomeObject)
-    >>> my_mock.some_method.return_value = "value"
-    >>> assertEqual("value", my_mock.some_method())
+    >>> SomeObject.some_method = mock.Mock(return_value='value')
+    >>> assertEqual("value", SomeObject.some_method())
 
 ::
 
@@ -182,14 +183,6 @@ Creating partial mocks
     assertEqual("value", mock.some_method())
     mox.Verify(mock)
 
-    # python-mock
-    mock = mock.Mock({"some_method": "value"}, SomeObject)
-    assertEqual("value", mock.some_method())
-    mock.mockCheckCall(self, 0, "some_method")
-
-    # pMock
-    # Doesn't seem to have support for partial mocks
-
     # Mocker
     mock = mocker.mock(SomeObject)
     mock.Get()
@@ -197,6 +190,13 @@ Creating partial mocks
     mocker.replay()
     assertEqual("value", mock.some_method())
     mocker.verify()
+
+::
+
+    >>> # Dingus
+    >>> object = SomeObject
+    >>> object.some_method = dingus.Dingus(return_value="value")
+    >>> assertEqual("value", object.some_method())
 
 
 Ensure calls are made in specific order
@@ -226,16 +226,6 @@ Ensure calls are made in specific order
     mox.Replay(mock)
     mox.Verify(mock)
 
-    # python-mock
-    # Doesn't seem to support call ordering
-
-    # pMock
-    mock = pmock.Mock()
-    mock.expects(pmock.once()).some_method().will(pmock.return_value("value"))
-    mock_db.expects(pmock.once()).method1().id("method1")
-    mock_db.expects(pmock.once()).method2().id("method2").after("method1")
-    mock.verify()
-
     # Mocker
     mock = mocker.mock()
     with mocker.order():
@@ -245,6 +235,16 @@ Ensure calls are made in specific order
         mocker.result('second thing')
         mocker.replay()
         mocker.verify()
+
+::
+
+    >>> # Dingus
+    >>> my_dingus = dingus.Dingus()
+    >>> my_dingus.method1()
+    <Dingus ...>
+    >>> my_dingus.method2()
+    <Dingus ...>
+    >>> assertEqual(['method1', 'method2'], [call.name for call in my_dingus.calls])
 
 
 Raising exceptions
@@ -271,18 +271,6 @@ Raising exceptions
     assertRaises(SomeException, mock.some_method)
     mox.Verify(mock)
 
-    # python-mock
-    mock = mock.Mock()
-    mock.mockSetExpectation('some_method', expectException(SomeException))
-    assertRaises(SomeException, mock.some_method)
-    mock.mockCheckCall(self, 0, "some_method")
-
-    # pMock
-    mock = pmock.Mock()
-    mock.expects(pmock.once()).some_method().will(pmock.raise_exception(SomeException("message")))
-    assertRaises(SomeException, mock.some_method)
-    mock.verify()
-
     # Mocker
     mock = mocker.mock()
     mock.some_method()
@@ -290,6 +278,13 @@ Raising exceptions
     mocker.replay()
     assertRaises(SomeException, mock.some_method)
     mocker.verify()
+
+::
+
+    >>> # Dingus
+    >>> my_dingus = dingus.Dingus()
+    >>> my_dingus.some_method = dingus.exception_raiser(SomeException)
+    >>> assertRaises(SomeException, my_dingus.some_method)
 
 
 Override new instances of a class
@@ -317,14 +312,16 @@ Override new instances of a class
     mox.ReplayAll()
     assertEqual(some_other_object, some_module.SomeClass())
 
-    # python-mock
-    # (TODO)
-
-    # pMock
-    # (TODO)
-
     # Mocker
     # (TODO)
+
+::
+
+    >>> # Dingus
+    >>> MockClass = dingus.Dingus(return_value=some_other_object)
+    >>> with dingus.patch('somemodule.SomeClass', MockClass):
+    ...     assertEqual(some_other_object, somemodule.SomeClass())
+    ...
 
 
 Call the same method multiple times
@@ -360,14 +357,18 @@ Call the same method multiple times
     mox.Replay(mock)
     mox.Verify(mock)
 
-    # Python Mock module
-    # (TODO)
-
-    # pMock
-    # (TODO)
-
     # Mocker
     # (TODO)
+
+::
+
+    >>> # Dingus
+    >>> my_dingus = dingus.Dingus()
+    >>> my_dingus.some_method()
+    <Dingus ...>
+    >>> my_dingus.some_method()
+    <Dingus ...>
+    >>> assert len(my_dingus.calls('some_method')) == 2
 
 
 Mock chained methods
@@ -403,20 +404,23 @@ Mock chained methods
     assertEqual("some_value", some_object.method1().method2().method3(arg1, arg2))
     self.mox.VerifyAll()
 
-    # Python Mock module
-    # (TODO)
-
-    # pMock
-    # (TODO)
-
     # Mocker
     # (TODO)
+
+::
+
+    >>> # Dingus
+    >>> my_dingus = dingus.Dingus()
+    >>> method3 = my_dingus.method1.return_value.method2.return_value.method3
+    >>> method3.return_value = 'some value'
+    >>> assertEqual('some value', my_dingus.method1().method2().method3(1, 2))
+    >>> assert method3.calls('()', 1, 2).once()
 
 
 Mocking a context manager
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Example for mock only (so far):
+Examples for mock and Dingus only (so far):
 
 .. doctest::
 
@@ -427,6 +431,17 @@ Example for mock only (so far):
     ...
     >>> my_mock.__enter__.assert_called_with()
     >>> my_mock.__exit__.assert_called_with(None, None, None)
+
+::
+
+
+    >>> # Dingus (nothing special here; all dinguses are "magic mocks")
+    >>> my_dingus = dingus.Dingus()
+    >>> with my_dingus:
+    ...     pass
+    ...
+    >>> assert my_dingus.__enter__.calls()
+    >>> assert my_dingus.__exit__.calls('()', None, None, None)
 
 
 Mocking the builtin open used as a context manager
@@ -463,3 +478,17 @@ Example for mock only (so far):
     >>> data
     'some data'
     >>> my_mock.assert_called_once_with('foo')
+
+::
+
+    >>> # Dingus
+    >>> my_dingus = dingus.Dingus()
+    >>> with dingus.patch('__builtin__.open', my_dingus):
+    ...     file_ = open.return_value.__enter__.return_value
+    ...     file_.read.return_value = 'some data'
+    ...     with open('foo') as h:
+    ...         data = f.read()
+    ...
+    >>> data
+    'some data'
+    >>> assert my_dingus.calls('()', 'foo').once()
