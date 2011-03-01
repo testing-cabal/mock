@@ -215,8 +215,11 @@ Applying the same patch to every test method
 ============================================
 
 If you want several patches in place for multiple test methods the obvious way
-is to apply the patch
-
+is to apply the patch decorators to every method. This can feel like unnecessary
+repetition. For Python 2.6 or more recent you can use `patch` (in all its
+various forms) as a class decorator. This applies the patches to all test
+methods on the class. A test method is identified by methods whose names start
+with `test`:
 
 .. doctest::
 
@@ -226,9 +229,13 @@ is to apply the patch
     ...         self.assertTrue(mymodule.SomeClass is MockSomeClass)
     ...     def test_two(self, MockSomeClass):
     ...         self.assertTrue(mymodule.SomeClass is MockSomeClass)
+    ...     def not_a_test(self):
+    ...         return 'something'
     ...
     >>> MyTest('test_one').run()
     >>> MyTest('test_two').run()
+    >>> MyTest('test_two').not_a_test()
+    'something'
 
 
 the addition of start and stop methods to patch objects. This is useful where
