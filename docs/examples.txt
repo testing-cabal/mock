@@ -203,6 +203,7 @@ function in the module under test instead of patching it globally:
     >>> open_name = '%s.open' % __name__
     >>> with patch(open_name, create=True) as mock_open:
     ...     mock_open.return_value = MagicMock(spec=file)
+    ...
     ...     with open('/some/path', 'w') as f:
     ...         f.write('something')
     ...
@@ -510,13 +511,17 @@ me.
     >>> new_mock.call_args
     ((set([6]),), {})
 
-`copy_call_args` is called with the mock that will be called. It returns a new mock that we do the assertion on. The `side_effect` function makes a copy of the args and calls our `new_mock` with the copy.
+`copy_call_args` is called with the mock that will be called. It returns a new
+mock that we do the assertion on. The `side_effect` function makes a copy of
+the args and calls our `new_mock` with the copy.
 
 .. note::
 
-    If your mock is only going to be used once there is an easier way of checking arguments at the point they are called. You can simply do the checking inside a `side_effect` function.
+    If your mock is only going to be used once there is an easier way of
+    checking arguments at the point they are called. You can simply do the
+    checking inside a `side_effect` function.
 
-    .. code-block:: pycon
+    .. doctest::
 
         >>> def side_effect(arg):
         ...     assert arg == set([6])
