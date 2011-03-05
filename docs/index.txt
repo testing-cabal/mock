@@ -84,10 +84,10 @@ User Guide
 Installing
 ==========
 
-The current version is |release|, dated 2010/11/12. Mock is still
-experimental; the API may change (although we are moving towards a 1.0 release
-when the API will stabilise). If you find bugs or have suggestions for
-improvements / extensions then please contact us.
+The current version is |release|. Mock is still experimental; the API may
+change (although we are moving towards a 1.0 release when the API will
+stabilise). If you find bugs or have suggestions for improvements / extensions
+then please contact us.
 
 * `mock on PyPI <http://pypi.python.org/pypi/mock>`_
 * `mock documentation as PDF <http://www.voidspace.org.uk/downloads/mock-0.7.0.pdf>`_
