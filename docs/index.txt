@@ -341,7 +341,7 @@ In `classic mock terminology
 <http://xunitpatterns.com/Mocks,%20Fakes,%20Stubs%20and%20Dummies.html>`_
 :class:`mock.Mock` is a `spy <http://xunitpatterns.com/Test%20Spy.html>`_ that
 allows for *post-mortem* examination. This is what I call the "action ->
-assertion" pattern of testing.
+assertion" [#]_ pattern of testing.
 
 I'm not however a fan of this "statically typed mocking terminology" promulgated
 by `Martin Fowler <http://martinfowler.com/articles/mocksArentStubs.html>`_. It
@@ -360,3 +360,6 @@ itself!
 
 How about a simpler definition: a "mock object" is an object used to replace a
 real one in a system under test.
+
+.. [#] This pattern is called "AAA" by some members of the testing community;
+   "Arrange - Act - Assert".
