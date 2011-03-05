@@ -653,7 +653,7 @@ You may want to mock a dictionary, or other container object, recording all
 access to it whilst having it still behave like a dictionary.
 
 We can do this with :class:`MagicMock`, which will behave like a dictionary,
-and using :data:`side_effect` to delegate dictionary access to a real underlying
+and using :data:`Mock.side_effect` to delegate dictionary access to a real underlying
 dictionary that is under our control.
 
 When the `__getitem__` and `__setitem__` methods of our `MagicMock` are called
@@ -661,7 +661,7 @@ When the `__getitem__` and `__setitem__` methods of our `MagicMock` are called
 the case of `__setitem__` the value too). We can also control what is returned.
 
 After the `MagicMock` has been used we can use attributes like
-:data:`call_args_list` to assert about how the dictionary was used:
+:data:`Mock.call_args_list` to assert about how the dictionary was used:
 
 .. doctest::
 
