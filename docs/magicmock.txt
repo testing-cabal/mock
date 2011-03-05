@@ -1,4 +1,8 @@
 
+.. testsetup::
+
+   from mock import Mock, MagicMock, patch
+
 .. _magic-methods:
 
 Mocking Magic Methods
@@ -22,7 +26,6 @@ the first argument [#]_.
 
 .. doctest::
 
-   >>> from mock import Mock
    >>> def __str__(self):
    ...     return 'fooble'
    ...
@@ -31,14 +34,12 @@ the first argument [#]_.
    >>> str(mock)
    'fooble'
 
-   >>> from mock import Mock
    >>> mock = Mock()
    >>> mock.__str__ = Mock()
    >>> mock.__str__.return_value = 'fooble'
    >>> str(mock)
    'fooble'
 
-   >>> from mock import Mock
    >>> mock = Mock()
    >>> mock.__iter__ = Mock(return_value=iter([]))
    >>> list(mock)
@@ -49,7 +50,6 @@ One use case for this is for mocking objects used as context managers in a
 
 .. doctest::
 
-   >>> from mock import Mock
    >>> mock = Mock()
    >>> mock.__enter__ = Mock()
    >>> mock.__exit__ = Mock()
@@ -124,7 +124,6 @@ and use them in the usual way:
 
 .. doctest::
 
-   >>> from mock import MagicMock
    >>> mock = MagicMock()
    >>> mock[3] = 'fish'
    >>> mock.__setitem__.assert_called_with(3, 'fish')
@@ -162,7 +161,6 @@ For example:
 
 .. doctest::
 
-   >>> from mock import MagicMock
    >>> mock = MagicMock()
    >>> int(mock)
    1
