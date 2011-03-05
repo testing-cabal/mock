@@ -644,3 +644,68 @@ and returns the created mock for us:
     >>> MyTest('test_foo').run()
     >>> assert mymodule.Foo is original
 
+
+
+Mocking a dictionary with MagicMock
+===================================
+
+You may want to mock a dictionary, or other container object, recording all
+access to it whilst having it still behave like a dictionary.
+
+We can do this with :class:`MagicMock`, which will behave like a dictionary,
+and using :data:`side_effect` to delegate dictionary access to a real underlying
+dictionary that is under our control.
+
+When the `__getitem__` and `__setitem__` methods of our `MagicMock` are called
+(normal dictionary access) then `side_effect` is called with the key (and in
+the case of `__setitem__` the value too). We can also control what is returned.
+
+After the `MagicMock` has been used we can use attributes like
+:data:`call_args_list` to assert about how the dictionary was used:
+
+.. doctest::
+
+    >>> my_dict = {'a': 1, 'b': 2, 'c': 3}
+    >>> def getitem(name):
+    ...      return my_dict[name]
+    ...
+    >>> def setitem(name, val):
+    ...     my_dict[name] = val
+    ...
+    >>> mock = MagicMock()
+    >>> mock.__getitem__.side_effect = getitem
+    >>> mock.__setitem__.side_effect = setitem
+
+With these side effect functions in place, the `mock` will behave like a normal
+dictionary but recording the access. It even raises a `KeyError` if you try
+to access a key that doesn't exist.
+
+.. doctest::
+
+    >>> mock['a']
+    1
+    >>> mock['c']
+    3
+    >>> mock['d']
+    Traceback (most recent call last):
+      ...
+    KeyError: 'd'
+    >>> mock['b'] = 'fish'
+    >>> mock['d'] = 'eggs'
+    >>> mock['b']
+    'fish'
+    >>> mock['d']
+    'eggs'
+
+After it has been used you can make assertions about the access using the normal
+mock methods and attributes:
+
+.. doctest::
+
+    >>> mock.__getitem__.call_args_list
+    [(('a',), {}), (('c',), {}), (('d',), {}), (('b',), {}), (('d',), {})]
+    >>> mock.__setitem__.call_args_list
+    [(('b', 'fish'), {}), (('d', 'eggs'), {})]
+    >>> my_dict
+    {'a': 1, 'c': 3, 'b': 'fish', 'd': 'eggs'}
+
