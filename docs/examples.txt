@@ -676,6 +676,27 @@ After the `MagicMock` has been used we can use attributes like
     >>> mock.__getitem__.side_effect = getitem
     >>> mock.__setitem__.side_effect = setitem
 
+.. note::
+
+    An alternative to using `MagicMock` is to use `Mock` and *only* provide
+    the magic methods you specifically want:
+
+    .. doctest::
+
+        >>> mock = Mock()
+        >>> mock.__setitem__ = Mock(side_effect=getitem)
+        >>> mock.__getitem__ = Mock(side_effect=setitem)
+
+    A *third* option is to use `MagicMock` but passing in `dict` as the `spec`
+    (or `spec_set`) argument so that the `MagicMock` created only has
+    dictionary magic methods available:
+
+    .. doctest::
+
+        >>> mock = MagicMock(spec_set=dict)
+        >>> mock.__getitem__.side_effect = getitem
+        >>> mock.__setitem__.side_effect = setitem
+
 With these side effect functions in place, the `mock` will behave like a normal
 dictionary but recording the access. It even raises a `KeyError` if you try
 to access a key that doesn't exist.
