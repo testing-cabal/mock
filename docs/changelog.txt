@@ -44,7 +44,7 @@ itself is garbage collected. This is tricky to get right though.
 CHANGELOG
 =========
 
-2011/02/XX Version 0.7.0
+2011/03/05 Version 0.7.0
 ------------------------
 
 No API changes since 0.7.0 rc1. Many documentation changes including a stylish
