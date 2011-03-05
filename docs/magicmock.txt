@@ -1,4 +1,6 @@
 
+.. currentmodule:: mock
+
 .. testsetup::
 
    from mock import Mock, MagicMock, patch
@@ -60,7 +62,7 @@ One use case for this is for mocking objects used as context managers in a
    >>> mock.__enter__.assert_called_with()
    >>> mock.__exit__.assert_called_with(None, None, None)
 
-Calls to magic methods do not (yet) appear in :attr:`mock.Mock.method_calls`.
+Calls to magic methods do not (yet) appear in :attr:`Mock.method_calls`.
 This may change in a future release.
 
 .. note::
