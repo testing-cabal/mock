@@ -6,7 +6,7 @@
 
 .. testsetup::
 
-    import sys, unittest, unittest2
+    import sys, unittest2
     from mock import MagicMock, Mock, patch
     from datetime import date
 
@@ -25,8 +25,9 @@
     class TestCase(unittest2.TestCase):
         def run(self):
             result = unittest2.TestResult()
-            super(unittest2.TestCase, self).run(result)
+            out = unittest2.TestCase.run(self, result)
             assert result.wasSuccessful()
+            return out
 
 
 Here are some more examples for some slightly more advanced scenarios than in
@@ -229,7 +230,7 @@ with `test`:
 .. doctest::
 
     >>> @patch('mymodule.SomeClass')
-    ... class MyTest(unittest.TestCase):
+    ... class MyTest(TestCase):
     ...
     ...     def test_one(self, MockSomeClass):
     ...         self.assertTrue(mymodule.SomeClass is MockSomeClass)
@@ -611,7 +612,9 @@ right:
     ...                     assert mymodule.Bar is mock_bar
     ...                     assert mymodule.Spam is mock_spam
     ...
+    >>> original = mymodule.Foo
     >>> MyTest('test_foo').test_foo()
+    >>> assert mymodule.Foo is original
 
 With unittest2_ `cleanup` functions and the patch :ref:`start and stop methods
 <start-and-stop>` we can achieve the same effect without the nested
@@ -624,9 +627,9 @@ and returns the created mock for us:
     ...
     ...     def create_patch(self, name):
     ...         patcher = patch(name)
-    ...         mock = patcher.start()
+    ...         thing = patcher.start()
     ...         self.addCleanup(patcher.stop)
-    ...         return mock
+    ...         return thing
     ...
     ...     def test_foo(self):
     ...         mock_foo = self.create_patch('mymodule.Foo')
@@ -637,5 +640,7 @@ and returns the created mock for us:
     ...         assert mymodule.Bar is mock_bar
     ...         assert mymodule.Spam is mock_spam
     ...
+    >>> original = mymodule.Foo
     >>> MyTest('test_foo').run()
+    >>> assert mymodule.Foo is original
 
