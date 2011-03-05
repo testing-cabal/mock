@@ -9,11 +9,15 @@ mock is tested on Python versions 2.4-2.7 and Python 3.
 The mock module also provides utility functions / objects to assist with
 testing, particularly monkey patching.
 
-* `PDF documentation for 0.7.0 <http://www.voidspace.org.uk/downloads/mock-0.7.0.pdf>`_
-* `mock on google code (repository and issue tracker) <http://code.google.com/p/mock/>`_
-* `mock documentation <http://www.voidspace.org.uk/python/mock/>`_
+* `PDF documentation for 0.7.0
+  <http://www.voidspace.org.uk/downloads/mock-0.7.0.pdf>`_
+* `mock on google code (repository and issue tracker)
+  <http://code.google.com/p/mock/>`_
+* `mock documentation
+  <http://www.voidspace.org.uk/python/mock/>`_
 * `mock on PyPI <http://pypi.python.org/pypi/mock/>`_
-* `Mailing list (testing-in-python@lists.idyll.org) <http://lists.idyll.org/listinfo/testing-in-python>`_
+* `Mailing list (testing-in-python@lists.idyll.org)
+  <http://lists.idyll.org/listinfo/testing-in-python>`_
 
 Mock is very easy to use and is designed for use with
 `unittest <http://pypi.python.org/pypi/unittest2>`_. Mock is based on
@@ -78,7 +82,6 @@ mock (or other object) during the test and restored when the test ends::
    function in the same order they applied (the normal *python* order that
    decorators are applied). This means from the bottom up, so in the example
    above the mock for `test_module.ClassName2` is passed in first.
-
 
    With `patch` it matters that you patch objects in the namespace where they
    are looked up. This is normally straightforward, but for a quick guide
