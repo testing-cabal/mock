@@ -19,7 +19,7 @@ readme = os.path.join(os.path.dirname(__file__), 'README.txt')
 LONG_DESCRIPTION = open(readme).read()
 
 CLASSIFIERS = [
-    'Development Status :: 4 - Beta',
+    'Development Status :: 5 - Production/Stable',
     'Environment :: Console',
     'Intended Audience :: Developers',
     'License :: OSI Approved :: BSD License',
