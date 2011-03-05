@@ -8,7 +8,7 @@
 :Date: 2011/02/17
 :Homepage: `Mock Homepage`_
 :Download: `Mock on PyPI`_
-:Documentation: `PDF Documentation <http://www.voidspace.org.uk/downloads/mock-0.7.0rc1.pdf>`_
+:Documentation: `PDF Documentation <http://www.voidspace.org.uk/downloads/mock-0.7.0.pdf>`_
 :License: `BSD License`_
 :Support: `Mailing list (testing-in-python@lists.idyll.org) <http://lists.idyll.org/listinfo/testing-in-python>`_
 :Issue tracker: `Google code project <http://code.google.com/p/mock/issues/list>`_
@@ -90,7 +90,7 @@ when the API will stabilise). If you find bugs or have suggestions for
 improvements / extensions then please contact us.
 
 * `mock on PyPI <http://pypi.python.org/pypi/mock>`_
-* `mock documentation as PDF <http://www.voidspace.org.uk/downloads/mock-0.7.0rc1.pdf>`_
+* `mock documentation as PDF <http://www.voidspace.org.uk/downloads/mock-0.7.0.pdf>`_
 * `Google Code Home & Mercurial Repository <http://code.google.com/p/mock/>`_
 
 .. index:: repository
