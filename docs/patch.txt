@@ -320,8 +320,6 @@ being looked up on the a module and so we have to patch `a.SomeClass` instead:
     ``@patch('a.SomeClass')``
 
 
-
-
 Patching Descriptors and Proxy Objects
 ======================================
 
@@ -332,3 +330,9 @@ You should patch these on the *class* rather than an instance.
 Since version 0.7.0 patch_ and patch.object_ work correctly with some objects
 that proxy attribute access, like the `django setttings object
 <http://www.voidspace.org.uk/python/weblog/arch_d7_2010_12_04.shtml#e1198>`_.
+
+.. note::
+
+    In django `import settings` and `from django.conf import settings`
+    return different objects. If you are using libraries / apps that do both you
+    may have to patch both. Grrr...
