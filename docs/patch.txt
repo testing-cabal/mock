@@ -12,7 +12,6 @@
         sys.path.append(os.getcwd())
 
     from mock import Mock, sentinel, patch
-    import unittest
     import unittest2
 
     class SomeClass(object):
