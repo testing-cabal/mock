@@ -22,6 +22,13 @@
     mymodule.grob = grob
     mymodule.date = date
 
+    class TestCase(unittest2.TestCase):
+        def run(self):
+            result = unittest2.TestResult()
+            super(unittest2.TestCase, self).run(result)
+            assert result.wasSuccessful()
+
+
 Here are some more examples for some slightly more advanced scenarios than in
 the :ref:`getting started <getting-started>` guide.
 
@@ -233,8 +240,8 @@ with `test`:
     ...     def not_a_test(self):
     ...         return 'something'
     ...
-    >>> MyTest('test_one').run()
-    >>> MyTest('test_two').run()
+    >>> MyTest('test_one').test_one()
+    >>> MyTest('test_two').test_two()
     >>> MyTest('test_two').not_a_test()
     'something'
 
@@ -244,7 +251,7 @@ you to move the patching into your `setUp` and `tearDown` methods.
 
 .. doctest::
 
-    >>> class MyTest(unittest.TestCase):
+    >>> class MyTest(TestCase):
     ...     def setUp(self):
     ...         self.patcher = patch('mymodule.foo')
     ...         self.mock_foo = self.patcher.start()
@@ -265,7 +272,7 @@ exception is raised in the setUp then tearDown is not called. `unittest2
 
 .. doctest::
 
-    >>> class MyTest(unittest2.TestCase):
+    >>> class MyTest(TestCase):
     ...     def setUp(self):
     ...         patcher = patch('mymodule.foo')
     ...         self.addCleanup(patcher.stop)
@@ -583,3 +590,52 @@ return value is an exception, raise it instead of returning it:
 
 Which approach you prefer is a matter of taste. The first approach is actually
 a line shorter but maybe the second approach is more readable.
+
+
+Nesting Patches
+===============
+
+Using patch as a context manager is nice, but if you do multiple patches you
+can end up with nested with statements indenting further and further to the
+right:
+
+.. doctest::
+
+    >>> class MyTest(TestCase):
+    ...
+    ...     def test_foo(self):
+    ...         with patch('mymodule.Foo') as mock_foo:
+    ...             with patch('mymodule.Bar') as mock_bar:
+    ...                 with patch('mymodule.Spam') as mock_spam:
+    ...                     assert mymodule.Foo is mock_foo
+    ...                     assert mymodule.Bar is mock_bar
+    ...                     assert mymodule.Spam is mock_spam
+    ...
+    >>> MyTest('test_foo').test_foo()
+
+With unittest2_ `cleanup` functions and the patch :ref:`start and stop methods
+<start-and-stop>` we can achieve the same effect without the nested
+indentation. A simple helper method, `create_patch`, puts the patch in place
+and returns the created mock for us:
+
+.. doctest::
+
+    >>> class MyTest(TestCase):
+    ...
+    ...     def create_patch(self, name):
+    ...         patcher = patch(name)
+    ...         mock = patcher.start()
+    ...         self.addCleanup(patcher.stop)
+    ...         return mock
+    ...
+    ...     def test_foo(self):
+    ...         mock_foo = self.create_patch('mymodule.Foo')
+    ...         mock_bar = self.create_patch('mymodule.Bar')
+    ...         mock_spam = self.create_patch('mymodule.Spam')
+    ...
+    ...         assert mymodule.Foo is mock_foo
+    ...         assert mymodule.Bar is mock_bar
+    ...         assert mymodule.Spam is mock_spam
+    ...
+    >>> MyTest('test_foo').run()
+
