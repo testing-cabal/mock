@@ -2,6 +2,8 @@
  Mock - Mocking and Testing Library
 ====================================
 
+.. currentmodule:: mock
+
 :Author: `Michael Foord <http://www.voidspace.org.uk/python/weblog/index.shtml>`_
 :Co-maintainer: `Konrad Delong <http://konryd.blogspot.com/>`_
 :Version: |release|
@@ -53,6 +55,8 @@ mock is tested on Python versions 2.4-2.7 and Python 3.
    test_module = sys.modules['test_module'] = ProductionClass
    ProductionClass.ClassName1 = ProductionClass
    ProductionClass.ClassName2 = ProductionClass
+
+   from mock import Mock, patch, MagicMock
 
 
 API Documentation
@@ -139,7 +143,6 @@ values or raise an exception when a mock is called:
 
 .. doctest::
 
-   >>> from mock import Mock
    >>> mock = Mock(side_effect=KeyError('foo'))
    >>> mock()
    Traceback (most recent call last):
@@ -238,7 +241,6 @@ class:
 
 .. doctest::
 
-    >>> from mock import Mock
     >>> mock = Mock()
     >>> mock.__str__ = Mock()
     >>> mock.__str__.return_value = 'wheeeeee'
