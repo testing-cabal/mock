@@ -672,7 +672,7 @@ def patch(target, new=DEFAULT, spec=None, create=False,
     with a ``new`` object. When the function/with statement exits the patch is
     undone.
 
-    The target is imported and the specified attribute patched with the new
+    The ``target`` is imported and the specified attribute patched with the new
     object, so it must be importable from the environment you are calling the
     decorator from.
 

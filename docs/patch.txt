@@ -30,7 +30,7 @@
 
 The patch decorators are used for patching objects only within the scope of
 the function they decorate. They automatically handle the unpatching for you,
-even if exceptions are raise. All of these functions can also be used in with
+even if exceptions are raised. All of these functions can also be used in with
 statements or as class decorators.
 
 
@@ -324,7 +324,7 @@ Patching Descriptors and Proxy Objects
 ======================================
 
 Since version 0.6.0 both patch_ and patch.object_ have been able to correctly
-patch and restore descriptors; class methods, static methods and properties.
+patch and restore descriptors: class methods, static methods and properties.
 You should patch these on the *class* rather than an instance.
 
 Since version 0.7.0 patch_ and patch.object_ work correctly with some objects
