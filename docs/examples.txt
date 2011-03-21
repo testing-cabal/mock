@@ -29,6 +29,37 @@
             assert result.wasSuccessful()
             return out
 
+    def configure_mock(mock, **kwargs):
+        for arg, val in kwargs.items():
+            if arg.endswith('__side_effect'):
+                arg = arg[:-len('__side_effect')]
+                getattr(mock, arg).side_effect = val
+                continue
+
+            if arg.endswith('__return_value'):
+                arg = arg[:-len('__return_value')]
+                getattr(mock, arg).return_value = val
+                continue
+
+            setattr(mock, arg, val)
+
+    class Call(object):
+        def __init__(self, name=None):
+            self.name = name
+
+        def __call__(self, *args, **kwargs):
+            if self.name is None:
+                return (args, kwargs)
+            return (self.name, args, kwargs)
+
+        def __getattr__(self, attr):
+            if self.name is None:
+                return Call(attr)
+            name = '%s.%s' % (self.name, attr)
+            return Call(name)
+
+    call = Call()
+
 
 Here are some more examples for some slightly more advanced scenarios than in
 the :ref:`getting started <getting-started>` guide.
@@ -539,8 +570,8 @@ the args and calls our `new_mock` with the copy.
         AssertionError
 
 
-Mocking multiple calls
-======================
+Multiple calls with different effects
+=====================================
 
 Handling code that needs to behave differently on subsequent calls during the
 test can be tricky. For example you may have a function that needs to raise
@@ -730,3 +761,176 @@ mock methods and attributes:
     >>> my_dict
     {'a': 1, 'c': 3, 'b': 'fish', 'd': 'eggs'}
 
+
+Less verbose configuration of mock objects
+==========================================
+
+If you have a mock object, particularly one created for you by `patch
+<http://www.voidspace.org.uk/python/mock/getting-started.html#patch-decorators>`_,
+setting up attributes and return values for methods takes one line for every
+aspect of configuration.
+
+A feature I'm considering for mock 0.8.0 is an api for `making configuring
+mocks less verbose <https://code.google.com/p/mock/issues/detail?id=80>`_. As
+is the way of these things, it is easy to prototype this first with a function
+that you can use right now.
+
+`configure_mock` is a function that takes a `Mock()
+<http://www.voidspace.org.uk/python/mock/getting-started.html#using-mock>`_
+instance along with keyword arguments for attributes of the mock you want to
+set. For example, to set `mock.foo` to 3 and `mock.bar` to None, you call:
+
+.. doctest::
+
+    >>> mock = Mock()
+    >>> configure_mock(mock, foo=3, bar=None)
+    >>> mock.foo
+    3
+    >>> print mock.bar
+    None
+
+`return_value` and `side_effect` can be used to set them directly on the main
+mock *anyway* as they are just attributes.
+
+.. code-block:: pycon
+
+    >>> mock = Mock()
+    >>> configure_mock(mock, side_effect=KeyError)
+    >>> mock()
+    Traceback (most recent call last):
+      ...
+    KeyError
+
+This is fine for directly setting attributes, but what if you want to
+configure the return values or side effects of child mocks? How about using
+`attribute__return_value` and `attribute__side_effect` as a sort-of-dsl for
+specifying these in the same way?
+
+.. doctest::
+
+    >>> mock = Mock()
+    >>> configure_mock(mock, attribute__return_value=3, thing__side_effect=KeyError)
+    >>> mock.attribute()
+    3
+    >>> mock.thing()
+    Traceback (most recent call last):
+      ...
+    KeyError
+
+This could be extended to allow for extended dotted syntax from a dictionary,
+like setting return value on `mock.foo.bar`, or specifying attributes on
+`mock.foo.return_value`. If you have any opinions on this then please comment
+on the issue.
+
+A minimal implementation of `configure_mock` that you can start using now is::
+
+    def configure_mock(mock, **kwargs):
+        for arg, val in kwargs.items():
+            if arg.endswith('__side_effect'):
+                arg = arg[:-len('__side_effect')]
+                getattr(mock, arg).side_effect = val
+                continue
+
+            if arg.endswith('__return_value'):
+                arg = arg[:-len('__return_value')]
+                getattr(mock, arg).return_value = val
+                continue
+
+            setattr(mock, arg, val)
+
+
+Tracking order of calls and less verbose call assertions
+========================================================
+
+The :class:`Mock` class allows you to track the *order* of method calls on
+your mock objects through the :attr:`Mock.method_calls` attribute. This
+doesn't allow you to track the order of calls between separate mock objects,
+however we can use `method_calls` to achieve the same effect.
+
+Because mocks track calls to child mocks in `method_calls`, and accessing an
+arbitrary attribute of a mock creates a child mock, we can create our separate
+mocks from a parent one. Calls to those child mock will then all be recorded,
+in order, in the `method_calls` of the parent:
+
+.. doctest::
+
+    >>> manager = Mock()
+
+    >>> mock_foo = manager.foo
+    >>> mock_bar = manager.bar
+
+    >>> mock_foo.something()
+    <mock.Mock object at 0x...>
+    >>> mock_bar.other.thing()
+    <mock.Mock object at 0x...>
+
+    >>> manager.method_calls
+    [('foo.something', (), {}), ('bar.other.thing', (), {})]
+
+Using the "soft comparisons" feature of mock 0.7.0 we can make the final
+assertion about the expected calls less verbose:
+
+.. doctest::
+
+    >>> expected_calls = [('foo.something',), ('bar.other.thing',)]
+    >>> manager.method_calls == expected_calls
+    True
+
+To make them even less verbose I would like to add a new `call` object to mock
+0.8.0. You can see the issues I expect to work on for 0.8.0 in the `issues
+list <https://code.google.com/p/mock/issues/list>`_.
+
+`call` would look something like this::
+
+    class Call(object):
+        def __init__(self, name=None):
+            self.name = name
+
+        def __call__(self, *args, **kwargs):
+            if self.name is None:
+                return (args, kwargs)
+            return (self.name, args, kwargs)
+
+        def __getattr__(self, attr):
+            if self.name is None:
+                return Call(attr)
+            name = '%s.%s' % (self.name, attr)
+            return Call(name)
+
+    call = Call()
+
+You can then use it like this:
+
+.. doctest::
+
+    >>> mock = Mock(return_value=None)
+    >>> mock(1, 2, 3)
+    >>> mock(a=3, b=6)
+    >>> mock.call_args_list == [call(1, 2, 3), call(a=3, b=6)]
+    True
+
+    >>> mock = Mock()
+    >>> mock.foo(1, 2 ,3)
+    <mock.Mock object at 0x...>
+    >>> mock.bar.baz(a=3, b=6)
+    <mock.Mock object at 0x...>
+    >>> mock.method_calls == [call.foo(1, 2, 3), call.bar.baz(a=3, b=6)]
+    True
+
+And for good measure, the first example (tracking order of calls between
+mocks) using the new `call` object for assertions:
+
+.. doctest::
+
+    >>> manager = Mock()
+
+    >>> mock_foo = manager.foo
+    >>> mock_bar = manager.bar
+
+    >>> mock_foo.something()
+    <mock.Mock object at 0x...>
+    >>> mock_bar.other.thing()
+    <mock.Mock object at 0x...>
+
+    >>> manager.method_calls == [call.foo.something(), call.bar.other.thing()]
+    True
