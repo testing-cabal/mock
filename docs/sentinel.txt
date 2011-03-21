@@ -57,7 +57,7 @@ In this example we monkey patch `method` to return
     >>> real.method = Mock(name="method")
     >>> real.method.return_value = sentinel.some_object
     >>> result = real.method()
-    >>> assert result == sentinel.some_object
+    >>> assert result is sentinel.some_object
     >>> sentinel.some_object
     <SentinelObject "some_object">
 
