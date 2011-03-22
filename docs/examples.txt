@@ -30,18 +30,16 @@
             return out
 
     def configure_mock(mock, **kwargs):
-        for arg, val in kwargs.items():
-            if arg.endswith('__side_effect'):
-                arg = arg[:-len('__side_effect')]
-                getattr(mock, arg).side_effect = val
-                continue
-
-            if arg.endswith('__return_value'):
-                arg = arg[:-len('__return_value')]
-                getattr(mock, arg).return_value = val
-                continue
-
-            setattr(mock, arg, val)
+        if mock is None:
+            mock = Mock()
+        for arg, val in sorted(kwargs.items(), key=lambda entry: len(entry[0].split('.'))):
+            args = arg.split('.')
+            final = args.pop()
+            obj = mock
+            for entry in args:
+                obj = getattr(obj, entry)
+            setattr(obj, final, val)
+        return mock
 
     class Call(object):
         def __init__(self, name=None):
@@ -784,6 +782,7 @@ set. For example, to set `mock.foo` to 3 and `mock.bar` to None, you call:
 
     >>> mock = Mock()
     >>> configure_mock(mock, foo=3, bar=None)
+    <mock.Mock object at 0x...>
     >>> mock.foo
     3
     >>> print mock.bar
@@ -792,10 +791,11 @@ set. For example, to set `mock.foo` to 3 and `mock.bar` to None, you call:
 `return_value` and `side_effect` can be used to set them directly on the main
 mock *anyway* as they are just attributes.
 
-.. code-block:: pycon
+.. doctest::
 
     >>> mock = Mock()
     >>> configure_mock(mock, side_effect=KeyError)
+    <mock.Mock object at 0x...>
     >>> mock()
     Traceback (most recent call last):
       ...
@@ -803,40 +803,45 @@ mock *anyway* as they are just attributes.
 
 This is fine for directly setting attributes, but what if you want to
 configure the return values or side effects of child mocks? How about using
-`attribute__return_value` and `attribute__side_effect` as a sort-of-dsl for
-specifying these in the same way?
+standard dotted notation to specify these. Instead of normal keyword arguments
+you'll need to build a dictionary of arguments and pass them in with `**`. The
+function could also create a mock for us if we pass in `None`:
 
 .. doctest::
 
-    >>> mock = Mock()
-    >>> configure_mock(mock, attribute__return_value=3, thing__side_effect=KeyError)
-    >>> mock.attribute()
+    >>> args = {'foo.baz.return_value': 'fish', 'foo.side_effect':
+    ... RuntimeError, 'side_effect': KeyError, 'foo.bar': 3}
+    ...
+    >>> mock = configure_mock(None, **args)
+    >>> mock.foo.bar
     3
-    >>> mock.thing()
+    >>> mock()
     Traceback (most recent call last):
       ...
     KeyError
+    >>> mock.foo.baz()
+    'fish'
+    >>> mock.foo()
+    Traceback (most recent call last):
+      ...
+    RuntimeError
 
-This could be extended to allow for extended dotted syntax from a dictionary,
-like setting return value on `mock.foo.bar`, or specifying attributes on
-`mock.foo.return_value`. If you have any opinions on this then please comment
-on the issue.
+If you have any opinions on this then please comment on the issue.
 
 A minimal implementation of `configure_mock` that you can start using now is::
 
     def configure_mock(mock, **kwargs):
-        for arg, val in kwargs.items():
-            if arg.endswith('__side_effect'):
-                arg = arg[:-len('__side_effect')]
-                getattr(mock, arg).side_effect = val
-                continue
-
-            if arg.endswith('__return_value'):
-                arg = arg[:-len('__return_value')]
-                getattr(mock, arg).return_value = val
-                continue
-
-            setattr(mock, arg, val)
+        if mock is None:
+            mock = Mock()
+        for arg, val in sorted(kwargs.items(),
+                               key=lambda entry: len(entry[0].split('.'))):
+            args = arg.split('.')
+            final = args.pop()
+            obj = mock
+            for entry in args:
+                obj = getattr(obj, entry)
+            setattr(obj, final, val)
+        return mock
 
 
 Tracking order of calls and less verbose call assertions
