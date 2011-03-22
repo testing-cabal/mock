@@ -280,6 +280,7 @@ References
 
 Articles and blog entries on testing with Mock:
 
+* `PyCon 2011 Video: Testing with mock <https://blip.tv/file/4881513>`_
 * `Mocking Django <http://www.mattjmorrison.com/blog/mocking-django>`_
 * `Mock recipes <http://konryd.blogspot.com/2010/06/mock-recipies.html>`_
 * `Mockity mock mock - some love for the mock module
