@@ -47,9 +47,10 @@ CHANGELOG
 2011/05/06 Version 0.7.1
 ------------------------
 
-Package fixes contributed by Michael Fladischer.
+Package fixes contributed by Michael Fladischer. No code changes.
 
 * Include template in package
+* Use isolated binaries for the tox tests
 
 
 2011/03/05 Version 0.7.0
