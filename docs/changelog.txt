@@ -51,6 +51,8 @@ Package fixes contributed by Michael Fladischer. No code changes.
 
 * Include template in package
 * Use isolated binaries for the tox tests
+* Unset executable bit on docs
+* Fix DOS line endings in getting-started.txt
 
 
 2011/03/05 Version 0.7.0
