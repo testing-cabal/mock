@@ -9,8 +9,8 @@ mock is tested on Python versions 2.4-2.7 and Python 3.
 The mock module also provides utility functions / objects to assist with
 testing, particularly monkey patching.
 
-* `PDF documentation for 0.7.0
-  <http://www.voidspace.org.uk/downloads/mock-0.7.0.pdf>`_
+* `PDF documentation for 0.7.1
+  <http://www.voidspace.org.uk/downloads/mock-0.7.1.pdf>`_
 * `mock on google code (repository and issue tracker)
   <http://code.google.com/p/mock/>`_
 * `mock documentation
