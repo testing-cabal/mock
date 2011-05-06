@@ -3,7 +3,7 @@
 # Copyright (C) 2007-2011 Michael Foord & the mock team
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 
-# mock 0.7.0
+# mock 0.7.1
 # http://www.voidspace.org.uk/python/mock/
 
 # Released subject to the BSD License
@@ -23,7 +23,7 @@ __all__ = (
     'DEFAULT'
 )
 
-__version__ = '0.7.0'
+__version__ = '0.7.1'
 
 __unittest = True
 
