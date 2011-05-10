@@ -938,3 +938,35 @@ mocks) using the new `call` object for assertions:
 
     >>> manager.method_calls == [call.foo.something(), call.bar.other.thing()]
     True
+
+
+Matching any argument in assertions
+===================================
+
+Sometimes you may need to make assertions about *some* of the arguments in a
+call to mock, but either not care about some of the arguments or want to pull
+them individually out of :attr:`Mock.call_args` and make more complex
+assertions on them.
+
+To ignore certain arguments you can pass in object that compares equal to
+*everything*. Calls to :meth:`Mock.assert_called_with` and
+:meth:`Mock.assert_called_once_with` will then succeed no matter what was
+passed in.
+
+Here's an example implementation:
+
+.. doctest::
+
+    >>> class _ANY(object):
+    ...     def __eq__(self, other):
+    ...         return True
+    ...
+    >>> ANY = _ANY()
+
+And an example of using it:
+
+.. doctest::
+
+    >>> mock = Mock(return_value=None)
+    >>> mock('foo', bar=object())
+    >>> mock.assert_called_once_with('foo', bar=ANY)
