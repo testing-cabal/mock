@@ -27,7 +27,6 @@
             result = unittest2.TestResult()
             out = unittest2.TestCase.run(self, result)
             assert result.wasSuccessful()
-            return out
 
     def configure_mock(mock, **kwargs):
         if mock is None:
