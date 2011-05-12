@@ -948,7 +948,7 @@ call to mock, but either not care about some of the arguments or want to pull
 them individually out of :attr:`Mock.call_args` and make more complex
 assertions on them.
 
-To ignore certain arguments you can pass in object that compares equal to
+To ignore certain arguments you can pass in objects that compare equal to
 *everything*. Calls to :meth:`Mock.assert_called_with` and
 :meth:`Mock.assert_called_once_with` will then succeed no matter what was
 passed in.
@@ -978,15 +978,15 @@ More complex argument matching
 Using the same basic concept as the `ANY` pattern above we can implement
 matchers to do more complex assertions on objects used as arguments to mocks.
 
-Suppose we have expect some object to be passed to a mock that by default
+Suppose we expect some object to be passed to a mock that by default
 compares equal based on object identity (which is the Python default for user
 defined classes). To use :meth:`Mock.assert_called_with` we would need to pass
 in the exact same object. If we are only interested in some of the attributes
 of this object then we can create a matcher that will check these attributes
-for us and pass this into `assert_called_with`:
+for us.
 
 You can see in this example how a 'standard' call to `assert_called_with` isn't
-sufficient for us:
+sufficient:
 
 .. doctest::
 
