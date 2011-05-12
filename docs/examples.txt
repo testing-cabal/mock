@@ -970,3 +970,92 @@ And an example of using it:
     >>> mock = Mock(return_value=None)
     >>> mock('foo', bar=object())
     >>> mock.assert_called_once_with('foo', bar=ANY)
+
+
+More complex argument matching
+==============================
+
+Using the same basic concept as the `ANY` pattern above we can implement
+matchers to do more complex assertions on objects used as arguments to mocks.
+
+Suppose we have expect some object to be passed to a mock that by default
+compares equal based on object identity (which is the Python default for user
+defined classes). To use :meth:`Mock.assert_called_with` we would need to pass
+in the exact same object. If we are only interested in some of the attributes
+of this object then we can create a matcher that will check these attributes
+for us and pass this into `assert_called_with`:
+
+You can see in this example how a 'standard' call to `assert_called_with` isn't
+sufficient for us:
+
+.. doctest::
+
+    >>> class Foo(object):
+    ...     def __init__(self, a, b):
+    ...         self.a, self.b = a, b
+    ...
+    >>> mock = Mock(return_value=None)
+    >>> mock(Foo(1, 2))
+    >>> mock.assert_called_with(Foo(1, 2))
+    Traceback (most recent call last):
+     ...
+    AssertionError: Expected: ((<__main__.Foo object at 0x...>,), {})
+    Called with: ((<__main__.Foo object at 0x...>,), {})
+
+A comparison function for our `Foo` class might look something like this:
+
+.. doctest::
+
+    >>> def compare(self, other):
+    ...     if not type(self) == type(other):
+    ...         return False
+    ...     if self.a != other.a:
+    ...         return False
+    ...     if self.b != other.b:
+    ...         return False
+    ...     return True
+    ...
+
+And a matcher object that can use comparison functions like this for its
+equality operation would look something like this:
+
+.. doctest::
+
+    >>> class Matcher(object):
+    ...     def __init__(self, compare, some_obj):
+    ...         self.compare = compare
+    ...         self.some_obj = some_obj
+    ...     def __eq__(self, other):
+    ...         return self.compare(self.some_obj, other)
+    ...
+
+Putting all this together:
+
+.. doctest::
+
+    >>> match_foo = Matcher(compare, Foo(1, 2))
+    >>> mock.assert_called_with(match_foo)
+
+The `Matcher` is instantiated with our compare function and the `Foo` object
+we want to compare against. In `assert_called_with` the `Matcher` equality
+method will be called, which compares the object the mock was called with
+against the one we created our matcher with. If they match then
+`assert_called_with` passes, and if they don't an `AssertionError` is raised:
+
+.. doctest::
+
+    >>> match_wrong = Matcher(compare, Foo(3, 4))
+    >>> mock.assert_called_with(match_wrong)
+    Traceback (most recent call last):
+     ...
+    AssertionError: Expected: ((<Matcher object at 0x...>,), {})
+    Called with: ((<Foo object at 0x...>,), {})
+
+With a bit of tweaking you could have the comparison function raise the
+`AssertionError` directly and provide a more useful failure message.
+
+As of version 1.5, the Python testing library `PyHamcrest
+<http://pypi.python.org/pypi/PyHamcrest>`_ provides similar functionality,
+that may be useful here, in the form of its equality matcher
+(`hamcrest.library.integration.match_equality
+<http://packages.python.org/PyHamcrest/integration.html#hamcrest.library.integration.match_equality>`_).
