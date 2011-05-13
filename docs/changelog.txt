@@ -44,6 +44,14 @@ itself is garbage collected. This is tricky to get right though.
 CHANGELOG
 =========
 
+2011/XX/XX Version 0.8.0 alpha 1
+--------------------------------
+
+* Added `ANY` for ignoring arguments in `assert_called_with` calls
+* Removal of deprecated `patch_object`
+* Addition of `call` helper object
+
+
 2011/05/06 Version 0.7.1
 ------------------------
 

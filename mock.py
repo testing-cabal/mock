@@ -3,7 +3,7 @@
 # Copyright (C) 2007-2011 Michael Foord & the mock team
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 
-# mock 0.7.1
+# mock 0.8.0
 # http://www.voidspace.org.uk/python/mock/
 
 # Released subject to the BSD License
@@ -18,18 +18,18 @@ __all__ = (
     'MagicMock',
     'mocksignature',
     'patch',
-    'patch_object',
     'sentinel',
-    'DEFAULT'
+    'DEFAULT',
+    'ANY',
+    'call'
 )
 
-__version__ = '0.7.1'
+__version__ = '0.8.0alpha1'
 
 __unittest = True
 
 
 import sys
-import warnings
 
 try:
     import inspect
@@ -657,12 +657,6 @@ def _patch_object(target, attribute, new=DEFAULT, spec=None, create=False,
                   spec_set)
 
 
-def patch_object(*args, **kwargs):
-    "A deprecated form of patch.object(...)"
-    warnings.warn(('Please use patch.object instead.'), DeprecationWarning, 2)
-    return _patch_object(*args, **kwargs)
-
-
 def patch(target, new=DEFAULT, spec=None, create=False,
             mocksignature=False, spec_set=None):
     """
@@ -956,3 +950,40 @@ class MagicMock(Mock):
             m = Mock()
             setattr(self, entry, m)
             _set_return_value(self, m, entry)
+
+
+
+class _ANY(object):
+    "A helper object that compares equal to everything."
+
+    def __eq__(self, other):
+        return True
+
+    def __repr__(self):
+        return '<ANY>'
+
+ANY = _ANY()
+
+class _Call(object):
+    "Call helper object"
+
+    def __init__(self, name=None):
+        self.name = name
+
+    def __call__(self, *args, **kwargs):
+        if self.name is None:
+            return (args, kwargs)
+        return (self.name, args, kwargs)
+
+    def __getattr__(self, attr):
+        if self.name is None:
+            return _Call(attr)
+        name = '%s.%s' % (self.name, attr)
+        return _Call(name)
+
+    def __repr__(self):
+        if self.name is None:
+            return '<call>'
+        return '<call %s>' % self.name
+
+call = _Call()
