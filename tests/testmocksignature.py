@@ -281,13 +281,17 @@ class TestMockSignature(unittest2.TestCase):
     def test_mock_attributes(self):
         func = mocksignature(f)
 
+        return_value = func.return_value
+        self.assertIsInstance(return_value, Mock)
+        self.assertIsNone(func.side_effect)
         self.assertFalse(func.called)
         self.assertIsNone(func.call_args)
         self.assertEqual(func.call_count, 0)
         self.assertEqual(func.method_calls, [])
         self.assertEqual(func.call_args_list, [])
 
-        func(1, 2, 3)
+        self.assertIs(func(1, 2, 3), return_value)
+
         self.assertTrue(func.called)
         self.assertEqual(func.call_args, ((1, 2, 3), {}))
         self.assertEqual(func.call_count, 1)
@@ -295,8 +299,10 @@ class TestMockSignature(unittest2.TestCase):
         self.assertEqual(func.call_args_list, [((1, 2, 3), {})])
         func.method_calls.append('foo')
 
+        return_value()
         func.reset_mock()
 
+        self.assertEqual(return_value.call_count, False)
         self.assertFalse(func.called)
         self.assertIsNone(func.call_args)
         self.assertEqual(func.call_count, 0)
