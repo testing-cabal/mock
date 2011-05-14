@@ -104,12 +104,6 @@ function:
 statements in the same way as ``patch``. It can also be used as a class
 decorator with same semantics as ``patch``.
 
-patch_object
-============
-
-.. deprecated:: 0.7
-   This is the same as ``patch.object``. Use the renamed version.
-
 
 patch.dict
 ==========

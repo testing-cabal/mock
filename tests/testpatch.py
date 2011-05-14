@@ -4,15 +4,11 @@
 
 import os
 import sys
-import warnings
 
 from tests import support
-from tests.support import unittest2, apply, inPy3k, SomeClass, with_available
+from tests.support import unittest2, apply, inPy3k, SomeClass
 
-if with_available:
-    from tests.support_with import examine_warnings
-
-from mock import Mock, patch, patch_object, sentinel
+from mock import Mock, patch, sentinel
 
 if not inPy3k:
     builtin_string = '__builtin__'
@@ -400,18 +396,6 @@ class PatchTest(unittest2.TestCase):
 
         self.assertEqual(Something.attribute, sentinel.Original, "patch not restored")
         self.assertEqual(PTModule.something, sentinel.Something, "patch not restored")
-
-    @unittest2.skipUnless(with_available, "test requires Python >= 2.5")
-    def testPatchObjectDeprecation(self):
-        # needed to enable the deprecation warnings
-        warnings.simplefilter('default')
-
-        @apply
-        @examine_warnings
-        def _examine_warnings(ws):
-            patch_object(SomeClass, 'class_attribute', spec=SomeClass)
-            warning = ws[0]
-            self.assertIs(warning.category, DeprecationWarning)
 
     def testPatchObjectTwice(self):
         class Something(object):
