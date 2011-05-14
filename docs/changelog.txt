@@ -52,6 +52,8 @@ CHANGELOG
 * Addition of `call` helper object
 * Protocol methods on `MagicMock` are magic mocks, and are created lazily on
   first lookup.
+* Private attributes `_name`, `_methods`, '_children', `_wraps` and `_parent`
+  renamed to reduce likelihood of clash with user attributes.
 
 
 2011/05/06 Version 0.7.1

@@ -256,9 +256,12 @@ class Mock(object):
 
 
     def __init__(self, spec=None, side_effect=None, return_value=DEFAULT,
-                    wraps=None, name=None, spec_set=None, parent=None):
-        self._parent = parent
-        self._name = name
+                    wraps=None, name=None, spec_set=None, parent=None,
+                    _old_name=None):
+        self._mock_parent = parent
+        self._mock_name = name
+        self.__old_name = _old_name
+
         _spec_class = None
         if spec_set is not None:
             spec = spec_set
@@ -273,11 +276,12 @@ class Mock(object):
 
         self._spec_class = _spec_class
         self._spec_set = spec_set
-        self._methods = spec
-        self._children = {}
+        self._mock_methods = spec
+        self._mock_children = {}
         self._return_value = return_value
         self.side_effect = side_effect
-        self._wraps = wraps
+        self._mock_wraps = wraps
+        self.mock_calls = []
 
         self.reset_mock()
 
@@ -296,7 +300,7 @@ class Mock(object):
         self.call_count = 0
         self.call_args_list = []
         self.method_calls = []
-        for child in self._children.values():
+        for child in self._mock_children.values():
             child.reset_mock()
         if isinstance(self._return_value, Mock):
             if not self._return_value is self:
@@ -322,14 +326,14 @@ class Mock(object):
         self.call_args = callargs((args, kwargs))
         self.call_args_list.append(callargs((args, kwargs)))
 
-        parent = self._parent
-        name = self._name
+        parent = self._mock_parent
+        name = self._mock_name
         while parent is not None:
             parent.method_calls.append(callargs((name, args, kwargs)))
-            if parent._parent is None:
+            if parent._mock_parent is None:
                 break
-            name = parent._name + '.' + name
-            parent = parent._parent
+            name = parent._mock_name + '.' + name
+            parent = parent._mock_parent
 
         ret_val = DEFAULT
         if self.side_effect is not None:
@@ -342,47 +346,47 @@ class Mock(object):
             if ret_val is DEFAULT:
                 ret_val = self.return_value
 
-        if self._wraps is not None and self._return_value is DEFAULT:
-            return self._wraps(*args, **kwargs)
+        if self._mock_wraps is not None and self._return_value is DEFAULT:
+            return self._mock_wraps(*args, **kwargs)
         if ret_val is DEFAULT:
             ret_val = self.return_value
         return ret_val
 
 
     def __getattr__(self, name):
-        if name == '_methods':
+        if name == '_mock_methods':
             raise AttributeError(name)
-        elif self._methods is not None:
-            if name not in self._methods or name in _all_magics:
+        elif self._mock_methods is not None:
+            if name not in self._mock_methods or name in _all_magics:
                 raise AttributeError("Mock object has no attribute '%s'" % name)
         elif _is_magic(name):
             raise AttributeError(name)
 
-        if name not in self._children:
+        if name not in self._mock_children:
             wraps = None
-            if self._wraps is not None:
-                wraps = getattr(self._wraps, name)
-            self._children[name] = self._get_child_mock(parent=self, name=name, wraps=wraps)
+            if self._mock_wraps is not None:
+                wraps = getattr(self._mock_wraps, name)
+            self._mock_children[name] = self._get_child_mock(parent=self, name=name, wraps=wraps)
 
-        return self._children[name]
+        return self._mock_children[name]
 
 
     def __repr__(self):
-        if self._name is None and self._spec_class is None:
+        if self._mock_name is None and self._spec_class is None:
             return object.__repr__(self)
 
         name_string = ''
         spec_string = ''
-        if self._name is not None:
+        if self._mock_name is not None:
             def get_name(name):
                 if name is None:
                     return 'mock'
                 return name
-            parent = self._parent
-            name = self._name
+            parent = self._mock_parent
+            name = self._mock_name
             while parent is not None:
-                name = get_name(parent._name) + '.' + name
-                parent = parent._parent
+                name = get_name(parent._mock_name) + '.' + name
+                parent = parent._mock_parent
             name_string = ' name=%r' % name
         if self._spec_class is not None:
             spec_string = ' spec=%r'
@@ -399,15 +403,15 @@ class Mock(object):
         if not 'method_calls' in self.__dict__:
             # allow all attribute setting until initialisation is complete
             return object.__setattr__(self, name, value)
-        if (self._spec_set and self._methods is not None and name not in
-            self._methods and name not in self.__dict__ and
+        if (self._spec_set and self._mock_methods is not None and name not in
+            self._mock_methods and name not in self.__dict__ and
             name != 'return_value'):
             raise AttributeError("Mock object has no attribute '%s'" % name)
         if name in _unsupported_magics:
             msg = 'Attempting to set unsupported magic method %r.' % name
             raise AttributeError(msg)
         elif name in _all_magics:
-            if self._methods is not None and name not in self._methods:
+            if self._mock_methods is not None and name not in self._mock_methods:
                 raise AttributeError("Mock object has no attribute '%s'" % name)
 
             if isinstance(value, MagicProxy):
@@ -947,8 +951,8 @@ class MagicMock(Mock):
         Mock.__init__(self, *args, **kw)
 
         these_magics = _magics
-        if self._methods is not None:
-            these_magics = _magics.intersection(self._methods)
+        if self._mock_methods is not None:
+            these_magics = _magics.intersection(self._mock_methods)
 
         for entry in these_magics:
 
