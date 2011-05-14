@@ -7,7 +7,7 @@ from tests.support import unittest2, inPy3k
 import copy
 import sys
 
-from mock import Mock, sentinel, DEFAULT
+from mock import MagicMock, Mock, sentinel, DEFAULT
 
 
 try:
@@ -44,9 +44,9 @@ class MockTest(unittest2.TestCase):
         self.assertFalse('_items' in mock.__dict__,
                          "default mock should not have '_items' attribute")
 
-        self.assertIsNone(mock._parent, "parent not initialised correctly")
-        self.assertIsNone(mock._methods, "methods not initialised correctly")
-        self.assertEqual(mock._children, {},
+        self.assertIsNone(mock._mock_parent, "parent not initialised correctly")
+        self.assertIsNone(mock._mock_methods, "methods not initialised correctly")
+        self.assertEqual(mock._mock_children, {},
                          "children not initialised incorrectly")
 
 
@@ -140,9 +140,9 @@ class MockTest(unittest2.TestCase):
 
         mock.reset_mock()
 
-        self.assertEqual(mock._name, "child", "name incorrectly reset")
-        self.assertEqual(mock._parent, parent, "parent incorrectly reset")
-        self.assertEqual(mock._methods, spec, "methods incorrectly reset")
+        self.assertEqual(mock._mock_name, "child", "name incorrectly reset")
+        self.assertEqual(mock._mock_parent, parent, "parent incorrectly reset")
+        self.assertEqual(mock._mock_methods, spec, "methods incorrectly reset")
 
         self.assertFalse(mock.called, "called not reset")
         self.assertEqual(mock.call_count, 0, "call_count not reset")
@@ -157,7 +157,7 @@ class MockTest(unittest2.TestCase):
         self.assertEqual(mock.return_value, return_value,
                           "return_value incorrectly reset")
         self.assertFalse(return_value.called, "return value mock not reset")
-        self.assertEqual(mock._children, {'something': something},
+        self.assertEqual(mock._mock_children, {'something': something},
                           "children reset incorrectly")
         self.assertEqual(mock.something, something,
                           "children incorrectly cleared")
@@ -276,9 +276,9 @@ class MockTest(unittest2.TestCase):
         mock = Mock()
         something = mock.something
 
-        self.assertEqual(something._name, "something",
+        self.assertEqual(something._mock_name, "something",
                          "attribute name not set correctly")
-        self.assertEqual(something._parent, mock,
+        self.assertEqual(something._mock_parent, mock,
                          "attribute parent not set correctly")
 
 
@@ -519,6 +519,37 @@ class MockTest(unittest2.TestCase):
         def test():
             s.foo = 'bar'
         self.assertRaises(AttributeError, test)
+
+    def test_mock_calls(self):
+        mock = MagicMock()
+
+        # need to do this because MagicMock.mock_calls used to just return
+        # a MagicMock which also returned a MagicMock when __eq__ was called
+        self.assertIs(mock.mock_calls == [], True)
+
+        mock()
+        expected = [('', (), {})]
+        self.assertEqual(mock.mock_calls, expected)
+
+        mock.foo()
+        expected.append(('foo', (), {}))
+        self.assertEqual(mock.mock_calls, expected)
+
+        mock().foo()
+        expected.append(('().foo', (), {}))
+        self.assertEqual(mock.mock_calls, expected)
+
+        mock().foo.bar().baz()
+        expected.append(('().foo.bar().baz', (), {}))
+        self.assertEqual(mock.mock_calls, expected)
+
+        int(mock.foo)
+        expected.append(('foo.__int__', (), {}))
+        self.assertEqual(mock.mock_calls, expected)
+
+        int(mock().foo.bar().baz())
+        expected.append(('().foo.bar().baz().__int__', (), {}))
+        self.assertEqual(mock.mock_calls, expected)
 
 
 if __name__ == '__main__':
