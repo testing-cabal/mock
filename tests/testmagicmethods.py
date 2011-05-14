@@ -344,6 +344,10 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertEqual(_get_type(returned), MagicMock)
 
 
+    def test_magic_methods_are_magic_mocks(self):
+        mock = MagicMock()
+        self.assertIsInstance(mock.__getitem__, MagicMock)
+
 
 if __name__ == '__main__':
     unittest2.main()

@@ -27,20 +27,6 @@ class AnyTest(unittest2.TestCase):
 
 
 class CallTest(unittest2.TestCase):
-    """
-    >>> manager = Mock()
-
-    >>> mock_foo = manager.foo
-    >>> mock_bar = manager.bar
-
-    >>> mock_foo.something()
-    <mock.Mock object at 0x...>
-    >>> mock_bar.other.thing()
-    <mock.Mock object at 0x...>
-
-    >>> manager.method_calls == [call.foo.something(), call.bar.other.thing()]
-    True
-    """
 
     def test_repr(self):
         self.assertEqual(repr(call), '<call>')
