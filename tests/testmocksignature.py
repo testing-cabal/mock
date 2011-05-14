@@ -8,6 +8,7 @@ from tests.support import unittest2, apply
 
 from mock import Mock, mocksignature, patch
 
+
 class Something(object):
     def __init__(self, foo, bar=10):
         pass
@@ -15,6 +16,11 @@ class Something(object):
         pass
 
 something = Something(1, 2)
+
+
+def f(a, b, c):
+    pass
+
 
 class TestMockSignature(unittest2.TestCase):
 
@@ -31,6 +37,7 @@ class TestMockSignature(unittest2.TestCase):
         self.assertEqual(f2('foo'), 3)
         mock.assert_called_with('foo')
         f2.mock.assert_called_with('foo')
+
 
     def testFunctionWithoutExplicitMock(self):
         def f(a):
@@ -81,6 +88,7 @@ class TestMockSignature(unittest2.TestCase):
         f2 = mocksignature(f, mock)
         f2()
         mock.assert_called_with(a)
+
 
     def testIntrospection(self):
         def f(a, *args, **kwargs):
@@ -251,8 +259,74 @@ class TestMockSignature(unittest2.TestCase):
         test()
         self.assertEqual(thing.meth, original)
 
-        # when patching instance methods using mocksignatures we
-        # replace the bound method with an instance attribute on
-        # unpatching. This is technically incorrect but will
-        # almost never cause any problems...
-        #self.assertNotIn('meth', something.__dict__)
+        # when patching instance methods using mocksignatures we used to
+        # replace the bound method with an instance attribute on unpatching.
+        self.assertNotIn('meth', thing.__dict__)
+
+
+    def test_assert_called_with(self):
+        func = mocksignature(f)
+
+        self.assertRaises(AssertionError, func.assert_called_with)
+        self.assertRaises(AssertionError, func.assert_called_once_with)
+
+        func(1, 2, 3)
+        func.assert_called_with(1, 2, 3)
+        self.assertRaises(AssertionError, func.assert_called_with, 4, 5, 6)
+        func.assert_called_once_with(1, 2, 3)
+        self.assertRaises(AssertionError, func.assert_called_once_with,
+                          4, 5, 6)
+
+
+    def test_mock_attributes(self):
+        func = mocksignature(f)
+
+        self.assertFalse(func.called)
+        self.assertIsNone(func.call_args)
+        self.assertEqual(func.call_count, 0)
+        self.assertEqual(func.method_calls, [])
+        self.assertEqual(func.call_args_list, [])
+
+        func(1, 2, 3)
+        self.assertTrue(func.called)
+        self.assertEqual(func.call_args, ((1, 2, 3), {}))
+        self.assertEqual(func.call_count, 1)
+        self.assertEqual(func.method_calls, [])
+        self.assertEqual(func.call_args_list, [((1, 2, 3), {})])
+        func.method_calls.append('foo')
+
+        func.reset_mock()
+
+        self.assertFalse(func.called)
+        self.assertIsNone(func.call_args)
+        self.assertEqual(func.call_count, 0)
+        self.assertEqual(func.method_calls, [])
+        self.assertEqual(func.call_args_list, [])
+
+        func.side_effect = KeyError
+        self.assertRaises(KeyError, func, 1, 2, 3)
+        self.assertTrue(func.called)
+
+        func.side_effect = None
+        func.return_value = 'foo'
+        self.assertEqual(func(1, 2, 3), 'foo')
+        self.assertEqual(func.call_count, 2)
+
+
+    def test_return_value_from_existing_mock(self):
+        mock = Mock(return_value='foo')
+        func = mocksignature(f, mock)
+        self.assertEqual(func(1, 2, 3), 'foo')
+
+        mock.return_value = 'bar'
+        self.assertEqual(func(1, 2, 3), 'bar')
+
+
+    def test_side_effect_from_existing_mock(self):
+        mock = Mock(side_effect=KeyError)
+        func = mocksignature(f, mock)
+        self.assertRaises(KeyError, func, 1, 2, 3)
+
+        mock.side_effect = NameError
+        self.assertRaises(NameError, func, 1, 2, 3)
+

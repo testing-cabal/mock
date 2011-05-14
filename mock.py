@@ -21,7 +21,7 @@ __all__ = (
     'sentinel',
     'DEFAULT',
     'ANY',
-    'call'
+    'call',
 )
 
 __version__ = '0.8.0alpha1'
@@ -70,10 +70,9 @@ except NameError:
 
 inPy3k = sys.version_info[0] == 3
 
+self = 'im_self'
 if inPy3k:
     self = '__self__'
-else:
-    self = 'im_self'
 
 
 # getsignature and mocksignature heavily "inspired" by
@@ -150,8 +149,36 @@ def mocksignature(func, mock=None, skipfirst=False):
 
     funcopy = eval(src, dict(_mock_=mock))
     _copy_func_details(func, funcopy)
-    funcopy.mock = mock
+    _setup_func(funcopy, mock)
     return funcopy
+
+
+def _setup_func(funcopy, mock):
+    funcopy.mock = mock
+    if not isinstance(mock, Mock):
+        return
+
+    def assert_called_with(*args, **kwargs):
+        return mock.assert_called_with(*args, **kwargs)
+    def assert_called_once_with(*args, **kwargs):
+        return mock.assert_called_once_with(*args, **kwargs)
+    def reset_mock():
+        funcopy.method_calls = []
+        return mock.reset_mock()
+
+    funcopy.called = False
+    funcopy.call_count = 0
+    funcopy.call_args = None
+    funcopy.call_args_list = []
+    funcopy.method_calls = []
+    funcopy.return_value = mock._mock_return_value
+    funcopy.side_effect = mock.side_effect
+
+    funcopy.assert_called_with = assert_called_with
+    funcopy.assert_called_once_with = assert_called_once_with
+    funcopy.reset_mock = reset_mock
+
+    mock._mock_signature = funcopy
 
 
 def _is_magic(name):
@@ -195,10 +222,25 @@ def _copy(value):
     return value
 
 
-if inPy3k:
-    class_types = type
-else:
-    class_types = (type, ClassType)
+ClassTypes = (type,)
+if not inPy3k:
+    ClassTypes = (type, ClassType)
+
+
+def _mock_signature_property(name):
+    def _get(self):
+        sig = self._mock_signature
+        if sig is None:
+            return getattr(self, '_mock_' + name)
+        return getattr(sig, name)
+    def _set(self, value):
+        sig = self._mock_signature
+        if sig is None:
+            setattr(self, '_mock_' + name, value)
+        else:
+            setattr(sig, name, value)
+
+    return property(_get, _set)
 
 
 class Mock(object):
@@ -268,7 +310,7 @@ class Mock(object):
             spec_set = True
 
         if spec is not None and not isinstance(spec, list):
-            if isinstance(spec, class_types):
+            if isinstance(spec, ClassTypes):
                 _spec_class = spec
             else:
                 _spec_class = spec.__class__
@@ -278,10 +320,16 @@ class Mock(object):
         self._spec_set = spec_set
         self._mock_methods = spec
         self._mock_children = {}
-        self._return_value = return_value
-        self.side_effect = side_effect
+        self._mock_return_value = return_value
+        self._mock_side_effect = side_effect
         self._mock_wraps = wraps
         self.mock_calls = []
+        self._mock_signature = None
+
+        self._mock_called = False
+        self._mock_call_args = None
+        self._mock_call_count = 0
+        self._mock_call_args_list = []
 
         self.reset_mock()
 
@@ -291,6 +339,12 @@ class Mock(object):
         if self._spec_class is None:
             return type(self)
         return self._spec_class
+
+    called = _mock_signature_property('called')
+    call_count = _mock_signature_property('call_count')
+    call_args = _mock_signature_property('call_args')
+    call_args_list = _mock_signature_property('call_args_list')
+    side_effect = _mock_signature_property('side_effect')
 
 
     def reset_mock(self):
@@ -302,18 +356,27 @@ class Mock(object):
         self.method_calls = []
         for child in self._mock_children.values():
             child.reset_mock()
-        if isinstance(self._return_value, Mock):
-            if not self._return_value is self:
-                self._return_value.reset_mock()
+
+        ret = self._mock_return_value
+        if isinstance(ret, Mock) and ret is not self:
+            ret.reset_mock()
 
 
     def __get_return_value(self):
-        if self._return_value is DEFAULT:
-            self._return_value = self._get_child_mock()
-        return self._return_value
+        ret = self._mock_return_value
+        if self._mock_signature is not None:
+            ret = self._mock_signature.return_value
+
+        if ret is DEFAULT:
+            ret = self._get_child_mock()
+            self.return_value = ret
+        return ret
 
     def __set_return_value(self, value):
-        self._return_value = value
+        if self._mock_signature is not None:
+            self._mock_signature.return_value = value
+        else:
+            self._mock_return_value = value
 
     __return_value_doc = "The value to be returned when the mock is called."
     return_value = property(__get_return_value, __set_return_value,
@@ -338,7 +401,7 @@ class Mock(object):
         ret_val = DEFAULT
         if self.side_effect is not None:
             if (isinstance(self.side_effect, BaseException) or
-                isinstance(self.side_effect, class_types) and
+                isinstance(self.side_effect, ClassTypes) and
                 issubclass(self.side_effect, BaseException)):
                 raise self.side_effect
 
@@ -346,7 +409,7 @@ class Mock(object):
             if ret_val is DEFAULT:
                 ret_val = self.return_value
 
-        if self._mock_wraps is not None and self._return_value is DEFAULT:
+        if self._mock_wraps is not None and self._mock_return_value is DEFAULT:
             return self._mock_wraps(*args, **kwargs)
         if ret_val is DEFAULT:
             ret_val = self.return_value
@@ -544,7 +607,7 @@ class _patch(object):
 
 
     def __call__(self, func):
-        if isinstance(func, class_types):
+        if isinstance(func, ClassTypes):
             return self.decorate_class(func)
         return self.decorate_callable(func)
 
@@ -613,12 +676,12 @@ class _patch(object):
             inherit = False
             if spec_set == True:
                 spec_set = original
-                if isinstance(spec_set, class_types):
+                if isinstance(spec_set, ClassTypes):
                     inherit = True
             elif spec == True:
                 # set spec to the object we are replacing
                 spec = original
-                if isinstance(spec, class_types):
+                if isinstance(spec, ClassTypes):
                     inherit = True
             new = Mock(spec=spec, spec_set=spec_set)
             if inherit:
@@ -755,7 +818,7 @@ class _patch_dict(object):
 
 
     def __call__(self, f):
-        if isinstance(f, class_types):
+        if isinstance(f, ClassTypes):
             return self.decorate_class(f)
         @wraps(f)
         def _inner(*args, **kw):
@@ -957,7 +1020,6 @@ class MagicMock(Mock):
             these_magics = _magics.intersection(self._mock_methods)
 
         for entry in these_magics:
-
             setattr(self, entry, _create_proxy(entry, self))
 
 
