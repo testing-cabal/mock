@@ -260,7 +260,7 @@ class Mock(object):
                     _old_name=None):
         self._mock_parent = parent
         self._mock_name = name
-        self.__old_name = _old_name
+        self._mock_old_name = _old_name
 
         _spec_class = None
         if spec_set is not None:
@@ -358,7 +358,7 @@ class Mock(object):
             raise AttributeError(name)
         elif self._mock_methods is not None:
             if name not in self._mock_methods or name in _all_magics:
-                raise AttributeError("Mock object has no attribute '%s'" % name)
+                raise AttributeError("Mock object has no attribute %r" % name)
         elif _is_magic(name):
             raise AttributeError(name)
 
@@ -366,7 +366,9 @@ class Mock(object):
             wraps = None
             if self._mock_wraps is not None:
                 wraps = getattr(self._mock_wraps, name)
-            self._mock_children[name] = self._get_child_mock(parent=self, name=name, wraps=wraps)
+            self._mock_children[name] = self._get_child_mock(parent=self,
+                                                              name=name,
+                                                              wraps=wraps)
 
         return self._mock_children[name]
 
@@ -544,8 +546,7 @@ class _patch(object):
     def __call__(self, func):
         if isinstance(func, class_types):
             return self.decorate_class(func)
-        else:
-            return self.decorate_callable(func)
+        return self.decorate_callable(func)
 
 
     def decorate_class(self, klass):
@@ -721,6 +722,7 @@ def patch(target, new=DEFAULT, spec=None, create=False,
                         (target,))
     target = _importer(target)
     return _patch(target, attribute, new, spec, create, mocksignature, spec_set)
+
 
 
 class _patch_dict(object):
@@ -958,6 +960,7 @@ class MagicMock(Mock):
 
             setattr(self, entry, _create_proxy(entry, self))
 
+
 def _create_proxy(entry, self):
     # could specify parent?
     def create_mock():
@@ -966,6 +969,7 @@ def _create_proxy(entry, self):
         _set_return_value(self, m, entry)
         return m
     return MagicProxy(create_mock)
+
 
 
 class MagicProxy(object):
@@ -978,6 +982,7 @@ class MagicProxy(object):
         return self.create_mock()
 
 
+
 class _ANY(object):
     "A helper object that compares equal to everything."
 
@@ -988,6 +993,8 @@ class _ANY(object):
         return '<ANY>'
 
 ANY = _ANY()
+
+
 
 class _Call(object):
     "Call helper object"
