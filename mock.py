@@ -164,14 +164,17 @@ def _setup_func(funcopy, mock):
         return mock.assert_called_once_with(*args, **kwargs)
     def reset_mock():
         funcopy.method_calls = []
-        return mock.reset_mock()
+        mock.reset_mock()
+        ret = funcopy.return_value
+        if isinstance(ret, Mock) and not ret is mock:
+            ret.reset_mock()
 
     funcopy.called = False
     funcopy.call_count = 0
     funcopy.call_args = None
     funcopy.call_args_list = []
     funcopy.method_calls = []
-    funcopy.return_value = mock._mock_return_value
+    funcopy.return_value = mock.return_value
     funcopy.side_effect = mock.side_effect
 
     funcopy.assert_called_with = assert_called_with
