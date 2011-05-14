@@ -410,6 +410,10 @@ class Mock(object):
             if self._methods is not None and name not in self._methods:
                 raise AttributeError("Mock object has no attribute '%s'" % name)
 
+            if isinstance(value, MagicProxy):
+                setattr(type(self), name, value)
+                return
+
             if not isinstance(value, Mock):
                 setattr(type(self), name, _get_method(name, value))
                 original = value
@@ -927,6 +931,7 @@ def _set_return_value(mock, method, name):
         method.return_value = return_value
 
 
+
 class MagicMock(Mock):
     """
     MagicMock is a subclass of :Mock with default implementations
@@ -946,11 +951,27 @@ class MagicMock(Mock):
             these_magics = _magics.intersection(self._methods)
 
         for entry in these_magics:
-            # could specify parent?
-            m = Mock()
-            setattr(self, entry, m)
-            _set_return_value(self, m, entry)
 
+            setattr(self, entry, _create_proxy(entry, self))
+
+def _create_proxy(entry, self):
+    # could specify parent?
+    def create_mock():
+        m = MagicMock(name=entry)
+        setattr(self, entry, m)
+        _set_return_value(self, m, entry)
+        return m
+    return MagicProxy(create_mock)
+
+
+class MagicProxy(object):
+    def __init__(self, create_mock):
+        self.create_mock = create_mock
+    def __call__(self, *args, **kwargs):
+        m = self.create_mock()
+        return m(*args, **kwargs)
+    def __get__(self, obj, _type=None):
+        return self.create_mock()
 
 
 class _ANY(object):

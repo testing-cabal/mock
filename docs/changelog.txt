@@ -50,6 +50,8 @@ CHANGELOG
 * Added `ANY` for ignoring arguments in `assert_called_with` calls
 * Removal of deprecated `patch_object`
 * Addition of `call` helper object
+* Protocol methods on `MagicMock` are magic mocks, and are created lazily on
+  first lookup.
 
 
 2011/05/06 Version 0.7.1
