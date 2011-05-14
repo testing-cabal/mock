@@ -7,10 +7,10 @@
 :Author: `Michael Foord <http://www.voidspace.org.uk/python/weblog/index.shtml>`_
 :Co-maintainer: `Konrad Delong <http://konryd.blogspot.com/>`_
 :Version: |release|
-:Date: 2011/03/05
+:Date: 2011/XX/XX
 :Homepage: `Mock Homepage`_
 :Download: `Mock on PyPI`_
-:Documentation: `PDF Documentation <http://www.voidspace.org.uk/downloads/mock-0.7.1.pdf>`_
+:Documentation: `PDF Documentation <http://www.voidspace.org.uk/downloads/mock-0.8.0a1.pdf>`_
 :License: `BSD License`_
 :Support: `Mailing list (testing-in-python@lists.idyll.org) <http://lists.idyll.org/listinfo/testing-in-python>`_
 :Issue tracker: `Google code project <http://code.google.com/p/mock/issues/list>`_
@@ -43,7 +43,6 @@ the 'action -> assertion' pattern instead of `'record -> replay'` used by many
 mocking frameworks.
 
 mock is tested on Python versions 2.4-2.7 and Python 3.
-
 
 .. testsetup::
 
@@ -333,7 +332,10 @@ Older Versions
 
 Documentation for older versions of mock:
 
-* `mock 0.6.0 <http://www.voidspace.org.uk/python/mock/0.6.0/>`_
+# XXXX
+
+* `mock 0.7 <http://www.voidspace.org.uk/python/mock/0.7/>`_
+* `mock 0.6 <http://www.voidspace.org.uk/python/mock/0.6.0/>`_
 
 
 Terminology

@@ -28,25 +28,6 @@ class AnyTest(unittest2.TestCase):
 
 class CallTest(unittest2.TestCase):
     """
-    >>> mock = Mock(return_value=None)
-    >>> mock(1, 2, 3)
-    >>> mock(a=3, b=6)
-    >>> mock.call_args_list == [call(1, 2, 3), call(a=3, b=6)]
-    True
-
-    >>> mock = Mock()
-    >>> mock.foo(1, 2 ,3)
-    <mock.Mock object at 0x...>
-    >>> mock.bar.baz(a=3, b=6)
-    <mock.Mock object at 0x...>
-    >>> mock.method_calls == [call.foo(1, 2, 3), call.bar.baz(a=3, b=6)]
-    True
-
-And for good measure, the first example (tracking order of calls between
-mocks) using the new `call` object for assertions:
-
-.. doctest::
-
     >>> manager = Mock()
 
     >>> mock_foo = manager.foo
@@ -71,3 +52,21 @@ mocks) using the new `call` object for assertions:
         self.assertEqual(call(), ((), {}))
         self.assertEqual(call('foo', 'bar', one=3, two=4),
                          (('foo', 'bar'), {'one': 3, 'two': 4}))
+
+        mock = Mock()
+        mock(1, 2, 3)
+        mock(a=3, b=6)
+        self.assertEqual(mock.call_args_list,
+                         [call(1, 2, 3), call(a=3, b=6)])
+
+    def test_attribute_call(self):
+        self.assertEqual(call.foo(1), ('foo', (1,), {}))
+        self.assertEqual(call.bar.baz(fish='eggs'),
+                         ('bar.baz', (), {'fish': 'eggs'}))
+
+        mock = Mock()
+        mock.foo(1, 2 ,3)
+        mock.bar.baz(a=3, b=6)
+        self.assertEqual(mock.method_calls,
+                         [call.foo(1, 2, 3), call.bar.baz(a=3, b=6)])
+
