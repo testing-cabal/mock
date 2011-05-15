@@ -24,7 +24,7 @@ def f(a, b, c):
 
 class TestMockSignature(unittest2.TestCase):
 
-    def testFunction(self):
+    def test_function(self):
         def f(a):
             pass
         mock = Mock()
@@ -39,7 +39,7 @@ class TestMockSignature(unittest2.TestCase):
         f2.mock.assert_called_with('foo')
 
 
-    def testFunctionWithoutExplicitMock(self):
+    def test_function_without_explicit_mock(self):
         def f(a):
             pass
 
@@ -52,7 +52,7 @@ class TestMockSignature(unittest2.TestCase):
         f2.mock.assert_called_with('foo')
 
 
-    def testMethod(self):
+    def test_method(self):
         class Foo(object):
             def method(self, a, b):
                 pass
@@ -65,7 +65,7 @@ class TestMockSignature(unittest2.TestCase):
         mock.assert_called_with('foo', 'bar')
 
 
-    def testFunctionWithDefaults(self):
+    def test_function_with_defaults(self):
         def f(a, b=None):
             pass
         mock = Mock()
@@ -90,7 +90,7 @@ class TestMockSignature(unittest2.TestCase):
         mock.assert_called_with(a)
 
 
-    def testIntrospection(self):
+    def test_introspection(self):
         def f(a, *args, **kwargs):
             pass
         f2 = mocksignature(f, f)
@@ -102,7 +102,7 @@ class TestMockSignature(unittest2.TestCase):
         self.assertEqual(inspect.getargspec(f), inspect.getargspec(f2))
 
 
-    def testFunctionWithVarArgsAndKwargs(self):
+    def test_function_with_varargs_and_kwargs(self):
         def f(a, b=None, *args, **kwargs):
             return (a, b, args, kwargs)
         f2 = mocksignature(f, f)
@@ -126,7 +126,7 @@ class TestMockSignature(unittest2.TestCase):
         self.assertRaises(TypeError, lambda: g(None))
 
 
-    def testMockSignatureWithPatch(self):
+    def test_mocksignature_with_patch(self):
         mock = Mock()
 
         def f(a, b, c):
@@ -157,7 +157,7 @@ class TestMockSignature(unittest2.TestCase):
 
 
     @unittest2.skipUnless(__debug__, 'assert disabled when run with -O/OO')
-    def testMockSignatureWithReservedArg(self):
+    def test_mocksignature_with_reserved_arg(self):
         def f(_mock_):
             pass
         self.assertRaises(AssertionError, lambda: mocksignature(f))
@@ -175,7 +175,7 @@ class TestMockSignature(unittest2.TestCase):
         self.assertRaises(AssertionError, lambda: mocksignature(f))
 
 
-    def testMockSignatureClass(self):
+    def test_mocksignature_class(self):
         MockedSomething = mocksignature(Something)
 
         result = MockedSomething(5, 23)
@@ -187,7 +187,7 @@ class TestMockSignature(unittest2.TestCase):
         self.assertRaises(TypeError, MockedSomething)
 
 
-    def testMockSignatureCallable(self):
+    def test_mocksignature_callable(self):
         mocked_something = mocksignature(something)
 
         result = mocked_something(5, 23)
@@ -199,7 +199,7 @@ class TestMockSignature(unittest2.TestCase):
         self.assertRaises(TypeError, mocked_something)
 
 
-    def testPatchMockSignatureClass(self):
+    def test_patch_mocksignature_class(self):
         original_something = Something
         something_name = '%s.Something' % __name__
         @patch(something_name, mocksignature=True)
@@ -215,7 +215,7 @@ class TestMockSignature(unittest2.TestCase):
         self.assertIs(Something, original_something)
 
 
-    def testPatchMockSignatureCallable(self):
+    def test_patch_mocksignature_callable(self):
         original_something = something
         something_name = '%s.something' % __name__
         @patch(something_name, mocksignature=True)
@@ -231,7 +231,7 @@ class TestMockSignature(unittest2.TestCase):
         self.assertIs(something, original_something)
 
 
-    def testPatchObjectMockSignature(self):
+    def test_patchobject_mocksignature(self):
         class something(object):
             def meth(self, a, b, c):
                 pass
@@ -335,4 +335,3 @@ class TestMockSignature(unittest2.TestCase):
 
         mock.side_effect = NameError
         self.assertRaises(NameError, func, 1, 2, 3)
-
