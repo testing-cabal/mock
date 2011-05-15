@@ -18,13 +18,14 @@ except NameError:
 
 class MockTest(unittest2.TestCase):
 
-    def testAll(self):
+    def test_all(self):
         # if __all__ is badly defined then import * will raise an error
         # We have to exec it because you can't import * inside a method
         # in Python 3
         exec("from mock import *")
 
-    def testConstructor(self):
+
+    def test_constructor(self):
         mock = Mock()
 
         self.assertFalse(mock.called, "called not initialised correctly")
@@ -50,17 +51,18 @@ class MockTest(unittest2.TestCase):
                          "children not initialised incorrectly")
 
 
-    def testUnicodeNotBroken(self):
+    def test_unicode_not_broken(self):
         # This used to raise an exception with Python 2.5 and Mock 0.4
         unicode(Mock())
 
 
-    def testReturnValueInConstructor(self):
+    def test_return_value_in_constructor(self):
         mock = Mock(return_value=None)
         self.assertIsNone(mock.return_value,
                           "return value in constructor not honoured")
 
-    def testRepr(self):
+
+    def test_repr(self):
         mock = Mock(name='foo')
         self.assertIn('foo', repr(mock))
         self.assertIn("'%s'" % id(mock), repr(mock))
@@ -69,7 +71,7 @@ class MockTest(unittest2.TestCase):
         self.assertIn('mock.baz', repr(mock().baz))
 
 
-    def testReprWithSpec(self):
+    def test_repr_with_spec(self):
         class X(object):
             pass
 
@@ -99,7 +101,7 @@ class MockTest(unittest2.TestCase):
         self.assertNotIn("spec", repr(mock))
 
 
-    def testSideEffect(self):
+    def test_side_effect(self):
         mock = Mock()
 
         def effect(*args, **kwargs):
@@ -127,7 +129,7 @@ class MockTest(unittest2.TestCase):
         self.assertEqual(mock(), sentinel.RETURN)
 
 
-    def testReset(self):
+    def test_reset_mock(self):
         parent = Mock()
         spec = ["something"]
         mock = Mock(name="child", parent=parent, spec=spec)
@@ -163,6 +165,7 @@ class MockTest(unittest2.TestCase):
                           "children incorrectly cleared")
         self.assertFalse(mock.something.called, "child not reset")
 
+
     def test_reset_mock_recursion(self):
         mock = Mock()
         mock.return_value = mock
@@ -170,7 +173,8 @@ class MockTest(unittest2.TestCase):
         # used to cause recursion
         mock.reset_mock()
 
-    def testCall(self):
+
+    def test_call(self):
         mock = Mock()
         self.assertTrue(isinstance(mock.return_value, Mock),
                         "Default return_value should be a Mock")
@@ -203,7 +207,8 @@ class MockTest(unittest2.TestCase):
         ],
             "call_args_list not set")
 
-    def testCallArgsComparison(self):
+
+    def test_call_args_comparison(self):
         mock = Mock()
         mock()
         mock(sentinel.Arg)
@@ -218,7 +223,8 @@ class MockTest(unittest2.TestCase):
         self.assertEqual(mock.call_args,
                          ((sentinel.Arg,), {"kw": sentinel.Kwarg}))
 
-    def testAssertCalledWith(self):
+
+    def test_assert_called_with(self):
         mock = Mock()
         mock()
 
@@ -233,7 +239,7 @@ class MockTest(unittest2.TestCase):
         mock.assert_called_with(1, 2, 3, a='fish', b='nothing')
 
 
-    def testAssertCalledOnceWith(self):
+    def test_assert_called_once_with(self):
         mock = Mock()
         mock()
 
@@ -256,7 +262,7 @@ class MockTest(unittest2.TestCase):
         )
 
 
-    def testAttributeAccessReturnsMocks(self):
+    def test_attribute_access_returns_mocks(self):
         mock = Mock()
         something = mock.something
         self.assertTrue(isinstance(something, Mock), "attribute isn't a mock")
@@ -272,7 +278,7 @@ class MockTest(unittest2.TestCase):
                         "method didn't record being called")
 
 
-    def testAttributesHaveNameAndParentSet(self):
+    def test_attributes_have_name_and_parent_set(self):
         mock = Mock()
         something = mock.something
 
@@ -282,7 +288,7 @@ class MockTest(unittest2.TestCase):
                          "attribute parent not set correctly")
 
 
-    def testMethodCallsRecorded(self):
+    def test_method_calls_recorded(self):
         mock = Mock()
         mock.something(3, fish=None)
         mock.something_else.something(6, cake=sentinel.Cake)
@@ -296,7 +302,8 @@ class MockTest(unittest2.TestCase):
         ],
             "method calls not recorded correctly")
 
-    def testMethodCallsCompareEasily(self):
+
+    def test_method_calls_compare_easily(self):
         mock = Mock()
         mock.something()
         self.assertEqual(mock.method_calls, [('something',)])
@@ -318,7 +325,8 @@ class MockTest(unittest2.TestCase):
             ('something', ('different',), {'some': 'more'})
         ])
 
-    def testOnlyAllowedMethodsExist(self):
+
+    def test_only_allowed_methods_exist(self):
         spec = ["something"]
         mock = Mock(spec=spec)
 
@@ -329,14 +337,14 @@ class MockTest(unittest2.TestCase):
                                 lambda: mock.something_else)
 
 
-    def testFromSpec(self):
+    def test_from_spec(self):
         class Something(object):
             x = 3
             __something__ = None
             def y(self):
                 pass
 
-        def testAttributes(mock):
+        def test_attributes(mock):
             # should work
             mock.x
             mock.y
@@ -348,11 +356,11 @@ class MockTest(unittest2.TestCase):
                                     "Mock object has no attribute '__foobar__'",
                                     lambda: mock.__foobar__)
 
-        testAttributes(Mock(spec=Something))
-        testAttributes(Mock(spec=Something()))
+        test_attributes(Mock(spec=Something))
+        test_attributes(Mock(spec=Something()))
 
 
-    def testWrapsCalls(self):
+    def test_wraps_calls(self):
         real = Mock()
 
         mock = Mock(wraps=real)
@@ -364,7 +372,7 @@ class MockTest(unittest2.TestCase):
         real.assert_called_with(1, 2, fish=3)
 
 
-    def testWrapsCallWithNonDefaultReturnValue(self):
+    def test_wraps_call_with_nondefault_return_value(self):
         real = Mock()
 
         mock = Mock(wraps=real)
@@ -374,7 +382,7 @@ class MockTest(unittest2.TestCase):
         self.assertFalse(real.called)
 
 
-    def testWrapsAttributes(self):
+    def test_wraps_attributes(self):
         class Real(object):
             attribute = Mock()
 
@@ -390,7 +398,7 @@ class MockTest(unittest2.TestCase):
         self.assertEqual(result, Real.attribute.frog())
 
 
-    def testExceptionalSideEffect(self):
+    def test_exceptional_side_effect(self):
         mock = Mock(side_effect=AttributeError)
         self.assertRaises(AttributeError, mock)
 
@@ -398,7 +406,7 @@ class MockTest(unittest2.TestCase):
         self.assertRaises(AttributeError, mock)
 
 
-    def testBaseExceptionalSideEffect(self):
+    def test_baseexceptional_side_effect(self):
         mock = Mock(side_effect=KeyboardInterrupt)
         self.assertRaises(KeyboardInterrupt, mock)
 
@@ -406,7 +414,7 @@ class MockTest(unittest2.TestCase):
         self.assertRaises(KeyboardInterrupt, mock)
 
 
-    def testAssertCalledWithMessage(self):
+    def test_assert_called_with_message(self):
         mock = Mock()
         self.assertRaisesRegexp(AssertionError, 'Not called',
                                 mock.assert_called_with)
@@ -420,7 +428,7 @@ class MockTest(unittest2.TestCase):
         self.assertEqual(mock.__name__, 'foo')
 
 
-    def testSpecClass(self):
+    def test_spec_class(self):
         class X(object):
             pass
 
@@ -440,7 +448,7 @@ class MockTest(unittest2.TestCase):
         self.assertTrue(isinstance(mock, X))
 
 
-    def testSettingAttributeWithSpec(self):
+    def test_setting_attribute_with_spec_set(self):
         class X(object):
             y = 3
 
@@ -455,7 +463,7 @@ class MockTest(unittest2.TestCase):
         self.assertRaises(AttributeError, set_attr)
 
 
-    def testCopy(self):
+    def test_copy(self):
         current = sys.getrecursionlimit()
         self.addCleanup(sys.setrecursionlimit, current)
 
@@ -466,7 +474,7 @@ class MockTest(unittest2.TestCase):
 
 
     @unittest2.skipIf(inPy3k, "no old style classes in Python 3")
-    def testSpecOldStyleClasses(self):
+    def test_spec_old_style_classes(self):
         class Foo:
             bar = 7
 
@@ -480,7 +488,7 @@ class MockTest(unittest2.TestCase):
 
 
     @unittest2.skipIf(inPy3k, "no old style classes in Python 3")
-    def testSpecSetOldStyleClasses(self):
+    def test_spec_set_old_style_classes(self):
         class Foo:
             bar = 7
 
@@ -501,7 +509,7 @@ class MockTest(unittest2.TestCase):
         self.assertRaises(AttributeError, _set)
 
 
-    def testSubclassWithProperties(self):
+    def test_subclass_with_properties(self):
         class SubClass(Mock):
             def _get(self):
                 return 3
@@ -519,6 +527,7 @@ class MockTest(unittest2.TestCase):
         def test():
             s.foo = 'bar'
         self.assertRaises(AttributeError, test)
+
 
     def DONTtest_mock_calls(self):
         mock = MagicMock()
