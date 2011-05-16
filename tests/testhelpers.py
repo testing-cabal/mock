@@ -109,8 +109,6 @@ class SpecSignatureTest(unittest2.TestCase):
 
 
     def test_attributes(self):
-        # test it is recursive - that class / instance attributes are mocked
-        # with signatures
         class Sub(SomeClass):
             attr = SomeClass()
 
@@ -149,13 +147,25 @@ class SpecSignatureTest(unittest2.TestCase):
 
 
     def test_method_calls(self):
-        mock = _spec_signature(SomeClass)
+        class Sub(SomeClass):
+            attr = SomeClass()
+
+        mock = _spec_signature(Sub)
         mock.one(1, 2)
         mock.two()
         mock.three(3)
 
-        self.assertEqual(mock.method_calls,
-                         [call.one(1, 2), call.two(), call.three(3)])
+        expected = [call.one(1, 2), call.two(), call.three(3)]
+        self.assertEqual(mock.method_calls, expected)
+
+        mock.attr.one(1, 2)
+        mock.attr.two()
+        mock.attr.three(3)
+
+        expected.extend(
+            [call.attr.one(1, 2), call.attr.two(), call.attr.three(3)]
+        )
+        self.assertEqual(mock.method_calls, expected)
 
 
     def test_magic_methods(self):
