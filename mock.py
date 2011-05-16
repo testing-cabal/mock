@@ -1096,7 +1096,7 @@ def _spec_signature(spec, _parent=None, _name=None):
 
     if type(spec) == list:
         raise TypeError(
-            "spec must be a class or an instance not a list or tuple"
+            "spec must be a class or an instance not a list"
         )
 
     mock = MagicMock(spec=spec, parent=_parent, name=_name)
