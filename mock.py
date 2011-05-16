@@ -431,6 +431,8 @@ class Mock(object):
         if name not in self._mock_children:
             wraps = None
             if self._mock_wraps is not None:
+                # XXXX should we get the attribute without triggering code
+                # execution?
                 wraps = getattr(self._mock_wraps, name)
             self._mock_children[name] = self._get_child_mock(parent=self,
                                                               name=name,
@@ -1108,10 +1110,10 @@ def _spec_signature(spec, _parent=None, _name=None):
         # XXXX need a better way of getting attributes
         # without triggering code execution
         original = getattr(spec, entry)
-        existing = getattr(mock, entry)
         if not isinstance(original, FunctionTypes):
-            new = _spec_signature(original, existing, entry)
+            new = _spec_signature(original, mock, entry)
         else:
+            existing = getattr(mock, entry)
             new = mocksignature(original, existing, skipfirst=skipfirst)
 
         setattr(mock, entry, new)
@@ -1127,11 +1129,11 @@ FunctionTypes = (
     type(_ANY.__eq__),
 )
 
-BuiltinFunctionTypes = (
-    # builtin function
-    type(sorted),
-    # unbound method on builtin
-    type(set.difference),
-    # bound method on builtin
-    type(set().difference),
-)
+#BuiltinFunctionTypes = (
+    ## builtin function
+    #type(sorted),
+    ## unbound method on builtin
+    #type(set.difference),
+    ## bound method on builtin
+    #type(set().difference),
+#)

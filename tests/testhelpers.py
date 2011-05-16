@@ -121,9 +121,24 @@ class SpecSignatureTest(unittest2.TestCase):
 
 
     def test_builtin_functions_types(self):
-        # we should replace builtin functions / methods with a mocksignature
-        # with *args / **kwargs signature
-        pass
+        # we could replace builtin functions / methods with a mocksignature
+        # with *args / **kwargs signature. Using the builtin method type
+        # as a spec seems to work fairly well though.
+        class BuiltinSubclass(list):
+            def bar(self, arg):
+                pass
+            sorted = sorted
+            attr = {}
+
+        mock = _spec_signature(BuiltinSubclass)
+        mock.append(3)
+        mock.append.assert_called_with(3)
+        self.assertRaises(AttributeError, getattr, mock.append, 'foo')
+
+        mock.bar('foo')
+        mock.bar.assert_called_with('foo')
+        self.assertRaises(TypeError, mock.bar, 'foo', 'bar')
+        self.assertRaises(AttributeError, getattr, mock.bar, 'foo')
 
 
     def test_method_calls(self):
