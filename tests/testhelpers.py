@@ -226,7 +226,7 @@ class SpecSignatureTest(unittest2.TestCase):
                 pass
 
         class Bar(Foo):
-            pass
+            g = Foo()
 
         for spec in (Foo, Foo(), Bar, Bar()):
             mock = _spec_signature(spec)
@@ -235,6 +235,32 @@ class SpecSignatureTest(unittest2.TestCase):
 
             self.assertRaises(AttributeError, getattr, mock, 'foo')
             self.assertRaises(AttributeError, getattr, mock.f, 'foo')
+
+        mock.g.f(1, 2)
+        mock.g.f.assert_called_once_with(1, 2)
+        self.assertRaises(AttributeError, getattr, mock.g, 'foo')
+
+
+    def test_recursive(self):
+        class A(object):
+            def a(self):
+                pass
+
+        A.A = A
+        mock = _spec_signature(A)
+
+        self.assertIs(mock, mock.A)
+        self.assertIs(mock.a, mock.A.a)
+
+        # create a function with the same id and test that it is treated
+        # differently rather than the mock reused
+        A.b = A.__dict__['a']
+        mock = _spec_signature(A)
+        self.assertIsNot(mock.a, mock.b)
+
+        mock.b()
+        mock.b.assert_called_with()
+        self.assertRaises(AssertionError, mock.a.assert_called_with)
 
 
 
@@ -245,4 +271,5 @@ class SpecSignatureTest(unittest2.TestCase):
         # (i.e. will inherit object.__init__ that takes no args but implemented
         #  in C.)
         pass
+
 
