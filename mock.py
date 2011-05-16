@@ -23,7 +23,7 @@ __all__ = (
     'DEFAULT'
 )
 
-__version__ = '0.7.1'
+__version__ = '0.7.2alpha'
 
 __unittest = True
 
@@ -264,7 +264,7 @@ class Mock(object):
             spec = spec_set
             spec_set = True
 
-        if spec is not None and not isinstance(spec, list):
+        if spec is not None and type(spec) is not list:
             if isinstance(spec, class_types):
                 _spec_class = spec
             else:
