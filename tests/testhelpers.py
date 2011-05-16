@@ -248,15 +248,20 @@ class SpecSignatureTest(unittest2.TestCase):
             foo = 'foo bar baz'
             bar = foo
 
-        A.A = A
+        A.B = A
         mock = _spec_signature(A)
 
-        self.assertIs(mock, mock.A)
-        self.assertIs(mock.a, mock.A.a)
+        self.assertIs(mock, mock.B)
+        self.assertIs(mock.a, mock.B.a)
 
-        self.assertIs(A.foo, A.bar)
+        # XXXX note that the mock names (and therefore entries in method_calls)
+        #      will be incorrect for cached entries
+        mock.a()
+        mock.B.a()
+        self.assertEqual(mock.method_calls, [call.a(), call.a()])
 
         # builtin types should not be cached
+        self.assertIs(A.foo, A.bar)
         self.assertIsNot(mock.foo, mock.bar)
         mock.foo.lower()
         self.assertRaises(AssertionError, mock.bar.assert_called_with)
