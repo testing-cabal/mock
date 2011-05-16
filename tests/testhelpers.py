@@ -140,10 +140,22 @@ class SpecSignatureTest(unittest2.TestCase):
         self.assertRaises(TypeError, mock.bar, 'foo', 'bar')
         self.assertRaises(AttributeError, getattr, mock.bar, 'foo')
 
+        mock.sorted([1, 2])
+        mock.sorted.assert_called_with([1, 2])
+
+        mock.attr.pop(3)
+        mock.attr.pop.assert_called_with(3)
+
+
 
     def test_method_calls(self):
-        # test method calls are recorded correctly in .method_calls
-        pass
+        mock = _spec_signature(SomeClass)
+        mock.one(1, 2)
+        mock.two()
+        mock.three(3)
+
+        self.assertEqual(mock.method_calls,
+                         [call.one(1, 2), call.two(), call.three(3)])
 
 
     def test_magic_methods(self):
