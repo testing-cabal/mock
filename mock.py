@@ -71,8 +71,10 @@ except NameError:
 inPy3k = sys.version_info[0] == 3
 
 self = 'im_self'
+builtin = '__builtin__'
 if inPy3k:
     self = '__self__'
+    builtin = 'builtins'
 
 
 # getsignature and mocksignature heavily "inspired" by
@@ -1089,10 +1091,14 @@ call = _Call()
 
 
 
-def _spec_signature(spec, spec_set=False, _parent=None, _name=None):
+def _spec_signature(spec, spec_set=False, _parent=None, _name=None, _ids=None):
+    if _ids is None:
+        _ids = {}
     skipfirst = False
+    _type = type(spec)
     if isinstance(spec, ClassTypes):
         skipfirst = True
+        _type = spec
 
     if type(spec) == list:
         raise TypeError(
@@ -1102,7 +1108,19 @@ def _spec_signature(spec, spec_set=False, _parent=None, _name=None):
     kwargs = {'spec': spec}
     if spec_set:
         kwargs = {'spec_set': spec}
+
+
+    if id(spec) in _ids:
+        mock = _ids[id(spec)][0]
+        return mock
+
     mock = MagicMock(parent=_parent, name=_name, **kwargs)
+
+    if id(spec) not in _ids and _type not in builtin_types:
+        # we keep the spec object around too, to avoid the problem
+        # of ids being reused producing incorrect results
+        _ids[id(spec)] = (mock, spec)
+
     if _parent is not None:
         _parent._mock_children[_name] = mock
 
@@ -1114,7 +1132,7 @@ def _spec_signature(spec, spec_set=False, _parent=None, _name=None):
         # without triggering code execution
         original = getattr(spec, entry)
         if not isinstance(original, FunctionTypes):
-            new = _spec_signature(original, spec_set, mock, entry)
+            new = _spec_signature(original, spec_set, mock, entry, _ids)
         else:
             existing = getattr(mock, entry)
             this_skip = _must_skip(spec, entry, skipfirst)
@@ -1122,6 +1140,7 @@ def _spec_signature(spec, spec_set=False, _parent=None, _name=None):
 
         setattr(mock, entry, new)
     return mock
+
 
 def _must_skip(spec, entry, skipfirst):
     if not isinstance(spec, ClassTypes):
@@ -1154,6 +1173,10 @@ FunctionTypes = (
     # unbound method
     type(_ANY.__eq__),
 )
+
+builtin_types = set([v for v in sys.modules[builtin].__dict__.values() if
+                     isinstance(v, type)] + list(FunctionTypes))
+
 
 #BuiltinFunctionTypes = (
     ## builtin function
