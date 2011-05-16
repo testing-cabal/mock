@@ -560,6 +560,10 @@ class MockTest(unittest2.TestCase):
         expected.append(('().foo.bar().baz().__int__', (), {}))
         self.assertEqual(mock.mock_calls, expected)
 
+        int(mock().foo.bar().baz()).fish()
+        expected.append(('().foo.bar().baz().__int__().fish', (), {}))
+        self.assertEqual(mock.mock_calls, expected)
+
 
 if __name__ == '__main__':
     unittest2.main()
