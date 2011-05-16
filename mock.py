@@ -1129,7 +1129,7 @@ def _spec_signature(spec, spec_set=False, _parent=None, _name=None, _ids=None):
             continue
 
         # XXXX need a better way of getting attributes
-        # without triggering code execution
+        # without triggering code execution (?)
         original = getattr(spec, entry)
         if not isinstance(original, FunctionTypes):
             new = _spec_signature(original, spec_set, mock, entry, _ids)
@@ -1176,13 +1176,3 @@ FunctionTypes = (
 
 builtin_types = set([v for v in sys.modules[builtin].__dict__.values() if
                      isinstance(v, type)] + list(FunctionTypes))
-
-
-#BuiltinFunctionTypes = (
-    ## builtin function
-    #type(sorted),
-    ## unbound method on builtin
-    #type(set.difference),
-    ## bound method on builtin
-    #type(set().difference),
-#)

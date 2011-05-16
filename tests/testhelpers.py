@@ -103,6 +103,17 @@ class SpecSignatureTest(unittest2.TestCase):
             self._check_someclass_mock(mock)
 
 
+    def test_function_as_instance_attribute(self):
+        obj = SomeClass()
+        def f(a):
+            pass
+        obj.f = f
+
+        mock = _spec_signature(obj)
+        mock.f('bing')
+        mock.f.assert_called_with('bing')
+
+
     def test_spec_as_list_fails(self):
         self.assertRaises(TypeError, _spec_signature, [])
         self.assertRaises(TypeError, _spec_signature, ['foo'])
@@ -275,6 +286,16 @@ class SpecSignatureTest(unittest2.TestCase):
         mock.b()
         mock.b.assert_called_with()
         self.assertRaises(AssertionError, mock.a.assert_called_with)
+
+        ## Note: functions that have themselves as attributes still fail
+        ##       unfortunate. We don't want to cache functions though as we
+        ##       we need to treat them differently if found on a class to if
+        ##       found on their own. So we want to ignore based on id.
+        #def f():
+        #    pass
+        #f.a = f
+        #mock = _spec_signature(f)
+
 
 
     def test_spec_inheritance_for_classes(self):
