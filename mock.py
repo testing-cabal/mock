@@ -1089,7 +1089,7 @@ call = _Call()
 
 
 
-def _spec_signature(spec, _parent=None, _name=None):
+def _spec_signature(spec, spec_set=False, _parent=None, _name=None):
     skipfirst = False
     if isinstance(spec, type):
         skipfirst = True
@@ -1099,7 +1099,10 @@ def _spec_signature(spec, _parent=None, _name=None):
             "spec must be a class or an instance not a list"
         )
 
-    mock = MagicMock(spec=spec, parent=_parent, name=_name)
+    kwargs = {'spec': spec}
+    if spec_set:
+        kwargs = {'spec_set': spec}
+    mock = MagicMock(parent=_parent, name=_name, **kwargs)
     if _parent is not None:
         _parent._mock_children[_name] = mock
 
@@ -1111,7 +1114,7 @@ def _spec_signature(spec, _parent=None, _name=None):
         # without triggering code execution
         original = getattr(spec, entry)
         if not isinstance(original, FunctionTypes):
-            new = _spec_signature(original, mock, entry)
+            new = _spec_signature(original, spec_set, mock, entry)
         else:
             existing = getattr(mock, entry)
             new = mocksignature(original, existing, skipfirst=skipfirst)

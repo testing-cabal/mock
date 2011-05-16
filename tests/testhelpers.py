@@ -184,8 +184,15 @@ class SpecSignatureTest(unittest2.TestCase):
 
 
     def test_spec_set(self):
-        # a flag indicating whether or not spec_set should be used
-        pass
+        class Sub(SomeClass):
+            attr = SomeClass()
+
+        for spec in (Sub, Sub()):
+            mock = _spec_signature(spec, spec_set=True)
+            self._check_someclass_mock(mock)
+
+            self.assertRaises(AttributeError, setattr, mock, 'foo', 'bar')
+            self.assertRaises(AttributeError, setattr, mock.attr, 'foo', 'bar')
 
 
     def test_property(self):
