@@ -2,7 +2,7 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
-from tests.support import unittest2
+from tests.support import unittest2, inPy3k
 
 from mock import MagicMock, Mock, ANY, call, _spec_signature
 
@@ -195,28 +195,13 @@ class SpecSignatureTest(unittest2.TestCase):
             self.assertRaises(AttributeError, setattr, mock.attr, 'foo', 'bar')
 
 
-    def test_classmethod(self):
+    def test_descriptors(self):
         class Foo(object):
             @classmethod
             def f(cls, a, b):
                 pass
-
-        class Bar(Foo):
-            pass
-
-        class Baz(SomeClass, Bar):
-            pass
-
-        for spec in (Foo, Foo(), Bar, Bar(), Baz, Baz()):
-            mock = _spec_signature(spec)
-            mock.f(1, 2)
-            mock.f.assert_called_with(1, 2)
-
-
-    def test_staticmethod(self):
-        class Foo(object):
             @staticmethod
-            def f(a, b):
+            def g(a, b):
                 pass
 
         class Bar(Foo):
@@ -228,13 +213,36 @@ class SpecSignatureTest(unittest2.TestCase):
         for spec in (Foo, Foo(), Bar, Bar(), Baz, Baz()):
             mock = _spec_signature(spec)
             mock.f(1, 2)
-            mock.f.assert_called_with(1, 2)
+            mock.f.assert_called_once_with(1, 2)
+
+            mock.g(3, 4)
+            mock.g.assert_called_once_with(3, 4)
 
 
+    @unittest2.skipIf(inPy3k, "No old style classes in Python 3")
     def test_old_style_classes(self):
-        pass
+        class Foo:
+            def f(self, a, b):
+                pass
+
+        class Bar(Foo):
+            pass
+
+        for spec in (Foo, Foo(), Bar, Bar()):
+            mock = _spec_signature(spec)
+            mock.f(1, 2)
+            mock.f.assert_called_once_with(1, 2)
+
+            self.assertRaises(AttributeError, getattr, mock, 'foo')
+            self.assertRaises(AttributeError, getattr, mock.f, 'foo')
+
 
 
     def test_spec_inheritance_for_classes(self):
+        # when inheritance is on we could mock classes __init__ and callable
+        # object signatures with mocksignature
+        # how does mocksignature on a class with no __init__ method work?
+        # (i.e. will inherit object.__init__ that takes no args but implemented
+        #  in C.)
         pass
 
