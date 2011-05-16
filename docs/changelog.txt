@@ -57,6 +57,12 @@ CHANGELOG
   renamed to reduce likelihood of clash with user attributes.
 
 
+2011/XX/XX Version 0.7.2
+------------------------
+
+* BUGFIX: instances of list subclasses can now be used as mock specs
+
+
 2011/05/06 Version 0.7.1
 ------------------------
 
