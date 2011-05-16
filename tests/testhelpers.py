@@ -272,9 +272,6 @@ class SpecSignatureTest(unittest2.TestCase):
         self.assertRaises(AssertionError, mock.a.assert_called_with)
 
 
-
-
-
     def test_spec_inheritance_for_classes(self):
         # when inheritance is on we could mock classes __init__ and callable
         # object signatures with mocksignature
