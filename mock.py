@@ -1091,7 +1091,7 @@ call = _Call()
 
 def _spec_signature(spec, spec_set=False, _parent=None, _name=None):
     skipfirst = False
-    if isinstance(spec, type):
+    if isinstance(spec, ClassTypes):
         skipfirst = True
 
     if type(spec) == list:
@@ -1117,18 +1117,39 @@ def _spec_signature(spec, spec_set=False, _parent=None, _name=None):
             new = _spec_signature(original, spec_set, mock, entry)
         else:
             existing = getattr(mock, entry)
-            this_skip = skipfirst
-            if skipfirst and getattr(original, self, None) is not None:
-                this_skip = False
+            this_skip = _must_skip(spec, entry, skipfirst)
             new = mocksignature(original, existing, skipfirst=this_skip)
 
         setattr(mock, entry, new)
     return mock
 
+def _must_skip(spec, entry, skipfirst):
+    if not isinstance(spec, ClassTypes):
+        if entry in getattr(spec, '__dict__', {}):
+            # instance attribute - shouldn't skip
+            return False
+        # can't use type because of old style classes
+        spec = spec.__class__
+    if not hasattr(spec, 'mro'):
+        # old style class: can't have descriptors anyway
+        return skipfirst
 
+    for klass in spec.mro():
+        result = klass.__dict__.get(entry, DEFAULT)
+        if result is DEFAULT:
+            continue
+        if isinstance(result, (staticmethod, classmethod)):
+            return False
+        return skipfirst
+
+    # shouldn't get here unless attribute dynamically provided
+    return skipfirst
+
+
+FunctionType = type(_spec_signature)
 FunctionTypes = (
     # python function
-    type(_spec_signature),
+    FunctionType,
     # instance method
     type(ANY.__eq__),
     # unbound method
