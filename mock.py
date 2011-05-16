@@ -1146,10 +1146,9 @@ def _must_skip(spec, entry, skipfirst):
     return skipfirst
 
 
-FunctionType = type(_spec_signature)
 FunctionTypes = (
     # python function
-    FunctionType,
+    type(_spec_signature),
     # instance method
     type(ANY.__eq__),
     # unbound method
