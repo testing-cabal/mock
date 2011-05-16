@@ -312,7 +312,7 @@ class Mock(object):
             spec = spec_set
             spec_set = True
 
-        if spec is not None and not isinstance(spec, list):
+        if spec is not None and type(spec) is not list:
             if isinstance(spec, ClassTypes):
                 _spec_class = spec
             else:
