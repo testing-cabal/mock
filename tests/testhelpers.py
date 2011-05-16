@@ -195,19 +195,16 @@ class SpecSignatureTest(unittest2.TestCase):
             self.assertRaises(AttributeError, setattr, mock.attr, 'foo', 'bar')
 
 
-    def test_property(self):
-        pass
-
-
     def test_classmethod(self):
         class Foo(object):
             @classmethod
             def f(cls, a, b):
                 pass
 
-        mock = _spec_signature(Foo)
-        mock.f(1, 2)
-        mock.f.assert_called_with(1, 2)
+        for spec in (Foo, Foo()):
+            mock = _spec_signature(spec)
+            mock.f(1, 2)
+            mock.f.assert_called_with(1, 2)
 
 
     def test_staticmethod(self):
@@ -216,6 +213,7 @@ class SpecSignatureTest(unittest2.TestCase):
             def f(a, b):
                 pass
 
-        mock = _spec_signature(Foo)
-        mock.f(1, 2)
-        mock.f.assert_called_with(1, 2)
+        for spec in (Foo, Foo()):
+            mock = _spec_signature(spec)
+            mock.f(1, 2)
+            mock.f.assert_called_with(1, 2)
