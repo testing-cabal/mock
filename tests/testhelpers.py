@@ -204,7 +204,10 @@ class SpecSignatureTest(unittest2.TestCase):
         class Bar(Foo):
             pass
 
-        for spec in (Foo, Foo(), Bar, Bar()):
+        class Baz(SomeClass, Bar):
+            pass
+
+        for spec in (Foo, Foo(), Bar, Bar(), Baz, Baz()):
             mock = _spec_signature(spec)
             mock.f(1, 2)
             mock.f.assert_called_with(1, 2)
@@ -219,7 +222,10 @@ class SpecSignatureTest(unittest2.TestCase):
         class Bar(Foo):
             pass
 
-        for spec in (Foo, Foo(), Bar, Bar()):
+        class Baz(SomeClass, Bar):
+            pass
+
+        for spec in (Foo, Foo(), Bar, Bar(), Baz, Baz()):
             mock = _spec_signature(spec)
             mock.f(1, 2)
             mock.f.assert_called_with(1, 2)
