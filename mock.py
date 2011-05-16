@@ -1117,12 +1117,15 @@ def _spec_signature(spec, _parent=None):
 FunctionTypes = (
     # python function
     type(_spec_signature),
-    # builtin function
-    type(sorted),
     # instance method
     type(ANY.__eq__),
     # unbound method
     type(_ANY.__eq__),
+)
+
+BuiltinFunctionTypes = (
+    # builtin function
+    type(sorted),
     # unbound method on builtin
     type(set.difference),
     # bound method on builtin

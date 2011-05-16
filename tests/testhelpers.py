@@ -105,17 +105,16 @@ class SpecSignatureTest(unittest2.TestCase):
         self.assertRaises(TypeError, _spec_signature, [])
         self.assertRaises(TypeError, _spec_signature, ['foo'])
 
-        class Sub(list):
-            pass
-
-        mock = _spec_signature(Sub(['foo']))
-        mock.append('bar')
-        mock.append.assert_called_with('bar')
-
 
     def test_attributes(self):
         # test it is recursive - that class / instance attributes are mocked
         # with signatures
+        pass
+
+
+    def test_builtin_functions_types(self):
+        # we should replace builtin functions / methods with a mocksignature
+        # with *args / **kwargs signature
         pass
 
 
@@ -143,4 +142,3 @@ class SpecSignatureTest(unittest2.TestCase):
 
     def test_staticmethod(self):
         pass
-
