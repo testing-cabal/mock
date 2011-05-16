@@ -69,7 +69,6 @@ class CallTest(unittest2.TestCase):
 
 
 class SpecSignatureTest(unittest2.TestCase):
-    # how should magic methods be handled? really you shouldn't have to
 
     def test_basic(self):
         for spec in (SomeClass, SomeClass()):
@@ -105,8 +104,13 @@ class SpecSignatureTest(unittest2.TestCase):
         # should this fail or should the list be used as the spec?
         self.assertRaises(TypeError, _spec_signature, [])
         self.assertRaises(TypeError, _spec_signature, ['foo'])
-        self.assertRaises(TypeError, _spec_signature, ())
-        self.assertRaises(TypeError, _spec_signature, ('foo',))
+
+        class Sub(list):
+            pass
+
+        mock = _spec_signature(Sub(['foo']))
+        mock.append('bar')
+        mock.append.assert_called_with('bar')
 
 
     def test_attributes(self):

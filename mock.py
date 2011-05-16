@@ -1092,7 +1092,7 @@ def _spec_signature(spec, _parent=None):
     if isinstance(spec, type):
         skipfirst = True
 
-    if isinstance(spec, (list, tuple)):
+    if type(spec) == list:
         raise TypeError(
             "spec must be a class or an instance not a list or tuple"
         )
