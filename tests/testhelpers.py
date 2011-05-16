@@ -245,12 +245,21 @@ class SpecSignatureTest(unittest2.TestCase):
         class A(object):
             def a(self):
                 pass
+            foo = 'foo bar baz'
+            bar = foo
 
         A.A = A
         mock = _spec_signature(A)
 
         self.assertIs(mock, mock.A)
         self.assertIs(mock.a, mock.A.a)
+
+        self.assertIs(A.foo, A.bar)
+
+        # builtin types should not be cached
+        self.assertIsNot(mock.foo, mock.bar)
+        mock.foo.lower()
+        self.assertRaises(AssertionError, mock.bar.assert_called_with)
 
         # create a function with the same id and test that it is treated
         # differently rather than the mock reused
@@ -261,6 +270,8 @@ class SpecSignatureTest(unittest2.TestCase):
         mock.b()
         mock.b.assert_called_with()
         self.assertRaises(AssertionError, mock.a.assert_called_with)
+
+
 
 
 
