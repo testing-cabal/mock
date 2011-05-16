@@ -140,9 +140,11 @@ class SpecSignatureTest(unittest2.TestCase):
 
         mock.sorted([1, 2])
         mock.sorted.assert_called_with([1, 2])
+        self.assertRaises(AttributeError, getattr, mock.sorted, 'foo')
 
         mock.attr.pop(3)
         mock.attr.pop.assert_called_with(3)
+        self.assertRaises(AttributeError, getattr, mock.attr, 'foo')
 
 
 
