@@ -4,7 +4,7 @@
 
 from tests.support import unittest2
 
-from mock import Mock, ANY, call, _spec_signature
+from mock import MagicMock, Mock, ANY, call, _spec_signature
 
 
 class SomeClass(object):
@@ -147,7 +147,6 @@ class SpecSignatureTest(unittest2.TestCase):
         self.assertRaises(AttributeError, getattr, mock.attr, 'foo')
 
 
-
     def test_method_calls(self):
         class Sub(SomeClass):
             attr = SomeClass()
@@ -171,7 +170,17 @@ class SpecSignatureTest(unittest2.TestCase):
 
 
     def test_magic_methods(self):
-        pass
+        class BuiltinSubclass(list):
+            attr = {}
+
+        mock = _spec_signature(BuiltinSubclass)
+        self.assertEqual(list(mock), [])
+        self.assertRaises(TypeError, int, mock)
+        self.assertRaises(TypeError, int, mock.attr)
+        self.assertEqual(list(mock), [])
+
+        self.assertIsInstance(mock['foo'], MagicMock)
+        self.assertIsInstance(mock.attr['foo'], MagicMock)
 
 
     def test_spec_set(self):
