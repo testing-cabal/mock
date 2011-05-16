@@ -1087,7 +1087,7 @@ call = _Call()
 
 
 
-def _spec_signature(spec, _parent=None):
+def _spec_signature(spec, _parent=None, _name=None):
     skipfirst = False
     if isinstance(spec, type):
         skipfirst = True
@@ -1097,7 +1097,10 @@ def _spec_signature(spec, _parent=None):
             "spec must be a class or an instance not a list or tuple"
         )
 
-    mock = MagicMock(spec=spec)
+    mock = MagicMock(spec=spec, parent=_parent, name=_name)
+    if _parent is not None:
+        _parent._mock_children[_name] = mock
+
     for entry in dir(spec):
         if _is_magic(entry):
             continue
@@ -1105,11 +1108,12 @@ def _spec_signature(spec, _parent=None):
         # XXXX need a better way of getting attributes
         # without triggering code execution
         original = getattr(spec, entry)
-        if not isinstance(original, FunctionTypes):
-            # XXXX should be recursive
-            continue
         existing = getattr(mock, entry)
-        new = mocksignature(original, existing, skipfirst=skipfirst)
+        if not isinstance(original, FunctionTypes):
+            new = _spec_signature(original, existing, entry)
+        else:
+            new = mocksignature(original, existing, skipfirst=skipfirst)
+
         setattr(mock, entry, new)
     return mock
 
