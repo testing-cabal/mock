@@ -1117,7 +1117,10 @@ def _spec_signature(spec, spec_set=False, _parent=None, _name=None):
             new = _spec_signature(original, spec_set, mock, entry)
         else:
             existing = getattr(mock, entry)
-            new = mocksignature(original, existing, skipfirst=skipfirst)
+            this_skip = skipfirst
+            if skipfirst and getattr(original, self, None) is not None:
+                this_skip = False
+            new = mocksignature(original, existing, skipfirst=this_skip)
 
         setattr(mock, entry, new)
     return mock

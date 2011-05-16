@@ -200,8 +200,22 @@ class SpecSignatureTest(unittest2.TestCase):
 
 
     def test_classmethod(self):
-        pass
+        class Foo(object):
+            @classmethod
+            def f(cls, a, b):
+                pass
+
+        mock = _spec_signature(Foo)
+        mock.f(1, 2)
+        mock.f.assert_called_with(1, 2)
 
 
     def test_staticmethod(self):
-        pass
+        class Foo(object):
+            @staticmethod
+            def f(a, b):
+                pass
+
+        mock = _spec_signature(Foo)
+        mock.f(1, 2)
+        mock.f.assert_called_with(1, 2)
