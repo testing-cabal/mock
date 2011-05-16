@@ -229,3 +229,12 @@ class SpecSignatureTest(unittest2.TestCase):
             mock = _spec_signature(spec)
             mock.f(1, 2)
             mock.f.assert_called_with(1, 2)
+
+
+    def test_old_style_classes(self):
+        pass
+
+
+    def test_spec_inheritance_for_classes(self):
+        pass
+
