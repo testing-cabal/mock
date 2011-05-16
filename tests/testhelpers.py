@@ -4,7 +4,17 @@
 
 from tests.support import unittest2
 
-from mock import Mock, ANY, call
+from mock import Mock, ANY, call, _spec_signature
+
+
+class SomeClass(object):
+    def one(self, a, b):
+        pass
+    def two(self):
+        pass
+    def three(self, a=None):
+        pass
+
 
 
 class AnyTest(unittest2.TestCase):
@@ -55,4 +65,78 @@ class CallTest(unittest2.TestCase):
         mock.bar.baz(a=3, b=6)
         self.assertEqual(mock.method_calls,
                          [call.foo(1, 2, 3), call.bar.baz(a=3, b=6)])
+
+
+
+class SpecSignatureTest(unittest2.TestCase):
+    # how should magic methods be handled? really you shouldn't have to
+
+    def test_basic(self):
+        for spec in (SomeClass, SomeClass()):
+            mock = _spec_signature(spec)
+
+            self.assertRaises(AttributeError, getattr, mock, 'foo')
+            mock.one(1, 2)
+            mock.one.assert_called_with(1, 2)
+            self.assertRaises(AssertionError,
+                              mock.one.assert_called_with, 3, 4)
+            self.assertRaises(TypeError, mock.one, 1)
+
+            mock.two()
+            mock.two.assert_called_with()
+            self.assertRaises(AssertionError,
+                              mock.two.assert_called_with, 3)
+            self.assertRaises(TypeError, mock.two, 1)
+
+            mock.three()
+            mock.three.assert_called_with(None)
+            self.assertRaises(AssertionError,
+                              mock.three.assert_called_with, 3)
+            self.assertRaises(TypeError, mock.three, 3, 2)
+
+            mock.three(1)
+            mock.three.assert_called_with(1)
+
+            mock.three(a=1)
+            mock.three.assert_called_with(1)
+
+
+    def test_spec_as_list_fails(self):
+        # should this fail or should the list be used as the spec?
+        self.assertRaises(TypeError, _spec_signature, [])
+        self.assertRaises(TypeError, _spec_signature, ['foo'])
+        self.assertRaises(TypeError, _spec_signature, ())
+        self.assertRaises(TypeError, _spec_signature, ('foo',))
+
+
+    def test_attributes(self):
+        # test it is recursive - that class / instance attributes are mocked
+        # with signatures
+        pass
+
+
+    def test_method_calls(self):
+        # test method calls are recorded correctly in .method_calls
+        pass
+
+
+    def test_magic_methods(self):
+        pass
+
+
+    def test_spec_set(self):
+        # a flag indicating whether or not spec_set should be used
+        pass
+
+
+    def test_property(self):
+        pass
+
+
+    def test_classmethod(self):
+        pass
+
+
+    def test_staticmethod(self):
+        pass
 

@@ -1084,3 +1084,47 @@ class _Call(object):
         return '<call %s>' % self.name
 
 call = _Call()
+
+
+
+def _spec_signature(spec, _parent=None):
+    skipfirst = False
+    if isinstance(spec, type):
+        skipfirst = True
+
+    if isinstance(spec, (list, tuple)):
+        raise TypeError(
+            "spec must be a class or an instance not a list or tuple"
+        )
+
+    mock = MagicMock(spec=spec)
+    for entry in dir(spec):
+        if _is_magic(entry):
+            continue
+
+        # XXXX need a better way of getting attributes
+        # without triggering code execution
+        original = getattr(spec, entry)
+        if not isinstance(original, FunctionTypes):
+            # XXXX should be recursive
+            continue
+        existing = getattr(mock, entry)
+        new = mocksignature(original, existing, skipfirst=skipfirst)
+        setattr(mock, entry, new)
+    return mock
+
+
+FunctionTypes = (
+    # python function
+    type(_spec_signature),
+    # builtin function
+    type(sorted),
+    # instance method
+    type(ANY.__eq__),
+    # unbound method
+    type(_ANY.__eq__),
+    # unbound method on builtin
+    type(set.difference),
+    # bound method on builtin
+    type(set().difference),
+)
