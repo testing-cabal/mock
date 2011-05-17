@@ -359,6 +359,7 @@ class Mock(object):
         self.call_count = 0
         self.call_args_list = []
         self.method_calls = []
+
         for child in self._mock_children.values():
             child.reset_mock()
 
@@ -475,6 +476,7 @@ class Mock(object):
         if not 'method_calls' in self.__dict__:
             # allow all attribute setting until initialisation is complete
             return object.__setattr__(self, name, value)
+
         if (self._spec_set and self._mock_methods is not None and name not in
             self._mock_methods and name not in self.__dict__ and
             name != 'return_value'):
@@ -1137,9 +1139,22 @@ def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
         # XXXX need a better way of getting attributes
         # without triggering code execution (?)
         original = getattr(spec, entry)
+
         if not isinstance(original, FunctionTypes):
-            new = _spec_signature(original, spec_set, inherit,
-                                  mock, entry, _ids)
+            if type(spec) in (int, float, bool):
+                # non-recursive for integers and floats.
+                # (we only need to include bool here because of a bug in
+                #  pypy 1.5.1 which is fixed in trunk.)
+                # Instead we could check for attributes that have the same
+                # type as the parent - this might solve the general problem.
+                kwargs = {'spec': original}
+                if spec_set:
+                    kwargs = {'spec_set': original}
+                new = MagicMock(parent=mock, name=entry, **kwargs)
+                mock._mock_children[entry] = new
+            else:
+                new = _spec_signature(original, spec_set, inherit,
+                                      mock, entry, _ids)
         else:
             existing = getattr(mock, entry)
             skipfirst = _must_skip(spec, entry, is_type)
