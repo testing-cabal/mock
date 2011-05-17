@@ -1091,13 +1091,14 @@ call = _Call()
 
 
 
-def _spec_signature(spec, spec_set=False, _parent=None, _name=None, _ids=None):
+def _spec_signature(spec, spec_set=False, inherit=False,
+                    _parent=None, _name=None, _ids=None):
     if _ids is None:
         _ids = {}
-    skipfirst = False
+    is_type = False
     _type = type(spec)
     if isinstance(spec, ClassTypes):
-        skipfirst = True
+        is_type = True
         _type = spec
 
     if type(spec) == list:
@@ -1132,11 +1133,12 @@ def _spec_signature(spec, spec_set=False, _parent=None, _name=None, _ids=None):
         # without triggering code execution (?)
         original = getattr(spec, entry)
         if not isinstance(original, FunctionTypes):
-            new = _spec_signature(original, spec_set, mock, entry, _ids)
+            new = _spec_signature(original, spec_set, inherit,
+                                  mock, entry, _ids)
         else:
             existing = getattr(mock, entry)
-            this_skip = _must_skip(spec, entry, skipfirst)
-            new = mocksignature(original, existing, skipfirst=this_skip)
+            skipfirst = _must_skip(spec, entry, is_type)
+            new = mocksignature(original, existing, skipfirst=skipfirst)
 
         setattr(mock, entry, new)
     return mock
