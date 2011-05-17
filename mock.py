@@ -1167,10 +1167,10 @@ def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
                 # Instead we could check for attributes that have the same
                 # type as the parent - this might solve the general problem.
                 new = MagicMock(parent=mock, name=entry, **kwargs)
-                mock._mock_children[entry] = new
             else:
                 new = _spec_signature(original, spec_set, inherit,
                                       mock, entry, _ids)
+            mock._mock_children[entry] = new
         else:
             parent = mock
             if isinstance(spec, FunctionTypes):
@@ -1184,7 +1184,9 @@ def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
         # not strictly speaking necessary for real mock (although needed for
         # attributes on functions created by mocksignature)- and may bypass
         # __getattr__ for mock attributes?
-        setattr(mock, entry, new)
+        if isinstance(new, FunctionTypes):
+            setattr(mock, entry, new)
+
     return mock
 
 
