@@ -287,15 +287,15 @@ class SpecSignatureTest(unittest2.TestCase):
         mock.b.assert_called_with()
         self.assertRaises(AssertionError, mock.a.assert_called_with)
 
-        ## Note: functions that have themselves as attributes still fail
-        ##       unfortunate. We don't want to cache functions though as we
-        ##       we need to treat them differently if found on a class to if
-        ##       found on their own. So we want to ignore based on id.
+        ## Note: functions that have themselves as attributes, even indirectly,
+        ##       still fail. Unfortunate. We don't want to cache functions
+        ##       though, as we need to treat them differently if found on a
+        ##       class to if found on their own. So we can't cache just based on
+        ##       id.
         #def f():
         #    pass
         #f.a = f
         #mock = _spec_signature(f)
-
 
 
     def test_spec_inheritance_for_classes(self):
@@ -304,6 +304,29 @@ class SpecSignatureTest(unittest2.TestCase):
         # how does mocksignature on a class with no __init__ method work?
         # (i.e. will inherit object.__init__ that takes no args but implemented
         #  in C.)
-        pass
+        class Foo(object):
+            def a(self):
+                pass
+            class Bar(object):
+                def f(self):
+                    pass
 
+        class_mock = _spec_signature(Foo, inherit=True)
+
+        self.assertIsNot(class_mock, class_mock())
+
+        for this_mock in class_mock, class_mock():
+            this_mock.a()
+            this_mock.a.assert_called_with()
+            self.assertRaises(TypeError, this_mock.assert_called_with, 'foo')
+
+        instance_mock = _spec_signature(Foo(), inherit=True)
+        instance_mock.a()
+        instance_mock.a.assert_called_with()
+        self.assertRaises(TypeError, instance_mock.assert_called_with, 'foo')
+
+        # The return value isn't created with a spec because the spec is an
+        # instance and not a class. The spec isn't inherited by return value.
+        instance_mock().a(1, 2, 3)
+        instance_mock().a.assert_called_with(1, 2, 3)
 
