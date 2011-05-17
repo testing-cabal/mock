@@ -114,7 +114,7 @@ def _getsignature(func, skipfirst):
 def _copy_func_details(func, funcopy):
     funcopy.__name__ = func.__name__
     funcopy.__doc__ = func.__doc__
-    funcopy.__dict__.update(func.__dict__)
+    #funcopy.__dict__.update(func.__dict__)
     funcopy.__module__ = func.__module__
     if not inPy3k:
         funcopy.func_defaults = func.func_defaults
@@ -1148,9 +1148,12 @@ def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
             # allow a mock to actually be a function from mocksignature
             continue
 
-        # XXXX need a better way of getting attributes
-        # without triggering code execution (?)
+        # XXXX do we need a better way of getting attributes
+        # without triggering code execution (?) (possibly not)s
         original = getattr(spec, entry)
+        kwargs = {'spec': original}
+        if spec_set:
+            kwargs = {'spec_set': original}
 
         if not isinstance(original, FunctionTypes):
             if type(spec) in (int, float, bool):
@@ -1159,16 +1162,17 @@ def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
                 #  pypy 1.5.1 which is fixed in trunk.)
                 # Instead we could check for attributes that have the same
                 # type as the parent - this might solve the general problem.
-                kwargs = {'spec': original}
-                if spec_set:
-                    kwargs = {'spec_set': original}
                 new = MagicMock(parent=mock, name=entry, **kwargs)
                 mock._mock_children[entry] = new
             else:
                 new = _spec_signature(original, spec_set, inherit,
                                       mock, entry, _ids)
         else:
-            existing = getattr(mock, entry)
+            if isinstance(spec, FunctionTypes):
+                existing = MagicMock(parent=mock.mock, name=entry, **kwargs)
+                mock._mock_children[entry] = existing
+            else:
+                existing = getattr(mock, entry)
             skipfirst = _must_skip(spec, entry, is_type)
             new = mocksignature(original, existing, skipfirst=skipfirst)
 
