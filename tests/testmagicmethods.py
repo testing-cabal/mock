@@ -162,6 +162,8 @@ class TestMockingMagicMethods(unittest2.TestCase):
 
 
     def testComparison(self):
+        # note: this test fails with Jython 2.5.1 due to a Jython bug
+        #       it is fixed in jython 2.5.2
         if not inPy3k:
             # incomparable in Python 3
             self. assertEqual(Mock() < 3, object() < 3)

@@ -365,6 +365,16 @@ class SpecSignatureTest(unittest2.TestCase):
 
         mock = _spec_signature(f)
         self.assertRaises(TypeError, mock)
+        mock(1, 2)
+        mock.assert_called_with(1, 2)
+
+        f.f = f
+        mock = _spec_signature(f)
+        self.assertRaises(TypeError, mock.f)
+        mock.f(1, 2)
+        mock.f.assert_called_with(1, 2)
+        # XXX Note that this is *not* recursive, the function is only copied
+        #     for one level deep.
 
 
     def test_none(self):
