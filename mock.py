@@ -232,8 +232,10 @@ ClassTypes = (type,)
 if not inPy3k:
     ClassTypes = (type, ClassType)
 
+_allowed_names = set(['return_value'])
 
 def _mock_signature_property(name):
+    _allowed_names.add(name)
     def _get(self):
         sig = self._mock_signature
         if sig is None:
@@ -480,7 +482,7 @@ class Mock(object):
 
         if (self._spec_set and self._mock_methods is not None and name not in
             self._mock_methods and name not in self.__dict__ and
-            name != 'return_value'):
+            name not in _allowed_names):
             raise AttributeError("Mock object has no attribute '%s'" % name)
         if name in _unsupported_magics:
             msg = 'Attempting to set unsupported magic method %r.' % name
@@ -1151,6 +1153,7 @@ def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
         # XXXX do we need a better way of getting attributes
         # without triggering code execution (?) (possibly not)s
         original = getattr(spec, entry)
+
         kwargs = {'spec': original}
         if spec_set:
             kwargs = {'spec_set': original}
@@ -1168,14 +1171,18 @@ def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
                 new = _spec_signature(original, spec_set, inherit,
                                       mock, entry, _ids)
         else:
+            parent = mock
             if isinstance(spec, FunctionTypes):
-                existing = MagicMock(parent=mock.mock, name=entry, **kwargs)
-                mock._mock_children[entry] = existing
-            else:
-                existing = getattr(mock, entry)
-            skipfirst = _must_skip(spec, entry, is_type)
-            new = mocksignature(original, existing, skipfirst=skipfirst)
+                parent = mock.mock
 
+            new = MagicMock(parent=parent, name=entry, **kwargs)
+            mock._mock_children[entry] = new
+            skipfirst = _must_skip(spec, entry, is_type)
+            new = mocksignature(original, new, skipfirst=skipfirst)
+
+        # not strictly speaking necessary for real mock (although needed for
+        # attributes on functions created by mocksignature)- and may bypass
+        # __getattr__ for mock attributes?
         setattr(mock, entry, new)
     return mock
 
