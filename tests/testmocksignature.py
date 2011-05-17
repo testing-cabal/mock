@@ -289,6 +289,7 @@ class TestMockSignature(unittest2.TestCase):
         self.assertEqual(func.call_count, 0)
         self.assertEqual(func.method_calls, [])
         self.assertEqual(func.call_args_list, [])
+        self.assertIs(func._mock_children, func.mock._mock_children)
 
         self.assertIs(func(1, 2, 3), return_value)
 
@@ -308,6 +309,7 @@ class TestMockSignature(unittest2.TestCase):
         self.assertEqual(func.call_count, 0)
         self.assertEqual(func.method_calls, [])
         self.assertEqual(func.call_args_list, [])
+        self.assertIs(func._mock_children, func.mock._mock_children)
 
         func.side_effect = KeyError
         self.assertRaises(KeyError, func, 1, 2, 3)
