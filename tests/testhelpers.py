@@ -303,6 +303,8 @@ class SpecSignatureTest(unittest2.TestCase):
             def a(self):
                 pass
             class Bar(object):
+                class Baz(object):
+                    pass
                 def f(self):
                     pass
 
@@ -329,6 +331,9 @@ class SpecSignatureTest(unittest2.TestCase):
         # instance and not a class. The spec isn't inherited by return value.
         instance_mock().a(1, 2, 3)
         instance_mock().a.assert_called_with(1, 2, 3)
+
+        self.assertIs(instance_mock.Bar.Baz, instance_mock.Bar().Baz)
+        self.assertIsNot(instance_mock.Bar.f, instance_mock.Bar().f)
 
 
     def test_spec_inheritance_callables(self):
