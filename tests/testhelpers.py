@@ -336,10 +336,41 @@ class SpecSignatureTest(unittest2.TestCase):
         self.assertIsNot(instance_mock.Bar.f, instance_mock.Bar().f)
 
 
+    def test_builtins(self):
+        # used to fail with infinite recursion
+        _spec_signature(1)
+
+        _spec_signature(int)
+        _spec_signature('foo')
+        _spec_signature(str)
+        _spec_signature({})
+        _spec_signature(dict)
+        _spec_signature(list)
+        _spec_signature(set())
+        _spec_signature(set)
+        _spec_signature(1.0)
+        _spec_signature(float)
+        _spec_signature(1j)
+        _spec_signature(complex)
+        _spec_signature(False)
+        _spec_signature(True)
+
+        # spec of None fails because it is the default value
+        _spec_signature(None)
+
+
     def test_spec_inheritance_callables(self):
         # with spec inheritance we could mock classes __init__ and callable
         # object signatures with mocksignature.
         # how does mocksignature on a class with no __init__ method work?
         # (i.e. will inherit object.__init__ that takes no args but implemented
         #  in C.)
+
+        # could we mock callable object signatures anyway - without requiring
+        # inheritance?
+        # for classes that are attributes we could inherit - it is only for
+        # top level classes that we can't know if they may be used as
+        # instances.
+
+        # for classes
         pass
