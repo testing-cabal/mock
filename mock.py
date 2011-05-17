@@ -1098,6 +1098,10 @@ def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
     if _ids is None:
         _ids = {}
     is_type = False
+
+    if spec is None:
+        spec = type(None)
+
     _type = type(spec)
     if isinstance(spec, ClassTypes):
         is_type = True
