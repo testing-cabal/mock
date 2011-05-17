@@ -1091,8 +1091,8 @@ call = _Call()
 
 
 
-def _spec_signature(spec, spec_set=False, inherit=False,
-                    _parent=None, _name=None, _ids=None):
+def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
+                    _name=None, _ids=None, _instance=False):
     if _ids is None:
         _ids = {}
     is_type = False
@@ -1102,6 +1102,8 @@ def _spec_signature(spec, spec_set=False, inherit=False,
         _type = spec
 
     if type(spec) == list:
+        # can't use _type because restriction only applies to list *instances*
+        # passing in 'list' (the type) as a spec is fine.
         raise TypeError(
             "spec must be a class or an instance not a list"
         )
@@ -1110,8 +1112,7 @@ def _spec_signature(spec, spec_set=False, inherit=False,
     if spec_set:
         kwargs = {'spec_set': spec}
 
-
-    if id(spec) in _ids:
+    if id(spec) in _ids and not _instance:
         mock = _ids[id(spec)][0]
         return mock
 
@@ -1124,6 +1125,10 @@ def _spec_signature(spec, spec_set=False, inherit=False,
 
     if _parent is not None:
         _parent._mock_children[_name] = mock
+
+    if is_type and inherit and not _instance:
+        mock.return_value = _spec_signature(spec, spec_set, inherit, _ids=_ids,
+                                            _instance=True)
 
     for entry in dir(spec):
         if _is_magic(entry):

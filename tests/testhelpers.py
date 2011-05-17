@@ -299,11 +299,6 @@ class SpecSignatureTest(unittest2.TestCase):
 
 
     def test_spec_inheritance_for_classes(self):
-        # when inheritance is on we could mock classes __init__ and callable
-        # object signatures with mocksignature
-        # how does mocksignature on a class with no __init__ method work?
-        # (i.e. will inherit object.__init__ that takes no args but implemented
-        #  in C.)
         class Foo(object):
             def a(self):
                 pass
@@ -318,15 +313,28 @@ class SpecSignatureTest(unittest2.TestCase):
         for this_mock in class_mock, class_mock():
             this_mock.a()
             this_mock.a.assert_called_with()
-            self.assertRaises(TypeError, this_mock.assert_called_with, 'foo')
+            self.assertRaises(TypeError, this_mock.a, 'foo')
+            self.assertRaises(AttributeError, getattr, this_mock, 'b')
+
+        self.assertIs(class_mock.Bar, class_mock().Bar)
+        self.assertIsNot(class_mock.a, class_mock().a)
 
         instance_mock = _spec_signature(Foo(), inherit=True)
         instance_mock.a()
         instance_mock.a.assert_called_with()
-        self.assertRaises(TypeError, instance_mock.assert_called_with, 'foo')
+        self.assertRaises(TypeError, instance_mock.a, 'foo')
+        self.assertRaises(AttributeError, getattr, instance_mock, 'b')
 
         # The return value isn't created with a spec because the spec is an
         # instance and not a class. The spec isn't inherited by return value.
         instance_mock().a(1, 2, 3)
         instance_mock().a.assert_called_with(1, 2, 3)
 
+
+    def test_spec_inheritance_callables(self):
+        # with spec inheritance we could mock classes __init__ and callable
+        # object signatures with mocksignature.
+        # how does mocksignature on a class with no __init__ method work?
+        # (i.e. will inherit object.__init__ that takes no args but implemented
+        #  in C.)
+        pass
