@@ -321,7 +321,8 @@ class Mock(object):
             if isinstance(spec, ClassTypes):
                 _spec_class = spec
             else:
-                _spec_class = spec.__class__
+                _spec_class = _get_class(spec)
+
             spec = dir(spec)
 
         self._spec_class = _spec_class
@@ -1100,7 +1101,7 @@ def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
                     _name=None, _ids=None, _instance=False):
     if spec is None:
         # can't use None as it is the default value for the Mock spec argument
-        spec = type(None)
+        spec = NoneType
 
     if type(spec) == list:
         # can't pass a list instance to the mock constructor as it will be
@@ -1111,7 +1112,7 @@ def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
         _ids = {}
 
     is_type = False
-    _type = type(spec)
+    _type = _get_class(spec)
     if isinstance(spec, ClassTypes):
         is_type = True
         _type = spec
@@ -1198,7 +1199,7 @@ def _must_skip(spec, entry, skipfirst):
         # old style class: can't have descriptors anyway
         return skipfirst
 
-    for klass in spec.mro():
+    for klass in spec.__mro__:
         result = klass.__dict__.get(entry, DEFAULT)
         if result is DEFAULT:
             continue
@@ -1209,6 +1210,13 @@ def _must_skip(spec, entry, skipfirst):
     # shouldn't get here unless attribute dynamically provided
     return skipfirst
 
+
+def _get_class(obj):
+    try:
+        return obj.__class__
+    except AttributeError:
+        # in Python 2, _sre.SRE_Pattern objects have no __class__
+        return type(obj)
 
 FunctionTypes = (
     # python function
@@ -1230,3 +1238,5 @@ FunctionAttributes = set([
     'func_globals',
     'func_name',
 ])
+
+NoneType = type(None)
