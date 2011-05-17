@@ -114,9 +114,22 @@ class SpecSignatureTest(unittest2.TestCase):
         mock.f.assert_called_with('bing')
 
 
-    def test_spec_as_list_fails(self):
-        self.assertRaises(TypeError, _spec_signature, [])
-        self.assertRaises(TypeError, _spec_signature, ['foo'])
+    def test_spec_as_list(self):
+        # because spec as a list of strings in the mock constructor means
+        # something very different we treat a list instance as the type.
+        mock = _spec_signature([])
+        mock.append('foo')
+        mock.append.assert_called_with('foo')
+
+        self.assertRaises(AttributeError, getattr, mock, 'foo')
+
+        class Foo(object):
+            foo = []
+
+        mock = _spec_signature(Foo)
+        mock.foo.append(3)
+        mock.foo.append.assert_called_with(3)
+        self.assertRaises(AttributeError, getattr, mock.foo, 'foo')
 
 
     def test_attributes(self):
@@ -287,16 +300,6 @@ class SpecSignatureTest(unittest2.TestCase):
         mock.b.assert_called_with()
         self.assertRaises(AssertionError, mock.a.assert_called_with)
 
-        ## Note: functions that have themselves as attributes, even indirectly,
-        ##       still fail. Unfortunate. We don't want to cache functions
-        ##       though, as we need to treat them differently if found on a
-        ##       class to if found on their own. So we can't cache just based on
-        ##       id.
-        #def f():
-        #    pass
-        #f.a = f
-        #mock = _spec_signature(f)
-
 
     def test_spec_inheritance_for_classes(self):
         class Foo(object):
@@ -354,6 +357,14 @@ class SpecSignatureTest(unittest2.TestCase):
         _spec_signature(complex)
         _spec_signature(False)
         _spec_signature(True)
+
+
+    def test_function(self):
+        def f(a, b):
+            pass
+
+        mock = _spec_signature(f)
+        self.assertRaises(TypeError, mock)
 
 
     def test_none(self):

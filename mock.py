@@ -178,6 +178,7 @@ def _setup_func(funcopy, mock):
     funcopy.method_calls = []
     funcopy.return_value = mock.return_value
     funcopy.side_effect = mock.side_effect
+    funcopy._mock_children = mock._mock_children
 
     funcopy.assert_called_with = assert_called_with
     funcopy.assert_called_once_with = assert_called_once_with
@@ -1095,24 +1096,23 @@ call = _Call()
 
 def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
                     _name=None, _ids=None, _instance=False):
-    if _ids is None:
-        _ids = {}
     if spec is None:
         # can't use None as it is the default value for the Mock spec argument
         spec = type(None)
+
+    if type(spec) == list:
+        # can't pass a list instance to the mock constructor as it will be
+        # interpreted as a list of strings
+        spec = list
+
+    if _ids is None:
+        _ids = {}
 
     is_type = False
     _type = type(spec)
     if isinstance(spec, ClassTypes):
         is_type = True
         _type = spec
-
-    if type(spec) == list:
-        # can't use _type because restriction only applies to list *instances*
-        # passing in 'list' (the type) as a spec is fine.
-        raise TypeError(
-            "spec must be a class or an instance not a list"
-        )
 
     kwargs = {'spec': spec}
     if spec_set:
@@ -1123,6 +1123,10 @@ def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
         return mock
 
     mock = MagicMock(parent=_parent, name=_name, **kwargs)
+    if isinstance(spec, FunctionTypes):
+        # should only happen at the top level because we don't
+        # recurse for functions
+        mock = mocksignature(spec, mock)
 
     if id(spec) not in _ids and _type not in builtin_types:
         # we keep the spec object around too, to avoid the problem
@@ -1138,6 +1142,10 @@ def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
 
     for entry in dir(spec):
         if _is_magic(entry):
+            continue
+
+        if isinstance(spec, FunctionTypes) and entry in FunctionAttributes:
+            # allow a mock to actually be a function from mocksignature
             continue
 
         # XXXX need a better way of getting attributes
@@ -1202,3 +1210,12 @@ FunctionTypes = (
 
 builtin_types = set([v for v in sys.modules[builtin].__dict__.values() if
                      isinstance(v, type)] + list(FunctionTypes))
+
+FunctionAttributes = set([
+    'func_closure',
+    'func_code',
+    'func_defaults',
+    'func_dict',
+    'func_globals',
+    'func_name',
+])
