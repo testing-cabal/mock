@@ -355,8 +355,11 @@ class SpecSignatureTest(unittest2.TestCase):
         _spec_signature(False)
         _spec_signature(True)
 
-        # spec of None fails because it is the default value
-        _spec_signature(None)
+
+    def test_none(self):
+        # used to fail because it's the default value of Mock spec arg
+        mock = _spec_signature(None)
+        self.assertRaises(AttributeError, getattr, mock, 'foo')
 
 
     def test_spec_inheritance_callables(self):
