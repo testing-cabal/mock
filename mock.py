@@ -1097,11 +1097,11 @@ def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
                     _name=None, _ids=None, _instance=False):
     if _ids is None:
         _ids = {}
-    is_type = False
-
     if spec is None:
+        # can't use None as it is the default value for the Mock spec argument
         spec = type(None)
 
+    is_type = False
     _type = type(spec)
     if isinstance(spec, ClassTypes):
         is_type = True
