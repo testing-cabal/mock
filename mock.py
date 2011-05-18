@@ -1141,10 +1141,8 @@ def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
         spec = list
 
     is_type = False
-    _type = _get_class(spec)
     if isinstance(spec, ClassTypes):
         is_type = True
-        _type = spec
 
     kwargs = {'spec': spec}
     if spec_set:
@@ -1257,9 +1255,6 @@ FunctionTypes = (
     # unbound method
     type(_ANY.__eq__),
 )
-
-builtin_types = set([v for v in sys.modules[builtin].__dict__.values() if
-                     isinstance(v, type)] + list(FunctionTypes))
 
 FunctionAttributes = set([
     'func_closure',
