@@ -6,7 +6,7 @@ import os
 import sys
 
 from tests import support
-from tests.support import unittest2, apply, inPy3k, SomeClass
+from tests.support import unittest2, inPy3k, SomeClass
 
 from mock import Mock, patch, sentinel
 
@@ -515,54 +515,60 @@ class PatchTest(unittest2.TestCase):
         foo = {'initial': object(), 'other': 'something'}
         original = foo.copy()
 
-        @apply
         @patch.dict(foo, clear=True)
         def test():
             self.assertEqual(foo, {})
             foo['a'] = 3
             foo['other'] = 'something else'
 
+        test()
+
         self.assertEqual(foo, original)
 
-        @apply
         @patch.dict(foo, {'a': 'b'}, clear=True)
         def test():
             self.assertEqual(foo, {'a': 'b'})
 
+        test()
+
         self.assertEqual(foo, original)
 
-        @apply
         @patch.dict(foo, [('a', 'b')], clear=True)
         def test():
             self.assertEqual(foo, {'a': 'b'})
 
+        test()
+
         self.assertEqual(foo, original)
 
 
-    def testPatchDictWithContainerObjectAndClear(self):
+    def test_patch_dict_with_container_object_and_clear(self):
         foo = Container()
         foo['initial'] = object()
         foo['other'] =  'something'
 
         original = foo.values.copy()
 
-        @apply
         @patch.dict(foo, clear=True)
         def test():
             self.assertEqual(foo.values, {})
             foo['a'] = 3
             foo['other'] = 'something else'
 
+        test()
+
         self.assertEqual(foo.values, original)
 
-        @apply
         @patch.dict(foo, {'a': 'b'}, clear=True)
         def test():
             self.assertEqual(foo.values, {'a': 'b'})
 
+        test()
+
         self.assertEqual(foo.values, original)
 
-    def testNamePreserved(self):
+
+    def test_name_preserved(self):
         foo = {}
 
         @patch('tests.testpatch.SomeClass', object())
@@ -574,7 +580,8 @@ class PatchTest(unittest2.TestCase):
 
         self.assertEqual(some_name.__name__, 'some_name')
 
-    def testPatchWithException(self):
+
+    def test_patch_with_exception(self):
         foo = {}
 
         @patch.dict(foo, {'a': 'b'})
@@ -589,13 +596,16 @@ class PatchTest(unittest2.TestCase):
 
         self.assertEqual(foo, {})
 
-    def testPatchDictWithString(self):
-        @apply
+
+    def test_patch_dict_with_string(self):
         @patch.dict('os.environ', {'konrad_delong': 'some value'})
         def test():
             self.assertIn('konrad_delong', os.environ)
 
-    def DONTtestPatchDescriptor(self):
+        test()
+
+
+    def DONTtest_patch_descriptor(self):
         # would be some effort to fix this - we could special case the
         # builtin descriptors: classmethod, property, staticmethod
         class Nothing(object):
@@ -637,7 +647,7 @@ class PatchTest(unittest2.TestCase):
         something.klass_dict()
 
 
-    def testPatchSpecSet(self):
+    def test_patch_spec_set(self):
         @patch('tests.testpatch.SomeClass', spec=SomeClass, spec_set=True)
         def test(MockClass):
             MockClass.z = 'foo'
@@ -662,7 +672,7 @@ class PatchTest(unittest2.TestCase):
         self.assertRaises(AttributeError, test)
 
 
-    def testSpecSetInherit(self):
+    def test_spec_set_inherit(self):
         @patch('tests.testpatch.SomeClass', spec_set=True)
         def test(MockClass):
             instance = MockClass()
@@ -671,7 +681,7 @@ class PatchTest(unittest2.TestCase):
         self.assertRaises(AttributeError, test)
 
 
-    def testPatchStartStop(self):
+    def test_patch_start_stop(self):
         original = something
         patcher = patch('%s.something' % __name__)
         self.assertIs(something, original)
@@ -684,7 +694,7 @@ class PatchTest(unittest2.TestCase):
         self.assertIs(something, original)
 
 
-    def testPatchObjectStartStop(self):
+    def test_patchobject_start_stop(self):
         original = something
         patcher = patch.object(PTModule, 'something', 'foo')
         self.assertIs(something, original)
@@ -697,7 +707,7 @@ class PatchTest(unittest2.TestCase):
         self.assertIs(something, original)
 
 
-    def testPatchDictStartStop(self):
+    def test_patch_dict_start_stop(self):
         d = {'foo': 'bar'}
         original = d.copy()
         patcher = patch.dict(d, [('spam', 'eggs')], clear=True)
@@ -710,7 +720,7 @@ class PatchTest(unittest2.TestCase):
         self.assertEqual(d, original)
 
 
-    def testPatchDictClassDecorator(self):
+    def test_patch_dict_class_decorator(self):
         this = self
         d = {'spam': 'eggs'}
         original = d.copy()
@@ -741,7 +751,7 @@ class PatchTest(unittest2.TestCase):
         self.assertEqual(d, original)
 
 
-    def testGetOnlyProxy(self):
+    def test_get_only_proxy(self):
         class Something(object):
             foo = 'foo'
         class SomethingElse:
@@ -759,7 +769,7 @@ class PatchTest(unittest2.TestCase):
             self.assertNotIn('foo', proxy.__dict__)
 
 
-    def testGetSetDeleteProxy(self):
+    def test_get_set_delete_proxy(self):
         class Something(object):
             foo = 'foo'
         class SomethingElse:
