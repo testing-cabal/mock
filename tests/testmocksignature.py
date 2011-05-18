@@ -4,7 +4,7 @@
 
 import inspect
 
-from tests.support import unittest2, apply
+from tests.support import unittest2
 
 from mock import Mock, mocksignature, patch
 
@@ -133,7 +133,6 @@ class TestMockSignature(unittest2.TestCase):
             pass
         mock.f = f
 
-        @apply
         @patch.object(mock, 'f', mocksignature=True)
         def test(mock_f):
             self.assertRaises(TypeError, mock.f, 3, 4)
@@ -143,7 +142,8 @@ class TestMockSignature(unittest2.TestCase):
             mock_f.assert_called_with(1, 2, 3)
             mock.f.mock.assert_called_with(1, 2, 3)
 
-        @apply
+        test()
+
         @patch('tests.support.SomeClass.wibble', mocksignature=True)
         def test(mock_wibble):
             from tests.support import SomeClass
@@ -154,6 +154,8 @@ class TestMockSignature(unittest2.TestCase):
 
             mock_wibble.assert_called_with(instance)
             instance.wibble.mock.assert_called_with(instance)
+
+        test()
 
 
     @unittest2.skipUnless(__debug__, 'assert disabled when run with -O/OO')
