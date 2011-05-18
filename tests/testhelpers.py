@@ -386,14 +386,38 @@ class SpecSignatureTest(unittest2.TestCase):
         mock.assert_called_with(4, 5)
 
 
+    @unittest2.skipIf(inPy3k, 'no old style classes in Python 3')
     def test_signature_old_style_class(self):
-        pass
+        class Foo:
+            def __init__(self, a, b=3):
+                pass
+
+        mock = _spec_signature(Foo)
+
+        self.assertRaises(TypeError, mock)
+        mock(1)
+        mock.assert_called_once_with(1, 3)
+
+        mock(4, 5)
+        mock.assert_called_with(4, 5)
+
 
     def test_class_with_no_init(self):
-        pass
+        # this used to raise an exception
+        # due to trying to get a signature from object.__init__
+        class Foo(object):
+            pass
+        _spec_signature(Foo)
 
+
+    @unittest2.skipIf(inPy3k, 'no old style classes in Python 3')
     def test_old_style_class_with_no_init(self):
-        pass
+        # this used to raise an exception
+        # due to Foo.__init__ raising an AttributeError
+        class Foo:
+            pass
+        _spec_signature(Foo)
+
 
     def test_signature_callable(self):
         pass
