@@ -1150,7 +1150,7 @@ def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
             continue
 
         # XXXX do we need a better way of getting attributes
-        # without triggering code execution (?) (possibly not)s
+        # without triggering code execution (?) (possibly not)
         original = getattr(spec, entry)
 
         kwargs = {'spec': original}
