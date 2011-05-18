@@ -1288,7 +1288,7 @@ def _set_signature(mock, original, skipfirst):
     src = ("def __call__(self, %s):\n    return self._mock_call(%s)" %
            (signature, signature))
     context = {}
-    exec src in context
+    exec (src, context)
 
     __call__ = context['__call__']
     _copy_func_details(func, __call__)
