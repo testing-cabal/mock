@@ -420,4 +420,19 @@ class SpecSignatureTest(unittest2.TestCase):
 
 
     def test_signature_callable(self):
-        pass
+        class Callable(object):
+            def __init__(self):
+                pass
+            def __call__(self, a):
+                pass
+
+        mock = _spec_signature(Callable)
+        mock()
+        mock.assert_called_once_with()
+        self.assertRaises(TypeError, mock, 'a')
+
+        mock = _spec_signature(Callable())
+        mock('a')
+        mock.assert_called_once_with('a')
+        self.assertRaises(TypeError, mock)
+
