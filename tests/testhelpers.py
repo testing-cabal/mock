@@ -432,7 +432,7 @@ class SpecSignatureTest(unittest2.TestCase):
         self.assertRaises(TypeError, mock, 'a')
 
         mock = _spec_signature(Callable())
-        mock('a')
+        mock(a='a')
         mock.assert_called_once_with('a')
         self.assertRaises(TypeError, mock)
 

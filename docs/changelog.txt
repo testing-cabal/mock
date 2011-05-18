@@ -62,8 +62,6 @@ CHANGELOG
   - Doesn't mock function / method attributes
   - Uses object traversal on the objects being mocked to determine types - so
     will trigger properties etc
-  - Because of the use of mocksignature, default values can only be the
-    basic types (or one where the repr can be eval'd back into the same value)
 
   Note that the `autospec` option to `patch` obsoletes the `mocksignature`
   option.
