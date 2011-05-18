@@ -612,7 +612,7 @@ def _importer(target):
 
 class _patch(object):
     def __init__(self, target, attribute, new, spec, create,
-                    mocksignature, spec_set):
+                    mocksignature, spec_set, autospec):
         self.target = target
         self.attribute = attribute
         self.new = new
@@ -621,11 +621,13 @@ class _patch(object):
         self.has_local = False
         self.mocksignature = mocksignature
         self.spec_set = spec_set
+        self.autospec = autospec
 
 
     def copy(self):
         return _patch(self.target, self.attribute, self.new, self.spec,
-                        self.create, self.mocksignature, self.spec_set)
+                        self.create, self.mocksignature, self.spec_set,
+                        self.autospec)
 
 
     def __call__(self, func):
@@ -665,8 +667,10 @@ class _patch(object):
         patched.patchings = [self]
         if hasattr(func, 'func_code'):
             # not in Python 3
-            patched.compat_co_firstlineno = getattr(func, "compat_co_firstlineno",
-                                                    func.func_code.co_firstlineno)
+            patched.compat_co_firstlineno = getattr(
+                func, "compat_co_firstlineno",
+                func.func_code.co_firstlineno
+            )
         return patched
 
 
@@ -685,15 +689,18 @@ class _patch(object):
             local = True
 
         if not self.create and original is DEFAULT:
-            raise AttributeError("%s does not have the attribute %r" % (target, name))
+            raise AttributeError(
+                "%s does not have the attribute %r" % (target, name)
+            )
         return original, local
 
 
     def __enter__(self):
         """Perform the patch."""
-        new, spec, spec_set = self.new, self.spec, self.spec_set
+        new, spec = self.new, self.spec
+        spec_set, autospec = self.spec_set, self.autospec
         original, local = self.get_original()
-        if new is DEFAULT:
+        if new is DEFAULT and not autospec:
             # XXXX what if original is DEFAULT - shouldn't use it as a spec
             inherit = False
             if spec_set == True:
@@ -708,6 +715,20 @@ class _patch(object):
             new = Mock(spec=spec, spec_set=spec_set)
             if inherit:
                 new.return_value = Mock(spec=spec, spec_set=spec_set)
+        elif autospec:
+            # spec is ignored, new *must* be default, spec_set is treated
+            # as a boolean. Should we check spec is not None and that spec_set
+            # is a bool? mocksignature should also not be used. Should we
+            # check this?
+            if new is not DEFAULT:
+                raise TypeError(
+                    "autospec creates the mock for you. Can't specify "
+                    "autospec and new."
+                )
+            spec_set = bool(spec_set)
+            kwargs = {'_name': getattr(original, '__name__', None)}
+            new = _spec_signature(original, spec_set, inherit=True, **kwargs)
+
         new_attr = new
         if self.mocksignature:
             new_attr = mocksignature(original, new)
@@ -735,8 +756,9 @@ class _patch(object):
     stop = __exit__
 
 
-def _patch_object(target, attribute, new=DEFAULT, spec=None, create=False,
-                  mocksignature=False, spec_set=None):
+def _patch_object(target, attribute, new=DEFAULT, spec=None,
+                      create=False, mocksignature=False, spec_set=None,
+                      autospec=False):
     """
     patch.object(target, attribute, new=DEFAULT, spec=None, create=False,
                  mocksignature=False, spec_set=None)
@@ -748,11 +770,11 @@ def _patch_object(target, attribute, new=DEFAULT, spec=None, create=False,
     meaning as for patch.
     """
     return _patch(target, attribute, new, spec, create, mocksignature,
-                  spec_set)
+                  spec_set, autospec)
 
 
 def patch(target, new=DEFAULT, spec=None, create=False,
-            mocksignature=False, spec_set=None):
+            mocksignature=False, spec_set=None, autospec=False):
     """
     ``patch`` acts as a function decorator, class decorator or a context
     manager. Inside the body of the function or with statement, the ``target``
@@ -806,7 +828,8 @@ def patch(target, new=DEFAULT, spec=None, create=False,
         raise TypeError("Need a valid target to patch. You supplied: %r" %
                         (target,))
     target = _importer(target)
-    return _patch(target, attribute, new, spec, create, mocksignature, spec_set)
+    return _patch(target, attribute, new, spec, create, mocksignature,
+                    spec_set, autospec)
 
 
 

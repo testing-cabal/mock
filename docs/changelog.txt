@@ -63,6 +63,9 @@ CHANGELOG
   - Uses object traversal on the objects being mocked to determine types - so
     will trigger properties etc.
 
+  Note that the `autospec` option to `patch` obsoletes the `mocksignature`
+  option.
+
 2011/XX/XX Version 0.7.2
 ------------------------
 
