@@ -81,18 +81,29 @@ if inPy3k:
 # the decorator module: http://pypi.python.org/pypi/decorator/
 # by Michele Simionato
 
-def _getsignature(func, skipfirst):
+def _getsignature(func, skipfirst, ignore_error=False):
     if inspect is None:
         raise ImportError('inspect module not available')
 
     if inspect.isclass(func):
-        func = func.__init__
+        try:
+            func = func.__init__
+        except AttributeError:
+            if ignore_error:
+                # old style class without an __init__ method
+                return
+            raise
         # will have a self arg
         skipfirst = True
     elif not (inspect.ismethod(func) or inspect.isfunction(func)):
         func = func.__call__
 
-    regargs, varargs, varkwargs, defaults = inspect.getargspec(func)
+    try:
+        regargs, varargs, varkwargs, defaults = inspect.getargspec(func)
+    except TypeError:
+        if ignore_error:
+            return
+        raise
 
     # instance methods need to lose the self argument
     if getattr(func, self, None) is not None:
@@ -106,6 +117,7 @@ def _getsignature(func, skipfirst):
         assert '_mock_' not in varkwargs, _msg
     if skipfirst:
         regargs = regargs[1:]
+
     signature = inspect.formatargspec(regargs, varargs, varkwargs, defaults,
                                       formatvalue=lambda value: "")
     return signature[1:-1], func
@@ -396,6 +408,10 @@ class Mock(object):
 
 
     def __call__(self, *args, **kwargs):
+        # stub method that can be replaced with one with a specific signature
+        return self._mock_call(*args, **kwargs)
+
+    def _mock_call(self, *args, **kwargs):
         self.called = True
         self.call_count += 1
         self.call_args = callargs((args, kwargs))
@@ -1151,6 +1167,8 @@ def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
         # should only happen at the top level because we don't
         # recurse for functions
         mock = mocksignature(spec, mock)
+    else:
+        _set_signature(mock, spec, is_type)
 
     if _parent is not None:
         _parent._mock_children[_name] = mock
@@ -1169,7 +1187,10 @@ def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
             continue
 
         # XXXX do we need a better way of getting attributes
-        # without triggering code execution (?) (possibly not)
+        # without triggering code execution (?) Probably not - we need the
+        # actual object to mock it so we would rather trigger a property than
+        # mock the property descriptor. Likewise we want to mock out
+        # dynamically provided attributes.
         original = getattr(spec, entry)
 
         kwargs = {'spec': original}
@@ -1243,6 +1264,35 @@ class _SpecState(object):
         self.instance = instance
         self.name = name
 
+
+
+def _callable(obj):
+    if isinstance(obj, ClassTypes):
+        return True
+    if getattr(obj, '__call__', None) is not None:
+        return True
+    return False
+
+
+def _set_signature(mock, original, skipfirst):
+    if not _callable(original):
+        return
+
+    skipfirst = isinstance(original, ClassTypes)
+    result = _getsignature(original, skipfirst, ignore_error=True)
+    if result is None:
+        # was a C function (e.g. object().__init__ ) that can't be mocked
+        return
+
+    signature, func = result
+    src = ("def __call__(self, %s):\n    return self._mock_call(%s)" %
+           (signature, signature))
+    context = {}
+    exec src in context
+
+    __call__ = context['__call__']
+    _copy_func_details(func, __call__)
+    type(mock).__call__ = __call__
 
 
 FunctionTypes = (
