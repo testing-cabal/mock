@@ -18,7 +18,7 @@ if inPy3k:
 PTModule = sys.modules[__name__]
 
 
-def _getProxy(obj, get_only=True):
+def _get_proxy(obj, get_only=True):
     class Proxy(object):
         def __getattr__(self, name):
             return getattr(obj, name)
@@ -31,9 +31,11 @@ def _getProxy(obj, get_only=True):
         Proxy.__delattr__ = __delattr__
     return Proxy()
 
+
 # for use in the test
 something  = sentinel.Something
 something_else  = sentinel.SomethingElse
+
 
 
 class Container(object):
@@ -758,7 +760,7 @@ class PatchTest(unittest2.TestCase):
             foo = 'foo'
 
         for thing in Something, SomethingElse, Something(), SomethingElse:
-            proxy = _getProxy(thing)
+            proxy = _get_proxy(thing)
 
             @patch.object(proxy, 'foo', 'bar')
             def test():
@@ -776,7 +778,7 @@ class PatchTest(unittest2.TestCase):
             foo = 'foo'
 
         for thing in Something, SomethingElse, Something(), SomethingElse:
-            proxy = _getProxy(Something, get_only=False)
+            proxy = _get_proxy(Something, get_only=False)
 
             @patch.object(proxy, 'foo', 'bar')
             def test():
