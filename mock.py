@@ -1171,9 +1171,10 @@ def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
             skipfirst = _must_skip(spec, entry, is_type)
             new = mocksignature(original, new, skipfirst=skipfirst)
 
-        # not strictly speaking necessary for real mock (although needed for
-        # attributes on functions created by mocksignature)- and may bypass
-        # __getattr__ for mock attributes?
+        # so functions created with mocksignature become instance methods,
+        # *plus* their underlying mock exists in _mock_children of the parent
+        # mock. Adding to _mock_children may be unnecessary where we are also
+        # setting as an instance attribute?
         if isinstance(new, FunctionTypes):
             setattr(mock, entry, new)
 
