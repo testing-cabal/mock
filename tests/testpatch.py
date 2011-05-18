@@ -256,7 +256,7 @@ class PatchTest(unittest2.TestCase):
         test()
 
 
-    def testNestedPatchWithSpecAsList(self):
+    def test_nested_patch_with_spec_as_list(self):
         # regression test for nested decorators
         @patch('%s.open' % builtin_string)
         @patch('tests.testpatch.SomeClass', spec=['wibble'])
@@ -267,8 +267,7 @@ class PatchTest(unittest2.TestCase):
         test()
 
 
-    def testPatchWithSpecAsBoolean(self):
-        @apply
+    def test_patch_with_spec_as_boolean(self):
         @patch('tests.testpatch.SomeClass', spec=True)
         def test(MockSomeClass):
             self.assertEqual(SomeClass, MockSomeClass)
@@ -277,10 +276,11 @@ class PatchTest(unittest2.TestCase):
 
             self.assertRaises(AttributeError, lambda: MockSomeClass.not_wibble)
 
+        test()
 
-    def testPatchObjectWithSpecAsBoolean(self):
+
+    def test_patch_object_with_spec_as_boolean(self):
         from tests import testpatch
-        @apply
         @patch.object(testpatch, 'SomeClass', spec=True)
         def test(MockSomeClass):
             self.assertEqual(SomeClass, MockSomeClass)
@@ -289,9 +289,10 @@ class PatchTest(unittest2.TestCase):
 
             self.assertRaises(AttributeError, lambda: MockSomeClass.not_wibble)
 
+        test()
 
-    def testPatchClassActsWithSpecIsInherited(self):
-        @apply
+
+    def test_patch_class_acts_with_spec_is_inherited(self):
         @patch('tests.testpatch.SomeClass', spec=True)
         def test(MockSomeClass):
             instance = MockSomeClass()
@@ -300,8 +301,10 @@ class PatchTest(unittest2.TestCase):
 
             self.assertRaises(AttributeError, lambda: instance.not_wibble)
 
+        test()
 
-    def testPatchWithCreateMocksNonExistentAttributes(self):
+
+    def test_patch_with_create_mocks_non_existent_attributes(self):
         @patch('%s.frooble' % builtin_string, sentinel.Frooble, create=True)
         def test():
             self.assertEqual(frooble, sentinel.Frooble)
@@ -310,7 +313,7 @@ class PatchTest(unittest2.TestCase):
         self.assertRaises(NameError, lambda: frooble)
 
 
-    def testPatchObjectWithCreateMocksNonExistentAttributes(self):
+    def test_patchobject_with_create_mocks_non_existent_attributes(self):
         @patch.object(SomeClass, 'frooble', sentinel.Frooble, create=True)
         def test():
             self.assertEqual(SomeClass.frooble, sentinel.Frooble)
@@ -319,7 +322,7 @@ class PatchTest(unittest2.TestCase):
         self.assertFalse(hasattr(SomeClass, 'frooble'))
 
 
-    def testPatchWontCreateByDefault(self):
+    def test_patch_wont_create_by_default(self):
         try:
             @patch('%s.frooble' % builtin_string, sentinel.Frooble)
             def test():
@@ -334,7 +337,7 @@ class PatchTest(unittest2.TestCase):
         self.assertRaises(NameError, lambda: frooble)
 
 
-    def testPatchObjecWontCreateByDefault(self):
+    def test_patchobjec_wont_create_by_default(self):
         try:
             @patch.object(SomeClass, 'frooble', sentinel.Frooble)
             def test():
@@ -348,7 +351,7 @@ class PatchTest(unittest2.TestCase):
         self.assertFalse(hasattr(SomeClass, 'frooble'))
 
 
-    def testPathWithStaticMethods(self):
+    def test_patch_with_static_methods(self):
         class Foo(object):
             @staticmethod
             def woot():
@@ -362,7 +365,7 @@ class PatchTest(unittest2.TestCase):
         self.assertEqual(Foo.woot(), sentinel.Static)
 
 
-    def testPatchLocal(self):
+    def test_patch_local(self):
         foo = sentinel.Foo
         @patch.object(sentinel, 'Foo', 'Foo')
         def anonymous():
@@ -372,7 +375,7 @@ class PatchTest(unittest2.TestCase):
         self.assertEqual(sentinel.Foo, foo)
 
 
-    def testPatchSlots(self):
+    def test_patch_slots(self):
         class Foo(object):
             __slots__ = ('Foo',)
 
@@ -386,109 +389,129 @@ class PatchTest(unittest2.TestCase):
 
         self.assertEqual(foo.Foo, sentinel.Foo)
 
-    def testPatchObjectClassDecorator(self):
+
+    def test_patchobject_class_decorator(self):
         class Something(object):
             attribute = sentinel.Original
 
         class Foo(object):
             def test_method(other_self):
-                self.assertEqual(Something.attribute, sentinel.Patched, "unpatched")
+                self.assertEqual(Something.attribute, sentinel.Patched,
+                                 "unpatched")
             def not_test_method(other_self):
-                self.assertEqual(Something.attribute, sentinel.Original, "non-test method patched")
+                self.assertEqual(Something.attribute, sentinel.Original,
+                                 "non-test method patched")
+
         Foo = patch.object(Something, 'attribute', sentinel.Patched)(Foo)
 
         f = Foo()
         f.test_method()
         f.not_test_method()
 
-        self.assertEqual(Something.attribute, sentinel.Original, "patch not restored")
+        self.assertEqual(Something.attribute, sentinel.Original,
+                         "patch not restored")
 
 
-    def testPatchClassDecorator(self):
+    def test_patch_class_decorator(self):
         class Something(object):
             attribute = sentinel.Original
 
         class Foo(object):
             def test_method(other_self, mock_something):
-                self.assertEqual(PTModule.something, mock_something, "unpatched")
+                self.assertEqual(PTModule.something, mock_something,
+                                 "unpatched")
             def not_test_method(other_self):
-                self.assertEqual(PTModule.something, sentinel.Something, "non-test method patched")
+                self.assertEqual(PTModule.something, sentinel.Something,
+                                 "non-test method patched")
         Foo = patch('%s.something' % __name__)(Foo)
 
         f = Foo()
         f.test_method()
         f.not_test_method()
 
-        self.assertEqual(Something.attribute, sentinel.Original, "patch not restored")
-        self.assertEqual(PTModule.something, sentinel.Something, "patch not restored")
+        self.assertEqual(Something.attribute, sentinel.Original,
+                         "patch not restored")
+        self.assertEqual(PTModule.something, sentinel.Something,
+                         "patch not restored")
 
-    def testPatchObjectTwice(self):
+
+    def test_patchobject_twice(self):
         class Something(object):
             attribute = sentinel.Original
             next_attribute = sentinel.Original2
 
-        @apply
         @patch.object(Something, 'attribute', sentinel.Patched)
         @patch.object(Something, 'attribute', sentinel.Patched)
         def test():
             self.assertEqual(Something.attribute, sentinel.Patched, "unpatched")
 
-        self.assertEqual(Something.attribute, sentinel.Original, "patch not restored")
+        test()
 
-    def testPatchDict(self):
+        self.assertEqual(Something.attribute, sentinel.Original,
+                         "patch not restored")
+
+
+    def test_patch_dict(self):
         foo = {'initial': object(), 'other': 'something'}
         original = foo.copy()
 
-        @apply
         @patch.dict(foo)
         def test():
             foo['a'] = 3
             del foo['initial']
             foo['other'] = 'something else'
 
+        test()
+
         self.assertEqual(foo, original)
 
-        @apply
         @patch.dict(foo, {'a': 'b'})
         def test():
             self.assertEqual(len(foo), 3)
             self.assertEqual(foo['a'], 'b')
 
+        test()
+
         self.assertEqual(foo, original)
 
-        @apply
         @patch.dict(foo, [('a', 'b')])
         def test():
             self.assertEqual(len(foo), 3)
             self.assertEqual(foo['a'], 'b')
 
+        test()
+
         self.assertEqual(foo, original)
 
-    def testPatchDictWithContainerObject(self):
+
+    def test_patch_dict_with_container_object(self):
         foo = Container()
         foo['initial'] = object()
         foo['other'] =  'something'
 
         original = foo.values.copy()
 
-        @apply
         @patch.dict(foo)
         def test():
             foo['a'] = 3
             del foo['initial']
             foo['other'] = 'something else'
 
+        test()
+
         self.assertEqual(foo.values, original)
 
-        @apply
         @patch.dict(foo, {'a': 'b'})
         def test():
             self.assertEqual(len(foo.values), 3)
             self.assertEqual(foo['a'], 'b')
 
+        test()
+
         self.assertEqual(foo.values, original)
 
-    def testPatchDictWithClear(self):
+
+    def test_patch_dict_with_clear(self):
         foo = {'initial': object(), 'other': 'something'}
         original = foo.copy()
 
