@@ -275,30 +275,17 @@ class SpecSignatureTest(unittest2.TestCase):
         A.B = A
         mock = _spec_signature(A)
 
-        self.assertIs(mock, mock.B)
-        self.assertIs(mock.a, mock.B.a)
+        mock()
+        self.assertFalse(mock.B.called)
 
-        # XXXX note that the mock names (and therefore entries in method_calls)
-        #      will be incorrect for cached entries
         mock.a()
         mock.B.a()
-        self.assertEqual(mock.method_calls, [call.a(), call.a()])
+        self.assertEqual(mock.method_calls, [call.a(), call.B.a()])
 
-        # builtin types should not be cached
         self.assertIs(A.foo, A.bar)
         self.assertIsNot(mock.foo, mock.bar)
         mock.foo.lower()
-        self.assertRaises(AssertionError, mock.bar.assert_called_with)
-
-        # create a function with the same id and test that it is treated
-        # differently rather than the mock reused
-        A.b = A.__dict__['a']
-        mock = _spec_signature(A)
-        self.assertIsNot(mock.a, mock.b)
-
-        mock.b()
-        mock.b.assert_called_with()
-        self.assertRaises(AssertionError, mock.a.assert_called_with)
+        self.assertRaises(AssertionError, mock.bar.lower.assert_called_with)
 
 
     def test_spec_inheritance_for_classes(self):
@@ -320,9 +307,6 @@ class SpecSignatureTest(unittest2.TestCase):
             this_mock.a.assert_called_with()
             self.assertRaises(TypeError, this_mock.a, 'foo')
             self.assertRaises(AttributeError, getattr, this_mock, 'b')
-
-        self.assertIs(class_mock.Bar, class_mock().Bar)
-        self.assertIsNot(class_mock.a, class_mock().a)
 
         instance_mock = _spec_signature(Foo(), inherit=True)
         instance_mock.a()
@@ -396,5 +380,5 @@ class SpecSignatureTest(unittest2.TestCase):
         # top level classes that we can't know if they may be used as
         # instances.
 
-        # for classes
+        # these could be done as a side_effect on the mock
         pass
