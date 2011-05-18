@@ -37,6 +37,23 @@ something  = sentinel.Something
 something_else  = sentinel.SomethingElse
 
 
+class Foo(object):
+    def __init__(self, a):
+        pass
+    def f(self, a):
+        pass
+    def g(self):
+        pass
+    foo = 'bar'
+
+    class Bar(object):
+        def a(self):
+            pass
+
+
+def function(a, b=Foo):
+    pass
+
 
 class Container(object):
     def __init__(self):
@@ -339,11 +356,11 @@ class PatchTest(unittest2.TestCase):
         self.assertRaises(NameError, lambda: frooble)
 
 
-    def test_patchobjec_wont_create_by_default(self):
+    def test_patchobject_wont_create_by_default(self):
         try:
             @patch.object(SomeClass, 'frooble', sentinel.Frooble)
             def test():
-                self.assertEqual(SomeClass.frooble, sentinel.Frooble)
+                self.fail('Patching non existent attributes should fail')
 
             test()
         except AttributeError:
@@ -788,6 +805,109 @@ class PatchTest(unittest2.TestCase):
             self.assertEqual(thing.foo, 'foo')
             self.assertNotIn('foo', proxy.__dict__)
 
+
+    def test_autospec(self):
+
+        class Boo(object):
+            def __init__(self, a):
+                pass
+            def f(self, a):
+                pass
+            def g(self):
+                pass
+            foo = 'bar'
+
+            class Bar(object):
+                def a(self):
+                    pass
+
+        def _test(mock):
+            mock(1)
+            mock.assert_called_with(1)
+            self.assertRaises(TypeError, mock)
+
+        def _test2(mock):
+            mock.f(1)
+            mock.f.assert_called_with(1)
+            self.assertRaises(TypeError, mock.f)
+
+            mock.g()
+            mock.g.assert_called_with()
+            self.assertRaises(TypeError, mock.g, 1)
+
+            self.assertRaises(AttributeError, getattr, mock, 'h')
+
+            mock.foo.lower()
+            mock.foo.lower.assert_called_with()
+            self.assertRaises(AttributeError, getattr, mock.foo, 'bar')
+
+            mock.Bar()
+            mock.Bar.assert_called_with()
+
+            mock.Bar.a()
+            mock.Bar.a.assert_called_with()
+            self.assertRaises(TypeError, mock.Bar.a, 1)
+
+            mock.Bar().a()
+            mock.Bar().a.assert_called_with()
+            self.assertRaises(TypeError, mock.Bar().a, 1)
+
+            self.assertRaises(AttributeError, getattr, mock.Bar, 'b')
+            self.assertRaises(AttributeError, getattr, mock.Bar(), 'b')
+
+
+        @patch('%s.Foo' % __name__, autospec=True)
+        def test(mock):
+            _test(mock)
+            _test2(mock)
+            _test2(mock(1))
+            self.assertIs(mock, Foo)
+            return mock
+
+        mock = test()
+        self.assertIsNot(Foo, mock)
+
+        # test patching a second time works
+        test()
+
+        module = sys.modules[__name__]
+
+        @patch.object(module, 'Foo', autospec=True)
+        def test(mock):
+            _test(mock)
+            _test2(mock)
+            _test2(mock(1))
+            self.assertIs(mock, Foo)
+            return mock
+
+        mock = test()
+        self.assertIsNot(Foo, mock)
+
+        # test patching a second time works
+        test()
+
+
+    def test_autospec_function(self):
+        @patch('%s.function' % __name__, autospec=True)
+        def test(mock):
+            function(1)
+            function.assert_called_with(1, Foo)
+            function(2, 3)
+            function.assert_called_with(2, 3)
+
+            self.assertRaises(TypeError, function)
+            self.assertRaises(AttributeError, getattr, function, 'foo')
+
+        test()
+
+
+    def test_autospec_other(self):
+        # autospec and new is an error
+        # autospec has inherit set to true
+        # autospec uses the __name__ if available
+        # instances (return values) of mocked classes should use __call__
+        # (or not be callable)
+        pass
 
 
 if __name__ == '__main__':
