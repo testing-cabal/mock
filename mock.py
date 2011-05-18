@@ -307,10 +307,12 @@ class Mock(object):
 
     def __init__(self, spec=None, side_effect=None, return_value=DEFAULT,
                     wraps=None, name=None, spec_set=None, parent=None,
-                    _old_name=None):
+                    _old_name=None, _spec_state=None):
         self._mock_parent = parent
         self._mock_name = name
         self._mock_old_name = _old_name
+
+        self._spec_state = _spec_state
 
         _spec_class = None
         if spec_set is not None:
@@ -435,17 +437,24 @@ class Mock(object):
         elif _is_magic(name):
             raise AttributeError(name)
 
-        if name not in self._mock_children:
+        result = self._mock_children.get(name)
+        if result is None:
             wraps = None
             if self._mock_wraps is not None:
                 # XXXX should we get the attribute without triggering code
                 # execution?
                 wraps = getattr(self._mock_wraps, name)
-            self._mock_children[name] = self._get_child_mock(parent=self,
-                                                              name=name,
-                                                              wraps=wraps)
+            result = self._get_child_mock(parent=self, name=name, wraps=wraps)
+            self._mock_children[name]  = result
 
-        return self._mock_children[name]
+        elif isinstance(result, _SpecState):
+            result = _spec_signature(
+                result.spec, result.spec_set, result.inherit,
+                result.parent, result.name, result.instance
+            )
+            self._mock_children[name]  = result
+
+        return result
 
 
     def __repr__(self):
@@ -1098,7 +1107,7 @@ call = _Call()
 
 
 def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
-                    _name=None, _ids=None, _instance=False):
+                    _name=None, _instance=False):
     if spec is None:
         # can't use None as it is the default value for the Mock spec argument
         spec = NoneType
@@ -1107,9 +1116,6 @@ def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
         # can't pass a list instance to the mock constructor as it will be
         # interpreted as a list of strings
         spec = list
-
-    if _ids is None:
-        _ids = {}
 
     is_type = False
     _type = _get_class(spec)
@@ -1121,26 +1127,18 @@ def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
     if spec_set:
         kwargs = {'spec_set': spec}
 
-    if id(spec) in _ids and not _instance:
-        mock = _ids[id(spec)][0]
-        return mock
-
     mock = MagicMock(parent=_parent, name=_name, **kwargs)
     if isinstance(spec, FunctionTypes):
         # should only happen at the top level because we don't
         # recurse for functions
         mock = mocksignature(spec, mock)
 
-    if id(spec) not in _ids and _type not in builtin_types:
-        # we keep the spec object around too, to avoid the problem
-        # of ids being reused producing incorrect results
-        _ids[id(spec)] = (mock, spec)
 
     if _parent is not None:
         _parent._mock_children[_name] = mock
 
     if is_type and inherit and not _instance:
-        mock.return_value = _spec_signature(spec, spec_set, inherit, _ids=_ids,
+        mock.return_value = _spec_signature(spec, spec_set, inherit,
                                             _instance=True)
 
     for entry in dir(spec):
@@ -1160,16 +1158,8 @@ def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
             kwargs = {'spec_set': original}
 
         if not isinstance(original, FunctionTypes):
-            if type(spec) in (int, float, bool):
-                # non-recursive for integers and floats.
-                # (we only need to include bool here because of a bug in
-                #  pypy 1.5.1 which is fixed in trunk.)
-                # Instead we could check for attributes that have the same
-                # type as the parent - this might solve the general problem.
-                new = MagicMock(parent=mock, name=entry, **kwargs)
-            else:
-                new = _spec_signature(original, spec_set, inherit,
-                                      mock, entry, _ids)
+            new = _SpecState(original, spec_set, inherit, mock, entry,
+                               _instance)
             mock._mock_children[entry] = new
         else:
             parent = mock
@@ -1197,7 +1187,7 @@ def _must_skip(spec, entry, skipfirst):
             return False
         # can't use type because of old style classes
         spec = spec.__class__
-    if not hasattr(spec, 'mro'):
+    if not hasattr(spec, '__mro__'):
         # old style class: can't have descriptors anyway
         return skipfirst
 
@@ -1219,6 +1209,21 @@ def _get_class(obj):
     except AttributeError:
         # in Python 2, _sre.SRE_Pattern objects have no __class__
         return type(obj)
+
+
+class _SpecState(object):
+
+    def __init__(self, spec, spec_set=False, inherit=False, parent=None,
+                 name=None, ids=None, instance=False):
+        self.spec = spec
+        self.ids = ids
+        self.spec_set = spec_set
+        self.inherit = inherit
+        self.parent = parent
+        self.instance = instance
+        self.name = name
+
+
 
 FunctionTypes = (
     # python function
