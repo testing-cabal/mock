@@ -901,6 +901,11 @@ class PatchTest(unittest2.TestCase):
         test()
 
 
+    def test_autospec_with_new(self):
+        patcher = patch('%s.function' % __name__, new=3, autospec=True)
+        self.assertRaises(TypeError, patcher.start)
+
+
     def test_autospec_other(self):
         # autospec and new is an error
         # autospec has inherit set to true
