@@ -335,6 +335,7 @@ class SpecSignatureTest(unittest2.TestCase):
         _spec_signature(str)
         _spec_signature({})
         _spec_signature(dict)
+        _spec_signature([])
         _spec_signature(list)
         _spec_signature(set())
         _spec_signature(set)
@@ -370,18 +371,29 @@ class SpecSignatureTest(unittest2.TestCase):
         self.assertRaises(AttributeError, getattr, mock, 'foo')
 
 
-    def test_spec_inheritance_callables(self):
-        # with spec inheritance we could mock classes __init__ and callable
-        # object signatures with mocksignature.
-        # how does mocksignature on a class with no __init__ method work?
-        # (i.e. will inherit object.__init__ that takes no args but implemented
-        #  in C.)
+    def test_signature_class(self):
+        class Foo(object):
+            def __init__(self, a, b=3):
+                pass
 
-        # could we mock callable object signatures anyway - without requiring
-        # inheritance?
-        # for classes that are attributes we could inherit - it is only for
-        # top level classes that we can't know if they may be used as
-        # instances.
+        mock = _spec_signature(Foo)
 
-        # these could be done as a side_effect on the mock
+        self.assertRaises(TypeError, mock)
+        mock(1)
+        mock.assert_called_once_with(1, 3)
+
+        mock(4, 5)
+        mock.assert_called_with(4, 5)
+
+
+    def test_signature_old_style_class(self):
+        pass
+
+    def test_class_with_no_init(self):
+        pass
+
+    def test_old_style_class_with_no_init(self):
+        pass
+
+    def test_signature_callable(self):
         pass
