@@ -1140,9 +1140,7 @@ def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
         # interpreted as a list of strings
         spec = list
 
-    is_type = False
-    if isinstance(spec, ClassTypes):
-        is_type = True
+    is_type = isinstance(spec, ClassTypes)
 
     kwargs = {'spec': spec}
     if spec_set:
@@ -1154,11 +1152,11 @@ def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
         # recurse for functions
         mock = mocksignature(spec, mock)
 
-
     if _parent is not None:
         _parent._mock_children[_name] = mock
 
     if is_type and inherit and not _instance:
+        # XXXX could give a name to the return_value mock?
         mock.return_value = _spec_signature(spec, spec_set, inherit,
                                             _instance=True)
 
