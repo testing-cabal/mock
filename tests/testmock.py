@@ -538,6 +538,18 @@ class MockTest(unittest2.TestCase):
         self.assertRaises(AttributeError, test)
 
 
+    def test_setting_call(self):
+        mock = Mock()
+        def __call__(self, a):
+            return self._mock_call(a)
+
+        type(mock).__call__ = __call__
+        mock('one')
+        mock.assert_called_with('one')
+
+        self.assertRaises(TypeError, mock, 'one', 'two')
+
+
     def DONTtest_mock_calls(self):
         mock = MagicMock()
 
