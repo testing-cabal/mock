@@ -905,9 +905,12 @@ class PatchTest(unittest2.TestCase):
         patcher = patch('%s.function' % __name__, new=3, autospec=True)
         self.assertRaises(TypeError, patcher.start)
 
+        module = sys.modules[__name__]
+        patcher = patch.object(module, 'function', new=3, autospec=True)
+        self.assertRaises(TypeError, patcher.start)
+
 
     def test_autospec_other(self):
-        # autospec and new is an error
         # autospec has inherit set to true
         # autospec uses the __name__ if available
         # instances (return values) of mocked classes should use __call__
