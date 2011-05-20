@@ -55,7 +55,8 @@ CHANGELOG
 * Protocol methods on `MagicMock` are magic mocks, and are created lazily on
   first lookup. This means the result of calling a protocol method is a
   MagicMock instead of a Mock as it was previously
-* Added Mock API to functions created by `mocksignature`
+* Added the Mock API (`assert_called_with` etc) to functions created by
+  `mocksignature`
 * Private attributes `_name`, `_methods`, '_children', `_wraps` and `_parent`
   (etc) renamed to reduce likelihood of clash with user attributes.
 * Implemented auto-speccing (recursive, lazy speccing of mocks with mocked
@@ -79,6 +80,7 @@ CHANGELOG
 
 * Added the `create_autospec` function for manually creating 'auto-specced'
   mocks.
+
 
 2011/XX/XX Version 0.7.2
 ------------------------
