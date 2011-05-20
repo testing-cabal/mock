@@ -116,6 +116,7 @@ def _getsignature(func, skipfirst):
 def _getsignature2(func, skipfirst):
     if inspect is None:
         raise ImportError('inspect module not available')
+
     if isinstance(func, ClassTypes):
         try:
             func = func.__init__
@@ -135,6 +136,7 @@ def _getsignature2(func, skipfirst):
     if getattr(func, self, None) is not None:
         regargs = regargs[1:]
     if skipfirst:
+        # this condition and the above one are never both True - why?
         regargs = regargs[1:]
 
     signature = inspect.formatargspec(regargs, varargs, varkwargs, defaults,
@@ -157,7 +159,6 @@ def _check_signature(func, mock, skipfirst):
     type(mock)._mock_check_sig = checksig
 
 
-
 def _copy_func_details(func, funcopy):
     funcopy.__name__ = func.__name__
     funcopy.__doc__ = func.__doc__
@@ -177,8 +178,20 @@ def _callable(obj):
         return True
     return False
 
+try:
+    _isidentifier = str.isidentifier
+except AttributeError:
+    import keyword
+    import re
+    def _isidentifier(string):
+        if string in keyword.kwlist:
+            return False
+        return re.match(r'^[a-z_][a-z0-9_]*$', string, re.I)
 
 def _set_signature(mock, original, skipfirst):
+    # creates a function with signature (*args, **kwargs) that delegates to a
+    # mock. It still does signature checking by calling a lambda with the same
+    # signature as the original. This is effectively mocksignature2.
     if not _callable(original):
         return
 
@@ -195,9 +208,16 @@ def _set_signature(mock, original, skipfirst):
     checksig = eval(src, context)
     _copy_func_details(func, checksig)
 
-    def funcopy(*args, **kwargs):
-        checksig(*args, **kwargs)
-        return mock(*args, **kwargs)
+    name = original.__name__
+    import keyword
+    if not _isidentifier(name):
+        name = funcopy
+    context = {'checksig': checksig, 'mock': mock}
+    src = """def %s(*args, **kwargs):
+    checksig(*args, **kwargs)
+    return mock(*args, **kwargs)""" % name
+    exec (src, context)
+    funcopy = context[name]
     _setup_func(funcopy, mock)
     return funcopy
 
