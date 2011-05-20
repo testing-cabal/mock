@@ -51,21 +51,30 @@ CHANGELOG
 * Removal of deprecated `patch_object`
 * Addition of `call` helper object
 * Protocol methods on `MagicMock` are magic mocks, and are created lazily on
-  first lookup.
+  first lookup. This means the result of calling a protocol method is a
+  MagicMock instead of a Mock as it was previously
 * Added Mock API to functions created by `mocksignature`
 * Private attributes `_name`, `_methods`, '_children', `_wraps` and `_parent`
   (etc) renamed to reduce likelihood of clash with user attributes.
 * Implemented auto-speccing (recursive, lazy speccing of mocks with patch
-  with mocksignature for functions/methods). Limitations:
+  with mocksignature for functions/methods).
+
+  Limitations:
 
   - Doesn't mock magic methods or attributes
   - Doesn't mock function / method attributes
   - Uses object traversal on the objects being mocked to determine types - so
     will trigger properties etc
+  - The return value of mocked classes (the 'instance') has the same call
+    signature as the class __init__ (as they share the same spec)
+
+  You create auto-specced mocks by passing `autospec=True` to `patch`.
 
   Note that the `autospec` option to `patch` obsoletes the `mocksignature`
   option.
 
+* Added the `create_autospec` function for manually creating 'auto-specced'
+  mocks.
 
 2011/XX/XX Version 0.7.2
 ------------------------
