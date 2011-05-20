@@ -823,7 +823,7 @@ class _patch(object):
                 spec = original
                 if isinstance(spec, ClassTypes):
                     inherit = True
-            new = Mock(spec=spec, spec_set=spec_set)
+            new = MagicMock(spec=spec, spec_set=spec_set)
             if inherit:
                 new.return_value = Mock(spec=spec, spec_set=spec_set)
         elif autospec:
