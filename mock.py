@@ -69,6 +69,18 @@ except NameError:
     # Python 3
     long = int
 
+try:
+    _isidentifier = str.isidentifier
+except AttributeError:
+    # Python 2.X
+    import keyword
+    import re
+    def _isidentifier(string):
+        if string in keyword.kwlist:
+            return False
+        return re.match(r'^[a-z_][a-z0-9_]*$', string, re.I)
+
+
 inPy3k = sys.version_info[0] == 3
 
 self = 'im_self'
@@ -178,15 +190,6 @@ def _callable(obj):
         return True
     return False
 
-try:
-    _isidentifier = str.isidentifier
-except AttributeError:
-    import keyword
-    import re
-    def _isidentifier(string):
-        if string in keyword.kwlist:
-            return False
-        return re.match(r'^[a-z_][a-z0-9_]*$', string, re.I)
 
 def _set_signature(mock, original, skipfirst):
     # creates a function with signature (*args, **kwargs) that delegates to a
