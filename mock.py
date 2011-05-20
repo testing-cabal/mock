@@ -75,10 +75,11 @@ except AttributeError:
     # Python 2.X
     import keyword
     import re
+    regex = re.compile(r'^[a-z_][a-z0-9_]*$', re.I)
     def _isidentifier(string):
         if string in keyword.kwlist:
             return False
-        return re.match(r'^[a-z_][a-z0-9_]*$', string, re.I)
+        return regex.match(string)
 
 
 inPy3k = sys.version_info[0] == 3
