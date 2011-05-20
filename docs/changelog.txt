@@ -47,6 +47,8 @@ CHANGELOG
 2011/XX/XX Version 0.8.0 alpha 1
 --------------------------------
 
+* `patch` and `patch.object` now create a `MagicMock` instead of a `Mock` by
+  default
 * Added `ANY` for ignoring arguments in `assert_called_with` calls
 * Removal of deprecated `patch_object`
 * Addition of `call` helper object
