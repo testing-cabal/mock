@@ -22,6 +22,7 @@ __all__ = (
     'DEFAULT',
     'ANY',
     'call',
+    'create_autospec',
 )
 
 __version__ = '0.8.0alpha1'
@@ -81,29 +82,18 @@ if inPy3k:
 # the decorator module: http://pypi.python.org/pypi/decorator/
 # by Michele Simionato
 
-def _getsignature(func, skipfirst, ignore_error=False):
+def _getsignature(func, skipfirst):
     if inspect is None:
         raise ImportError('inspect module not available')
 
     if inspect.isclass(func):
-        try:
-            func = func.__init__
-        except AttributeError:
-            if ignore_error:
-                # old style class without an __init__ method
-                return
-            raise
+        func = func.__init__
         # will have a self arg
         skipfirst = True
     elif not (inspect.ismethod(func) or inspect.isfunction(func)):
         func = func.__call__
 
-    try:
-        regargs, varargs, varkwargs, defaults = inspect.getargspec(func)
-    except TypeError:
-        if ignore_error:
-            return
-        raise
+    regargs, varargs, varkwargs, defaults = inspect.getargspec(func)
 
     # instance methods need to lose the self argument
     if getattr(func, self, None) is not None:
@@ -123,6 +113,51 @@ def _getsignature(func, skipfirst, ignore_error=False):
     return signature[1:-1], func
 
 
+def _getsignature2(func, skipfirst):
+    if inspect is None:
+        raise ImportError('inspect module not available')
+    if isinstance(func, ClassTypes):
+        try:
+            func = func.__init__
+        except AttributeError:
+            return
+        skipfirst = True
+    elif not isinstance(func, FunctionTypes):
+        func = func.__call__
+
+    try:
+        regargs, varargs, varkwargs, defaults = inspect.getargspec(func)
+    except TypeError:
+        # C function / method, possibly inherited object().__init__
+        return
+
+    # instance methods and classmethods need to lose the self argument
+    if getattr(func, self, None) is not None:
+        regargs = regargs[1:]
+    if skipfirst:
+        regargs = regargs[1:]
+
+    signature = inspect.formatargspec(regargs, varargs, varkwargs, defaults,
+                                      formatvalue=lambda value: "")
+    return signature[1:-1], func
+
+
+def _check_signature(func, mock, skipfirst):
+    if not _callable(func):
+        return
+
+    result = _getsignature2(func, skipfirst)
+    if result is None:
+        return
+    signature, func = result
+
+    src = "lambda self, %s: None" % signature
+    checksig = eval(src, {})
+    _copy_func_details(func, checksig)
+    type(mock)._mock_check_sig = checksig
+
+
+
 def _copy_func_details(func, funcopy):
     funcopy.__name__ = func.__name__
     funcopy.__doc__ = func.__doc__
@@ -133,6 +168,38 @@ def _copy_func_details(func, funcopy):
     else:
         funcopy.__defaults__ = func.__defaults__
         funcopy.__kwdefaults__ = func.__kwdefaults__
+
+
+def _callable(obj):
+    if isinstance(obj, ClassTypes):
+        return True
+    if getattr(obj, '__call__', None) is not None:
+        return True
+    return False
+
+
+def _set_signature(mock, original, skipfirst):
+    if not _callable(original):
+        return
+
+    skipfirst = isinstance(original, ClassTypes)
+    result = _getsignature2(original, skipfirst)
+    if result is None:
+        # was a C function (e.g. object().__init__ ) that can't be mocked
+        return
+
+    signature, func = result
+
+    src = "lambda %s: None" % signature
+    context = {'_mock_': mock}
+    checksig = eval(src, context)
+    _copy_func_details(func, checksig)
+
+    def funcopy(*args, **kwargs):
+        checksig(*args, **kwargs)
+        return mock(*args, **kwargs)
+    _setup_func(funcopy, mock)
+    return funcopy
 
 
 def mocksignature(func, mock=None, skipfirst=False):
@@ -407,8 +474,12 @@ class Mock(object):
                             __return_value_doc)
 
 
-    def __call__(self, *args, **kwargs):
+    def _mock_check_sig(self, *args, **kwargs):
         # stub method that can be replaced with one with a specific signature
+        pass
+
+    def __call__(self, *args, **kwargs):
+        self._mock_check_sig(*args, **kwargs)
         return self._mock_call(*args, **kwargs)
 
     def _mock_call(self, *args, **kwargs):
@@ -464,7 +535,7 @@ class Mock(object):
             self._mock_children[name]  = result
 
         elif isinstance(result, _SpecState):
-            result = _spec_signature(
+            result = create_autospec(
                 result.spec, result.spec_set, result.inherit,
                 result.parent, result.name, result.instance
             )
@@ -743,7 +814,7 @@ class _patch(object):
                 )
             spec_set = bool(spec_set)
             kwargs = {'_name': getattr(original, '__name__', None)}
-            new = _spec_signature(original, spec_set, inherit=True, **kwargs)
+            new = create_autospec(original, spec_set, inherit=True, **kwargs)
 
         new_attr = new
         if self.mocksignature:
@@ -1145,8 +1216,9 @@ call = _Call()
 
 
 
-def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
+def create_autospec(spec, spec_set=False, inherit=False, _parent=None,
                     _name=None, _instance=False):
+    """XXXX needs docstring!"""
     if spec is None:
         # can't use None as it is the default value for the Mock spec argument
         spec = NoneType
@@ -1166,16 +1238,16 @@ def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
     if isinstance(spec, FunctionTypes):
         # should only happen at the top level because we don't
         # recurse for functions
-        mock = mocksignature(spec, mock)
+        mock = _set_signature(mock, spec, False)
     else:
-        _set_signature(mock, spec, is_type)
+        _check_signature(spec, mock, is_type)
 
     if _parent is not None:
         _parent._mock_children[_name] = mock
 
     if is_type and inherit and not _instance:
         # XXXX could give a name to the return_value mock?
-        mock.return_value = _spec_signature(spec, spec_set, inherit,
+        mock.return_value = create_autospec(spec, spec_set, inherit,
                                             _instance=True)
 
     for entry in dir(spec):
@@ -1209,7 +1281,7 @@ def _spec_signature(spec, spec_set=False, inherit=False, _parent=None,
             new = MagicMock(parent=parent, name=entry, **kwargs)
             mock._mock_children[entry] = new
             skipfirst = _must_skip(spec, entry, is_type)
-            new = mocksignature(original, new, skipfirst=skipfirst)
+            _check_signature(original, new, skipfirst=skipfirst)
 
         # so functions created with mocksignature become instance methods,
         # *plus* their underlying mock exists in _mock_children of the parent
@@ -1265,39 +1337,9 @@ class _SpecState(object):
         self.name = name
 
 
-
-def _callable(obj):
-    if isinstance(obj, ClassTypes):
-        return True
-    if getattr(obj, '__call__', None) is not None:
-        return True
-    return False
-
-
-def _set_signature(mock, original, skipfirst):
-    if not _callable(original):
-        return
-
-    skipfirst = isinstance(original, ClassTypes)
-    result = _getsignature(original, skipfirst, ignore_error=True)
-    if result is None:
-        # was a C function (e.g. object().__init__ ) that can't be mocked
-        return
-
-    signature, func = result
-    src = ("def __call__(self, %s):\n    return self._mock_call(%s)" %
-           (signature, signature))
-    context = {}
-    exec (src, context)
-
-    __call__ = context['__call__']
-    _copy_func_details(func, __call__)
-    type(mock).__call__ = __call__
-
-
 FunctionTypes = (
     # python function
-    type(_spec_signature),
+    type(create_autospec),
     # instance method
     type(ANY.__eq__),
     # unbound method
