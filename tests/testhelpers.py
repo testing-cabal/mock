@@ -4,7 +4,7 @@
 
 from tests.support import unittest2, inPy3k
 
-from mock import MagicMock, Mock, ANY, call, _spec_signature
+from mock import MagicMock, Mock, ANY, call, create_autospec
 
 
 class SomeClass(object):
@@ -85,7 +85,7 @@ class SpecSignatureTest(unittest2.TestCase):
         self.assertRaises(TypeError, mock.two, 1)
 
         mock.three()
-        mock.three.assert_called_with(None)
+        mock.three.assert_called_with()
         self.assertRaises(AssertionError,
                           mock.three.assert_called_with, 3)
         self.assertRaises(TypeError, mock.three, 3, 2)
@@ -94,12 +94,12 @@ class SpecSignatureTest(unittest2.TestCase):
         mock.three.assert_called_with(1)
 
         mock.three(a=1)
-        mock.three.assert_called_with(1)
+        mock.three.assert_called_with(a=1)
 
 
     def test_basic(self):
         for spec in (SomeClass, SomeClass()):
-            mock = _spec_signature(spec)
+            mock = create_autospec(spec)
             self._check_someclass_mock(mock)
 
 
@@ -109,7 +109,7 @@ class SpecSignatureTest(unittest2.TestCase):
             pass
         obj.f = f
 
-        mock = _spec_signature(obj)
+        mock = create_autospec(obj)
         mock.f('bing')
         mock.f.assert_called_with('bing')
 
@@ -117,7 +117,7 @@ class SpecSignatureTest(unittest2.TestCase):
     def test_spec_as_list(self):
         # because spec as a list of strings in the mock constructor means
         # something very different we treat a list instance as the type.
-        mock = _spec_signature([])
+        mock = create_autospec([])
         mock.append('foo')
         mock.append.assert_called_with('foo')
 
@@ -126,7 +126,7 @@ class SpecSignatureTest(unittest2.TestCase):
         class Foo(object):
             foo = []
 
-        mock = _spec_signature(Foo)
+        mock = create_autospec(Foo)
         mock.foo.append(3)
         mock.foo.append.assert_called_with(3)
         self.assertRaises(AttributeError, getattr, mock.foo, 'foo')
@@ -136,7 +136,7 @@ class SpecSignatureTest(unittest2.TestCase):
         class Sub(SomeClass):
             attr = SomeClass()
 
-        sub_mock = _spec_signature(Sub)
+        sub_mock = create_autospec(Sub)
 
         for mock in (sub_mock, sub_mock.attr):
             self._check_someclass_mock(mock)
@@ -152,7 +152,7 @@ class SpecSignatureTest(unittest2.TestCase):
             sorted = sorted
             attr = {}
 
-        mock = _spec_signature(BuiltinSubclass)
+        mock = create_autospec(BuiltinSubclass)
         mock.append(3)
         mock.append.assert_called_with(3)
         self.assertRaises(AttributeError, getattr, mock.append, 'foo')
@@ -175,7 +175,7 @@ class SpecSignatureTest(unittest2.TestCase):
         class Sub(SomeClass):
             attr = SomeClass()
 
-        mock = _spec_signature(Sub)
+        mock = create_autospec(Sub)
         mock.one(1, 2)
         mock.two()
         mock.three(3)
@@ -197,7 +197,7 @@ class SpecSignatureTest(unittest2.TestCase):
         class BuiltinSubclass(list):
             attr = {}
 
-        mock = _spec_signature(BuiltinSubclass)
+        mock = create_autospec(BuiltinSubclass)
         self.assertEqual(list(mock), [])
         self.assertRaises(TypeError, int, mock)
         self.assertRaises(TypeError, int, mock.attr)
@@ -212,7 +212,7 @@ class SpecSignatureTest(unittest2.TestCase):
             attr = SomeClass()
 
         for spec in (Sub, Sub()):
-            mock = _spec_signature(spec, spec_set=True)
+            mock = create_autospec(spec, spec_set=True)
             self._check_someclass_mock(mock)
 
             self.assertRaises(AttributeError, setattr, mock, 'foo', 'bar')
@@ -235,7 +235,7 @@ class SpecSignatureTest(unittest2.TestCase):
             pass
 
         for spec in (Foo, Foo(), Bar, Bar(), Baz, Baz()):
-            mock = _spec_signature(spec)
+            mock = create_autospec(spec)
             mock.f(1, 2)
             mock.f.assert_called_once_with(1, 2)
 
@@ -253,7 +253,7 @@ class SpecSignatureTest(unittest2.TestCase):
             g = Foo()
 
         for spec in (Foo, Foo(), Bar, Bar()):
-            mock = _spec_signature(spec)
+            mock = create_autospec(spec)
             mock.f(1, 2)
             mock.f.assert_called_once_with(1, 2)
 
@@ -273,7 +273,7 @@ class SpecSignatureTest(unittest2.TestCase):
             bar = foo
 
         A.B = A
-        mock = _spec_signature(A)
+        mock = create_autospec(A)
 
         mock()
         self.assertFalse(mock.B.called)
@@ -296,7 +296,7 @@ class SpecSignatureTest(unittest2.TestCase):
                 def f(self):
                     pass
 
-        class_mock = _spec_signature(Foo, inherit=True)
+        class_mock = create_autospec(Foo, inherit=True)
 
         self.assertIsNot(class_mock, class_mock())
 
@@ -306,7 +306,7 @@ class SpecSignatureTest(unittest2.TestCase):
             self.assertRaises(TypeError, this_mock.a, 'foo')
             self.assertRaises(AttributeError, getattr, this_mock, 'b')
 
-        instance_mock = _spec_signature(Foo(), inherit=True)
+        instance_mock = create_autospec(Foo(), inherit=True)
         instance_mock.a()
         instance_mock.a.assert_called_with()
         self.assertRaises(TypeError, instance_mock.a, 'foo')
@@ -328,36 +328,36 @@ class SpecSignatureTest(unittest2.TestCase):
 
     def test_builtins(self):
         # used to fail with infinite recursion
-        _spec_signature(1)
+        create_autospec(1)
 
-        _spec_signature(int)
-        _spec_signature('foo')
-        _spec_signature(str)
-        _spec_signature({})
-        _spec_signature(dict)
-        _spec_signature([])
-        _spec_signature(list)
-        _spec_signature(set())
-        _spec_signature(set)
-        _spec_signature(1.0)
-        _spec_signature(float)
-        _spec_signature(1j)
-        _spec_signature(complex)
-        _spec_signature(False)
-        _spec_signature(True)
+        create_autospec(int)
+        create_autospec('foo')
+        create_autospec(str)
+        create_autospec({})
+        create_autospec(dict)
+        create_autospec([])
+        create_autospec(list)
+        create_autospec(set())
+        create_autospec(set)
+        create_autospec(1.0)
+        create_autospec(float)
+        create_autospec(1j)
+        create_autospec(complex)
+        create_autospec(False)
+        create_autospec(True)
 
 
     def test_function(self):
         def f(a, b):
             pass
 
-        mock = _spec_signature(f)
+        mock = create_autospec(f)
         self.assertRaises(TypeError, mock)
         mock(1, 2)
         mock.assert_called_with(1, 2)
 
         f.f = f
-        mock = _spec_signature(f)
+        mock = create_autospec(f)
         self.assertRaises(TypeError, mock.f)
         mock.f(1, 2)
         mock.f.assert_called_with(1, 2)
@@ -367,7 +367,7 @@ class SpecSignatureTest(unittest2.TestCase):
 
     def test_none(self):
         # used to fail because it's the default value of Mock spec arg
-        mock = _spec_signature(None)
+        mock = create_autospec(None)
         self.assertRaises(AttributeError, getattr, mock, 'foo')
 
 
@@ -376,11 +376,11 @@ class SpecSignatureTest(unittest2.TestCase):
             def __init__(self, a, b=3):
                 pass
 
-        mock = _spec_signature(Foo)
+        mock = create_autospec(Foo)
 
         self.assertRaises(TypeError, mock)
         mock(1)
-        mock.assert_called_once_with(1, 3)
+        mock.assert_called_once_with(1)
 
         mock(4, 5)
         mock.assert_called_with(4, 5)
@@ -392,11 +392,11 @@ class SpecSignatureTest(unittest2.TestCase):
             def __init__(self, a, b=3):
                 pass
 
-        mock = _spec_signature(Foo)
+        mock = create_autospec(Foo)
 
         self.assertRaises(TypeError, mock)
         mock(1)
-        mock.assert_called_once_with(1, 3)
+        mock.assert_called_once_with(1)
 
         mock(4, 5)
         mock.assert_called_with(4, 5)
@@ -407,7 +407,7 @@ class SpecSignatureTest(unittest2.TestCase):
         # due to trying to get a signature from object.__init__
         class Foo(object):
             pass
-        _spec_signature(Foo)
+        create_autospec(Foo)
 
 
     @unittest2.skipIf(inPy3k, 'no old style classes in Python 3')
@@ -416,7 +416,7 @@ class SpecSignatureTest(unittest2.TestCase):
         # due to Foo.__init__ raising an AttributeError
         class Foo:
             pass
-        _spec_signature(Foo)
+        create_autospec(Foo)
 
 
     def test_signature_callable(self):
@@ -426,13 +426,13 @@ class SpecSignatureTest(unittest2.TestCase):
             def __call__(self, a):
                 pass
 
-        mock = _spec_signature(Callable)
+        mock = create_autospec(Callable)
         mock()
         mock.assert_called_once_with()
         self.assertRaises(TypeError, mock, 'a')
 
-        mock = _spec_signature(Callable())
+        mock = create_autospec(Callable())
         mock(a='a')
-        mock.assert_called_once_with('a')
+        mock.assert_called_once_with(a='a')
         self.assertRaises(TypeError, mock)
 

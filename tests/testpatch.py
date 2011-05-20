@@ -891,7 +891,7 @@ class PatchTest(unittest2.TestCase):
         @patch('%s.function' % __name__, autospec=True)
         def test(mock):
             function(1)
-            function.assert_called_with(1, Foo)
+            function.assert_called_with(1)
             function(2, 3)
             function.assert_called_with(2, 3)
 
@@ -915,7 +915,11 @@ class PatchTest(unittest2.TestCase):
         # autospec uses the __name__ if available
         # instances (return values) of mocked classes should use __call__
         # (or not be callable)
+
+        # autospec should pass the name through to new mocks
+        # return values should be name + ()
         pass
+
 
 
 if __name__ == '__main__':
