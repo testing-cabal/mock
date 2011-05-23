@@ -18,7 +18,7 @@ from mock import Mock, MagicMock, _magics
 
 class TestMockingMagicMethods(unittest2.TestCase):
 
-    def testDeletingMagicMethods(self):
+    def test_deleting_magic_methods(self):
         mock = Mock()
         self.assertFalse(hasattr(mock, '__getitem__'))
 
@@ -29,7 +29,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertFalse(hasattr(mock, '__getitem__'))
 
 
-    def testMagicMethodWrapping(self):
+    def test_magic_method_wrapping(self):
         mock = Mock()
         def f(self, name):
             return self, 'fish'
@@ -42,13 +42,14 @@ class TestMockingMagicMethods(unittest2.TestCase):
         # the first argument (self) is removed
         def instance_f(name):
             pass
-        self.assertEqual(inspect.getargspec(mock.__getitem__), inspect.getargspec(instance_f))
+        self.assertEqual(inspect.getargspec(mock.__getitem__),
+                         inspect.getargspec(instance_f))
 
         mock.__getitem__ = mock
         self.assertTrue(mock.__getitem__ is mock)
 
 
-    def testMagicMethodsIsolatedBetweenMocks(self):
+    def test_magic_methods_isolated_between_mocks(self):
         mock1 = Mock()
         mock2 = Mock()
 

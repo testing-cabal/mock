@@ -47,6 +47,11 @@ CHANGELOG
 2011/XX/XX Version 0.8.0 alpha 1
 --------------------------------
 
+mock 0.8.0 is the last version that will support Python 2.4.
+
+* In Python 2.6 or more recent, `dir` on a mock will report all the dynamically
+  created attributes (or the full list of attributes if there is a spec) as
+  well as all the mock methods and attributes
 * `patch` and `patch.object` now create a `MagicMock` instead of a `Mock` by
   default
 * Added `ANY` for ignoring arguments in `assert_called_with` calls
@@ -60,7 +65,7 @@ CHANGELOG
 * Private attributes `_name`, `_methods`, '_children', `_wraps` and `_parent`
   (etc) renamed to reduce likelihood of clash with user attributes.
 * Implemented auto-speccing (recursive, lazy speccing of mocks with mocked
-  signatures for functions/methods).
+  signatures for functions/methods)
 
   Limitations:
 
@@ -79,7 +84,7 @@ CHANGELOG
   option.
 
 * Added the `create_autospec` function for manually creating 'auto-specced'
-  mocks.
+  mocks
 
 
 2011/XX/XX Version 0.7.2
