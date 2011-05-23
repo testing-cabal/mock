@@ -227,13 +227,12 @@ class TestMockingMagicMethods(unittest2.TestCase):
         mock.__iter__.return_value = iter([1, 2, 3])
         self.assertEqual(list(mock), [1, 2, 3])
 
+        name = '__nonzero__'
+        other = '__bool__'
         if inPy3k:
-            mock.__bool__.return_value = False
-            self.assertFalse(hasattr(mock, '__nonzero__'))
-        else:
-            mock.__nonzero__.return_value = False
-            self.assertFalse(hasattr(mock, '__bool__'))
-
+            name, other = other, name
+        getattr(mock, name).return_value = False
+        self.assertFalse(hasattr(mock, other))
         self.assertFalse(bool(mock))
 
         for entry in _magics:
