@@ -277,7 +277,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
 
 
     @unittest2.skipIf(inPy3k, "no __cmp__ in Python 3")
-    def testNonDefaultMagicMethods(self):
+    def test_non_default_magic_methods(self):
         mock = MagicMock()
         self.assertRaises(AttributeError, lambda: mock.__cmp__)
 
@@ -287,7 +287,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertEqual(mock, object())
 
 
-    def testMagicMethodsAndSpec(self):
+    def test_magic_methods_and_spec(self):
         class Iterable(object):
             def __iter__(self):
                 pass
@@ -312,7 +312,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertRaises(AttributeError, set_int)
 
 
-    def testMagicMethodsAndSpecSet(self):
+    def test_magic_methods_and_spec_set(self):
         class Iterable(object):
             def __iter__(self):
                 pass
@@ -337,7 +337,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertRaises(AttributeError, set_int)
 
 
-    def testSettingUnsupportedMagicMethod(self):
+    def test_setting_unsupported_magic_method(self):
         mock = MagicMock()
         def set_setattr():
             mock.__setattr__ = lambda self, name: None
@@ -347,7 +347,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
         )
 
 
-    def testAttributesAndReturnValue(self):
+    def test_attributes_and_return_value(self):
         mock = MagicMock()
         attr = mock.foo
         def _get_type(obj):
@@ -363,6 +363,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
     def test_magic_methods_are_magic_mocks(self):
         mock = MagicMock()
         self.assertIsInstance(mock.__getitem__, MagicMock)
+
 
 
 if __name__ == '__main__':
