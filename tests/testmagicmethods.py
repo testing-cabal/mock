@@ -12,6 +12,7 @@ except NameError:
     long = int
 
 import inspect
+import sys
 from mock import Mock, MagicMock, _magics
 
 
@@ -362,6 +363,20 @@ class TestMockingMagicMethods(unittest2.TestCase):
     def test_magic_methods_are_magic_mocks(self):
         mock = MagicMock()
         self.assertIsInstance(mock.__getitem__, MagicMock)
+
+        mock[1][2].__getitem__.return_value = 3
+        self.assertEqual(mock[1][2][3], 3)
+
+
+    @unittest2.skipUnless(sys.version_info[:2] >= (2, 6),
+                          "__dir__ not available until Python 2.6 or later")
+    def test_dir(self):
+        # overriding the default implementation
+        mock = Mock()
+        def _dir(self):
+            return ['foo']
+        mock.__dir__ = _dir
+        self.assertEqual(dir(mock), ['foo'])
 
 
 
