@@ -599,8 +599,8 @@ class Mock(object):
     def __dir__(self):
         # note this method doesn't work on old style classes
         extras = self._mock_methods or []
-        return sorted(list(set((dir(type(self)) + list(self.__dict__) +
-                                list(self._mock_children) + extras))))
+        return sorted(set((dir(type(self)) + list(self.__dict__) +
+                            list(self._mock_children) + extras)))
 
 
     def __setattr__(self, name, value):

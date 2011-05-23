@@ -372,11 +372,11 @@ class TestMockingMagicMethods(unittest2.TestCase):
                           "__dir__ not available until Python 2.6 or later")
     def test_dir(self):
         # overriding the default implementation
-        mock = Mock()
-        def _dir(self):
-            return ['foo']
-        mock.__dir__ = _dir
-        self.assertEqual(dir(mock), ['foo'])
+        for mock in Mock(), MagicMock():
+            def _dir(self):
+                return ['foo']
+            mock.__dir__ = _dir
+            self.assertEqual(dir(mock), ['foo'])
 
 
 
