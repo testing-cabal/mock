@@ -54,6 +54,9 @@ mock 0.8.0 is the last version that will support Python 2.4.
   well as all the mock methods and attributes
 * `patch` and `patch.object` now create a `MagicMock` instead of a `Mock` by
   default
+* `MagicMock` equality and inequality methods use a `side_effect` to implement
+  default equality behaviour rather than returning a `MagicMock`. This allows
+  for more sane comparison of magic mocks
 * Added `ANY` for ignoring arguments in `assert_called_with` calls
 * Removal of deprecated `patch_object`
 * Addition of `call` helper object

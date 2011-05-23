@@ -1133,6 +1133,11 @@ _calculate_return_value = {
     '__unicode__': lambda self: unicode(object.__str__(self)),
 }
 
+_side_effect_methods = {
+    '__eq__': lambda self: lambda other: self is other,
+    '__ne__': lambda self: lambda other: self is not other,
+}
+
 _return_values = {
     '__int__': 1,
     '__contains__': False,
@@ -1158,7 +1163,12 @@ def _set_return_value(mock, method, name):
         try:
             return_value = _calculate_return_value[name](mock)
         except AttributeError:
+            # XXXX why do we return AttributeError here?
+            #      set it as a side_effect instead?
             return_value = AttributeError(name)
+    elif name in _side_effect_methods:
+        side_effect = _side_effect_methods[name](mock)
+        method.side_effect = side_effect
     if return_value is not DEFAULT:
         method.return_value = return_value
 
