@@ -57,21 +57,23 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertEqual(list(mock1), [])
         self.assertRaises(TypeError, lambda: list(mock2))
 
-    def testRepr(self):
+
+    def test_repr(self):
         mock = Mock()
         self.assertEqual(repr(mock), object.__repr__(mock))
         mock.__repr__ = lambda s: 'foo'
         self.assertEqual(repr(mock), 'foo')
 
 
-    def testStr(self):
+    def test_str(self):
         mock = Mock()
         self.assertEqual(str(mock), object.__str__(mock))
         mock.__str__ = lambda s: 'foo'
         self.assertEqual(str(mock), 'foo')
 
+
     @unittest2.skipIf(inPy3k, "no unicode in Python 3")
-    def testUnicode(self):
+    def test_unicode(self):
         mock = Mock()
         self.assertEqual(unicode(mock), unicode(str(mock)))
 
@@ -79,7 +81,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertEqual(unicode(mock), unicode('foo'))
 
 
-    def testDictMethods(self):
+    def test_dict_methods(self):
         mock = Mock()
 
         self.assertRaises(TypeError, lambda: mock['foo'])
@@ -110,7 +112,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertEqual(_dict, {})
 
 
-    def testNumeric(self):
+    def test_numeric(self):
         original = mock = Mock()
         mock.value = 0
 
@@ -138,7 +140,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertEqual(mock.value, 16)
 
 
-    def testHash(self):
+    def test_hash(self):
         mock = Mock()
         # test delegation
         self.assertEqual(hash(mock), Mock.__hash__(mock))
@@ -149,7 +151,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertEqual(hash(mock), 3)
 
 
-    def testNonZero(self):
+    def test_nonzero(self):
         m = Mock()
         self.assertTrue(bool(m))
 
@@ -162,7 +164,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertFalse(bool(m))
 
 
-    def testComparison(self):
+    def test_comparison(self):
         # note: this test fails with Jython 2.5.1 due to a Jython bug
         #       it is fixed in jython 2.5.2
         if not inPy3k:
@@ -182,7 +184,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self. assertTrue(mock >= 3)
 
 
-    def testEquality(self):
+    def test_equality(self):
         mock = Mock()
         self.assertEqual(mock, mock)
         self.assertNotEqual(mock, Mock())
@@ -201,7 +203,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertFalse(mock != 4)
 
 
-    def testLenContainsIter(self):
+    def test_len_contains_iter(self):
         mock = Mock()
 
         self.assertRaises(TypeError, len, mock)
@@ -219,7 +221,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertEqual(list(mock), list('foobarbaz'))
 
 
-    def testMagicMock(self):
+    def test_magicmock(self):
         mock = MagicMock()
 
         mock.__iter__.return_value = iter([1, 2, 3])
@@ -239,7 +241,18 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertFalse(hasattr(mock, '__imaginery__'))
 
 
-    def testMagicMockDefaults(self):
+    def test_magic_mock_equality(self):
+        mock = MagicMock()
+        self.assertIsInstance(mock == object(), bool)
+        self.assertIsInstance(mock != object(), bool)
+
+        self.assertEqual(mock == object(), False)
+        self.assertEqual(mock != object(), True)
+        self.assertEqual(mock == mock, True)
+        self.assertEqual(mock != mock, False)
+
+
+    def test_magicmock_defaults(self):
         mock = MagicMock()
         self.assertEqual(int(mock), 1)
         self.assertEqual(complex(mock), 1j)
