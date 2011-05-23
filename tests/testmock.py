@@ -550,6 +550,42 @@ class MockTest(unittest2.TestCase):
         self.assertRaises(TypeError, mock, 'one', 'two')
 
 
+    @unittest2.skipUnless(sys.version_info[:2] >= (2, 6),
+                          "__dir__ not available until Python 2.6 or later")
+    def test_dir(self):
+        mock = Mock()
+        attrs = set(dir(mock))
+        type_attrs = set(dir(Mock))
+
+        # all attributes from the type are included
+        self.assertEqual(set(), type_attrs - attrs)
+
+        # creates these attributes
+        mock.a, mock.b
+        self.assertIn('a', dir(mock))
+        self.assertIn('b', dir(mock))
+
+        # instance attributes
+        mock.c = mock.d = None
+        self.assertIn('c', dir(mock))
+        self.assertIn('d', dir(mock))
+
+
+    @unittest2.skipUnless(sys.version_info[:2] >= (2, 6),
+                          "__dir__ not available until Python 2.6 or later")
+    def test_dir_from_spec(self):
+        mock = Mock(spec=sys)
+        sys_attrs = set(dir(sys))
+        attrs = set(dir(mock))
+
+        # all attributes from the spec are included
+        self.assertEqual(set(), sys_attrs - attrs)
+
+        # shadow a sys attribute
+        mock.version = 3
+        self.assertEqual(dir(mock).count('version'), 1)
+
+
     def DONTtest_mock_calls(self):
         mock = MagicMock()
 
