@@ -52,6 +52,8 @@ mock 0.8.0 is the last version that will support Python 2.4.
 * In Python 2.6 or more recent, `dir` on a mock will report all the dynamically
   created attributes (or the full list of attributes if there is a spec) as
   well as all the mock methods and attributes
+* `__dir__` is no longer a magic method supported by default in `MagicMock`,
+  because it conflicts with the default implementation
 * `patch` and `patch.object` now create a `MagicMock` instead of a `Mock` by
   default
 * `MagicMock` equality and inequality methods use a `side_effect` to implement
