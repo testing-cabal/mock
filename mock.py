@@ -817,7 +817,7 @@ class _patch(object):
         new, spec = self.new, self.spec
         spec_set, autospec = self.spec_set, self.autospec
         original, local = self.get_original()
-        if new is DEFAULT and not autospec:
+        if new is DEFAULT and autospec is False:
             # XXXX what if original is DEFAULT - shouldn't use it as a spec
             inherit = False
             if spec_set == True:
@@ -832,7 +832,7 @@ class _patch(object):
             new = MagicMock(spec=spec, spec_set=spec_set)
             if inherit:
                 new.return_value = Mock(spec=spec, spec_set=spec_set)
-        elif autospec:
+        elif autospec is not False:
             # spec is ignored, new *must* be default, spec_set is treated
             # as a boolean. Should we check spec is not None and that spec_set
             # is a bool? mocksignature should also not be used. Should we
@@ -844,7 +844,9 @@ class _patch(object):
                 )
             spec_set = bool(spec_set)
             kwargs = {'_name': getattr(original, '__name__', None)}
-            new = create_autospec(original, spec_set, inherit=True, **kwargs)
+            if autospec is True:
+                autospec = original
+            new = create_autospec(autospec, spec_set, inherit=True, **kwargs)
 
         new_attr = new
         if self.mocksignature:
