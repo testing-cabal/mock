@@ -923,8 +923,18 @@ class PatchTest(unittest2.TestCase):
             patcher.stop()
 
 
+    def test_autospec_inherits(self):
+        FooClass = Foo
+        patcher = patch('%s.Foo' % __name__, autospec=True)
+        mock = patcher.start()
+        try:
+            self.assertIsInstance(mock, FooClass)
+            self.assertIsInstance(mock(3), FooClass)
+        finally:
+            patcher.stop()
+
+
     def test_autospec_other(self):
-        # autospec has inherit set to true
         # autospec uses the __name__ if available
         # instances (return values) of mocked classes should use __call__
         # (or not be callable)
