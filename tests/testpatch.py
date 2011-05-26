@@ -910,6 +910,19 @@ class PatchTest(unittest2.TestCase):
         self.assertRaises(TypeError, patcher.start)
 
 
+    def test_autospec_with_object(self):
+        class Bar(Foo):
+            extra = []
+
+        patcher = patch('%s.Foo' % __name__, autospec=Bar)
+        mock = patcher.start()
+        try:
+            self.assertIsInstance(mock, Bar)
+            self.assertIsInstance(mock.extra, list)
+        finally:
+            patcher.stop()
+
+
     def test_autospec_other(self):
         # autospec has inherit set to true
         # autospec uses the __name__ if available
