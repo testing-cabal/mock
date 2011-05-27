@@ -48,6 +48,9 @@ CHANGELOG
 ------------------------
 
 * BUGFIX: instances of list subclasses can now be used as mock specs
+* BUGFIX: MagicMock equality / inequality protocol methods changed to use the
+  default equality / inequality. This is done through a `side_effect` on
+  the mocks used for `__eq__` / `__ne__`
 
 
 2011/05/06 Version 0.7.1
