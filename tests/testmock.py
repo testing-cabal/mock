@@ -586,6 +586,22 @@ class MockTest(unittest2.TestCase):
         self.assertEqual(dir(mock).count('version'), 1)
 
 
+
+    def test_configure_mock(self):
+        mock = Mock(foo='bar')
+        self.assertEqual(mock.foo, 'bar')
+
+        mock = MagicMock(foo='bar')
+        self.assertEqual(mock.foo, 'bar')
+
+        kwargs = {'side_effect': KeyError, 'foo.bar.return_value': 33,
+                  'foo': MagicMock()}
+        mock = Mock(**kwargs)
+        self.assertRaises(KeyError, mock)
+        self.assertEqual(mock.foo.bar(), 33)
+        self.assertIsInstance(mock.foo, MagicMock)
+
+
     def DONTtest_mock_calls(self):
         mock = MagicMock()
 
