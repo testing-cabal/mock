@@ -90,6 +90,9 @@ if inPy3k:
     self = '__self__'
     builtin = 'builtins'
 
+# hack for Python 3 :-)
+_super = super
+
 
 # getsignature and mocksignature heavily "inspired" by
 # the decorator module: http://pypi.python.org/pypi/decorator/
@@ -573,7 +576,7 @@ class Mock(object):
 
         elif isinstance(result, _SpecState):
             result = create_autospec(
-                result.spec, result.spec_set, result.inherit,
+                result.spec, result.spec_set, result.inherit, None,
                 result.parent, result.name, result.instance
             )
             self._mock_children[name]  = result
@@ -1209,7 +1212,7 @@ class MagicMock(Mock):
     Attributes and the return value of a `MagicMock` will also be `MagicMocks`.
     """
     def __init__(self, *args, **kw):
-        Mock.__init__(self, *args, **kw)
+        _super(MagicMock, self).__init__(*args, **kw)
 
         these_magics = _magics
         if self._mock_methods is not None:
