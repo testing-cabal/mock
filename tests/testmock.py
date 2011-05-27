@@ -601,6 +601,12 @@ class MockTest(unittest2.TestCase):
         self.assertEqual(mock.foo.bar(), 33)
         self.assertIsInstance(mock.foo, MagicMock)
 
+        mock = MagicMock()
+        mock.configure_mock(**kwargs)
+        self.assertRaises(KeyError, mock)
+        self.assertEqual(mock.foo.bar(), 33)
+        self.assertIsInstance(mock.foo, MagicMock)
+
 
     def DONTtest_mock_calls(self):
         mock = MagicMock()
