@@ -21,7 +21,7 @@
         attribute = None
 
     sys.modules['package'] = package = Mock(name='package')
-    sys.modules['package.module'] = package.module
+    sys.modules['package.module'] = module = package.module
 
 
 For comprehensive examples, see the unit tests included in the full source
@@ -142,6 +142,32 @@ will raise a failure exception.
 
 As ``close`` is a mock object is has all the attributes from the previous
 example.
+
+
+Mocking Classes
+---------------
+
+A common use case is to mock out classes instantiated by your code under test.
+When you patch a class, then that class is replaced with a mock. Instances
+are created by *calling the class*. This means you access the "mock instance"
+by looking at the return value of the mocked class. e.g.
+
+.. doctest::
+
+    >>> def some_function():
+    ...     instance = Foo()
+    ...     return instance.method()
+    ...
+    >>> with patch('
+
+@patch('package.MyClassName')
+def test_something(self, my_mock):
+    instance_mock = my_mock.return_value
+    instance_mock.my_method.return_value = 'xyz'
+
+mock autocreates a new mock to be the return value of any mock. So you control the behaviour of the instances of mocked classes by configuring my_mock.return_value.
+
+
 
 
 Naming your mocks

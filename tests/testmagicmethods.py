@@ -179,23 +179,24 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self. assertTrue(mock >= 3)
 
 
-    def testEquality(self):
-        mock = Mock()
-        self.assertEqual(mock, mock)
-        self.assertNotEqual(mock, Mock())
-        self.assertNotEqual(mock, 3)
+    def test_equality(self):
+        for mock in Mock(), MagicMock():
+            self.assertEqual(mock == mock, True)
+            self.assertEqual(mock != mock, False)
+            self.assertEqual(mock == object(), False)
+            self.assertEqual(mock != object(), True)
 
-        def eq(self, other):
-            return other == 3
-        mock.__eq__ = eq
-        self.assertTrue(mock == 3)
-        self.assertFalse(mock == 4)
+            def eq(self, other):
+                return other == 3
+            mock.__eq__ = eq
+            self.assertTrue(mock == 3)
+            self.assertFalse(mock == 4)
 
-        def ne(self, other):
-            return other == 3
-        mock.__ne__ = ne
-        self.assertTrue(mock != 3)
-        self.assertFalse(mock != 4)
+            def ne(self, other):
+                return other == 3
+            mock.__ne__ = ne
+            self.assertTrue(mock != 3)
+            self.assertFalse(mock != 4)
 
 
     def testLenContainsIter(self):

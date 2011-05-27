@@ -3,7 +3,7 @@
 # Copyright (C) 2007-2011 Michael Foord & the mock team
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 
-# mock 0.7.1
+# mock 0.7.2
 # http://www.voidspace.org.uk/python/mock/
 
 # Released subject to the BSD License
@@ -23,7 +23,7 @@ __all__ = (
     'DEFAULT'
 )
 
-__version__ = '0.7.2alpha'
+__version__ = '0.7.2'
 
 __unittest = True
 
@@ -919,6 +919,12 @@ _return_values = {
     '__index__': 1,
 }
 
+_side_effect_methods = {
+    '__eq__': lambda self: lambda other: self is other,
+    '__ne__': lambda self: lambda other: self is not other,
+}
+
+
 
 def _set_return_value(mock, method, name):
     return_value = DEFAULT
@@ -929,6 +935,9 @@ def _set_return_value(mock, method, name):
             return_value = _calculate_return_value[name](mock)
         except AttributeError:
             return_value = AttributeError(name)
+    elif name in _side_effect_methods:
+        side_effect = _side_effect_methods[name](mock)
+        method.side_effect = side_effect
     if return_value is not DEFAULT:
         method.return_value = return_value
 
