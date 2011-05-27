@@ -8,7 +8,7 @@ import sys
 from tests import support
 from tests.support import unittest2, inPy3k, SomeClass
 
-from mock import Mock, patch, sentinel
+from mock import MagicMock, Mock, patch, sentinel
 
 
 builtin_string = '__builtin__'
@@ -806,8 +806,50 @@ class PatchTest(unittest2.TestCase):
             self.assertNotIn('foo', proxy.__dict__)
 
 
-    def test_autospec(self):
+    def test_patch_keyword_args(self):
+        kwargs = {'side_effect': KeyError, 'foo.bar.return_value': 33,
+                  'foo': MagicMock()}
 
+        name = '%s.Foo' % __name__
+        patcher = patch(name, **kwargs)
+        mock = patcher.start()
+        patcher.stop()
+
+        self.assertRaises(KeyError, mock)
+        self.assertEqual(mock.foo.bar(), 33)
+        self.assertIsInstance(mock.foo, MagicMock)
+
+
+    def test_patch_object_keyword_args(self):
+        kwargs = {'side_effect': KeyError, 'foo.bar.return_value': 33,
+                  'foo': MagicMock()}
+
+        patcher = patch.object(Foo, 'f', **kwargs)
+        mock = patcher.start()
+        patcher.stop()
+
+        self.assertRaises(KeyError, mock)
+        self.assertEqual(mock.foo.bar(), 33)
+        self.assertIsInstance(mock.foo, MagicMock)
+
+
+    def test_patch_dict_keyword_args(self):
+        original = {'foo': 'bar'}
+        copy = original.copy()
+
+        patcher = patch.dict(original, foo=3, bar=4, baz=5)
+        patcher.start()
+
+        try:
+            self.assertEqual(original, dict(foo=3, bar=4, baz=5))
+        finally:
+            patcher.stop()
+
+        self.assertEqual(original, copy)
+
+
+
+    def test_autospec(self):
         class Boo(object):
             def __init__(self, a):
                 pass

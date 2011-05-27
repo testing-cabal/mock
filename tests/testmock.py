@@ -601,7 +601,7 @@ class MockTest(unittest2.TestCase):
         self.assertEqual(mock.foo.bar(), 33)
         self.assertIsInstance(mock.foo, MagicMock)
 
-        mock = MagicMock()
+        mock = Mock()
         mock.configure_mock(**kwargs)
         self.assertRaises(KeyError, mock)
         self.assertEqual(mock.foo.bar(), 33)
