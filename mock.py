@@ -484,7 +484,10 @@ class Mock(object):
     def configure_mock(self, **kwargs):
         """XXX needs docstring"""
         for arg, val in sorted(kwargs.items(),
-                               key=lambda entry: len(entry[0].split('.'))):
+                               # we sort on the number of dots so that
+                               # attributes are set before we set attributes on
+                               # attributes
+                               key=lambda entry: entry[0].count('.')):
             args = arg.split('.')
             final = args.pop()
             obj = self
