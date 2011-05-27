@@ -506,6 +506,7 @@ class Mock(object):
             self.return_value = ret
         return ret
 
+
     def __set_return_value(self, value):
         if self._mock_signature is not None:
             self._mock_signature.return_value = value
