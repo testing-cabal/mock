@@ -49,13 +49,16 @@ CHANGELOG
 
 mock 0.8.0 is the last version that will support Python 2.4.
 
+* The patchers (`patch`, `patch.object` and `patch.dict`), plus `Mock` and
+  `MagicMock`, take keyword arguments for configuration
+* New mock method `configure_mock` for setting attributes and return values /
+  side effects on the mock and its attributes
 * In Python 2.6 or more recent, `dir` on a mock will report all the dynamically
   created attributes (or the full list of attributes if there is a spec) as
   well as all the mock methods and attributes
 * `patch` and `patch.object` now create a `MagicMock` instead of a `Mock` by
   default
 * Added `ANY` for ignoring arguments in `assert_called_with` calls
-* Removal of deprecated `patch_object`
 * Addition of `call` helper object
 * Protocol methods on `MagicMock` are magic mocks, and are created lazily on
   first lookup. This means the result of calling a protocol method is a
@@ -89,6 +92,7 @@ mock 0.8.0 is the last version that will support Python 2.4.
 
 * Added the `create_autospec` function for manually creating 'auto-specced'
   mocks
+* Removal of deprecated `patch_object`
 
 
 2011/XX/XX Version 0.7.2

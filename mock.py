@@ -410,7 +410,7 @@ class Mock(object):
 
     def __init__(self, spec=None, side_effect=None, return_value=DEFAULT,
                     wraps=None, name=None, spec_set=None, parent=None,
-                    _old_name=None, _spec_state=None):
+                    _old_name=None, _spec_state=None, **kwargs):
         self._mock_parent = parent
         self._mock_name = name
         self._mock_old_name = _old_name
@@ -446,6 +446,7 @@ class Mock(object):
         self._mock_call_args_list = []
 
         self.reset_mock()
+        self.configure_mock(**kwargs)
 
 
     @property
@@ -475,6 +476,18 @@ class Mock(object):
         ret = self._mock_return_value
         if isinstance(ret, Mock) and ret is not self:
             ret.reset_mock()
+
+
+    def configure_mock(self, **kwargs):
+        """XXX needs docstring"""
+        for arg, val in sorted(kwargs.items(),
+                               key=lambda entry: len(entry[0].split('.'))):
+            args = arg.split('.')
+            final = args.pop()
+            obj = self
+            for entry in args:
+                obj = getattr(obj, entry)
+            setattr(obj, final, val)
 
 
     def __get_return_value(self):
@@ -729,7 +742,7 @@ def _importer(target):
 
 class _patch(object):
     def __init__(self, target, attribute, new, spec, create,
-                    mocksignature, spec_set, autospec):
+                    mocksignature, spec_set, autospec, kwargs):
         self.target = target
         self.attribute = attribute
         self.new = new
@@ -739,12 +752,13 @@ class _patch(object):
         self.mocksignature = mocksignature
         self.spec_set = spec_set
         self.autospec = autospec
+        self.kwargs = kwargs
 
 
     def copy(self):
         return _patch(self.target, self.attribute, self.new, self.spec,
                         self.create, self.mocksignature, self.spec_set,
-                        self.autospec)
+                        self.autospec, self.kwargs)
 
 
     def __call__(self, func):
@@ -816,6 +830,8 @@ class _patch(object):
         """Perform the patch."""
         new, spec = self.new, self.spec
         spec_set, autospec = self.spec_set, self.autospec
+        kwargs = self.kwargs
+
         original, local = self.get_original()
         if new is DEFAULT and autospec is False:
             # XXXX what if original is DEFAULT - shouldn't use it as a spec
@@ -829,7 +845,7 @@ class _patch(object):
                 spec = original
                 if isinstance(spec, ClassTypes):
                     inherit = True
-            new = MagicMock(spec=spec, spec_set=spec_set)
+            new = MagicMock(spec=spec, spec_set=spec_set, **kwargs)
             if inherit:
                 new.return_value = Mock(spec=spec, spec_set=spec_set)
         elif autospec is not False:
@@ -843,10 +859,15 @@ class _patch(object):
                     "autospec and new."
                 )
             spec_set = bool(spec_set)
-            kwargs = {'_name': getattr(original, '__name__', None)}
+            _kwargs = {'_name': getattr(original, '__name__', None)}
             if autospec is True:
                 autospec = original
-            new = create_autospec(autospec, spec_set, inherit=True, **kwargs)
+            new = create_autospec(autospec, spec_set, inherit=True,
+                                  configure=kwargs, **_kwargs)
+        elif self.kwargs:
+            # can't set keyword args when we aren't creating the mock
+            # XXXX If new is a Mock we could call new.configure_mock(**kwargs)
+            raise TypeError("Can't pass kwargs to a mock we aren't creating")
 
         new_attr = new
         if self.mocksignature:
@@ -877,7 +898,7 @@ class _patch(object):
 
 def _patch_object(target, attribute, new=DEFAULT, spec=None,
                       create=False, mocksignature=False, spec_set=None,
-                      autospec=False):
+                      autospec=False, **kwargs):
     """
     patch.object(target, attribute, new=DEFAULT, spec=None, create=False,
                  mocksignature=False, spec_set=None)
@@ -889,11 +910,11 @@ def _patch_object(target, attribute, new=DEFAULT, spec=None,
     meaning as for patch.
     """
     return _patch(target, attribute, new, spec, create, mocksignature,
-                  spec_set, autospec)
+                  spec_set, autospec, kwargs)
 
 
-def patch(target, new=DEFAULT, spec=None, create=False,
-            mocksignature=False, spec_set=None, autospec=False):
+def patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False,
+          spec_set=None, autospec=False, **kwargs):
     """
     ``patch`` acts as a function decorator, class decorator or a context
     manager. Inside the body of the function or with statement, the ``target``
@@ -948,7 +969,7 @@ def patch(target, new=DEFAULT, spec=None, create=False,
                         (target,))
     target = _importer(target)
     return _patch(target, attribute, new, spec, create, mocksignature,
-                    spec_set, autospec)
+                  spec_set, autospec, kwargs)
 
 
 
@@ -971,12 +992,13 @@ class _patch_dict(object):
     values are set.
     """
 
-    def __init__(self, in_dict, values=(), clear=False):
+    def __init__(self, in_dict, values=(), clear=False, **kwargs):
         if isinstance(in_dict, basestring):
             in_dict = _importer(in_dict)
         self.in_dict = in_dict
         # support any argument supported by dict(...) constructor
         self.values = dict(values)
+        self.values.update(kwargs)
         self.clear = clear
         self._original = None
 
@@ -1258,9 +1280,11 @@ call = _Call()
 
 
 
-def create_autospec(spec, spec_set=False, inherit=False, _parent=None,
-                    _name=None, _instance=False):
+def create_autospec(spec, spec_set=False, inherit=False, configure=None,
+                    _parent=None, _name=None, _instance=False):
     """XXXX needs docstring!"""
+    if configure is None:
+        configure = {}
     if spec is None:
         # can't use None as it is the default value for the Mock spec argument
         spec = NoneType
@@ -1276,7 +1300,9 @@ def create_autospec(spec, spec_set=False, inherit=False, _parent=None,
     if spec_set:
         kwargs = {'spec_set': spec}
 
+    kwargs.update(configure)
     mock = MagicMock(parent=_parent, name=_name, **kwargs)
+
     if isinstance(spec, FunctionTypes):
         # should only happen at the top level because we don't
         # recurse for functions
