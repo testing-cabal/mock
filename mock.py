@@ -23,6 +23,7 @@ __all__ = (
     'ANY',
     'call',
     'create_autospec',
+    'FILTER_DIR',
 )
 
 __version__ = '0.8.0alpha1'
@@ -93,6 +94,7 @@ if inPy3k:
 # hack for Python 3 :-)
 _super = super
 
+FILTER_DIR = True
 
 
 # getsignature and mocksignature heavily "inspired" by
@@ -619,9 +621,13 @@ class Mock(object):
 
     def __dir__(self):
         extras = self._mock_methods or []
-        from_type = [e for e in dir(type(self)) if not e.startswith('_')]
-        from_dict = [e for e in self.__dict__ if not e.startswith('_') or
-                     _is_magic(e)]
+        from_type = dir(type(self))
+        from_dict = list(self.__dict__)
+
+        if FILTER_DIR:
+            from_type = [e for e in from_type if not e.startswith('_')]
+            from_dict = [e for e in from_dict if not e.startswith('_') or
+                         _is_magic(e)]
         return sorted(set(extras + from_type + from_dict +
                           list(self._mock_children)))
 

@@ -7,7 +7,8 @@ from tests.support import unittest2, inPy3k
 import copy
 import sys
 
-from mock import MagicMock, Mock, sentinel, DEFAULT
+import mock
+from mock import MagicMock, Mock, patch, sentinel, DEFAULT
 
 
 try:
@@ -589,6 +590,20 @@ class MockTest(unittest2.TestCase):
         mock.version = 3
         self.assertEqual(dir(mock).count('version'), 1)
 
+
+    @unittest2.skipUnless(sys.version_info[:2] >= (2, 6),
+                          "__dir__ not available until Python 2.6 or later")
+    def test_filter_dir(self):
+        patcher = patch.object(mock, 'FILTER_DIR', False)
+        patcher.start()
+        try:
+            attrs = set(dir(Mock()))
+            type_attrs = set(dir(Mock))
+
+            # ALL attributes from the type are included
+            self.assertEqual(set(), type_attrs - attrs)
+        finally:
+            patcher.stop()
 
 
     def test_configure_mock(self):
