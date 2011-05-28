@@ -94,6 +94,7 @@ if inPy3k:
 _super = super
 
 
+
 # getsignature and mocksignature heavily "inspired" by
 # the decorator module: http://pypi.python.org/pypi/decorator/
 # by Michele Simionato
@@ -618,8 +619,11 @@ class Mock(object):
 
     def __dir__(self):
         extras = self._mock_methods or []
-        return sorted(set((dir(type(self)) + list(self.__dict__) +
-                            list(self._mock_children) + extras)))
+        from_type = [e for e in dir(type(self)) if not e.startswith('_')]
+        from_dict = [e for e in self.__dict__ if not e.startswith('_') or
+                     _is_magic(e)]
+        return sorted(set(extras + from_type + from_dict +
+                          list(self._mock_children)))
 
 
     def __setattr__(self, name, value):
@@ -1292,9 +1296,6 @@ def create_autospec(spec, spec_set=False, inherit=False, configure=None,
     """XXXX needs docstring!"""
     if configure is None:
         configure = {}
-    if spec is None:
-        # can't use None as it is the default value for the Mock spec argument
-        spec = NoneType
 
     if type(spec) == list:
         # can't pass a list instance to the mock constructor as it will be
@@ -1306,6 +1307,9 @@ def create_autospec(spec, spec_set=False, inherit=False, configure=None,
     kwargs = {'spec': spec}
     if spec_set:
         kwargs = {'spec_set': spec}
+    elif spec is None:
+        # None we mock with a normal mock without a spec
+        kwargs = {}
 
     kwargs.update(configure)
     mock = MagicMock(parent=_parent, name=_name, **kwargs)
@@ -1430,4 +1434,3 @@ FunctionAttributes = set([
     'func_name',
 ])
 
-NoneType = type(None)

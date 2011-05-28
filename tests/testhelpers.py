@@ -365,12 +365,6 @@ class SpecSignatureTest(unittest2.TestCase):
         #     for one level deep.
 
 
-    def test_none(self):
-        # used to fail because it's the default value of Mock spec arg
-        mock = create_autospec(None)
-        self.assertRaises(AttributeError, getattr, mock, 'foo')
-
-
     def test_signature_class(self):
         class Foo(object):
             def __init__(self, a, b=3):
@@ -436,3 +430,14 @@ class SpecSignatureTest(unittest2.TestCase):
         mock.assert_called_once_with(a='a')
         self.assertRaises(TypeError, mock)
 
+
+    def test_create_autospec_none(self):
+        class Foo(object):
+            bar = None
+
+        mock = create_autospec(Foo)
+        none = mock.bar
+        self.assertNotIsInstance(none, type(None))
+
+        none.foo()
+        none.foo.assert_called_once_with()

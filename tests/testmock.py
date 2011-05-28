@@ -555,9 +555,9 @@ class MockTest(unittest2.TestCase):
     def test_dir(self):
         mock = Mock()
         attrs = set(dir(mock))
-        type_attrs = set(dir(Mock))
+        type_attrs = set([m for m in dir(Mock) if not m.startswith('_')])
 
-        # all attributes from the type are included
+        # all public attributes from the type are included
         self.assertEqual(set(), type_attrs - attrs)
 
         # creates these attributes
@@ -569,6 +569,10 @@ class MockTest(unittest2.TestCase):
         mock.c = mock.d = None
         self.assertIn('c', dir(mock))
         self.assertIn('d', dir(mock))
+
+        # magic methods
+        mock.__iter__ = lambda s: iter([])
+        self.assertIn('__iter__', dir(mock))
 
 
     @unittest2.skipUnless(sys.version_info[:2] >= (2, 6),

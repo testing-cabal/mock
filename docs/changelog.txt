@@ -80,12 +80,13 @@ mock 0.8.0 is the last version that will support Python 2.4.
     will trigger properties etc
   - The return value of mocked classes (the 'instance') has the same call
     signature as the class __init__ (as they share the same spec)
-  - None is often used as a default value where the real value at runtime may
-    be an object of another type. A mock autospecced to None is not very useful
-    here. Maybe None should be special cased and just return a mock without
-    an autospec? (Unless None is the top-level argument to `create_autospec`)
 
   You create auto-specced mocks by passing `autospec=True` to `patch`.
+
+  Note that attributes that are None are special cased and mocked without a
+  spec (so any attribute / method can be used). This is because None is
+  typically used as a default value for attributes that may be of some other
+  type, and as we don't know what type that may be we allow all access.
 
   Note that the `autospec` option to `patch` obsoletes the `mocksignature`
   option.
