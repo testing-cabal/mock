@@ -848,7 +848,6 @@ class PatchTest(unittest2.TestCase):
         self.assertEqual(original, copy)
 
 
-
     def test_autospec(self):
         class Boo(object):
             def __init__(self, a):
