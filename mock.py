@@ -919,9 +919,25 @@ _return_values = {
     '__index__': 1,
 }
 
+
+def _get_eq(self):
+    def __eq__(other):
+        ret_val = self.__eq__._return_value
+        if ret_val is not DEFAULT:
+            return ret_val
+        return self is other
+    return __eq__
+
+def _get_ne(self):
+    def __ne__(other):
+        if self.__ne__._return_value is not DEFAULT:
+            return DEFAULT
+        return self is not other
+    return __ne__
+
 _side_effect_methods = {
-    '__eq__': lambda self: lambda other: self is other,
-    '__ne__': lambda self: lambda other: self is not other,
+    '__eq__': _get_eq,
+    '__ne__': _get_ne,
 }
 
 

@@ -198,6 +198,13 @@ class TestMockingMagicMethods(unittest2.TestCase):
             self.assertTrue(mock != 3)
             self.assertFalse(mock != 4)
 
+        mock = MagicMock()
+        mock.__eq__.return_value = True
+        self.assertEqual(mock == 3, True)
+
+        mock.__ne__.return_value = False
+        self.assertEqual(mock != 3, False)
+
 
     def testLenContainsIter(self):
         mock = Mock()
