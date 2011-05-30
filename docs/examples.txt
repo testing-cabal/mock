@@ -274,9 +274,8 @@ with `test`:
     >>> MyTest('test_two').not_a_test()
     'something'
 
-An alternative way of managing patches is to use the
-:ref:`start and stop <start-and-stop>` methods of patch. These allow
-you to move the patching into your `setUp` and `tearDown` methods.
+An alternative way of managing patches is to use the :ref:`start-and-stop`.
+These allow you to move the patching into your `setUp` and `tearDown` methods.
 
 .. doctest::
 
@@ -644,10 +643,10 @@ right:
     >>> MyTest('test_foo').test_foo()
     >>> assert mymodule.Foo is original
 
-With unittest2_ `cleanup` functions and the patch :ref:`start and stop methods
-<start-and-stop>` we can achieve the same effect without the nested
-indentation. A simple helper method, `create_patch`, puts the patch in place
-and returns the created mock for us:
+With unittest2_ `cleanup` functions and the :ref:`start-and-stop` we can
+achieve the same effect without the nested indentation. A simple helper
+method, `create_patch`, puts the patch in place and returns the created mock
+for us:
 
 .. doctest::
 
@@ -916,12 +915,11 @@ Unfortunately it seems that using `patch.dict` as a test *decorator* on
 <http://somethingaboutorange.com/mrl/projects/nose/>`_ collects tests.
 `nosetests` does some manipulation of `sys.modules` (along with `sys.path`
 manipulation) and using `patch.dict` with `sys.modules` can cause it to not
-find tests. Using `patch.dict` as a context manager, or using the patcher
-`start and stop methods </python/mock/patch.html#start-and-stop>`_, work
-around this by taking a reference to `sys.modules` inside the test rather than
-at import time. (Using `patch.dict` as a decorator takes a *reference* to
-`sys.modules` at import time, it doesn't do the patching until the test is
-executed though.)
+find tests. Using `patch.dict` as a context manager, or using the
+:ref:`start-and-stop`, work around this by taking a reference to `sys.modules`
+inside the test rather than at import time. (Using `patch.dict` as a decorator
+takes a *reference* to `sys.modules` at import time, it doesn't do the
+patching until the test is executed though.)
 
 
 Tracking order of calls and less verbose call assertions
