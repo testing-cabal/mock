@@ -681,8 +681,8 @@ You may want to mock a dictionary, or other container object, recording all
 access to it whilst having it still behave like a dictionary.
 
 We can do this with :class:`MagicMock`, which will behave like a dictionary,
-and using :data:`Mock.side_effect` to delegate dictionary access to a real underlying
-dictionary that is under our control.
+and using :data:`Mock.side_effect` to delegate dictionary access to a real
+underlying dictionary that is under our control.
 
 When the `__getitem__` and `__setitem__` methods of our `MagicMock` are called
 (normal dictionary access) then `side_effect` is called with the key (and in
@@ -885,6 +885,31 @@ Here's an example that mocks out the 'fooble' module.
 
 As you can see the `import fooble` succeeds, but on exit there is no 'fooble'
 left in `sys.modules`.
+
+This also works for the `from module import name` form:
+
+.. doctest::
+
+    >>> mock = Mock()
+    >>> with patch.dict('sys.modules', {'fooble': mock}):
+    ...    from fooble import blob
+    ...    blob.blip()
+    ...
+    <mock.Mock object at 0x...>
+    >>> mock.blob.blip.assert_called_once_with()
+
+With slightly more work you can also mock package imports:
+
+.. doctest::
+
+    >>> mock = Mock()
+    >>> modules = {'package': mock, 'package.module': mock.module}
+    >>> with patch.dict('sys.modules', modules):
+    ...    from package.module import fooble
+    ...    fooble()
+    ...
+    <mock.Mock object at 0x...>
+    >>> mock.module.fooble.assert_called_once_with()
 
 Unfortunately it seems that using `patch.dict` as a test *decorator* on
 `sys.modules` interferes with the way `nosetests

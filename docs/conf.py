@@ -12,6 +12,7 @@
 # serve to show the default value.
 
 import sys, os
+sys.path.insert(0, os.path.abspath('..'))
 from mock import __version__
 
 # If your extensions are in another directory, add it here. If the directory
