@@ -10,11 +10,11 @@ Feature requests and bug reports are handled on the issue tracker:
 
  * `mock module issue tracker <http://code.google.com/p/mock/issues/list>`_
 
-When mocking a class with ``patch``, passing in ``spec=True``, the mock class
-has an instance created from the same spec. Should this be the default
-behaviour for mocks anyway (mock return values inheriting the spec from their
-parent), or should it be controlled by an additional keyword argument
-(``inherit``) to the Mock constructor?
+When mocking a class with `patch`, passing in `spec=True` or `autospec=True`,
+the mock class has an instance created from the same spec. Should this be the
+default behaviour for mocks anyway (mock return values inheriting the spec
+from their parent), or should it be controlled by an additional keyword
+argument (`inherit`) to the Mock constructor?
 
 Interaction of magic methods with spec, wraps. For example, should spec cause
 all methods to be wrapped with mocksignature perhaps? (or another keyword
@@ -100,7 +100,7 @@ mock 0.8.0 is the last version that will support Python 2.4.
 * Removal of deprecated `patch_object`
 
 
-2011/XX/XX Version 0.7.2
+2011/05/30 Version 0.7.2
 ------------------------
 
 * BUGFIX: instances of list subclasses can now be used as mock specs
