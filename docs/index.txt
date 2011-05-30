@@ -7,7 +7,7 @@
 :Author: `Michael Foord <http://www.voidspace.org.uk/python/weblog/index.shtml>`_
 :Co-maintainer: `Konrad Delong <http://konryd.blogspot.com/>`_
 :Version: |release|
-:Date: 2011/03/05
+:Date: 2011/05/30
 :Homepage: `Mock Homepage`_
 :Download: `Mock on PyPI`_
 :Documentation: `PDF Documentation <http://www.voidspace.org.uk/downloads/mock-0.7.2.pdf>`_
@@ -94,7 +94,7 @@ stabilise). If you find bugs or have suggestions for improvements / extensions
 then please contact us.
 
 * `mock on PyPI <http://pypi.python.org/pypi/mock>`_
-* `mock documentation as PDF <http://www.voidspace.org.uk/downloads/mock-0.7.1.pdf>`_
+* `mock documentation as PDF <http://www.voidspace.org.uk/downloads/mock-0.7.2.pdf>`_
 * `Google Code Home & Mercurial Repository <http://code.google.com/p/mock/>`_
 
 .. index:: repository
