@@ -208,9 +208,11 @@ class TestMockingMagicMethods(unittest2.TestCase):
 
         mock = MagicMock()
         mock.__eq__.return_value = True
+        self.assertIsInstance(mock == 3, bool)
         self.assertEqual(mock == 3, True)
 
         mock.__ne__.return_value = False
+        self.assertIsInstance(mock != 3, bool)
         self.assertEqual(mock != 3, False)
 
 
