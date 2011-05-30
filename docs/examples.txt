@@ -240,7 +240,7 @@ function in the module under test instead of patching it globally:
     ...     with open('/some/path', 'w') as f:
     ...         f.write('something')
     ...
-    <mock.Mock object at 0x...>
+    <mock.MagicMock object at 0x...>
     >>> file_handle = mock_open.return_value.__enter__.return_value
     >>> file_handle.write.assert_called_with('something')
 
