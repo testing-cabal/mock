@@ -50,7 +50,7 @@ CHANGELOG
 mock 0.8.0 is the last version that will support Python 2.4.
 
 * The patchers (`patch`, `patch.object` and `patch.dict`), plus `Mock` and
-  `MagicMock`, take keyword arguments for configuration
+  `MagicMock`, take arbitrary keyword arguments for configuration
 * New mock method `configure_mock` for setting attributes and return values /
   side effects on the mock and its attributes
 * In Python 2.6 or more recent, `dir` on a mock will report all the dynamically
