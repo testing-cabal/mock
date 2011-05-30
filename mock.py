@@ -26,6 +26,7 @@ __all__ = (
     'FILTER_DIR',
 )
 
+
 __version__ = '0.8.0alpha1'
 
 __unittest = True
@@ -1193,6 +1194,28 @@ _return_values = {
     '__long__': long(1),
     '__index__': 1,
 }
+
+
+def _get_eq(self):
+    def __eq__(other):
+        ret_val = self.__eq__._mock_return_value
+        if ret_val is not DEFAULT:
+            return ret_val
+        return self is other
+    return __eq__
+
+def _get_ne(self):
+    def __ne__(other):
+        if self.__ne__._mock_return_value is not DEFAULT:
+            return DEFAULT
+        return self is not other
+    return __ne__
+
+_side_effect_methods = {
+    '__eq__': _get_eq,
+    '__ne__': _get_ne,
+}
+
 
 
 def _set_return_value(mock, method, name):

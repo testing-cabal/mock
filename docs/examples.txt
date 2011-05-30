@@ -843,6 +843,62 @@ A minimal implementation of `configure_mock` that you can start using now is::
         return mock
 
 
+Mocking imports with patch.dict
+===============================
+
+One situation where mocking can be hard is where you have a local import inside
+a function. These are harder to mock because they aren't using an object from
+the module namespace that we can patch out.
+
+Generally local imports are to be avoided. They are sometimes done to prevent
+circular dependencies, for which there is *usually* a much better way to solve
+the problem (refactor the code) or to prevent "up front costs" by delaying the
+import. This can also be solved in better ways than an unconditional local
+import (store the module as a class or module attribute and only do the import
+on first use).
+
+That aside there is a way to use `mock` to affect the results of an import.
+Importing fetches an *object* from the `sys.modules` dictionary. Note that it
+fetches an *object*, which need not be a module. Importing a module for the
+first time results in a module object being put in `sys.modules`, so usually
+when you import something you get a module back. This need not be the case
+however.
+
+This means you can use :func:`patch.dict` to *temporarily* put a mock in place
+in `sys.modules`. Any imports whilst this patch is active will fetch the mock.
+When the patch is complete (the decorated function exits, the with statement
+body is complete or `patcher.stop()` is called) then whatever was there
+previously will be restored safely.
+
+Here's an example that mocks out the 'fooble' module.
+
+.. doctest::
+
+    >>> mock = Mock()
+    >>> with patch.dict('sys.modules', {'fooble': mock}):
+    ...    import fooble
+    ...    fooble.blob()
+    ...
+    <mock.Mock object at 0x...>
+    >>> assert 'fooble' not in sys.modules
+    >>> mock.blob.assert_called_once_with()
+
+As you can see the `import fooble` succeeds, but on exit there is no 'fooble'
+left in `sys.modules`.
+
+Unfortunately it seems that using `patch.dict` as a test *decorator* on
+`sys.modules` interferes with the way `nosetests
+<http://somethingaboutorange.com/mrl/projects/nose/>`_ collects tests.
+`nosetests` does some manipulation of `sys.modules` (along with `sys.path`
+manipulation) and using `patch.dict` with `sys.modules` can cause it to not
+find tests. Using `patch.dict` as a context manager, or using the patcher
+`start and stop methods </python/mock/patch.html#start-and-stop>`_, work
+around this by taking a reference to `sys.modules` inside the test rather than
+at import time. (Using `patch.dict` as a decorator takes a *reference* to
+`sys.modules` at import time, it doesn't do the patching until the test is
+executed though.)
+
+
 Tracking order of calls and less verbose call assertions
 ========================================================
 

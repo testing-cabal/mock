@@ -188,7 +188,9 @@ class TestMockingMagicMethods(unittest2.TestCase):
     def test_equality(self):
         for mock in Mock(), MagicMock():
             self.assertEqual(mock == mock, True)
+            self.assertIsInstance(mock == mock, bool)
             self.assertEqual(mock != mock, False)
+            self.assertIsInstance(mock != mock, bool)
             self.assertEqual(mock == object(), False)
             self.assertEqual(mock != object(), True)
 
@@ -203,6 +205,13 @@ class TestMockingMagicMethods(unittest2.TestCase):
             mock.__ne__ = ne
             self.assertTrue(mock != 3)
             self.assertFalse(mock != 4)
+
+        mock = MagicMock()
+        mock.__eq__.return_value = True
+        self.assertEqual(mock == 3, True)
+
+        mock.__ne__.return_value = False
+        self.assertEqual(mock != 3, False)
 
 
     def test_len_contains_iter(self):
