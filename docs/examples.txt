@@ -96,21 +96,21 @@ So, suppose we have some code that looks a little bit like this:
     ...         # more code
 
 Assuming that `BackendProvider` is already well tested, how do we test
-`method()`? Specifically, we want to test that the code section ``# more
-code`` uses the response object in the correct way.
+`method()`? Specifically, we want to test that the code section `# more
+code` uses the response object in the correct way.
 
 As this chain of calls is made from an instance attribute we can monkey patch
 the `backend` attribute on a `Something` instance. In this particular case
 we are only interested in the return value from the final call to
 `start_call` so we don't have much configuration to do. Let's assume the
 object it returns is 'file-like', so we'll ensure that our response object
-uses the builtin ``file`` as its `spec`.
+uses the builtin `file` as its `spec`.
 
 To do this we create a mock instance as our mock backend and create a mock
 response object for it. To set the response as the return value for that final
 `start_call` we could do this:
 
-    ``mock_backend.get_endpoint.return_value.create_call.return_value.start_call.return_value = mock_response``.
+    `mock_backend.get_endpoint.return_value.create_call.return_value.start_call.return_value = mock_response`.
 
 Here's how we might do it in a slightly nicer way. We start by creating our
 initial mocks:
@@ -205,7 +205,7 @@ is to use the new :class:`MagicMock`, which
 is preconfigured to be able to act as a context manger. As an added bonus
 we'll use the spec argument to ensure that the mocked object can only be used
 in the same ways a real file could be used (attempting to access a method or
-attribute not on the `file` will raise an ``AttributeError``):
+attribute not on the `file` will raise an `AttributeError`):
 
 .. doctest::
 
@@ -213,22 +213,22 @@ attribute not on the `file` will raise an ``AttributeError``):
     >>> mock_open.return_value = MagicMock(spec=file)
 
 In terms of configuring our mock this is all that needs to be done. In fact it
-could be constructed with a one liner: ``mock_open =
-Mock(return_value=MagicMock(spec=file))``.
+could be constructed with a one liner: `mock_open =
+Mock(return_value=MagicMock(spec=file))`.
 
-So what is the best way of patching the builtin ``open`` function? One way
-would be to globally patch ``__builtin__.open``. So long as you are sure that
-none of the other code being called also accesses ``open`` this is perfectly
+So what is the best way of patching the builtin `open` function? One way
+would be to globally patch `__builtin__.open`. So long as you are sure that
+none of the other code being called also accesses `open` this is perfectly
 reasonable. It does make some people nervous however. By default we can't
-patch the ``open`` name in the module where it is used, because ``open``
-doesn't exist as an attribute in that namespace. ``patch`` refuses to patch
+patch the `open` name in the module where it is used, because `open`
+doesn't exist as an attribute in that namespace. `patch` refuses to patch
 attributes that don't exist because that is a great way of having tests that
 pass but code that is horribly broken (your code can access attributes that
-only exist during your tests!). ``patch`` *will* however create (and then
+only exist during your tests!). `patch` *will* however create (and then
 remove again) non-existent attributes if you tell it that you are really sure
 you know what you're doing.
 
-By passing ``create=True`` into ``patch`` we can just patch the ``open``
+By passing `create=True` into `patch` we can just patch the `open`
 function in the module under test instead of patching it globally:
 
 .. doctest::
@@ -326,7 +326,7 @@ function instead. The :func:`patch` decorator makes it so simple to
 patch out methods with a mock that having to create a real function becomes a
 nuisance.
 
-If you pass ``mocksignature=True`` to patch then it does the patching with a
+If you pass `mocksignature=True` to patch then it does the patching with a
 *real* function object. This function object has the same signature as the one
 it is replacing, but delegates to a mock under the hood. You still get your
 mock auto-created in exactly the same way as before. What it means though, is
