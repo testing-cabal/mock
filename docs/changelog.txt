@@ -57,9 +57,9 @@ mock 0.8.0 is the last version that will support Python 2.4.
   created attributes (or the full list of attributes if there is a spec) as
   well as all the mock methods and attributes.
 * Module level `FILTER_DIR` added to control whether `dir(mock)` filters
-  private attributes. `True` by default. Note that `vars(Mock())` can
-  still be used to get all instance attributes and `dir(type(Mock())` will still
-  return all the other attributes (irrespective of `FILTER_DIR`)
+  private attributes. `True` by default. Note that `vars(Mock())` can still be
+  used to get all instance attributes and `dir(type(Mock())` will still return
+  all the other attributes (irrespective of `FILTER_DIR`)
 * `patch` and `patch.object` now create a `MagicMock` instead of a `Mock` by
   default
 * Added `ANY` for ignoring arguments in `assert_called_with` calls
