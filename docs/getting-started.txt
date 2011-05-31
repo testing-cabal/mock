@@ -235,6 +235,7 @@ to pass `isintance` tests:
     >>> isinstance(mock, SomeClass)
     True
 
+
 Tracking all Method Calls
 -------------------------
 
