@@ -378,6 +378,45 @@ accessed whilst still able to control things like return values:
     'fish'
     >>> mock_foo.assert_called_once_with()
 
+This approach works fine if you can replace the whole object you're mocking. If
+you *just* want to mock the property on another object here's an alternative
+approach using the support for magic methods introduced in 0.7:
+
+.. doctest::
+
+    >>> class Foo(object):
+    ...    @property
+    ...    def fish(self):
+    ...      return 'fish'
+    ...
+    >>> with patch.object(Foo, 'fish') as mock_fish:
+    ...   mock_fish.__get__ = Mock(return_value='mocked fish')
+    ...   foo = Foo()
+    ...   print foo.fish
+    ...
+    mocked fish
+    >>> mock_fish.__get__.assert_called_with(mock_fish, foo, Foo)
+
+If you're using an earlier version of mock, a third approach is to subclass
+:class:`Mock` and provide a `__get__ method
+<http://docs.python.org/reference/datamodel.html#implementing-descriptors>`_
+that delegates back to the mock:
+
+.. doctest::
+
+    >>> class PropertyMock(Mock):
+    ...   def __get__(self, instance, owner):
+    ...     return self()
+    ...
+    >>> prop_mock = PropertyMock()
+    >>> with patch.object(Foo, 'fish', prop_mock):
+    ...   foo = Foo()
+    ...   prop_mock.return_value = 'mocked fish'
+    ...   print foo.fish
+    ...
+    mocked fish
+    >>> prop_mock.assert_called_with()
+
 
 Checking multiple calls with mock
 =================================
