@@ -417,6 +417,8 @@ that delegates back to the mock:
     mocked fish
     >>> prop_mock.assert_called_with()
 
+As you're patching on the class these techniques affect *all* instances of
+`Foo`.
 
 Checking multiple calls with mock
 =================================
