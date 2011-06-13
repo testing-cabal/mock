@@ -245,6 +245,54 @@ function in the module under test instead of patching it globally:
     >>> file_handle.write.assert_called_with('something')
 
 
+Mocking a Generator Method
+==========================
+
+A generator method is a method that uses the `yield statement
+<http://docs.python.org/reference/simple_stmts.html#the-yield-statement>`_ to
+return a series of values when iterated over.
+
+A generator method is called to return the generator object. It is the generator
+object that is then iterated over. The protocol method for iteration is
+`__iter__ <http://docs.python.org/library/stdtypes.html#container.__iter__>`_,
+so we can mock this using a `MagicMock`.
+
+Here's an example class:
+
+.. doctest::
+
+    >>> class Foo(object):
+    ...     def iter(self):
+    ...         for i in [1, 2, 3]:
+    ...             yield i
+    ...
+    >>> foo = Foo()
+    >>> list(foo.iter())
+    [1, 2, 3]
+
+To configure the values returned from the iteration (implicit in the call to
+`list`), we need to configure the iterator returned by the call to `foo.iter()`.
+
+.. doctest::
+
+    >>> values = [1, 2, 3]
+    >>> mock_foo = MagicMock()
+    >>> iterable = mock_foo.iter.return_value
+    >>> iterator = iter(values)
+    >>> iterable.__iter__.return_value = iterator
+    >>> list(mock_foo.iter())
+    [1, 2, 3]
+
+The above example is done step-by-step. The shorter version is:
+
+.. doctest::
+
+    >>> mock_foo = MagicMock()
+    >>> mock_foo.iter.return_value.__iter__.return_value = iter([1, 2, 3])
+    >>> list(mock_foo.iter())
+    [1, 2, 3]
+
+
 Applying the same patch to every test method
 ============================================
 
