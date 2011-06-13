@@ -10,11 +10,11 @@ Feature requests and bug reports are handled on the issue tracker:
 
  * `mock module issue tracker <http://code.google.com/p/mock/issues/list>`_
 
-When mocking a class with ``patch``, passing in ``spec=True``, the mock class
-has an instance created from the same spec. Should this be the default
-behaviour for mocks anyway (mock return values inheriting the spec from their
-parent), or should it be controlled by an additional keyword argument
-(``inherit``) to the Mock constructor?
+When mocking a class with `patch`, passing in `spec=True` or `autospec=True`,
+the mock class has an instance created from the same spec. Should this be the
+default behaviour for mocks anyway (mock return values inheriting the spec
+from their parent), or should it be controlled by an additional keyword
+argument (`inherit`) to the Mock constructor?
 
 Interaction of magic methods with spec, wraps. For example, should spec cause
 all methods to be wrapped with mocksignature perhaps? (or another keyword
@@ -43,6 +43,62 @@ itself is garbage collected. This is tricky to get right though.
 
 CHANGELOG
 =========
+
+2011/XX/XX Version 0.8.0 alpha 1
+--------------------------------
+
+mock 0.8.0 is the last version that will support Python 2.4.
+
+* The patchers (`patch`, `patch.object` and `patch.dict`), plus `Mock` and
+  `MagicMock`, take arbitrary keyword arguments for configuration
+* New mock method `configure_mock` for setting attributes and return values /
+  side effects on the mock and its attributes
+* In Python 2.6 or more recent, `dir` on a mock will report all the dynamically
+  created attributes (or the full list of attributes if there is a spec) as
+  well as all the mock methods and attributes.
+* Module level `FILTER_DIR` added to control whether `dir(mock)` filters
+  private attributes. `True` by default. Note that `vars(Mock())` can still be
+  used to get all instance attributes and `dir(type(Mock())` will still return
+  all the other attributes (irrespective of `FILTER_DIR`)
+* `patch` and `patch.object` now create a `MagicMock` instead of a `Mock` by
+  default
+* Added `ANY` for ignoring arguments in `assert_called_with` calls
+* Addition of `call` helper object
+* Protocol methods on `MagicMock` are magic mocks, and are created lazily on
+  first lookup. This means the result of calling a protocol method is a
+  MagicMock instead of a Mock as it was previously
+* Added the Mock API (`assert_called_with` etc) to functions created by
+  `mocksignature`
+* Private attributes `_name`, `_methods`, '_children', `_wraps` and `_parent`
+  (etc) renamed to reduce likelihood of clash with user attributes.
+* Implemented auto-speccing (recursive, lazy speccing of mocks with mocked
+  signatures for functions/methods)
+
+  Limitations:
+
+  - Doesn't mock magic methods or attributes (it creates MagicMocks, so the
+    magic methods are *there*, they just don't have the signature mocked nor
+    are attributes followed)
+  - Doesn't mock function / method attributes
+  - Uses object traversal on the objects being mocked to determine types - so
+    will trigger properties etc
+  - The return value of mocked classes (the 'instance') has the same call
+    signature as the class __init__ (as they share the same spec)
+
+  You create auto-specced mocks by passing `autospec=True` to `patch`.
+
+  Note that attributes that are None are special cased and mocked without a
+  spec (so any attribute / method can be used). This is because None is
+  typically used as a default value for attributes that may be of some other
+  type, and as we don't know what type that may be we allow all access.
+
+  Note that the `autospec` option to `patch` obsoletes the `mocksignature`
+  option.
+
+* Added the `create_autospec` function for manually creating 'auto-specced'
+  mocks
+* Removal of deprecated `patch_object`
+
 
 2011/05/30 Version 0.7.2
 ------------------------

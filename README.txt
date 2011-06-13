@@ -6,17 +6,11 @@ needed attributes in the normal way.
 
 mock is tested on Python versions 2.4-2.7 and Python 3.
 
-.. note::
-
-    You can install the latest alpha version of `mock (0.8 alpha 1)
-    <http://www.voidspace.org.uk/downloads/mock-0.8.0alpha1.tar.gz#egg=mock-dev>`_
-    with `pip install mock==dev`.
-
 The mock module also provides utility functions / objects to assist with
 testing, particularly monkey patching.
 
-* `PDF documentation for 0.7.2
-  <http://www.voidspace.org.uk/downloads/mock-0.7.2.pdf>`_
+* `PDF documentation for 0.8.0 alpha 1
+  <http://www.voidspace.org.uk/downloads/mock-0.8.0a1.pdf>`_
 * `mock on google code (repository and issue tracker)
   <http://code.google.com/p/mock/>`_
 * `mock documentation
