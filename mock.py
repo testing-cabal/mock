@@ -1320,7 +1320,7 @@ call = _Call()
 
 
 
-def create_autospec(spec, spec_set=False, inherit=False, configure=None,
+def create_autospec(spec, spec_set=False, inherit=DEFAULT, configure=None,
                     _parent=None, _name=None, _instance=False):
     """XXXX needs docstring!"""
     if configure is None:
@@ -1353,9 +1353,12 @@ def create_autospec(spec, spec_set=False, inherit=False, configure=None,
     if _parent is not None:
         _parent._mock_children[_name] = mock
 
-    if is_type and inherit and not _instance:
+    this_inherit = inherit
+    if inherit is DEFAULT:
+        this_inherit = is_type
+    if this_inherit and not _instance:
         # XXXX could give a name to the return_value mock?
-        mock.return_value = create_autospec(spec, spec_set, inherit,
+        mock.return_value = create_autospec(spec, spec_set, this_inherit,
                                             _instance=True)
 
     for entry in dir(spec):
@@ -1378,7 +1381,10 @@ def create_autospec(spec, spec_set=False, inherit=False, configure=None,
             kwargs = {'spec_set': original}
 
         if not isinstance(original, FunctionTypes):
-            new = _SpecState(original, spec_set, inherit, mock, entry,
+            this_inherit = inherit
+            if inherit is DEFAULT:
+                this_inherit = isinstance(original, ClassTypes)
+            new = _SpecState(original, spec_set, this_inherit, mock, entry,
                                _instance)
             mock._mock_children[entry] = new
         else:
