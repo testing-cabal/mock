@@ -306,7 +306,7 @@ class SpecSignatureTest(unittest2.TestCase):
             self.assertRaises(TypeError, this_mock.a, 'foo')
             self.assertRaises(AttributeError, getattr, this_mock, 'b')
 
-        instance_mock = create_autospec(Foo(), inherit=True)
+        instance_mock = create_autospec(Foo())
         instance_mock.a()
         instance_mock.a.assert_called_with()
         self.assertRaises(TypeError, instance_mock.a, 'foo')
@@ -324,6 +324,64 @@ class SpecSignatureTest(unittest2.TestCase):
         instance_mock.Bar().f()
         instance_mock.Bar().f.assert_called_with()
         self.assertRaises(AttributeError, getattr, instance_mock.Bar(), 'g')
+
+
+    def test_inherit(self):
+        class Foo(object):
+            a = 3
+
+        Foo.Foo = Foo
+
+        # default
+        mock = create_autospec(Foo)
+        instance = mock()
+        self.assertRaises(AttributeError, getattr, instance, 'b')
+
+        attr_instance = mock.Foo()
+        self.assertRaises(AttributeError, getattr, attr_instance, 'b')
+
+        # Explicit True
+        mock = create_autospec(Foo, inherit=True)
+        instance = mock()
+        self.assertRaises(AttributeError, getattr, instance, 'b')
+
+        attr_instance = mock.Foo()
+        self.assertRaises(AttributeError, getattr, attr_instance, 'b')
+
+        # Explicit False
+        mock = create_autospec(Foo, inherit=False)
+        instance = mock()
+
+        attr_instance = mock.Foo()
+        attr_instance.b()
+        attr_instance.b.assert_called_once_with()
+
+        # instance default
+        mock = create_autospec(Foo())
+        self.assertRaises(AttributeError, getattr, mock, 'b')
+
+        call_result = mock()
+        call_result.b()
+        call_result.b.assert_called_once_with()
+
+        # instance explicit True
+        mock = create_autospec(Foo(), inherit=True)
+        call_result = mock()
+        self.assertRaises(AttributeError, getattr, call_result, 'b')
+
+        call_result = mock.Foo()
+        self.assertRaises(AttributeError, getattr, call_result, 'b')
+
+        # instance explicit False
+        mock = create_autospec(Foo(), inherit=False)
+
+        call_result = mock()
+        call_result.b()
+        call_result.b.assert_called_once_with()
+
+        call_result = mock.Foo()
+        call_result.b()
+        call_result.b.assert_called_once_with()
 
 
     def test_builtins(self):
