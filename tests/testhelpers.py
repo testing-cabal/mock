@@ -507,5 +507,6 @@ class SpecSignatureTest(unittest2.TestCase):
                 pass
 
         a = create_autospec(Foo)
+        # using the mock module as an autospec also shows the issue
 
 

@@ -400,6 +400,14 @@ class callargs(tuple):
         return tuple(args_kwargs) == (other_args, other_kwargs)
 
 
+def _raises(name):
+    msg = "Non-callable mock has no %s" % name
+    def fget(self):
+        raise TypeError(msg)
+    def fset(self, value):
+        raise TypeError(msg)
+    return fget, fset
+
 
 class Base(object):
     _mock_return_value = DEFAULT
@@ -506,15 +514,8 @@ class NonCallableMock(Base):
             _old_name, _spec_state, **kwargs
         )
 
-
-    def __get_return_value(self):
-        raise TypeError("Non-callable mock has no return value")
-
-
-    def __set_return_value(self, value):
-        raise TypeError("Can't set a return value on a non-callable mock")
-
-    return_value = property(__get_return_value, __set_return_value)
+    return_value = property(*_raises('return_value'))
+    side_effect = property(*_raises('side_effect'))
 
 
     @property
