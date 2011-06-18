@@ -44,6 +44,16 @@ itself is garbage collected. This is tricky to get right though.
 CHANGELOG
 =========
 
+
+2011/XX/XX Version 0.8.0 alpha 2
+--------------------------------
+
+* Addition of `NonCallableMock` and `NonCallableMagicMock`
+
+(`MagicMock` is no longer a subclass of `Mock`, but a subclass of
+`NonCallableMock` with the callability mixed in.)
+
+
 2011/06/14 Version 0.8.0 alpha 1
 --------------------------------
 

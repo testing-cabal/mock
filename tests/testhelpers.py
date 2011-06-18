@@ -4,6 +4,7 @@
 
 from tests.support import unittest2, inPy3k
 
+import mock
 from mock import MagicMock, Mock, ANY, call, create_autospec
 
 
@@ -499,3 +500,8 @@ class SpecSignatureTest(unittest2.TestCase):
 
         none.foo()
         none.foo.assert_called_once_with()
+
+
+    def test_autospec_mock_module(self):
+        # used to raise an exception
+        create_autospec(mock)

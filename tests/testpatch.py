@@ -200,7 +200,7 @@ class PatchTest(unittest2.TestCase):
         def test(mock):
             self.assertEqual(mock, Test.something,
                              "Mock not passed into test function")
-            self.assertTrue(isinstance(mock, Mock),
+            self.assertIsInstance(mock, MagicMock,
                             "patch with two arguments did not create a mock")
 
         test()
@@ -216,9 +216,9 @@ class PatchTest(unittest2.TestCase):
                              "Mock not passed into test function")
             self.assertEqual(mock2, Test.something,
                              "Second Mock not passed into test function")
-            self.assertTrue(isinstance(mock2, Mock),
+            self.assertIsInstance(mock2, MagicMock,
                             "patch with two arguments did not create a mock")
-            self.assertTrue(isinstance(mock2, Mock),
+            self.assertIsInstance(mock2, MagicMock,
                             "patch with two arguments did not create a mock")
 
             # A hack to test that new mocks are passed the second time
@@ -237,7 +237,7 @@ class PatchTest(unittest2.TestCase):
         @patch('tests.testpatch.SomeClass', spec=SomeClass)
         def test(MockSomeClass):
             self.assertEqual(SomeClass, MockSomeClass)
-            self.assertTrue(isinstance(SomeClass.wibble, Mock))
+            self.assertTrue(isinstance(SomeClass.wibble, MagicMock))
             self.assertRaises(AttributeError, lambda: SomeClass.not_wibble)
 
         test()
@@ -247,7 +247,8 @@ class PatchTest(unittest2.TestCase):
         @patch.object(SomeClass, 'class_attribute', spec=SomeClass)
         def test(MockAttribute):
             self.assertEqual(SomeClass.class_attribute, MockAttribute)
-            self.assertTrue(isinstance(SomeClass.class_attribute.wibble, Mock))
+            self.assertTrue(isinstance(SomeClass.class_attribute.wibble,
+                                       MagicMock))
             self.assertRaises(AttributeError,
                               lambda: SomeClass.class_attribute.not_wibble)
 
@@ -258,7 +259,7 @@ class PatchTest(unittest2.TestCase):
         @patch('tests.testpatch.SomeClass', spec=['wibble'])
         def test(MockSomeClass):
             self.assertEqual(SomeClass, MockSomeClass)
-            self.assertTrue(isinstance(SomeClass.wibble, Mock))
+            self.assertTrue(isinstance(SomeClass.wibble, MagicMock))
             self.assertRaises(AttributeError, lambda: SomeClass.not_wibble)
 
         test()
@@ -268,7 +269,8 @@ class PatchTest(unittest2.TestCase):
         @patch.object(SomeClass, 'class_attribute', spec=['wibble'])
         def test(MockAttribute):
             self.assertEqual(SomeClass.class_attribute, MockAttribute)
-            self.assertTrue(isinstance(SomeClass.class_attribute.wibble, Mock))
+            self.assertTrue(isinstance(SomeClass.class_attribute.wibble,
+                                       MagicMock))
             self.assertRaises(AttributeError,
                               lambda: SomeClass.class_attribute.not_wibble)
 
@@ -281,7 +283,7 @@ class PatchTest(unittest2.TestCase):
         @patch('tests.testpatch.SomeClass', spec=['wibble'])
         def test(MockSomeClass, MockOpen):
             self.assertEqual(SomeClass, MockSomeClass)
-            self.assertTrue(isinstance(SomeClass.wibble, Mock))
+            self.assertTrue(isinstance(SomeClass.wibble, MagicMock))
             self.assertRaises(AttributeError, lambda: SomeClass.not_wibble)
         test()
 
