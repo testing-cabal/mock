@@ -24,10 +24,12 @@ __all__ = (
     'call',
     'create_autospec',
     'FILTER_DIR',
+    'NonCallableMock',
+    'NonCallableMagicMock',
 )
 
 
-__version__ = '0.8.0alpha1'
+__version__ = '0.8.0alpha2'
 
 __unittest = True
 
@@ -91,9 +93,6 @@ builtin = '__builtin__'
 if inPy3k:
     self = '__self__'
     builtin = 'builtins'
-
-# hack for Python 3 :-)
-_super = super
 
 FILTER_DIR = True
 
@@ -186,9 +185,9 @@ def _copy_func_details(func, funcopy):
     funcopy.__module__ = func.__module__
     if not inPy3k:
         funcopy.func_defaults = func.func_defaults
-    else:
-        funcopy.__defaults__ = func.__defaults__
-        funcopy.__kwdefaults__ = func.__kwdefaults__
+        return
+    funcopy.__defaults__ = func.__defaults__
+    funcopy.__kwdefaults__ = func.__kwdefaults__
 
 
 def _callable(obj):
@@ -199,7 +198,7 @@ def _callable(obj):
     return False
 
 
-def _set_signature(mock, original, skipfirst):
+def _set_signature(mock, original):
     # creates a function with signature (*args, **kwargs) that delegates to a
     # mock. It still does signature checking by calling a lambda with the same
     # signature as the original. This is effectively mocksignature2.
@@ -267,7 +266,9 @@ def mocksignature(func, mock=None, skipfirst=False):
 
 def _setup_func(funcopy, mock):
     funcopy.mock = mock
-    if not isinstance(mock, Mock):
+
+    # can't use isinstance with mocks
+    if not _is_instance_mock(mock):
         return
 
     def assert_called_with(*args, **kwargs):
@@ -278,7 +279,7 @@ def _setup_func(funcopy, mock):
         funcopy.method_calls = []
         mock.reset_mock()
         ret = funcopy.return_value
-        if isinstance(ret, Mock) and not ret is mock:
+        if _is_instance_mock(ret) and not ret is mock:
             ret.reset_mock()
 
     funcopy.called = False
@@ -286,6 +287,7 @@ def _setup_func(funcopy, mock):
     funcopy.call_args = None
     funcopy.call_args_list = []
     funcopy.method_calls = []
+
     funcopy.return_value = mock.return_value
     funcopy.side_effect = mock.side_effect
     funcopy._mock_children = mock._mock_children
@@ -361,7 +363,54 @@ def _mock_signature_property(name):
     return property(_get, _set)
 
 
-class Mock(object):
+
+class callargs(tuple):
+    """
+    A tuple for holding the results of a call to a mock, either in the form
+    `(args, kwargs)` or `(name, args, kwargs)`.
+
+    If args or kwargs are empty then a callargs tuple will compare equal to
+    a tuple without those values. This makes comparisons less verbose::
+
+        callargs('name', (), {}) == ('name',)
+        callargs('name', (1,), {}) == ('name', (1,))
+        callargs((), {'a': 'b'}) == ({'a': 'b'},)
+    """
+    def __eq__(self, other):
+        if len(self) == 3:
+            if other[0] != self[0]:
+                return False
+            args_kwargs = self[1:]
+            other_args_kwargs = other[1:]
+        else:
+            args_kwargs = tuple(self)
+            other_args_kwargs = other
+
+        if len(other_args_kwargs) == 0:
+            other_args, other_kwargs = (), {}
+        elif len(other_args_kwargs) == 1:
+            if isinstance(other_args_kwargs[0], tuple):
+                other_args = other_args_kwargs[0]
+                other_kwargs = {}
+            else:
+                other_args = ()
+                other_kwargs = other_args_kwargs[0]
+        else:
+            other_args, other_kwargs = other_args_kwargs
+
+        return tuple(args_kwargs) == (other_args, other_kwargs)
+
+
+
+class Base(object):
+    _mock_return_value = DEFAULT
+    _mock_side_effect = None
+    def __init__(self, *args, **kwargs):
+        pass
+
+
+
+class NonCallableMock(Base):
     """
     Create a new ``Mock`` object. ``Mock`` takes several optional arguments
     that specify the behaviour of the Mock object:
@@ -407,6 +456,7 @@ class Mock(object):
       mock. This can be useful for debugging. The name is propagated to child
       mocks.
     """
+
     def __new__(cls, *args, **kw):
         # every instance has its own class
         # so we can create magic methods on the
@@ -415,9 +465,8 @@ class Mock(object):
         return object.__new__(new)
 
 
-    def __init__(self, spec=None, side_effect=None, return_value=DEFAULT,
-                    wraps=None, name=None, spec_set=None, parent=None,
-                    _old_name=None, _spec_state=None, **kwargs):
+    def __init__(self, spec=None, wraps=None, name=None, spec_set=None,
+                 parent=None, _old_name=None, _spec_state=None, **kwargs):
         self._mock_parent = parent
         self._mock_name = name
         self._mock_old_name = _old_name
@@ -441,8 +490,6 @@ class Mock(object):
         self._spec_set = spec_set
         self._mock_methods = spec
         self._mock_children = {}
-        self._mock_return_value = return_value
-        self._mock_side_effect = side_effect
         self._mock_wraps = wraps
         self.mock_calls = []
         self._mock_signature = None
@@ -454,6 +501,21 @@ class Mock(object):
 
         self.reset_mock()
         self.configure_mock(**kwargs)
+
+        super(NonCallableMock, self).__init__(
+            spec, wraps, name, spec_set, parent,
+            _old_name, _spec_state, **kwargs
+        )
+
+
+    def __get_return_value(self):
+        raise TypeError("Non-callable mock has no return value")
+
+
+    def __set_return_value(self, value):
+        raise TypeError("Can't set a return value on a non-callable mock")
+
+    return_value = property(__get_return_value, __set_return_value)
 
 
     @property
@@ -481,7 +543,7 @@ class Mock(object):
             child.reset_mock()
 
         ret = self._mock_return_value
-        if isinstance(ret, Mock) and ret is not self:
+        if _is_instance_mock(ret) and ret is not self:
             ret.reset_mock()
 
 
@@ -498,69 +560,6 @@ class Mock(object):
             for entry in args:
                 obj = getattr(obj, entry)
             setattr(obj, final, val)
-
-
-    def __get_return_value(self):
-        ret = self._mock_return_value
-        if self._mock_signature is not None:
-            ret = self._mock_signature.return_value
-
-        if ret is DEFAULT:
-            ret = self._get_child_mock()
-            self.return_value = ret
-        return ret
-
-
-    def __set_return_value(self, value):
-        if self._mock_signature is not None:
-            self._mock_signature.return_value = value
-        else:
-            self._mock_return_value = value
-
-    __return_value_doc = "The value to be returned when the mock is called."
-    return_value = property(__get_return_value, __set_return_value,
-                            __return_value_doc)
-
-
-    def _mock_check_sig(self, *args, **kwargs):
-        # stub method that can be replaced with one with a specific signature
-        pass
-
-    def __call__(self, *args, **kwargs):
-        self._mock_check_sig(*args, **kwargs)
-        return self._mock_call(*args, **kwargs)
-
-    def _mock_call(self, *args, **kwargs):
-        self.called = True
-        self.call_count += 1
-        self.call_args = callargs((args, kwargs))
-        self.call_args_list.append(callargs((args, kwargs)))
-
-        parent = self._mock_parent
-        name = self._mock_name
-        while parent is not None:
-            parent.method_calls.append(callargs((name, args, kwargs)))
-            if parent._mock_parent is None:
-                break
-            name = parent._mock_name + '.' + name
-            parent = parent._mock_parent
-
-        ret_val = DEFAULT
-        if self.side_effect is not None:
-            if (isinstance(self.side_effect, BaseException) or
-                isinstance(self.side_effect, ClassTypes) and
-                issubclass(self.side_effect, BaseException)):
-                raise self.side_effect
-
-            ret_val = self.side_effect(*args, **kwargs)
-            if ret_val is DEFAULT:
-                ret_val = self.return_value
-
-        if self._mock_wraps is not None and self._mock_return_value is DEFAULT:
-            return self._mock_wraps(*args, **kwargs)
-        if ret_val is DEFAULT:
-            ret_val = self.return_value
-        return ret_val
 
 
     def __getattr__(self, name):
@@ -653,7 +652,7 @@ class Mock(object):
                 setattr(type(self), name, value)
                 return
 
-            if not isinstance(value, Mock):
+            if not _is_instance_mock(value):
                 setattr(type(self), name, _get_method(name, value))
                 original = value
                 real = lambda *args, **kw: original(self, *args, **kw)
@@ -697,46 +696,98 @@ class Mock(object):
 
 
     def _get_child_mock(self, **kw):
-        klass = type(self).__mro__[1]
+        _type = type(self)
+        if not issubclass(_type, CallableMixin):
+            if issubclass(_type, NonCallableMagicMock):
+                klass = MagicMock
+            elif issubclass(_type, NonCallableMock) :
+                klass = Mock
+        else:
+            klass = _type.__mro__[1]
         return klass(**kw)
 
 
 
-class callargs(tuple):
-    """
-    A tuple for holding the results of a call to a mock, either in the form
-    `(args, kwargs)` or `(name, args, kwargs)`.
+class CallableMixin(Base):
 
-    If args or kwargs are empty then a callargs tuple will compare equal to
-    a tuple without those values. This makes comparisons less verbose::
+    def __init__(self, spec=None, side_effect=None, return_value=DEFAULT,
+                 wraps=None, name=None, spec_set=None, parent=None,
+                 _old_name=None, _spec_state=None, **kwargs):
+        self._mock_return_value = return_value
+        self._mock_side_effect = side_effect
 
-        callargs('name', (), {}) == ('name',)
-        callargs('name', (1,), {}) == ('name', (1,))
-        callargs((), {'a': 'b'}) == ({'a': 'b'},)
-    """
-    def __eq__(self, other):
-        if len(self) == 3:
-            if other[0] != self[0]:
-                return False
-            args_kwargs = self[1:]
-            other_args_kwargs = other[1:]
+        super(CallableMixin, self).__init__(
+            spec, wraps, name, spec_set, parent,
+            _old_name, _spec_state, **kwargs
+        )
+
+
+    def __get_return_value(self):
+        ret = self._mock_return_value
+        if self._mock_signature is not None:
+            ret = self._mock_signature.return_value
+
+        if ret is DEFAULT:
+            ret = self._get_child_mock()
+            self.return_value = ret
+        return ret
+
+
+    def __set_return_value(self, value):
+        if self._mock_signature is not None:
+            self._mock_signature.return_value = value
         else:
-            args_kwargs = tuple(self)
-            other_args_kwargs = other
+            self._mock_return_value = value
 
-        if len(other_args_kwargs) == 0:
-            other_args, other_kwargs = (), {}
-        elif len(other_args_kwargs) == 1:
-            if isinstance(other_args_kwargs[0], tuple):
-                other_args = other_args_kwargs[0]
-                other_kwargs = {}
-            else:
-                other_args = ()
-                other_kwargs = other_args_kwargs[0]
-        else:
-            other_args, other_kwargs = other_args_kwargs
+    __return_value_doc = "The value to be returned when the mock is called."
+    return_value = property(__get_return_value, __set_return_value,
+                            __return_value_doc)
 
-        return tuple(args_kwargs) == (other_args, other_kwargs)
+    def _mock_check_sig(self, *args, **kwargs):
+        # stub method that can be replaced with one with a specific signature
+        pass
+
+    def __call__(self, *args, **kwargs):
+        self._mock_check_sig(*args, **kwargs)
+        return self._mock_call(*args, **kwargs)
+
+    def _mock_call(self, *args, **kwargs):
+        self.called = True
+        self.call_count += 1
+        self.call_args = callargs((args, kwargs))
+        self.call_args_list.append(callargs((args, kwargs)))
+
+        parent = self._mock_parent
+        name = self._mock_name
+        while parent is not None:
+            parent.method_calls.append(callargs((name, args, kwargs)))
+            if parent._mock_parent is None:
+                break
+            name = parent._mock_name + '.' + name
+            parent = parent._mock_parent
+
+        ret_val = DEFAULT
+        if self.side_effect is not None:
+            if (isinstance(self.side_effect, BaseException) or
+                isinstance(self.side_effect, ClassTypes) and
+                issubclass(self.side_effect, BaseException)):
+                raise self.side_effect
+
+            ret_val = self.side_effect(*args, **kwargs)
+            if ret_val is DEFAULT:
+                ret_val = self.return_value
+
+        if self._mock_wraps is not None and self._mock_return_value is DEFAULT:
+            return self._mock_wraps(*args, **kwargs)
+        if ret_val is DEFAULT:
+            ret_val = self.return_value
+        return ret_val
+
+
+
+class Mock(CallableMixin, NonCallableMock):
+    pass
+
 
 
 def _dot_lookup(thing, comp, import_path):
@@ -1237,7 +1288,20 @@ def _set_return_value(mock, method, name):
 
 
 
-class MagicMock(Mock):
+class NonCallableMagicMock(NonCallableMock):
+    def __init__(self, *args, **kw):
+        super(NonCallableMagicMock, self).__init__(*args, **kw)
+
+        these_magics = _magics
+        if self._mock_methods is not None:
+            these_magics = _magics.intersection(self._mock_methods)
+
+        for entry in these_magics:
+            setattr(self, entry, _create_proxy(entry, self))
+
+
+
+class MagicMock(CallableMixin, NonCallableMagicMock):
     """
     MagicMock is a subclass of Mock with default implementations
     of most of the magic methods. You can use MagicMock without having to
@@ -1248,15 +1312,7 @@ class MagicMock(Mock):
 
     Attributes and the return value of a `MagicMock` will also be `MagicMocks`.
     """
-    def __init__(self, *args, **kw):
-        _super(MagicMock, self).__init__(*args, **kw)
 
-        these_magics = _magics
-        if self._mock_methods is not None:
-            these_magics = _magics.intersection(self._mock_methods)
-
-        for entry in these_magics:
-            setattr(self, entry, _create_proxy(entry, self))
 
 
 def _create_proxy(entry, self):
@@ -1346,7 +1402,7 @@ def create_autospec(spec, spec_set=False, inherit=DEFAULT, configure=None,
     if isinstance(spec, FunctionTypes):
         # should only happen at the top level because we don't
         # recurse for functions
-        mock = _set_signature(mock, spec, False)
+        mock = _set_signature(mock, spec)
     else:
         _check_signature(spec, mock, is_type)
 
@@ -1465,7 +1521,13 @@ FunctionAttributes = set([
     'func_code',
     'func_defaults',
     'func_dict',
+    'func_doc',
     'func_globals',
     'func_name',
 ])
 
+
+def _is_instance_mock(obj):
+    # can't use isinstance on Mock objects because they override __class__
+    # The base class for all mocks is NonCallableMock
+    return issubclass(type(obj), NonCallableMock)

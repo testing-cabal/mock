@@ -36,7 +36,8 @@ class WithTest(unittest2.TestCase):
     def testWithStatementAs(self):
         with patch('tests._testwith.something') as mock_something:
             self.assertEqual(something, mock_something, "unpatched")
-            self.assertTrue(isinstance(mock_something, Mock), "patching wrong type")
+            self.assertTrue(isinstance(mock_something, MagicMock),
+                            "patching wrong type")
         self.assertEqual(something, sentinel.Something)
 
 
@@ -54,7 +55,8 @@ class WithTest(unittest2.TestCase):
             with nested(patch('tests._testwith.something'),
                     patch('tests._testwith.something_else')) as (mock_something, mock_something_else):
                 self.assertEqual(something, mock_something, "unpatched")
-                self.assertEqual(something_else, mock_something_else, "unpatched")
+                self.assertEqual(something_else, mock_something_else,
+                                 "unpatched")
         self.assertEqual(something, sentinel.Something)
         self.assertEqual(something_else, sentinel.SomethingElse)
 
@@ -95,7 +97,8 @@ class WithTest(unittest2.TestCase):
             with patch('tests._testwith.something') as mock_again:
                 self.assertEqual(something, mock_again, "unpatched")
 
-            self.assertEqual(something, mock_something, "restored with wrong instance")
+            self.assertEqual(something, mock_something,
+                             "restored with wrong instance")
 
         self.assertEqual(something, sentinel.Something, "not restored")
 
@@ -104,7 +107,8 @@ class WithTest(unittest2.TestCase):
             self.assertEqual(something, mock_something, "unpatched")
 
             with patch('tests._testwith.something_else') as mock_something_else:
-                self.assertEqual(something_else, mock_something_else, "unpatched")
+                self.assertEqual(something_else, mock_something_else,
+                                 "unpatched")
 
         self.assertEqual(something, sentinel.Something)
         self.assertEqual(something_else, sentinel.SomethingElse)
