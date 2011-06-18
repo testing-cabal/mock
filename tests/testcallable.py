@@ -6,6 +6,16 @@ from tests.support import unittest2
 
 from mock import Mock, MagicMock, NonCallableMagicMock, NonCallableMock
 
+"""
+Note that NonCallableMock and NonCallableMagicMock still have the unused (and
+unusable) attributes: return_value, side_effect, call_count, call_args and
+call_args_list. These could be removed or raise errors on getting / setting.
+
+They also have the assert_called_with and assert_called_once_with methods.
+Removing these would be pointless as fetching them would create a mock
+(attribute) that could be called without error.
+"""
+
 
 class TestCallable(unittest2.TestCase):
 
