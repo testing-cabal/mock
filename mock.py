@@ -219,9 +219,8 @@ def _set_signature(mock, original):
     _copy_func_details(func, checksig)
 
     name = original.__name__
-    import keyword
     if not _isidentifier(name):
-        name = funcopy
+        name = 'funcopy'
     context = {'checksig': checksig, 'mock': mock}
     src = """def %s(*args, **kwargs):
     checksig(*args, **kwargs)
