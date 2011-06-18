@@ -400,14 +400,6 @@ class callargs(tuple):
         return tuple(args_kwargs) == (other_args, other_kwargs)
 
 
-def _raises(name):
-    msg = "Non-callable mock has no %s" % name
-    def fget(self):
-        raise TypeError(msg)
-    def fset(self, value):
-        raise TypeError(msg)
-    return fget, fset
-
 
 class Base(object):
     _mock_return_value = DEFAULT
@@ -514,8 +506,27 @@ class NonCallableMock(Base):
             _old_name, _spec_state, **kwargs
         )
 
-    return_value = property(*_raises('return_value'))
-    side_effect = property(*_raises('side_effect'))
+
+    def __get_return_value(self):
+        ret = self._mock_return_value
+        if self._mock_signature is not None:
+            ret = self._mock_signature.return_value
+
+        if ret is DEFAULT:
+            ret = self._get_child_mock()
+            self.return_value = ret
+        return ret
+
+
+    def __set_return_value(self, value):
+        if self._mock_signature is not None:
+            self._mock_signature.return_value = value
+        else:
+            self._mock_return_value = value
+
+    __return_value_doc = "The value to be returned when the mock is called."
+    return_value = property(__get_return_value, __set_return_value,
+                            __return_value_doc)
 
 
     @property
@@ -721,27 +732,6 @@ class CallableMixin(Base):
             _old_name, _spec_state, **kwargs
         )
 
-
-    def __get_return_value(self):
-        ret = self._mock_return_value
-        if self._mock_signature is not None:
-            ret = self._mock_signature.return_value
-
-        if ret is DEFAULT:
-            ret = self._get_child_mock()
-            self.return_value = ret
-        return ret
-
-
-    def __set_return_value(self, value):
-        if self._mock_signature is not None:
-            self._mock_signature.return_value = value
-        else:
-            self._mock_return_value = value
-
-    __return_value_doc = "The value to be returned when the mock is called."
-    return_value = property(__get_return_value, __set_return_value,
-                            __return_value_doc)
 
     def _mock_check_sig(self, *args, **kwargs):
         # stub method that can be replaced with one with a specific signature
