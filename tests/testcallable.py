@@ -11,7 +11,7 @@ class TestCallable(unittest2.TestCase):
 
     def test_non_callable(self):
         for mock in NonCallableMagicMock(), NonCallableMock():
-            self.assertRaises(TypeError, mock())
+            self.assertRaises(TypeError, mock)
             self.assertFalse(hasattr(mock, '__call__'))
 
 
@@ -21,13 +21,6 @@ class TestCallable(unittest2.TestCase):
 
         two = NonCallableMagicMock()
         self.assertTrue(issubclass(type(two.two), MagicMock))
-
-
-    def test_side_effect_return_value(self):
-        for mock in NonCallableMagicMock(), NonCallableMock():
-            for attr in 'side_effect', 'return_value':
-                self.assertRaises(TypeError, getattr, mock, attr)
-                self.assertRaises(TypeError, setattr, mock, attr, 'foo')
 
 
     def test_subclasses(self):
