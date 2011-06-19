@@ -88,6 +88,10 @@ except AttributeError:
 
 inPy3k = sys.version_info[0] == 3
 
+# Needed to work around Python 3 bug where use of "super" interferes with
+# defining __class__ as a descriptor
+_super = super
+
 self = 'im_self'
 builtin = '__builtin__'
 if inPy3k:
@@ -501,7 +505,7 @@ class NonCallableMock(Base):
         self.reset_mock()
         self.configure_mock(**kwargs)
 
-        super(NonCallableMock, self).__init__(
+        _super(NonCallableMock, self).__init__(
             spec, wraps, name, spec_set, parent,
             _old_name, _spec_state, **kwargs
         )
@@ -727,7 +731,7 @@ class CallableMixin(Base):
         self._mock_return_value = return_value
         self._mock_side_effect = side_effect
 
-        super(CallableMixin, self).__init__(
+        _super(CallableMixin, self).__init__(
             spec, wraps, name, spec_set, parent,
             _old_name, _spec_state, **kwargs
         )
@@ -1280,7 +1284,7 @@ def _set_return_value(mock, method, name):
 
 class NonCallableMagicMock(NonCallableMock):
     def __init__(self, *args, **kw):
-        super(NonCallableMagicMock, self).__init__(*args, **kw)
+        _super(NonCallableMagicMock, self).__init__(*args, **kw)
 
         these_magics = _magics
         if self._mock_methods is not None:

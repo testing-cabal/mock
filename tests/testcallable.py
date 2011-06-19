@@ -4,7 +4,10 @@
 
 from tests.support import unittest2
 
-from mock import Mock, MagicMock, NonCallableMagicMock, NonCallableMock
+from mock import (
+    Mock, MagicMock, NonCallableMagicMock,
+    NonCallableMock, patch
+)
 
 """
 Note that NonCallableMock and NonCallableMagicMock still have the unused (and
@@ -45,4 +48,8 @@ class TestCallable(unittest2.TestCase):
 
         two = MagicSub()
         self.assertTrue(issubclass(type(two.two), MagicSub))
+
+
+    def test_spec(self):
+        pass
 
