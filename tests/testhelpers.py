@@ -501,13 +501,9 @@ class SpecSignatureTest(unittest2.TestCase):
         none.foo.assert_called_once_with()
 
 
-    @unittest2.expectedFailure
     def test_autospec_functions_with_self_in_odd_place(self):
         class Foo(object):
             def f(a, self):
                 pass
 
         a = create_autospec(Foo)
-        # using the mock module as an autospec also shows the issue
-
-
