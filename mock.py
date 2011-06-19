@@ -176,7 +176,9 @@ def _check_signature(func, mock, skipfirst):
         return
     signature, func = result
 
-    src = "lambda self, %s: None" % signature
+    # can't use self because "self" is common as an argument name
+    # unfortunately even not in the first place
+    src = "lambda _mock_self, %s: None" % signature
     checksig = eval(src, {})
     _copy_func_details(func, checksig)
     type(mock)._mock_check_sig = checksig

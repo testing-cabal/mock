@@ -49,6 +49,8 @@ CHANGELOG
 --------------------------------
 
 * Addition of `NonCallableMock` and `NonCallableMagicMock`
+* BUGFIX: autospec for functions / methods with an argument named self that
+  isn't the first argument no longer broken
 
 (`MagicMock` is no longer a subclass of `Mock`, but a subclass of
 `NonCallableMock` with the callability mixed in.)
