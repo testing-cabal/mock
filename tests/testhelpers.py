@@ -507,3 +507,5 @@ class SpecSignatureTest(unittest2.TestCase):
                 pass
 
         a = create_autospec(Foo)
+        a.f(self=10)
+        a.f.assert_called_with(self=10)

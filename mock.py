@@ -204,6 +204,17 @@ def _callable(obj):
     return False
 
 
+def _instance_callable(klass):
+    """Given a class, return True if instances would be callable"""
+    # uses __bases__ instead of __mro__ so that we work with old style classes
+    if '__call__' in klass.__dict__:
+        return True
+    for base in klass.__bases__:
+        if _instance_callable(base):
+            return True
+    return False
+
+
 def _set_signature(mock, original):
     # creates a function with signature (*args, **kwargs) that delegates to a
     # mock. It still does signature checking by calling a lambda with the same
@@ -685,13 +696,14 @@ class NonCallableMock(Base):
         return object.__delattr__(self, name)
 
 
-    def assert_called_with(self, *args, **kwargs):
+    def assert_called_with(_mock_self, *args, **kwargs):
         """
         assert that the mock was called with the specified arguments.
 
         Raises an AssertionError if the args and keyword args passed in are
         different to the last call to the mock.
         """
+        self = _mock_self
         if self.call_args is None:
             raise AssertionError('Expected: %s\nNot called' % ((args, kwargs),))
         if not self.call_args == (args, kwargs):
@@ -700,11 +712,12 @@ class NonCallableMock(Base):
             )
 
 
-    def assert_called_once_with(self, *args, **kwargs):
+    def assert_called_once_with(_mock_self, *args, **kwargs):
         """
         assert that the mock was called exactly once and with the specified
         arguments.
         """
+        self = _mock_self
         if not self.call_count == 1:
             msg = ("Expected to be called once. Called %s times." %
                    self.call_count)
@@ -743,11 +756,14 @@ class CallableMixin(Base):
         # stub method that can be replaced with one with a specific signature
         pass
 
-    def __call__(self, *args, **kwargs):
-        self._mock_check_sig(*args, **kwargs)
-        return self._mock_call(*args, **kwargs)
+    def __call__(_mock_self, *args, **kwargs):
+        # can't use self in-case a function / method we are mocking uses self
+        # in the signature
+        _mock_self._mock_check_sig(*args, **kwargs)
+        return _mock_self._mock_call(*args, **kwargs)
 
-    def _mock_call(self, *args, **kwargs):
+    def _mock_call(_mock_self, *args, **kwargs):
+        self = _mock_self
         self.called = True
         self.call_count += 1
         self.call_args = callargs((args, kwargs))
@@ -910,9 +926,13 @@ class _patch(object):
                 spec = original
                 if isinstance(spec, ClassTypes):
                     inherit = True
-            new = MagicMock(spec=spec, spec_set=spec_set, **kwargs)
+            Klass = MagicMock
+            if spec is not None:
+                if not _callable(spec):
+                    Klass = NonCallableMagicMock
+            new = Klass(spec=spec, spec_set=spec_set, **kwargs)
             if inherit:
-                new.return_value = Mock(spec=spec, spec_set=spec_set)
+                new.return_value = MagicMock(spec=spec, spec_set=spec_set)
         elif autospec is not False:
             # spec is ignored, new *must* be default, spec_set is treated
             # as a boolean. Should we check spec is not None and that spec_set
@@ -1415,6 +1435,7 @@ def create_autospec(spec, spec_set=False, inherit=DEFAULT, configure=None,
 
     for entry in dir(spec):
         if _is_magic(entry):
+            # MagicMock already does the useful magic methods for us
             continue
 
         if isinstance(spec, FunctionTypes) and entry in FunctionAttributes:
@@ -1426,6 +1447,7 @@ def create_autospec(spec, spec_set=False, inherit=DEFAULT, configure=None,
         # actual object to mock it so we would rather trigger a property than
         # mock the property descriptor. Likewise we want to mock out
         # dynamically provided attributes.
+        # XXXX what about attributes that raise exceptions on being fetched
         original = getattr(spec, entry)
 
         kwargs = {'spec': original}
@@ -1449,7 +1471,7 @@ def create_autospec(spec, spec_set=False, inherit=DEFAULT, configure=None,
             skipfirst = _must_skip(spec, entry, is_type)
             _check_signature(original, new, skipfirst=skipfirst)
 
-        # so functions created with mocksignature become instance methods,
+        # so functions created with mocksignature become instance attributes,
         # *plus* their underlying mock exists in _mock_children of the parent
         # mock. Adding to _mock_children may be unnecessary where we are also
         # setting as an instance attribute?

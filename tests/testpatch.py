@@ -6,7 +6,7 @@ import os
 import sys
 
 from tests import support
-from tests.support import unittest2, inPy3k, SomeClass
+from tests.support import unittest2, inPy3k, SomeClass, is_instance
 
 from mock import MagicMock, Mock, patch, sentinel
 
@@ -237,7 +237,7 @@ class PatchTest(unittest2.TestCase):
         @patch('tests.testpatch.SomeClass', spec=SomeClass)
         def test(MockSomeClass):
             self.assertEqual(SomeClass, MockSomeClass)
-            self.assertTrue(isinstance(SomeClass.wibble, MagicMock))
+            self.assertTrue(is_instance(SomeClass.wibble, MagicMock))
             self.assertRaises(AttributeError, lambda: SomeClass.not_wibble)
 
         test()
@@ -247,7 +247,7 @@ class PatchTest(unittest2.TestCase):
         @patch.object(SomeClass, 'class_attribute', spec=SomeClass)
         def test(MockAttribute):
             self.assertEqual(SomeClass.class_attribute, MockAttribute)
-            self.assertTrue(isinstance(SomeClass.class_attribute.wibble,
+            self.assertTrue(is_instance(SomeClass.class_attribute.wibble,
                                        MagicMock))
             self.assertRaises(AttributeError,
                               lambda: SomeClass.class_attribute.not_wibble)
@@ -259,7 +259,7 @@ class PatchTest(unittest2.TestCase):
         @patch('tests.testpatch.SomeClass', spec=['wibble'])
         def test(MockSomeClass):
             self.assertEqual(SomeClass, MockSomeClass)
-            self.assertTrue(isinstance(SomeClass.wibble, MagicMock))
+            self.assertTrue(is_instance(SomeClass.wibble, MagicMock))
             self.assertRaises(AttributeError, lambda: SomeClass.not_wibble)
 
         test()
@@ -269,7 +269,7 @@ class PatchTest(unittest2.TestCase):
         @patch.object(SomeClass, 'class_attribute', spec=['wibble'])
         def test(MockAttribute):
             self.assertEqual(SomeClass.class_attribute, MockAttribute)
-            self.assertTrue(isinstance(SomeClass.class_attribute.wibble,
+            self.assertTrue(is_instance(SomeClass.class_attribute.wibble,
                                        MagicMock))
             self.assertRaises(AttributeError,
                               lambda: SomeClass.class_attribute.not_wibble)
@@ -283,7 +283,7 @@ class PatchTest(unittest2.TestCase):
         @patch('tests.testpatch.SomeClass', spec=['wibble'])
         def test(MockSomeClass, MockOpen):
             self.assertEqual(SomeClass, MockSomeClass)
-            self.assertTrue(isinstance(SomeClass.wibble, MagicMock))
+            self.assertTrue(is_instance(SomeClass.wibble, MagicMock))
             self.assertRaises(AttributeError, lambda: SomeClass.not_wibble)
         test()
 
@@ -316,7 +316,9 @@ class PatchTest(unittest2.TestCase):
     def test_patch_class_acts_with_spec_is_inherited(self):
         @patch('tests.testpatch.SomeClass', spec=True)
         def test(MockSomeClass):
+            self.assertTrue(is_instance(MockSomeClass, MagicMock))
             instance = MockSomeClass()
+            self.assertTrue(is_instance(instance, MagicMock))
             # Should not raise attribute error
             instance.wibble
 

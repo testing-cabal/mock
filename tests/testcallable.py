@@ -2,7 +2,7 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
-from tests.support import unittest2
+from tests.support import is_instance, unittest2, X
 
 from mock import (
     Mock, MagicMock, NonCallableMagicMock,
@@ -50,6 +50,14 @@ class TestCallable(unittest2.TestCase):
         self.assertTrue(issubclass(type(two.two), MagicSub))
 
 
-    def test_spec(self):
-        pass
+    def test_patch_spec(self):
+        patcher = patch('%s.X' % __name__, spec=True)
+        mock = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        instance = mock()
+        mock.assert_called_once_with()
+
+        self.assertTrue(is_instance(instance, NonCallableMagicMock))
+        self.assertRaises(TypeError, instance)
 
