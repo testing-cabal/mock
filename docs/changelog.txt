@@ -28,9 +28,9 @@ violates TOOWTDI and would be unsafe for IronPython (non-deterministic calling
 of destructors). Destructors aren't called *anyway* where there are cycles,
 but a weak reference with a callback can be used to get round this.
 
-``Mock`` has several attributes. This makes it unsuitable for mocking objects
-that use these attribute names. A way round this would be to provide ``start``
-and ``stop`` (or similar) methods that *hide* these attributes when needed.
+`Mock` has several attributes. This makes it unsuitable for mocking objects
+that use these attribute names. A way round this would be to provide `start`
+and `stop` (or similar) methods that *hide* these attributes when needed.
 In 0.8 many, but not all, of these attributes are renamed to gain a `_mock`
 prefix, making it less likely that they will clash.
 
