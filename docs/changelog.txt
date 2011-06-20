@@ -49,6 +49,10 @@ CHANGELOG
 --------------------------------
 
 * Addition of `NonCallableMock` and `NonCallableMagicMock`
+* Mocks created by `patch` have a `MagicMock` as the `return_value` where a
+  class is being patched
+* BUGFIX: `assert_called_with` / `assert_called_once_with` can be used with
+  `self` as a keyword argument
 * BUGFIX: autospec for functions / methods with an argument named self that
   isn't the first argument no longer broken
 
