@@ -951,7 +951,7 @@ class _patch(object):
                 autospec = original
             new = create_autospec(autospec, spec_set, inherit=True,
                                   configure=kwargs, **_kwargs)
-        elif self.kwargs:
+        elif kwargs:
             # can't set keyword args when we aren't creating the mock
             # XXXX If new is a Mock we could call new.configure_mock(**kwargs)
             raise TypeError("Can't pass kwargs to a mock we aren't creating")
@@ -1415,7 +1415,14 @@ def create_autospec(spec, spec_set=False, inherit=DEFAULT, configure=None,
         kwargs = {}
 
     kwargs.update(configure)
-    mock = MagicMock(parent=_parent, name=_name, **kwargs)
+
+    Klass = MagicMock
+    if not _callable(spec):
+        Klass = NonCallableMagicMock
+    elif is_type and _instance and not _instance_callable(spec):
+        Klass = NonCallableMagicMock
+
+    mock = Klass(parent=_parent, name=_name, **kwargs)
 
     if isinstance(spec, FunctionTypes):
         # should only happen at the top level because we don't

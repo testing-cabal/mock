@@ -44,6 +44,8 @@ attributes. If `patch` is created with a `spec`, and is replacing a class, then
 a `return_value` mock is created. The keyword arguments are not applied to the
 child mock, but could be.
 
+`inherit` argument to `create_autospec` doesn't seem to make much sense.
+
 
 CHANGELOG
 =========
