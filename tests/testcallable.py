@@ -70,3 +70,21 @@ class TestCallable(unittest2.TestCase):
         self.assertTrue(is_instance(mock, NonCallableMagicMock))
         self.assertRaises(TypeError, mock)
 
+
+    def test_patch_spec_callable_class(self):
+        class CallableX(X):
+            def __call__(self):
+                pass
+
+        patcher = patch('%s.X' % __name__, spec=CallableX)
+        mock = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        instance = mock()
+        mock.assert_called_once_with()
+
+        self.assertTrue(is_instance(instance, MagicMock))
+        instance()
+        instance.assert_called_once_with()
+
+
