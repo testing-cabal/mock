@@ -4,7 +4,7 @@
 
 from __future__ import with_statement
 
-from tests.support import unittest2
+from tests.support import unittest2, is_instance
 
 from mock import MagicMock, Mock, patch, sentinel
 
@@ -36,7 +36,7 @@ class WithTest(unittest2.TestCase):
     def testWithStatementAs(self):
         with patch('tests._testwith.something') as mock_something:
             self.assertEqual(something, mock_something, "unpatched")
-            self.assertTrue(isinstance(mock_something, MagicMock),
+            self.assertTrue(is_instance(mock_something, MagicMock),
                             "patching wrong type")
         self.assertEqual(something, sentinel.Something)
 

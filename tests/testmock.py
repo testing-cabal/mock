@@ -2,7 +2,7 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
-from tests.support import unittest2, inPy3k
+from tests.support import unittest2, inPy3k, is_instance
 
 import copy
 import sys
@@ -32,7 +32,7 @@ class MockTest(unittest2.TestCase):
         self.assertFalse(mock.called, "called not initialised correctly")
         self.assertEqual(mock.call_count, 0,
                          "call_count not initialised correctly")
-        self.assertTrue(isinstance(mock.return_value, Mock),
+        self.assertTrue(is_instance(mock.return_value, Mock),
                         "return_value not initialised correctly")
 
         self.assertEqual(mock.call_args, None,
@@ -177,7 +177,7 @@ class MockTest(unittest2.TestCase):
 
     def test_call(self):
         mock = Mock()
-        self.assertTrue(isinstance(mock.return_value, Mock),
+        self.assertTrue(is_instance(mock.return_value, Mock),
                         "Default return_value should be a Mock")
 
         result = mock()
@@ -266,7 +266,7 @@ class MockTest(unittest2.TestCase):
     def test_attribute_access_returns_mocks(self):
         mock = Mock()
         something = mock.something
-        self.assertTrue(isinstance(something, Mock), "attribute isn't a mock")
+        self.assertTrue(is_instance(something, Mock), "attribute isn't a mock")
         self.assertEqual(mock.something, something,
                          "different attributes returned for same name")
 
