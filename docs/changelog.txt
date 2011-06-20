@@ -44,7 +44,8 @@ attributes. If `patch` is created with a `spec`, and is replacing a class, then
 a `return_value` mock is created. The keyword arguments are not applied to the
 child mock, but could be.
 
-`inherit` argument to `create_autospec` doesn't seem to make much sense.
+`inherit` argument to `create_autospec` doesn't seem to make much sense as a
+public argument.
 
 
 CHANGELOG
@@ -57,6 +58,9 @@ CHANGELOG
 * Addition of `NonCallableMock` and `NonCallableMagicMock`
 * Mocks created by `patch` have a `MagicMock` as the `return_value` where a
   class is being patched
+* `create_autospec` can create non-callable mocks for non-callable objects.
+  `return_value` mocks of classes will be non-callable unless the class has
+  a `__call__` method
 * BUGFIX: `assert_called_with` / `assert_called_once_with` can be used with
   `self` as a keyword argument
 * BUGFIX: autospec for functions / methods with an argument named self that
