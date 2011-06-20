@@ -932,7 +932,9 @@ class _patch(object):
                     Klass = NonCallableMagicMock
             new = Klass(spec=spec, spec_set=spec_set, **kwargs)
             if inherit:
-                new.return_value = MagicMock(spec=spec, spec_set=spec_set)
+                if not _instance_callable(spec):
+                    Klass = NonCallableMagicMock
+                new.return_value = Klass(spec=spec, spec_set=spec_set)
         elif autospec is not False:
             # spec is ignored, new *must* be default, spec_set is treated
             # as a boolean. Should we check spec is not None and that spec_set

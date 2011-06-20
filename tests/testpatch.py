@@ -8,7 +8,7 @@ import sys
 from tests import support
 from tests.support import unittest2, inPy3k, SomeClass, is_instance
 
-from mock import MagicMock, Mock, patch, sentinel
+from mock import MagicMock, Mock, NonCallableMagicMock, patch, sentinel
 
 
 builtin_string = '__builtin__'
@@ -318,7 +318,7 @@ class PatchTest(unittest2.TestCase):
         def test(MockSomeClass):
             self.assertTrue(is_instance(MockSomeClass, MagicMock))
             instance = MockSomeClass()
-            self.assertTrue(is_instance(instance, MagicMock))
+            self.assertTrue(is_instance(instance, NonCallableMagicMock))
             # Should not raise attribute error
             instance.wibble
 
