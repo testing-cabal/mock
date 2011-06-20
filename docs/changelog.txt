@@ -8,37 +8,41 @@ Contributions, bug reports and comments welcomed!
 
 Feature requests and bug reports are handled on the issue tracker:
 
- * `mock module issue tracker <http://code.google.com/p/mock/issues/list>`_
+ * `mock issue tracker <http://code.google.com/p/mock/issues/list>`_
 
 When mocking a class with `patch`, passing in `spec=True` or `autospec=True`,
 the mock class has an instance created from the same spec. Should this be the
 default behaviour for mocks anyway (mock return values inheriting the spec
 from their parent), or should it be controlled by an additional keyword
-argument (`inherit`) to the Mock constructor?
+argument (`inherit`) to the Mock constructor? `create_autospec` does this, so
+an additional keyword argument to Mock is probably unnecessary.
 
-Interaction of magic methods with spec, wraps. For example, should spec cause
-all methods to be wrapped with mocksignature perhaps? (or another keyword
-argument perhaps?)
+`wraps` is not integrated with magic methods.
 
 Should magic method calls (including `__call__`?) be tracked in `method_calls`?
+`mock_calls` that tracks all calls will solve this.
 
-Could take a patch keyword argument and auto-do the patching in the
+`patch` could take a keyword argument and auto-do the patching in the
 constructor and unpatch in the destructor. This would be useful in itself, but
 violates TOOWTDI and would be unsafe for IronPython (non-deterministic calling
-of destructors). Destructors aren't called *anyway* where there are cycles, but
-a weak reference with a callback can be used to get round this.
+of destructors). Destructors aren't called *anyway* where there are cycles,
+but a weak reference with a callback can be used to get round this.
 
 ``Mock`` has several attributes. This makes it unsuitable for mocking objects
 that use these attribute names. A way round this would be to provide ``start``
 and ``stop`` (or similar) methods that *hide* these attributes when needed.
-(`_name` is a mock attribute that will be not-uncommon, but it is accessed
-externally on mocks when building `method_calls` names and so can't be changed
-to a double underscore name.)
+In 0.8 many, but not all, of these attributes are renamed to gain a `_mock`
+prefix, making it less likely that they will clash.
 
 If a patch is started using `patch.start` and then not stopped correctly, due
 to a bug in the test code, then the unpatching is not done. Using weak
 references it would be possible to detect and fix this when the patch object
-itself is garbage collected. This is tricky to get right though.
+itself is garbage collected. This would be tricky to get right though.
+
+When a `Mock` is created by `patch`, arbitrary keywords can be used to set
+attributes. If `patch` is created with a `spec`, and is replacing a class, then
+a `return_value` mock is created. The keyword arguments are not applied to the
+child mock, but could be.
 
 
 CHANGELOG
