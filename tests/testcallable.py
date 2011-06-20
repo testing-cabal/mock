@@ -88,3 +88,11 @@ class TestCallable(unittest2.TestCase):
         instance.assert_called_once_with()
 
 
+    def test_create_autopsec(self):
+        mock = create_autospec(X)
+        instance = mock()
+        self.assertRaises(TypeError, instance)
+
+        mock = create_autospec(X())
+        self.assertRaises(TypeError, mock)
+

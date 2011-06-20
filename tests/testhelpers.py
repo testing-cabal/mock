@@ -312,10 +312,8 @@ class SpecSignatureTest(unittest2.TestCase):
         self.assertRaises(TypeError, instance_mock.a, 'foo')
         self.assertRaises(AttributeError, getattr, instance_mock, 'b')
 
-        # The return value isn't created with a spec because the spec is an
-        # instance and not a class. The spec isn't inherited by return value.
-        instance_mock().a(1, 2, 3)
-        instance_mock().a.assert_called_with(1, 2, 3)
+        # The return value isn't isn't callable
+        self.assertRaises(TypeError, instance_mock)
 
         instance_mock.Bar.f()
         instance_mock.Bar.f.assert_called_with()
@@ -359,25 +357,20 @@ class SpecSignatureTest(unittest2.TestCase):
         # instance default
         mock = create_autospec(Foo())
         self.assertRaises(AttributeError, getattr, mock, 'b')
-
-        call_result = mock()
-        call_result.b()
-        call_result.b.assert_called_once_with()
+        self.assertRaises(TypeError, mock)
 
         # instance explicit True
         mock = create_autospec(Foo(), inherit=True)
-        call_result = mock()
-        self.assertRaises(AttributeError, getattr, call_result, 'b')
+        # instance still not callable
+        self.assertRaises(TypeError, mock)
 
         call_result = mock.Foo()
         self.assertRaises(AttributeError, getattr, call_result, 'b')
 
         # instance explicit False
         mock = create_autospec(Foo(), inherit=False)
-
-        call_result = mock()
-        call_result.b()
-        call_result.b.assert_called_once_with()
+        # instance still not callable
+        self.assertRaises(TypeError, mock)
 
         call_result = mock.Foo()
         call_result.b()
