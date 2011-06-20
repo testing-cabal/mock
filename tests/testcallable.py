@@ -6,7 +6,7 @@ from tests.support import is_instance, unittest2, X
 
 from mock import (
     Mock, MagicMock, NonCallableMagicMock,
-    NonCallableMock, patch
+    NonCallableMock, patch, create_autospec
 )
 
 """
@@ -60,4 +60,13 @@ class TestCallable(unittest2.TestCase):
 
         self.assertTrue(is_instance(instance, NonCallableMagicMock))
         self.assertRaises(TypeError, instance)
+
+
+    def test_patch_spec_instance(self):
+        patcher = patch('%s.X' % __name__, spec=X())
+        mock = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        self.assertTrue(is_instance(mock, NonCallableMagicMock))
+        self.assertRaises(TypeError, mock)
 
