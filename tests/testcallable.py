@@ -2,7 +2,7 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
-from tests.support import is_instance, unittest2, X
+from tests.support import is_instance, unittest2, X, SomeClass
 
 from mock import (
     Mock, MagicMock, NonCallableMagicMock,
@@ -76,16 +76,30 @@ class TestCallable(unittest2.TestCase):
             def __call__(self):
                 pass
 
-        patcher = patch('%s.X' % __name__, spec=CallableX)
-        mock = patcher.start()
-        self.addCleanup(patcher.stop)
+        class Sub(CallableX):
+            pass
 
-        instance = mock()
-        mock.assert_called_once_with()
+        class Multi(SomeClass, Sub):
+            pass
 
-        self.assertTrue(is_instance(instance, MagicMock))
-        instance()
-        instance.assert_called_once_with()
+        class OldStyle:
+            def __call__(self):
+                pass
+
+        class OldStyleSub(OldStyle):
+            pass
+
+        for Klass in CallableX, Sub, Multi, OldStyle, OldStyleSub:
+            patcher = patch('%s.X' % __name__, spec=Klass)
+            mock = patcher.start()
+            self.addCleanup(patcher.stop)
+
+            instance = mock()
+            mock.assert_called_once_with()
+
+            self.assertTrue(is_instance(instance, MagicMock))
+            instance()
+            instance.assert_called_once_with()
 
 
     def test_create_autopsec(self):
