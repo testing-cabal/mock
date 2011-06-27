@@ -204,8 +204,14 @@ def _callable(obj):
     return False
 
 
-def _instance_callable(klass):
-    """Given a class, return True if instances would be callable"""
+def _instance_callable(obj):
+    """Given an object, return True if the object is callable.
+    For classes, return True if instances would be callable."""
+    if not isinstance(obj, ClassTypes):
+        # already an instance
+        return hasattr(obj, '__call__')
+
+    klass = obj
     # uses __bases__ instead of __mro__ so that we work with old style classes
     if '__call__' in klass.__dict__:
         return True
@@ -360,7 +366,7 @@ ClassTypes = (type,)
 if not inPy3k:
     ClassTypes = (type, ClassType)
 
-_allowed_names = set(['return_value'])
+_allowed_names = set(['return_value', '_mock_return_value'])
 
 def _mock_signature_property(name):
     _allowed_names.add(name)
@@ -482,10 +488,9 @@ class NonCallableMock(Base):
 
 
     def __init__(self, spec=None, wraps=None, name=None, spec_set=None,
-                 parent=None, _old_name=None, _spec_state=None, **kwargs):
+                 parent=None, _spec_state=None, **kwargs):
         self._mock_parent = parent
         self._mock_name = name
-        self._mock_old_name = _old_name
 
         self._spec_state = _spec_state
 
@@ -520,7 +525,7 @@ class NonCallableMock(Base):
 
         _super(NonCallableMock, self).__init__(
             spec, wraps, name, spec_set, parent,
-            _old_name, _spec_state, **kwargs
+            _spec_state, **kwargs
         )
 
 
@@ -742,13 +747,13 @@ class CallableMixin(Base):
 
     def __init__(self, spec=None, side_effect=None, return_value=DEFAULT,
                  wraps=None, name=None, spec_set=None, parent=None,
-                 _old_name=None, _spec_state=None, **kwargs):
+                 _spec_state=None, **kwargs):
         self._mock_return_value = return_value
         self._mock_side_effect = side_effect
 
         _super(CallableMixin, self).__init__(
             spec, wraps, name, spec_set, parent,
-            _old_name, _spec_state, **kwargs
+            _spec_state, **kwargs
         )
 
 
@@ -909,30 +914,34 @@ class _patch(object):
 
     def __enter__(self):
         """Perform the patch."""
-        new, spec = self.new, self.spec
-        spec_set, autospec = self.spec_set, self.autospec
-        kwargs = self.kwargs
+        new, spec, spec_set = self.new, self.spec, self.spec_set
+        autospec, kwargs = self.autospec, self.kwargs
 
         original, local = self.get_original()
         if new is DEFAULT and autospec is False:
-            # XXXX what if original is DEFAULT - shouldn't use it as a spec
             inherit = False
             if spec_set == True:
                 spec_set = original
-                if isinstance(spec_set, ClassTypes):
-                    inherit = True
             elif spec == True:
                 # set spec to the object we are replacing
                 spec = original
-                if isinstance(spec, ClassTypes):
+
+            if (spec or spec_set) is not None:
+                if isinstance(original, ClassTypes):
+                    # If we're patching out a class and there is a spec
                     inherit = True
+
             Klass = MagicMock
-            if spec is not None:
-                if not _callable(spec):
+            if (spec or spec_set) is not None:
+                if not _callable(spec or spec_set):
                     Klass = NonCallableMagicMock
+
             new = Klass(spec=spec, spec_set=spec_set, **kwargs)
             if inherit:
-                if not _instance_callable(spec):
+                # we can only tell if the instance should be callable if the
+                # spec is not a list
+                if (not isinstance(spec or spec_set, list) and not
+                    _instance_callable(spec or spec_set)):
                     Klass = NonCallableMagicMock
                 new.return_value = Klass(spec=spec, spec_set=spec_set)
         elif autospec is not False:
