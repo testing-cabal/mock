@@ -502,3 +502,14 @@ class SpecSignatureTest(unittest2.TestCase):
         a = create_autospec(Foo)
         a.f(self=10)
         a.f.assert_called_with(self=10)
+
+
+    def test_autospec_property(self):
+        class Foo(object):
+            @property
+            def foo(self):
+                return 3
+
+        a = create_autospec(Foo)
+        a.foo
+        import pdb;pdb.set_trace()

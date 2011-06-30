@@ -992,7 +992,18 @@ class _patch(object):
     stop = __exit__
 
 
-def _patch_object(target, attribute, new=DEFAULT, spec=None,
+
+def _get_target(target):
+    try:
+        target, attribute = target.rsplit('.', 1)
+    except (TypeError, ValueError):
+        raise TypeError("Need a valid target to patch. You supplied: %r" %
+                        (target,))
+    target = _importer(target)
+    return target, attribute
+
+
+def _patch_object(target, attribute=DEFAULT, new=DEFAULT, spec=None,
                       create=False, mocksignature=False, spec_set=None,
                       autospec=False, **kwargs):
     """
@@ -1005,9 +1016,21 @@ def _patch_object(target, attribute, new=DEFAULT, spec=None,
     Arguments new, spec, create, mocksignature and spec_set have the same
     meaning as for patch.
     """
+    if attribute is DEFAULT:
+        attribute = target
+        if not kwargs:
+            raise FooBarBazException
+
     return _patch(target, attribute, new, spec, create, mocksignature,
                   spec_set, autospec, kwargs)
 
+
+def _patch_multiple(target, **kwargs):
+    target, attribute = _get_target(target)
+    if not kwargs:
+        raise FooBarBazException
+    return _patch(target, attribute, attribute, spec, create, mocksignature,
+                  spec_set, autospec, kwargs)
 
 def patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False,
           spec_set=None, autospec=False, **kwargs):
@@ -1058,15 +1081,9 @@ def patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False,
     `patch.dict(...)` and `patch.object(...)` are available for alternate
     use-cases.
     """
-    try:
-        target, attribute = target.rsplit('.', 1)
-    except (TypeError, ValueError):
-        raise TypeError("Need a valid target to patch. You supplied: %r" %
-                        (target,))
-    target = _importer(target)
+    target, attribute = _get_target(target)
     return _patch(target, attribute, new, spec, create, mocksignature,
                   spec_set, autospec, kwargs)
-
 
 
 class _patch_dict(object):
@@ -1187,6 +1204,7 @@ def _clear_dict(in_dict):
 
 patch.object = _patch_object
 patch.dict = _patch_dict
+patch.multiple = _patch_multiple
 
 
 magic_methods = (
