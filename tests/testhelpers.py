@@ -510,6 +510,13 @@ class SpecSignatureTest(unittest2.TestCase):
             def foo(self):
                 return 3
 
-        a = create_autospec(Foo)
-        a.foo
-        import pdb;pdb.set_trace()
+        foo = create_autospec(Foo)
+        mock_property = foo.foo
+
+        # no spec on properties
+        self.assertTrue(isinstance(mock_property, MagicMock))
+        mock_property(1, 2, 3)
+        mock_property.abc(4, 5, 6)
+        mock_property.assert_called_once_with(1, 2, 3)
+        mock_property.abc.assert_called_once_with(4, 5, 6)
+
