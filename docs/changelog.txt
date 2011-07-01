@@ -9,14 +9,6 @@ Contributions, bug reports and comments welcomed!
 Feature requests and bug reports are handled on the issue tracker:
 
  * `mock issue tracker <http://code.google.com/p/mock/issues/list>`_
-
-When mocking a class with `patch`, passing in `spec=True` or `autospec=True`,
-the mock class has an instance created from the same spec. Should this be the
-default behaviour for mocks anyway (mock return values inheriting the spec
-from their parent), or should it be controlled by an additional keyword
-argument (`inherit`) to the Mock constructor? `create_autospec` does this, so
-an additional keyword argument to Mock is probably unnecessary.
-
 `wraps` is not integrated with magic methods.
 
 Should magic method calls (including `__call__`?) be tracked in `method_calls`?
@@ -34,10 +26,10 @@ and `stop` (or similar) methods that *hide* these attributes when needed.
 In 0.8 many, but not all, of these attributes are renamed to gain a `_mock`
 prefix, making it less likely that they will clash.
 
-If a patch is started using `patch.start` and then not stopped correctly, due
-to a bug in the test code, then the unpatching is not done. Using weak
-references it would be possible to detect and fix this when the patch object
-itself is garbage collected. This would be tricky to get right though.
+If a patch is started using `patch.start` and then not stopped correctly then
+the unpatching is not done. Using weak references it would be possible to
+detect and fix this when the patch object itself is garbage collected. This
+would be tricky to get right though.
 
 When a `Mock` is created by `patch`, arbitrary keywords can be used to set
 attributes. If `patch` is created with a `spec`, and is replacing a class, then
@@ -46,6 +38,14 @@ child mock, but could be.
 
 `inherit` argument to `create_autospec` doesn't seem to make much sense as a
 public argument.
+
+When mocking a class with `patch`, passing in `spec=True` or `autospec=True`,
+the mock class has an instance created from the same spec. Should this be the
+default behaviour for mocks anyway (mock return values inheriting the spec
+from their parent), or should it be controlled by an additional keyword
+argument (`inherit`) to the Mock constructor? `create_autospec` does this, so
+an additional keyword argument to Mock is probably unnecessary.
+
 
 
 CHANGELOG
