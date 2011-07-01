@@ -1444,7 +1444,11 @@ def create_autospec(spec, spec_set=False, inherit=DEFAULT, configure=None,
     kwargs.update(configure)
 
     Klass = MagicMock
-    if not _callable(spec):
+    if type(spec) is property:
+        # property descriptors don't have a spec
+        # because we don't know what type they return
+        kwargs = {}
+    elif not _callable(spec):
         Klass = NonCallableMagicMock
     elif is_type and _instance and not _instance_callable(spec):
         Klass = NonCallableMagicMock
