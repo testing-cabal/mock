@@ -616,7 +616,7 @@ class NonCallableMock(Base):
 
         elif isinstance(result, _SpecState):
             result = create_autospec(
-                result.spec, result.spec_set, result.inherit, None,
+                result.spec, result.spec_set, None,
                 result.parent, result.name, result.instance
             )
             self._mock_children[name]  = result
@@ -958,8 +958,7 @@ class _patch(object):
             _kwargs = {'_name': getattr(original, '__name__', None)}
             if autospec is True:
                 autospec = original
-            new = create_autospec(autospec, spec_set, inherit=True,
-                                  configure=kwargs, **_kwargs)
+            new = create_autospec(autospec, spec_set, configure=kwargs, **_kwargs)
         elif kwargs:
             # can't set keyword args when we aren't creating the mock
             # XXXX If new is a Mock we could call new.configure_mock(**kwargs)
@@ -1421,7 +1420,7 @@ call = _Call()
 
 
 
-def create_autospec(spec, spec_set=False, inherit=DEFAULT, configure=None,
+def create_autospec(spec, spec_set=False, configure=None,
                     _parent=None, _name=None, _instance=False):
     """XXXX needs docstring!"""
     if configure is None:
@@ -1465,13 +1464,9 @@ def create_autospec(spec, spec_set=False, inherit=DEFAULT, configure=None,
     if _parent is not None:
         _parent._mock_children[_name] = mock
 
-    this_inherit = inherit
-    if inherit is DEFAULT:
-        this_inherit = is_type
-    if this_inherit and not _instance:
+    if is_type and not _instance:
         # XXXX could give a name to the return_value mock?
-        mock.return_value = create_autospec(spec, spec_set, this_inherit,
-                                            _instance=True)
+        mock.return_value = create_autospec(spec, spec_set, _instance=True)
 
     for entry in dir(spec):
         if _is_magic(entry):
@@ -1495,11 +1490,7 @@ def create_autospec(spec, spec_set=False, inherit=DEFAULT, configure=None,
             kwargs = {'spec_set': original}
 
         if not isinstance(original, FunctionTypes):
-            this_inherit = inherit
-            if inherit is DEFAULT:
-                this_inherit = isinstance(original, ClassTypes)
-            new = _SpecState(original, spec_set, this_inherit, mock, entry,
-                               _instance)
+            new = _SpecState(original, spec_set, mock, entry, _instance)
             mock._mock_children[entry] = new
         else:
             parent = mock
@@ -1554,12 +1545,11 @@ def _get_class(obj):
 
 class _SpecState(object):
 
-    def __init__(self, spec, spec_set=False, inherit=False, parent=None,
+    def __init__(self, spec, spec_set=False, parent=None,
                  name=None, ids=None, instance=False):
         self.spec = spec
         self.ids = ids
         self.spec_set = spec_set
-        self.inherit = inherit
         self.parent = parent
         self.instance = instance
         self.name = name
