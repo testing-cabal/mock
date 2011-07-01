@@ -979,14 +979,15 @@ class PatchTest(unittest2.TestCase):
             patcher.stop()
 
 
-    def test_autospec_other(self):
-        # autospec uses the __name__ if available
-        # instances (return values) of mocked classes should use __call__
-        # (or not be callable)
+    def test_autospec_name(self):
+        patcher = patch('%s.Foo' % __name__, autospec=True)
+        mock = patcher.start()
+        try:
+            self.assertIn("name='Foo'", repr(mock))
+            self.assertIn("name='Foo.f'", repr(mock.f))
+        finally:
+            patcher.stop()
 
-        # autospec should pass the name through to new mocks
-        # return values should be name + ()
-        pass
 
 
 

@@ -43,6 +43,8 @@ from their parent), or should it be controlled by an additional keyword
 argument (`inherit`) to the Mock constructor? `create_autospec` does this, so
 an additional keyword argument to Mock is probably unnecessary.
 
+`MagicMock` is no longer a subclass of `Mock`, but a subclass of
+`NonCallableMock` with the callability mixed in.
 
 
 CHANGELOG
@@ -70,8 +72,6 @@ CHANGELOG
   boolean) still applies "spec inheritance" to the return value of the created
   mock
 
-(`MagicMock` is no longer a subclass of `Mock`, but a subclass of
-`NonCallableMock` with the callability mixed in.)
 
 
 2011/06/14 Version 0.8.0 alpha 1
