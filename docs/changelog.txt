@@ -61,6 +61,7 @@ CHANGELOG
   a `__call__` method
 * `autospec` creates a `MagicMock` without a spec for properties, because we
   don't know the type of object they return
+* Removed the "inherit" argument from `create_autospec`
 * BUGFIX: `assert_called_with` / `assert_called_once_with` can be used with
   `self` as a keyword argument
 * BUGFIX: autospec for functions / methods with an argument named self that
