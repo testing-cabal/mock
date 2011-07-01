@@ -296,7 +296,7 @@ class SpecSignatureTest(unittest2.TestCase):
                 def f(self):
                     pass
 
-        class_mock = create_autospec(Foo, inherit=True)
+        class_mock = create_autospec(Foo)
 
         self.assertIsNot(class_mock, class_mock())
 
@@ -330,7 +330,7 @@ class SpecSignatureTest(unittest2.TestCase):
 
         Foo.Foo = Foo
 
-        # default
+        # class
         mock = create_autospec(Foo)
         instance = mock()
         self.assertRaises(AttributeError, getattr, instance, 'b')
@@ -338,43 +338,14 @@ class SpecSignatureTest(unittest2.TestCase):
         attr_instance = mock.Foo()
         self.assertRaises(AttributeError, getattr, attr_instance, 'b')
 
-        # Explicit True
-        mock = create_autospec(Foo, inherit=True)
-        instance = mock()
-        self.assertRaises(AttributeError, getattr, instance, 'b')
-
-        attr_instance = mock.Foo()
-        self.assertRaises(AttributeError, getattr, attr_instance, 'b')
-
-        # Explicit False
-        mock = create_autospec(Foo, inherit=False)
-        instance = mock()
-
-        attr_instance = mock.Foo()
-        attr_instance.b()
-        attr_instance.b.assert_called_once_with()
-
-        # instance default
+        # instance
         mock = create_autospec(Foo())
         self.assertRaises(AttributeError, getattr, mock, 'b')
         self.assertRaises(TypeError, mock)
 
-        # instance explicit True
-        mock = create_autospec(Foo(), inherit=True)
-        # instance still not callable
-        self.assertRaises(TypeError, mock)
-
+        # attribute instance
         call_result = mock.Foo()
         self.assertRaises(AttributeError, getattr, call_result, 'b')
-
-        # instance explicit False
-        mock = create_autospec(Foo(), inherit=False)
-        # instance still not callable
-        self.assertRaises(TypeError, mock)
-
-        call_result = mock.Foo()
-        call_result.b()
-        call_result.b.assert_called_once_with()
 
 
     def test_builtins(self):
@@ -410,10 +381,8 @@ class SpecSignatureTest(unittest2.TestCase):
         f.f = f
         mock = create_autospec(f)
         self.assertRaises(TypeError, mock.f)
-        mock.f(1, 2)
-        mock.f.assert_called_with(1, 2)
-        # XXX Note that this is *not* recursive, the function is only copied
-        #     for one level deep.
+        mock.f(3, 4)
+        mock.f.assert_called_with(3, 4)
 
 
     def test_signature_class(self):
