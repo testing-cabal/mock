@@ -55,7 +55,8 @@ CHANGELOG
 2011/XX/XX Version 0.8.0 alpha 2
 --------------------------------
 
-* Addition of `NonCallableMock` and `NonCallableMagicMock`
+* Addition of `NonCallableMock` and `NonCallableMagicMock`, mocks without a
+  `__call__` method
 * Mocks created by `patch` have a `MagicMock` as the `return_value` where a
   class is being patched
 * `create_autospec` can create non-callable mocks for non-callable objects.
@@ -113,8 +114,6 @@ mock 0.8.0 is the last version that will support Python 2.4.
   - Doesn't mock function / method attributes
   - Uses object traversal on the objects being mocked to determine types - so
     properties etc may be triggered
-  - Where a class is the autospec, then properties will have `property` as
-    the spec, which is probably not what is intended
   - The return value of mocked classes (the 'instance') has the same call
     signature as the class __init__ (as they share the same spec)
 
