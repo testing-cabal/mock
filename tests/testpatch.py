@@ -900,14 +900,14 @@ class PatchTest(unittest2.TestCase):
             self.assertRaises(AttributeError, getattr, mock.Bar, 'b')
             self.assertRaises(AttributeError, getattr, mock.Bar(), 'b')
 
-
-        @patch('%s.Foo' % __name__, autospec=True)
-        def test(mock):
+        def function(mock):
             _test(mock)
             _test2(mock)
             _test2(mock(1))
             self.assertIs(mock, Foo)
             return mock
+
+        test = patch('%s.Foo' % __name__, autospec=True)(function)
 
         mock = test()
         self.assertIsNot(Foo, mock)
@@ -916,14 +916,7 @@ class PatchTest(unittest2.TestCase):
         test()
 
         module = sys.modules[__name__]
-
-        @patch.object(module, 'Foo', autospec=True)
-        def test(mock):
-            _test(mock)
-            _test2(mock)
-            _test2(mock(1))
-            self.assertIs(mock, Foo)
-            return mock
+        test = patch.object(module, 'Foo', autospec=True)(function)
 
         mock = test()
         self.assertIsNot(Foo, mock)
@@ -993,4 +986,3 @@ class PatchTest(unittest2.TestCase):
 
 if __name__ == '__main__':
     unittest2.main()
-
