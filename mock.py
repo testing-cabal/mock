@@ -1483,6 +1483,8 @@ def create_autospec(spec, spec_set=False, configure=None,
         # mock the property descriptor. Likewise we want to mock out
         # dynamically provided attributes.
         # XXXX what about attributes that raise exceptions on being fetched
+        # we could be resilient against it, or catch and propagate the exception
+        # when the attribute is fetched from the mock
         original = getattr(spec, entry)
 
         kwargs = {'spec': original}
