@@ -841,8 +841,20 @@ def _importer(target):
 
 
 class _patch(object):
-    def __init__(self, target, attribute, new, spec, create,
-                 mocksignature, spec_set, autospec, new_callable, kwargs):
+    def __init__(
+            self, target, attribute, new, spec, create,
+            mocksignature, spec_set, autospec, new_callable, kwargs
+        ):
+        if new_callable is not None:
+            if new is not DEFAULT:
+                raise ValueError(
+                    "Cannot use 'new' and 'new_callable' together"
+                )
+            if autospec is not False:
+                raise ValueError(
+                    "Cannot use 'autospec' and 'new_callable' together"
+                )
+
         self.target = target
         self.attribute = attribute
         self.new = new
@@ -1050,8 +1062,10 @@ def _patch_object(
         if not kwargs:
             raise FooBarBazException
 
-    return _patch(target, attribute, new, spec, create, mocksignature,
-                  spec_set, autospec, new_callable, kwargs)
+    return _patch(
+        target, attribute, new, spec, create, mocksignature,
+        spec_set, autospec, new_callable, kwargs
+    )
 
 
 def _patch_multiple(target, **kwargs):
