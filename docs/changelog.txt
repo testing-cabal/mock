@@ -61,8 +61,8 @@ CHANGELOG
 * `create_autospec` can create non-callable mocks for non-callable objects.
   `return_value` mocks of classes will be non-callable unless the class has
   a `__call__` method
-* `autospec` creates a `MagicMock` without a spec for properties, because we
-  don't know the type of object they return
+* `autospec` creates a `MagicMock` without a spec for properties and slot
+  descriptors, because we don't know the type of object they return
 * Removed the "inherit" argument from `create_autospec`
 * BUGFIX: `assert_called_with` / `assert_called_once_with` can be used with
   `self` as a keyword argument
@@ -72,6 +72,8 @@ CHANGELOG
   boolean) still applies "spec inheritance" to the return value of the created
   mock
 
+`MagicMock` is no longer a subclass of `Mock`, but a subclass of
+`NonCallableMock` with the callability mixed in.
 
 
 2011/06/14 Version 0.8.0 alpha 1
