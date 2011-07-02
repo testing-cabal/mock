@@ -101,6 +101,22 @@ if inPy3k:
 FILTER_DIR = True
 
 
+def _is_instance_mock(obj):
+    # can't use isinstance on Mock objects because they override __class__
+    # The base class for all mocks is NonCallableMock
+    return issubclass(type(obj), NonCallableMock)
+
+
+class _slotted(object):
+    __slots__ = ['a']
+
+
+DescriptorTypes = (
+    type(_slotted.a),
+    property,
+)
+
+
 # getsignature and mocksignature heavily "inspired" by
 # the decorator module: http://pypi.python.org/pypi/decorator/
 # by Michele Simionato
@@ -1443,8 +1459,8 @@ def create_autospec(spec, spec_set=False, configure=None,
     kwargs.update(configure)
 
     Klass = MagicMock
-    if type(spec) is property:
-        # property descriptors don't have a spec
+    if type(spec) in DescriptorTypes:
+        # descriptors don't have a spec
         # because we don't know what type they return
         kwargs = {}
     elif not _callable(spec):
@@ -1575,9 +1591,3 @@ FunctionAttributes = set([
     'func_globals',
     'func_name',
 ])
-
-
-def _is_instance_mock(obj):
-    # can't use isinstance on Mock objects because they override __class__
-    # The base class for all mocks is NonCallableMock
-    return issubclass(type(obj), NonCallableMock)

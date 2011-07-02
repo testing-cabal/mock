@@ -911,7 +911,6 @@ class PatchTest(unittest2.TestCase):
 
         mock = test()
         self.assertIsNot(Foo, mock)
-
         # test patching a second time works
         test()
 
@@ -920,7 +919,6 @@ class PatchTest(unittest2.TestCase):
 
         mock = test()
         self.assertIsNot(Foo, mock)
-
         # test patching a second time works
         test()
 

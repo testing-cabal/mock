@@ -489,3 +489,16 @@ class SpecSignatureTest(unittest2.TestCase):
         mock_property.assert_called_once_with(1, 2, 3)
         mock_property.abc.assert_called_once_with(4, 5, 6)
 
+
+    def test_autospec_slots(self):
+        class Foo(object):
+            __slots__ = ['a']
+
+        foo = create_autospec(Foo)
+        mock_slot = foo.a
+
+        # no spec on slots
+        mock_slot(1, 2, 3)
+        mock_slot.abc(4, 5, 6)
+        mock_slot.assert_called_once_with(1, 2, 3)
+        mock_slot.abc.assert_called_once_with(4, 5, 6)
