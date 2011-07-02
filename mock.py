@@ -842,10 +842,11 @@ def _importer(target):
 
 class _patch(object):
     def __init__(self, target, attribute, new, spec, create,
-                    mocksignature, spec_set, autospec, kwargs):
+                 mocksignature, spec_set, autospec, new_callable, kwargs):
         self.target = target
         self.attribute = attribute
         self.new = new
+        self.new_callable = new_callable
         self.spec = spec
         self.create = create
         self.has_local = False
@@ -858,7 +859,7 @@ class _patch(object):
     def copy(self):
         return _patch(self.target, self.attribute, self.new, self.spec,
                         self.create, self.mocksignature, self.spec_set,
-                        self.autospec, self.kwargs)
+                        self.autospec, self.new_callable, self.kwargs)
 
 
     def __call__(self, func):
@@ -930,8 +931,10 @@ class _patch(object):
         """Perform the patch."""
         new, spec, spec_set = self.new, self.spec, self.spec_set
         autospec, kwargs = self.autospec, self.kwargs
+        new_callable = self.new_callable
 
         original, local = self.get_original()
+
         if new is DEFAULT and autospec is False:
             inherit = False
             if spec_set == True:
@@ -946,11 +949,21 @@ class _patch(object):
                     inherit = True
 
             Klass = MagicMock
-            if (spec or spec_set) is not None:
+            _kwargs = {}
+            if new_callable is not None:
+                Klass = new_callable
+            elif (spec or spec_set) is not None:
                 if not _callable(spec or spec_set):
                     Klass = NonCallableMagicMock
 
-            new = Klass(spec=spec, spec_set=spec_set, **kwargs)
+            if spec is not None:
+                _kwargs['spec'] = spec
+            if spec_set is not None:
+                _kwargs['spec_set'] = spec_set
+
+            _kwargs.update(kwargs)
+            new = Klass(**_kwargs)
+
             if inherit:
                 # we can only tell if the instance should be callable if the
                 # spec is not a list
@@ -972,7 +985,8 @@ class _patch(object):
             _kwargs = {'_name': getattr(original, '__name__', None)}
             if autospec is True:
                 autospec = original
-            new = create_autospec(autospec, spec_set, configure=kwargs, **_kwargs)
+            new = create_autospec(autospec, spec_set, configure=kwargs,
+                                  **_kwargs)
         elif kwargs:
             # can't set keyword args when we aren't creating the mock
             # XXXX If new is a Mock we could call new.configure_mock(**kwargs)
@@ -1016,9 +1030,11 @@ def _get_target(target):
     return target, attribute
 
 
-def _patch_object(target, attribute=DEFAULT, new=DEFAULT, spec=None,
-                      create=False, mocksignature=False, spec_set=None,
-                      autospec=False, **kwargs):
+def _patch_object(
+        target, attribute=DEFAULT, new=DEFAULT, spec=None,
+        create=False, mocksignature=False, spec_set=None, autospec=False,
+        new_callable=None, **kwargs
+    ):
     """
     patch.object(target, attribute, new=DEFAULT, spec=None, create=False,
                  mocksignature=False, spec_set=None)
@@ -1035,7 +1051,7 @@ def _patch_object(target, attribute=DEFAULT, new=DEFAULT, spec=None,
             raise FooBarBazException
 
     return _patch(target, attribute, new, spec, create, mocksignature,
-                  spec_set, autospec, kwargs)
+                  spec_set, autospec, new_callable, kwargs)
 
 
 def _patch_multiple(target, **kwargs):
@@ -1043,10 +1059,14 @@ def _patch_multiple(target, **kwargs):
     if not kwargs:
         raise FooBarBazException
     return _patch(target, attribute, attribute, spec, create, mocksignature,
-                  spec_set, autospec, kwargs)
+                  spec_set, autospec, new_callable, kwargs)
 
-def patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False,
-          spec_set=None, autospec=False, **kwargs):
+
+def patch(
+        target, new=DEFAULT, spec=None, create=False,
+        mocksignature=False, spec_set=None, autospec=False,
+        new_callable=None, **kwargs
+    ):
     """
     ``patch`` acts as a function decorator, class decorator or a context
     manager. Inside the body of the function or with statement, the ``target``
@@ -1095,8 +1115,10 @@ def patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False,
     use-cases.
     """
     target, attribute = _get_target(target)
-    return _patch(target, attribute, new, spec, create, mocksignature,
-                  spec_set, autospec, kwargs)
+    return _patch(
+        target, attribute, new, spec, create, mocksignature,
+        spec_set, autospec, new_callable, kwargs
+    )
 
 
 class _patch_dict(object):

@@ -8,8 +8,10 @@ import sys
 from tests import support
 from tests.support import unittest2, inPy3k, SomeClass, is_instance
 
-from mock import MagicMock, Mock, NonCallableMagicMock, patch, sentinel
-
+from mock import (
+    NonCallableMock, CallableMixin, patch, sentinel,
+    MagicMock, Mock, NonCallableMagicMock, patch
+)
 
 builtin_string = '__builtin__'
 if inPy3k:
@@ -74,6 +76,16 @@ class Container(object):
 
 
 class PatchTest(unittest2.TestCase):
+
+    def assertNotCallable(self, obj, magic=True):
+        MockClass = NonCallableMagicMock
+        if not magic:
+            MockClass = NonCallableMock
+
+        self.assertRaises(TypeError, obj)
+        self.assertTrue(is_instance(obj, MockClass))
+        self.assertFalse(is_instance(obj, CallableMixin))
+
 
     def test_single_patchobject(self):
         class Something(object):
@@ -318,7 +330,7 @@ class PatchTest(unittest2.TestCase):
         def test(MockSomeClass):
             self.assertTrue(is_instance(MockSomeClass, MagicMock))
             instance = MockSomeClass()
-            self.assertTrue(is_instance(instance, NonCallableMagicMock))
+            self.assertNotCallable(instance)
             # Should not raise attribute error
             instance.wibble
 
@@ -993,6 +1005,64 @@ class PatchTest(unittest2.TestCase):
         result = unittest2.TextTestResult(None, None, None)
         traceback = result._exc_info_to_string(err, self)
         self.assertIn('raise AssertionError', traceback)
+
+
+    def test_new_callable_patch(self):
+        name = '%s.Foo' % __name__
+        patcher = patch(name, new_callable=NonCallableMagicMock)
+
+        m1 = patcher.start()
+        patcher.stop()
+        m2 = patcher.start()
+        patcher.stop()
+
+        self.assertIsNot(m1, m2)
+        for mock in m1, m2:
+            self.assertNotCallable(m1)
+
+
+    def test_new_callable_patch_object(self):
+        name = '%s.Foo' % __name__
+        patcher = patch.object(Foo, 'f', new_callable=NonCallableMagicMock)
+
+        m1 = patcher.start()
+        patcher.stop()
+        m2 = patcher.start()
+        patcher.stop()
+
+        self.assertIsNot(m1, m2)
+        for mock in m1, m2:
+            self.assertNotCallable(m1)
+
+
+    def test_new_callable_keyword_arguments(self):
+        class Bar(object):
+            kwargs = None
+            def __init__(self, **kwargs):
+                Bar.kwargs = kwargs
+
+        name = '%s.Foo' % __name__
+        patcher = patch(name, new_callable=Bar, arg1=1, arg2=2)
+        m = patcher.start()
+        try:
+            self.assertIs(type(m), Bar)
+            self.assertEqual(Bar.kwargs, dict(arg1=1, arg2=2))
+        finally:
+            patcher.stop()
+
+"""
+new_callable notes.
+
+Keyword arguments should still be passed in at creation
+Patch keyword arguments (like create) should still behave correctly
+Patch keyword arguments like spec / spec_set should be passed into callable_new
+For mock classes, inheritance should still be honoured (but *not* for non-mock
+classes).
+Can't use autospec or new with new_callable
+What about mocksignature?
+Class decorating needs to be tested (uses change to self.copy.)
+"""
+
 
 
 if __name__ == '__main__':
