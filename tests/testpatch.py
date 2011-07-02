@@ -1050,12 +1050,33 @@ class PatchTest(unittest2.TestCase):
         finally:
             patcher.stop()
 
+
+    def test_new_callable_spec(self):
+        class Bar(object):
+            kwargs = None
+            def __init__(self, **kwargs):
+                Bar.kwargs = kwargs
+
+        name = '%s.Foo' % __name__
+        patcher = patch(name, new_callable=Bar, spec=Bar)
+        m = patcher.start()
+        try:
+            self.assertEqual(Bar.kwargs, dict(spec=Bar))
+        finally:
+            patcher.stop()
+
+        patcher = patch(name, new_callable=Bar, spec_set=Bar)
+        m = patcher.start()
+        try:
+            self.assertEqual(Bar.kwargs, dict(spec_set=Bar))
+        finally:
+            patcher.stop()
+
+
 """
 new_callable notes.
 
-Keyword arguments should still be passed in at creation
 Patch keyword arguments (like create) should still behave correctly
-Patch keyword arguments like spec / spec_set should be passed into callable_new
 For mock classes, inheritance should still be honoured (but *not* for non-mock
 classes).
 Can't use autospec or new with new_callable
