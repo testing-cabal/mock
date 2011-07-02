@@ -52,6 +52,8 @@ class Foo(object):
         def a(self):
             pass
 
+foo_name = '%s.Foo' % __name__
+
 
 def function(a, b=Foo):
     pass
@@ -827,8 +829,7 @@ class PatchTest(unittest2.TestCase):
         kwargs = {'side_effect': KeyError, 'foo.bar.return_value': 33,
                   'foo': MagicMock()}
 
-        name = '%s.Foo' % __name__
-        patcher = patch(name, **kwargs)
+        patcher = patch(foo_name, **kwargs)
         mock = patcher.start()
         patcher.stop()
 
@@ -920,7 +921,7 @@ class PatchTest(unittest2.TestCase):
             self.assertIs(mock, Foo)
             return mock
 
-        test = patch('%s.Foo' % __name__, autospec=True)(function)
+        test = patch(foo_name, autospec=True)(function)
 
         mock = test()
         self.assertIsNot(Foo, mock)
@@ -963,7 +964,7 @@ class PatchTest(unittest2.TestCase):
         class Bar(Foo):
             extra = []
 
-        patcher = patch('%s.Foo' % __name__, autospec=Bar)
+        patcher = patch(foo_name, autospec=Bar)
         mock = patcher.start()
         try:
             self.assertIsInstance(mock, Bar)
@@ -974,7 +975,7 @@ class PatchTest(unittest2.TestCase):
 
     def test_autospec_inherits(self):
         FooClass = Foo
-        patcher = patch('%s.Foo' % __name__, autospec=True)
+        patcher = patch(foo_name, autospec=True)
         mock = patcher.start()
         try:
             self.assertIsInstance(mock, FooClass)
@@ -984,7 +985,7 @@ class PatchTest(unittest2.TestCase):
 
 
     def test_autospec_name(self):
-        patcher = patch('%s.Foo' % __name__, autospec=True)
+        patcher = patch(foo_name, autospec=True)
         mock = patcher.start()
         try:
             self.assertIn("name='Foo'", repr(mock))
@@ -1008,8 +1009,7 @@ class PatchTest(unittest2.TestCase):
 
 
     def test_new_callable_patch(self):
-        name = '%s.Foo' % __name__
-        patcher = patch(name, new_callable=NonCallableMagicMock)
+        patcher = patch(foo_name, new_callable=NonCallableMagicMock)
 
         m1 = patcher.start()
         patcher.stop()
@@ -1022,7 +1022,6 @@ class PatchTest(unittest2.TestCase):
 
 
     def test_new_callable_patch_object(self):
-        name = '%s.Foo' % __name__
         patcher = patch.object(Foo, 'f', new_callable=NonCallableMagicMock)
 
         m1 = patcher.start()
@@ -1041,8 +1040,7 @@ class PatchTest(unittest2.TestCase):
             def __init__(self, **kwargs):
                 Bar.kwargs = kwargs
 
-        name = '%s.Foo' % __name__
-        patcher = patch(name, new_callable=Bar, arg1=1, arg2=2)
+        patcher = patch(foo_name, new_callable=Bar, arg1=1, arg2=2)
         m = patcher.start()
         try:
             self.assertIs(type(m), Bar)
@@ -1057,15 +1055,14 @@ class PatchTest(unittest2.TestCase):
             def __init__(self, **kwargs):
                 Bar.kwargs = kwargs
 
-        name = '%s.Foo' % __name__
-        patcher = patch(name, new_callable=Bar, spec=Bar)
+        patcher = patch(foo_name, new_callable=Bar, spec=Bar)
         m = patcher.start()
         try:
             self.assertEqual(Bar.kwargs, dict(spec=Bar))
         finally:
             patcher.stop()
 
-        patcher = patch(name, new_callable=Bar, spec_set=Bar)
+        patcher = patch(foo_name, new_callable=Bar, spec_set=Bar)
         m = patcher.start()
         try:
             self.assertEqual(Bar.kwargs, dict(spec_set=Bar))
@@ -1073,13 +1070,45 @@ class PatchTest(unittest2.TestCase):
             patcher.stop()
 
 
+    def test_new_callable_create(self):
+        non_existent_attr = '%s.weeeee' % foo_name
+        p = patch(non_existent_attr, new_callable=NonCallableMock)
+        self.assertRaises(AttributeError, p.start)
+
+        p = patch(non_existent_attr, new_callable=NonCallableMock,
+                  create=True)
+        m = p.start()
+        try:
+            self.assertNotCallable(m, magic=False)
+        finally:
+            p.stop()
+
+
+    def test_new_callable_incompatible_with_new(self):
+        self.assertRaises(
+            ValueError, patch, foo_name, new=object(), new_callable=MagicMock
+        )
+        self.assertRaises(
+            ValueError, patch.object, Foo, 'f', new=object(),
+            new_callable=MagicMock
+        )
+
+
+    def test_new_callable_incompatible_with_autospec(self):
+        self.assertRaises(
+            ValueError, patch, foo_name, new_callable=MagicMock,
+            autospec=True
+        )
+        self.assertRaises(
+            ValueError, patch.object, Foo, 'f', new_callable=MagicMock,
+            autospec=True
+        )
+
 """
 new_callable notes.
 
-Patch keyword arguments (like create) should still behave correctly
 For mock classes, inheritance should still be honoured (but *not* for non-mock
 classes).
-Can't use autospec or new with new_callable
 What about mocksignature?
 Class decorating needs to be tested (uses change to self.copy.)
 """
