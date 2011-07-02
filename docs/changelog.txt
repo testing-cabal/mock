@@ -69,8 +69,9 @@ CHANGELOG
 * BUGFIX: autospec for functions / methods with an argument named self that
   isn't the first argument no longer broken
 * BUGFIX: when patching a class with an explicit spec / spec_set (not a
-  boolean) still applies "spec inheritance" to the return value of the created
-  mock
+  boolean) it applies "spec inheritance" to the return value of the created
+  mock (the "instance")
+* BUGFIX: remove the `__unittest` marker causing traceback truncation
 
 `MagicMock` is no longer a subclass of `Mock`, but a subclass of
 `NonCallableMock` with the callability mixed in.

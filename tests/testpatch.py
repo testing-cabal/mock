@@ -628,7 +628,8 @@ class PatchTest(unittest2.TestCase):
         test()
 
 
-    def DONTtest_patch_descriptor(self):
+    @unittest2.expectedFailure
+    def test_patch_descriptor(self):
         # would be some effort to fix this - we could special case the
         # builtin descriptors: classmethod, property, staticmethod
         class Nothing(object):
@@ -980,6 +981,18 @@ class PatchTest(unittest2.TestCase):
             patcher.stop()
 
 
+    def test_tracebacks(self):
+        @patch.object(Foo, 'f', object())
+        def test():
+            raise AssertionError
+        try:
+            test()
+        except:
+            err = sys.exc_info()
+
+        result = unittest2.TextTestResult(None, None, None)
+        traceback = result._exc_info_to_string(err, self)
+        self.assertIn('raise AssertionError', traceback)
 
 
 if __name__ == '__main__':
