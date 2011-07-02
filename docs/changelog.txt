@@ -54,6 +54,9 @@ CHANGELOG
 2011/XX/XX Version 0.8.0 alpha 2
 --------------------------------
 
+* New `new_callable` argument to `patch` and `patch.object` allowing you to
+  pass in a class or callable object (instead of `MagicMock`) that will be
+  called to replace the object being patched
 * Addition of `NonCallableMock` and `NonCallableMagicMock`, mocks without a
   `__call__` method
 * Mocks created by `patch` have a `MagicMock` as the `return_value` where a
