@@ -46,6 +46,14 @@ an additional keyword argument to Mock is probably unnecessary.
 `MagicMock` is no longer a subclass of `Mock`, but a subclass of
 `NonCallableMock` with the callability mixed in.
 
+When using `new_callable` as an argument to patch, passing in a class that
+is *not* a `Mock` class, the `spec` and `spec_set` arguments are still passed
+into the constructor. There is code to avoid trying to set the `return_value`
+in these cases (as would normally be done so that the "instance" of a patched
+class inherits the spec). Would it make more sense for `spec` and `spec_set`
+to be *invalid* (`ValueError`) when a non-Mock class is used with
+`new_callable`?
+
 
 CHANGELOG
 =========
