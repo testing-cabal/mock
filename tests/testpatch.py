@@ -1145,20 +1145,42 @@ class PatchTest(unittest2.TestCase):
         original = Foo
         class SomeTest(object):
 
-            def test_one(self, mock_foo):
+            def _test(self, mock_foo):
                 test.assertIsNot(Foo, original)
                 test.assertIs(Foo, mock_foo)
                 test.assertIsInstance(Foo, SomeClass)
 
             def test_two(self, mock_foo):
-                test.assertIsNot(Foo, original)
-                test.assertIs(Foo, mock_foo)
-                test.assertIsInstance(Foo, SomeClass)
+                self._test(mock_foo)
+            def test_one(self, mock_foo):
+                self._test(mock_foo)
 
         SomeTest = patch(foo_name, new_callable=SomeClass)(SomeTest)
         SomeTest().test_one()
         SomeTest().test_two()
         self.assertIs(Foo, original)
+
+
+    def test_patch_multiple(self):
+        original_foo = Foo
+        original_f = Foo.f
+        original_g = Foo.g
+
+        patcher1 = patch.multiple(foo_name, f=1, g=2)
+        patcher2 = patch.object(Foo, f=1, g=2)
+
+        for patcher in patcher1, patcher2:
+            patcher.start()
+            try:
+                self.assertIs(Foo, original_foo)
+                self.assertEqual(Foo.f, 1)
+                self.assertEqual(Foo.g, 2)
+            finally:
+                patcher.stop()
+
+            self.assertIs(Foo, original_foo)
+            self.assertEqual(Foo.f, original_f)
+            self.assertEqual(Foo.g, original_g)
 
 
 
