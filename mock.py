@@ -976,7 +976,7 @@ class _patch(object):
             _kwargs.update(kwargs)
             new = Klass(**_kwargs)
 
-            if inherit:
+            if inherit and _is_instance_mock(new):
                 # we can only tell if the instance should be callable if the
                 # spec is not a list
                 if (not isinstance(spec or spec_set, list) and not
