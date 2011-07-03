@@ -271,6 +271,7 @@ your production code if they are called incorrectly:
 the `__init__` method, and on callable objects where it copies the signature of
 the `__call__` method.
 
+
 .. index:: references
 .. index:: articles
 
@@ -284,6 +285,8 @@ Articles and blog entries on testing with Mock:
 * `Mock recipes <http://konryd.blogspot.com/2010/06/mock-recipies.html>`_
 * `Mockity mock mock - some love for the mock module
   <http://konryd.blogspot.com/2010/05/mockity-mock-mock-some-love-for-mock.html>`_
+* `Coverage and Mock (with django)
+  <http://mattsnider.com/python/mock-and-coverage/>`_
 * `Python Unit Testing with Mock <http://www.insomnihack.com/?p=194>`_
 * `Getting started with Python Mock
   <http://myadventuresincoding.wordpress.com/2011/02/26/python-python-mock-cheat-sheet/>`_
