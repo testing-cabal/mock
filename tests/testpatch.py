@@ -1003,7 +1003,7 @@ class PatchTest(unittest2.TestCase):
         except:
             err = sys.exc_info()
 
-        result = unittest2.TextTestResult(None, None, None)
+        result = unittest2.TextTestResult(None, None, 0)
         traceback = result._exc_info_to_string(err, self)
         self.assertIn('raise AssertionError', traceback)
 
