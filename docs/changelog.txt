@@ -54,6 +54,17 @@ class inherits the spec). Would it make more sense for `spec` and `spec_set`
 to be *invalid* (`ValueError`) when a non-Mock class is used with
 `new_callable`?
 
+The `mocksignature` argument to `patch` with non a `Mock` passed into
+`new_callable` will *probably* cause an error. Should it just be invalid?
+
+Note that `NonCallableMock` and `NonCallableMagicMock` still have the unused
+(and unusable) attributes: `return_value`, `side_effect`, `call_count`,
+`call_args` and `call_args_list`. These could be removed or raise errors on
+getting / setting. They also have the `assert_called_with` and
+`assert_called_once_with` methods. Removing these would be pointless as
+fetching them would create a mock (attribute) that could be called without
+error.
+
 
 CHANGELOG
 =========

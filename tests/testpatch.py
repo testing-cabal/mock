@@ -1139,12 +1139,26 @@ class PatchTest(unittest2.TestCase):
 
         self.assertEqual(m.spec, Foo)
 
-"""
-new_callable notes.
 
-What about mocksignature? (should only apply to mocks?)
-Class decorating needs to be tested (uses change to self.copy.)
-"""
+    def test_new_callable_class_decorating(self):
+        test = self
+        original = Foo
+        class SomeTest(object):
+
+            def test_one(self, mock_foo):
+                test.assertIsNot(Foo, original)
+                test.assertIs(Foo, mock_foo)
+                test.assertIsInstance(Foo, SomeClass)
+
+            def test_two(self, mock_foo):
+                test.assertIsNot(Foo, original)
+                test.assertIs(Foo, mock_foo)
+                test.assertIsInstance(Foo, SomeClass)
+
+        SomeTest = patch(foo_name, new_callable=SomeClass)(SomeTest)
+        SomeTest().test_one()
+        SomeTest().test_two()
+        self.assertIs(Foo, original)
 
 
 
