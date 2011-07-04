@@ -1188,6 +1188,8 @@ class PatchTest(unittest2.TestCase):
         self.assertRaises(ValueError, patch.object, Foo)
 
 
+
+
 """
 Test patch.multiple decorating classes
 Test patch.multiple mixed with other patchers
@@ -1202,7 +1204,7 @@ new_callable keyword arguments
 
 With DEFAULT as the value, patch.multiple should create the mock and pass it
 into the function as a keyword argument. It should return a dictionary if used
-as a context manager
+as a context manager (or via patch.start).
 """
 
 
