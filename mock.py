@@ -1105,7 +1105,7 @@ def _do_patch_multiple(
         target, spec, create, mocksignature, spec_set, autospec,
         new_callable, kwargs
     ):
-    items = kwargs.items()
+    items = list(kwargs.items())
     attribute, new = items[0]
     patcher = _patch(
         target, attribute, new, spec, create, mocksignature, spec_set,
