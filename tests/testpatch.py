@@ -1195,7 +1195,14 @@ Test patch.multiple with patch.start
 Test patch.multiple as context manager
 
 A failure on exit of one patcher from a multiple must not prevent the exits
-in the rest from running
+in the rest from running (don't think this can actually happen)
+
+Test patch.multiple with create / spec / spec_set / autospec / mocksignature /
+new_callable keyword arguments
+
+With DEFAULT as the value, patch.multiple should create the mock and pass it
+into the function as a keyword argument. It should return a dictionary if used
+as a context manager
 """
 
 
