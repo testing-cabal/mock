@@ -866,6 +866,7 @@ class _patch(object):
         self.spec_set = spec_set
         self.autospec = autospec
         self.kwargs = kwargs
+        self.additional_patchers = []
 
 
     def copy(self):
@@ -895,7 +896,7 @@ class _patch(object):
 
         @wraps(func)
         def patched(*args, **keywargs):
-            # don't use a with here (backwards compatability with 2.5)
+            # don't use a with here (backwards compatability with 2.4)
             extra_args = []
             for patching in patched.patchings:
                 arg = patching.__enter__()
@@ -1011,6 +1012,14 @@ class _patch(object):
         self.temp_original = original
         self.is_local = local
         setattr(self.target, self.attribute, new_attr)
+        if self.additional_patchers:
+            extra_args = [new]
+            for patching in self.additional_patchers:
+                arg = patching.__enter__()
+                if patching.new is DEFAULT:
+                    extra_args.append(arg)
+            new = tuple(extra_args)
+
         return new
 
 
@@ -1026,6 +1035,8 @@ class _patch(object):
 
         del self.temp_original
         del self.is_local
+        for patcher in reversed(self.additional_patchers):
+            patcher.__exit__()
 
     start = __enter__
     stop = __exit__
@@ -1058,9 +1069,15 @@ def _patch_object(
     meaning as for patch.
     """
     if attribute is DEFAULT:
-        attribute = target
         if not kwargs:
-            raise FooBarBazException
+            raise ValueError(
+                'Must supply at least one keyword argument if not specifying '
+                'an attribute to be patched'
+            )
+        return _do_patch_multiple(
+            target, spec, create, mocksignature, spec_set, autospec,
+            new_callable, kwargs
+        )
 
     return _patch(
         target, attribute, new, spec, create, mocksignature,
@@ -1068,12 +1085,39 @@ def _patch_object(
     )
 
 
-def _patch_multiple(target, **kwargs):
-    target, attribute = _get_target(target)
+def _patch_multiple(target, spec=None, create=False,
+        mocksignature=False, spec_set=None, autospec=False,
+        new_callable=None, **kwargs
+    ):
+    target = _importer(target)
     if not kwargs:
-        raise FooBarBazException
-    return _patch(target, attribute, attribute, spec, create, mocksignature,
-                  spec_set, autospec, new_callable, kwargs)
+        raise ValueError(
+            'Must supply at least one keyword argument with patch.multiple'
+        )
+    return _do_patch_multiple(
+        target, spec, create, mocksignature, spec_set, autospec,
+        new_callable, kwargs
+    )
+
+
+def _do_patch_multiple(
+        target, spec, create, mocksignature, spec_set, autospec,
+        new_callable, kwargs
+    ):
+    items = kwargs.items()
+    attribute, new = items[0]
+    patcher = _patch(
+        target, attribute, new, spec, create, mocksignature, spec_set,
+        autospec, new_callable, {}
+    )
+    for attribute, new in items[1:]:
+        patcher.additional_patchers.append(
+            _patch(
+                target, attribute, new, spec, create, mocksignature, spec_set,
+                autospec, new_callable, {}
+            )
+        )
+    return patcher
 
 
 def patch(

@@ -1183,6 +1183,21 @@ class PatchTest(unittest2.TestCase):
             self.assertEqual(Foo.g, original_g)
 
 
+    def test_patch_multiple_no_kwargs(self):
+        self.assertRaises(ValueError, patch.multiple, foo_name)
+        self.assertRaises(ValueError, patch.object, Foo)
+
+
+"""
+Test patch.multiple decorating classes
+Test patch.multiple mixed with other patchers
+Test patch.multiple with patch.start
+Test patch.multiple as context manager
+
+A failure on exit of one patcher from a multiple must not prevent the exits
+in the rest from running
+"""
+
 
 if __name__ == '__main__':
     unittest2.main()
