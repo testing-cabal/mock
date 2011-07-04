@@ -1089,6 +1089,7 @@ def _patch_multiple(target, spec=None, create=False,
         mocksignature=False, spec_set=None, autospec=False,
         new_callable=None, **kwargs
     ):
+    """ XXXX needs docstring"""
     target = _importer(target)
     if not kwargs:
         raise ValueError(
