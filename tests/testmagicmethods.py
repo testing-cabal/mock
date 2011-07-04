@@ -391,6 +391,12 @@ class TestMockingMagicMethods(unittest2.TestCase):
             self.assertEqual(dir(mock), ['foo'])
 
 
+    def test_bound_methods(self):
+        m = Mock()
+        m.__iter__ = [3, 2, 1].__iter__
+        self.assertEqual(list(m), [3, 2, 1])
+
+
 
 if __name__ == '__main__':
     unittest2.main()
