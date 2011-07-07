@@ -393,8 +393,12 @@ class TestMockingMagicMethods(unittest2.TestCase):
 
     def test_bound_methods(self):
         m = Mock()
-        m.__iter__ = [3, 2, 1].__iter__
-        self.assertEqual(list(m), [3, 2, 1])
+        def set_bound_method():
+            m.__iter__ = [3, 2, 1].__iter__
+
+        # this seems like it should work, but is hard to do without introducing
+        # other api inconsistencies. Failure message could be better though.
+        self.assertRaises(TypeError, set_bound_method)
 
 
 
