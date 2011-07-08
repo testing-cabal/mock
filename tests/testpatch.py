@@ -10,7 +10,8 @@ from tests.support import unittest2, inPy3k, SomeClass, is_instance
 
 from mock import (
     NonCallableMock, CallableMixin, patch, sentinel,
-    MagicMock, Mock, NonCallableMagicMock, patch
+    MagicMock, Mock, NonCallableMagicMock, patch,
+    DEFAULT
 )
 
 builtin_string = '__builtin__'
@@ -1183,10 +1184,80 @@ class PatchTest(unittest2.TestCase):
             self.assertEqual(Foo.g, original_g)
 
 
+        @patch.multiple(foo_name, f=3, g=4)
+        def test():
+            self.assertIs(Foo, original_foo)
+            self.assertEqual(Foo.f, 3)
+            self.assertEqual(Foo.g, 4)
+
+        test()
+
+
     def test_patch_multiple_no_kwargs(self):
         self.assertRaises(ValueError, patch.multiple, foo_name)
         self.assertRaises(ValueError, patch.object, Foo)
 
+
+    def test_patch_multiple_create_mocks(self):
+        original_foo = Foo
+        original_f = Foo.f
+        original_g = Foo.g
+
+        @patch.multiple(foo_name, f=DEFAULT, g=3, foo=DEFAULT)
+        def test(f, foo):
+            self.assertIs(Foo, original_foo)
+            self.assertIs(Foo.f, f)
+            self.assertIs(Foo.g, 3)
+            self.assertIs(Foo.foo, foo)
+            self.assertTrue(is_instance(f, MagicMock))
+            self.assertTrue(is_instance(foo, MagicMock))
+
+        test()
+        self.assertEqual(Foo.f, original_f)
+        self.assertEqual(Foo.g, original_g)
+
+
+    def test_patch_multiple_stacked_decorators(self):
+        original_foo = Foo
+        original_f = Foo.f
+        original_g = Foo.g
+
+        @patch.multiple(foo_name, f=DEFAULT)
+        @patch.multiple(foo_name, foo=DEFAULT)
+        @patch(foo_name + '.g')
+        def test1(g, **kwargs):
+            _test(g, **kwargs)
+
+        @patch.multiple(foo_name, f=DEFAULT)
+        @patch(foo_name + '.g')
+        @patch.multiple(foo_name, foo=DEFAULT)
+        def test2(g, **kwargs):
+            _test(g, **kwargs)
+
+        @patch(foo_name + '.g')
+        @patch.multiple(foo_name, f=DEFAULT)
+        @patch.multiple(foo_name, foo=DEFAULT)
+        def test3(g, **kwargs):
+            _test(g, **kwargs)
+
+        def _test(g, **kwargs):
+            f = kwargs.pop('f')
+            foo = kwargs.pop('foo')
+            self.assertFalse(kwargs)
+
+            self.assertIs(Foo, original_foo)
+            self.assertIs(Foo.f, f)
+            self.assertIs(Foo.g, g)
+            self.assertIs(Foo.foo, foo)
+            self.assertTrue(is_instance(f, MagicMock))
+            self.assertTrue(is_instance(g, MagicMock))
+            self.assertTrue(is_instance(foo, MagicMock))
+
+        test1()
+        test2()
+        test3()
+        self.assertEqual(Foo.f, original_f)
+        self.assertEqual(Foo.g, original_g)
 
 
 
