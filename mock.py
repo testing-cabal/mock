@@ -841,6 +841,9 @@ def _importer(target):
 
 
 class _patch(object):
+
+    attribute_name = None
+
     def __init__(
             self, target, attribute, new, spec, create,
             mocksignature, spec_set, autospec, new_callable, kwargs
@@ -901,7 +904,12 @@ class _patch(object):
             for patching in patched.patchings:
                 arg = patching.__enter__()
                 if patching.new is DEFAULT:
-                    extra_args.append(arg)
+                    # arg will either be a mock or a dict
+                    if patching.attribute_name is not None:
+                        keywargs.update(arg)
+                    else:
+                        extra_args.append(arg)
+
             args += tuple(extra_args)
             try:
                 return func(*args, **keywargs)
@@ -1012,13 +1020,15 @@ class _patch(object):
         self.temp_original = original
         self.is_local = local
         setattr(self.target, self.attribute, new_attr)
-        if self.additional_patchers:
-            extra_args = [new]
+        if self.attribute_name is not None:
+            extra_args = {}
+            if self.new is DEFAULT:
+                extra_args[self.attribute_name] =  new
             for patching in self.additional_patchers:
                 arg = patching.__enter__()
                 if patching.new is DEFAULT:
-                    extra_args.append(arg)
-            new = tuple(extra_args)
+                    extra_args.update(arg)
+            return extra_args
 
         return new
 
@@ -1105,19 +1115,21 @@ def _do_patch_multiple(
         target, spec, create, mocksignature, spec_set, autospec,
         new_callable, kwargs
     ):
+    # need to wrap in a list for python 3, where items is a view
     items = list(kwargs.items())
     attribute, new = items[0]
     patcher = _patch(
         target, attribute, new, spec, create, mocksignature, spec_set,
         autospec, new_callable, {}
     )
+    patcher.attribute_name = attribute
     for attribute, new in items[1:]:
-        patcher.additional_patchers.append(
-            _patch(
-                target, attribute, new, spec, create, mocksignature, spec_set,
-                autospec, new_callable, {}
-            )
+        this_patcher = _patch(
+            target, attribute, new, spec, create, mocksignature, spec_set,
+            autospec, new_callable, {}
         )
+        this_patcher.attribute_name = attribute
+        patcher.additional_patchers.append(this_patcher)
     return patcher
 
 
