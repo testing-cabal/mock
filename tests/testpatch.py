@@ -1260,12 +1260,61 @@ class PatchTest(unittest2.TestCase):
         self.assertEqual(Foo.g, original_g)
 
 
+    def test_patch_multiple_create_mocks_patcher(self):
+        original_foo = Foo
+        original_f = Foo.f
+        original_g = Foo.g
+
+        patcher = patch.multiple(foo_name, f=DEFAULT, g=3, foo=DEFAULT)
+
+        result = patcher.start()
+        try:
+            f = result['f']
+            foo = result['foo']
+            self.assertEqual(set(result), set(['f', 'foo']))
+
+            self.assertIs(Foo, original_foo)
+            self.assertIs(Foo.f, f)
+            self.assertIs(Foo.foo, foo)
+            self.assertTrue(is_instance(f, MagicMock))
+            self.assertTrue(is_instance(foo, MagicMock))
+        finally:
+            patcher.stop()
+
+        self.assertEqual(Foo.f, original_f)
+        self.assertEqual(Foo.g, original_g)
+
+
+    def test_patch_multiple_decorating_class(self):
+        test = self
+        original_foo = Foo
+
+        class SomeTest(object):
+
+            def _test(self, f, foo):
+                test.assertIs(Foo, original_foo)
+                test.assertIs(Foo.f, f)
+                test.assertEqual(Foo.g, 3)
+                test.assertIs(Foo.foo, foo)
+                test.assertTrue(is_instance(f, MagicMock))
+                test.assertTrue(is_instance(foo, MagicMock))
+
+            def test_two(self, f, foo):
+                self._test(f, foo)
+            def test_one(self, f, foo):
+                self._test(f, foo)
+
+        SomeTest = patch.multiple(
+            foo_name, f=DEFAULT, g=3, foo=DEFAULT
+        )(SomeTest)
+
+        thing = SomeTest()
+        thing.test_one()
+        thing.test_two()
 
 """
 Test patch.multiple decorating classes
 Test patch.multiple mixed with other patchers
-Test patch.multiple with patch.start
-Test patch.multiple as context manager
 
 A failure on exit of one patcher from a multiple must not prevent the exits
 in the rest from running (don't think this can actually happen)

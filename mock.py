@@ -873,9 +873,16 @@ class _patch(object):
 
 
     def copy(self):
-        return _patch(self.target, self.attribute, self.new, self.spec,
-                        self.create, self.mocksignature, self.spec_set,
-                        self.autospec, self.new_callable, self.kwargs)
+        patcher = _patch(
+            self.target, self.attribute, self.new, self.spec,
+            self.create, self.mocksignature, self.spec_set,
+            self.autospec, self.new_callable, self.kwargs
+        )
+        patcher.attribute_name = self.attribute_name
+        patcher.additional_patchers = [
+            p.copy() for p in self.additional_patchers
+        ]
+        return patcher
 
 
     def __call__(self, func):
@@ -886,9 +893,15 @@ class _patch(object):
 
     def decorate_class(self, klass):
         for attr in dir(klass):
+            if not attr.startswith("test"):
+                continue
+
             attr_value = getattr(klass, attr)
-            if attr.startswith("test") and hasattr(attr_value, "__call__"):
-                setattr(klass, attr, self.copy()(attr_value))
+            if not hasattr(attr_value, "__call__"):
+                continue
+
+            patcher = self.copy()
+            setattr(klass, attr, patcher(attr_value))
         return klass
 
 
@@ -899,7 +912,7 @@ class _patch(object):
 
         @wraps(func)
         def patched(*args, **keywargs):
-            # don't use a with here (backwards compatability with 2.4)
+            # don't use a with here (backwards compatability with Python 2.4)
             extra_args = []
             for patching in patched.patchings:
                 arg = patching.__enter__()
@@ -914,7 +927,7 @@ class _patch(object):
             try:
                 return func(*args, **keywargs)
             finally:
-                for patching in reversed(getattr(patched, 'patchings', [])):
+                for patching in reversed(patched.patchings):
                     patching.__exit__()
 
         patched.patchings = [self]
