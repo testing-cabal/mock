@@ -1288,6 +1288,8 @@ class PatchTest(unittest2.TestCase):
     def test_patch_multiple_decorating_class(self):
         test = self
         original_foo = Foo
+        original_f = Foo.f
+        original_g = Foo.g
 
         class SomeTest(object):
 
@@ -1311,6 +1313,9 @@ class PatchTest(unittest2.TestCase):
         thing = SomeTest()
         thing.test_one()
         thing.test_two()
+
+        self.assertEqual(Foo.f, original_f)
+        self.assertEqual(Foo.g, original_g)
 
 """
 Test patch.multiple with create / spec / spec_set / autospec / mocksignature /
