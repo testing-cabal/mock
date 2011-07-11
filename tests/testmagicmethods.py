@@ -391,6 +391,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
             self.assertEqual(dir(mock), ['foo'])
 
 
+    @unittest2.skipIf('PyPy' in sys.version, "This fails differently on pypy")
     def test_bound_methods(self):
         m = Mock()
         def set_bound_method():
