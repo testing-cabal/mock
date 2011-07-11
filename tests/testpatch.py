@@ -1207,7 +1207,7 @@ class PatchTest(unittest2.TestCase):
         def test(f, foo):
             self.assertIs(Foo, original_foo)
             self.assertIs(Foo.f, f)
-            self.assertIs(Foo.g, 3)
+            self.assertEqual(Foo.g, 3)
             self.assertIs(Foo.foo, foo)
             self.assertTrue(is_instance(f, MagicMock))
             self.assertTrue(is_instance(foo, MagicMock))
