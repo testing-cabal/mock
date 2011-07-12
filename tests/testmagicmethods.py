@@ -141,6 +141,29 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertEqual(mock.value, 16)
 
 
+    @unittest2.skipIf(inPy3k, 'no truediv in Python 3')
+    def test_truediv(self):
+        mock = MagicMock()
+        mock.__truediv__.return_value = 6
+
+        context = {'mock': mock}
+        code = 'from __future__ import division\nresult = mock / 7\n'
+        exec(code, context)
+        self.assertEqual(context['result'], 6)
+
+        mock.__rtruediv__.return_value = 3
+        code = 'from __future__ import division\nresult = 2 / mock\n'
+        exec(code, context)
+        self.assertEqual(context['result'], 3)
+
+
+    @unittest2.skipIf(not inPy3k, 'truediv is available in Python 2')
+    def test_no_truediv(self):
+        self.assertRaises(
+            AttributeError, getattr, MagicMock(), '__truediv__'
+        )
+
+
     def test_hash(self):
         mock = Mock()
         # test delegation
