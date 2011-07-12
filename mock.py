@@ -1048,6 +1048,9 @@ class _patch(object):
 
     def __exit__(self, *_):
         """Undo the patch."""
+        if not hasattr(self, 'is_local'):
+            raise RuntimeError('stop called on unstarted patcher')
+
         if self.is_local and self.temp_original is not DEFAULT:
             setattr(self.target, self.attribute, self.temp_original)
         else:
