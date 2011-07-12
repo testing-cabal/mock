@@ -733,6 +733,13 @@ class PatchTest(unittest2.TestCase):
         self.assertIs(something, original)
 
 
+    def test_stop_without_start(self):
+        patcher = patch(foo_name, 'bar', 3)
+
+        # calling stop without start used to produce a very obscure error
+        self.assertRaises(RuntimeError, patcher.stop)
+
+
     def test_patchobject_start_stop(self):
         original = something
         patcher = patch.object(PTModule, 'something', 'foo')
@@ -1317,9 +1324,28 @@ class PatchTest(unittest2.TestCase):
         self.assertEqual(Foo.f, original_f)
         self.assertEqual(Foo.g, original_g)
 
+
+    def test_patch_multiple_create(self):
+        patcher = patch.multiple(Foo, blam='blam')
+        self.assertRaises(AttributeError, patcher.start)
+
+        patcher = patch.multiple(Foo, blam='blam', create=True)
+        patcher.start()
+        try:
+            self.assertEqual(Foo.blam, 'blam')
+        finally:
+            patcher.stop()
+
+        self.assertFalse(hasattr(Foo, 'blam'))
+
+
 """
 Test patch.multiple with create / spec / spec_set / autospec / mocksignature /
 new_callable keyword arguments
+
+A nested set of patches, where *one* of them raises an exception starting
+(e.g. because the patched attribute doesn't exist) may have problems - will
+__exit__ be called correctly on all started patchers?
 """
 
 

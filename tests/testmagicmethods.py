@@ -421,6 +421,8 @@ class TestMockingMagicMethods(unittest2.TestCase):
     def test_bound_methods(self):
         m = Mock()
 
+        # XXXX should this be an expected failure instead?
+
         # this seems like it should work, but is hard to do without introducing
         # other api inconsistencies. Failure message could be better though.
         self.assertRaises(TypeError, setattr, m, '__iter__', [3].__iter__)
