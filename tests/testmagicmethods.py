@@ -162,6 +162,9 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertRaises(
             AttributeError, getattr, MagicMock(), '__truediv__'
         )
+        self.assertRaises(
+            AttributeError, getattr, MagicMock(), '__rtruediv__'
+        )
 
 
     def test_hash(self):
@@ -417,12 +420,10 @@ class TestMockingMagicMethods(unittest2.TestCase):
     @unittest2.skipIf('PyPy' in sys.version, "This fails differently on pypy")
     def test_bound_methods(self):
         m = Mock()
-        def set_bound_method():
-            m.__iter__ = [3, 2, 1].__iter__
 
         # this seems like it should work, but is hard to do without introducing
         # other api inconsistencies. Failure message could be better though.
-        self.assertRaises(TypeError, set_bound_method)
+        self.assertRaises(TypeError, setattr, m, '__iter__', [3].__iter__)
 
 
 
