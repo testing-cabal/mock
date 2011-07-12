@@ -73,6 +73,8 @@ CHANGELOG
 2011/XX/XX Version 0.8.0 alpha 2
 --------------------------------
 
+* `patch.multiple` for doing multiple patches in a single call, using keyword
+  arguments
 * New `new_callable` argument to `patch` and `patch.object` allowing you to
   pass in a class or callable object (instead of `MagicMock`) that will be
   called to replace the object being patched

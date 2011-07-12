@@ -1077,7 +1077,7 @@ def _get_target(target):
 
 
 def _patch_object(
-        target, attribute=DEFAULT, new=DEFAULT, spec=None,
+        target, attribute, new=DEFAULT, spec=None,
         create=False, mocksignature=False, spec_set=None, autospec=False,
         new_callable=None, **kwargs
     ):
@@ -1091,17 +1091,6 @@ def _patch_object(
     Arguments new, spec, create, mocksignature and spec_set have the same
     meaning as for patch.
     """
-    if attribute is DEFAULT:
-        if not kwargs:
-            raise ValueError(
-                'Must supply at least one keyword argument if not specifying '
-                'an attribute to be patched'
-            )
-        return _do_patch_multiple(
-            target, spec, create, mocksignature, spec_set, autospec,
-            new_callable, kwargs
-        )
-
     return _patch(
         target, attribute, new, spec, create, mocksignature,
         spec_set, autospec, new_callable, kwargs
@@ -1113,21 +1102,13 @@ def _patch_multiple(target, spec=None, create=False,
         new_callable=None, **kwargs
     ):
     """ XXXX needs docstring"""
-    target = _importer(target)
+    if isinstance(target, basestring):
+        target = _importer(target)
+
     if not kwargs:
         raise ValueError(
             'Must supply at least one keyword argument with patch.multiple'
         )
-    return _do_patch_multiple(
-        target, spec, create, mocksignature, spec_set, autospec,
-        new_callable, kwargs
-    )
-
-
-def _do_patch_multiple(
-        target, spec, create, mocksignature, spec_set, autospec,
-        new_callable, kwargs
-    ):
     # need to wrap in a list for python 3, where items is a view
     items = list(kwargs.items())
     attribute, new = items[0]

@@ -1168,7 +1168,7 @@ class PatchTest(unittest2.TestCase):
         original_g = Foo.g
 
         patcher1 = patch.multiple(foo_name, f=1, g=2)
-        patcher2 = patch.object(Foo, f=1, g=2)
+        patcher2 = patch.multiple(Foo, f=1, g=2)
 
         for patcher in patcher1, patcher2:
             patcher.start()
@@ -1195,7 +1195,7 @@ class PatchTest(unittest2.TestCase):
 
     def test_patch_multiple_no_kwargs(self):
         self.assertRaises(ValueError, patch.multiple, foo_name)
-        self.assertRaises(ValueError, patch.object, Foo)
+        self.assertRaises(ValueError, patch.multiple, Foo)
 
 
     def test_patch_multiple_create_mocks(self):
