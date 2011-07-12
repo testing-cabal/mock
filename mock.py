@@ -1318,15 +1318,14 @@ magic_methods = (
     "trunc floor ceil "
 )
 
-numerics = "add sub mul div truediv floordiv mod lshift rshift and xor or pow "
+numerics = "add sub mul div floordiv mod lshift rshift and xor or pow "
 inplace = ' '.join('i%s' % n for n in numerics.split())
 right = ' '.join('r%s' % n for n in numerics.split())
 extra = ''
 if inPy3k:
     extra = 'bool next '
 else:
-    extra = 'unicode long nonzero oct hex '
-# __truediv__ and __rtruediv__ not available in Python 3 either
+    extra = 'unicode long nonzero oct hex truediv rtruediv '
 
 # not including __prepare__, __instancecheck__, __subclasscheck__
 # (as they are metaclass methods)
