@@ -1339,10 +1339,40 @@ class PatchTest(unittest2.TestCase):
         self.assertFalse(hasattr(Foo, 'blam'))
 
 
-"""
-Test patch.multiple with create / spec / spec_set / autospec / mocksignature /
-new_callable keyword arguments
+    def test_patch_multiple_spec_set(self):
+        # if spec_set works then we can assume that spec and autospec also
+        # work as the underlying machinery is the same
+        patcher = patch.multiple(Foo, foo=DEFAULT, spec_set=['a', 'b'])
+        result = patcher.start()
+        try:
+            self.assertEqual(Foo.foo, result['foo'])
+            Foo.foo.a(1)
+            Foo.foo.b(2)
+            Foo.foo.a.assert_called_with(1)
+            Foo.foo.b.assert_called_with(2)
+            self.assertRaises(AttributeError, setattr, Foo.foo, 'c', None)
+        finally:
+            patcher.stop()
 
+
+    def test_patch_multiple_new_callable(self):
+        class Thing(object):
+            pass
+
+        patcher = patch.multiple(
+            Foo, f=DEFAULT, g=DEFAULT, new_callable=Thing
+        )
+        result = patcher.start()
+        try:
+            self.assertIs(Foo.f, result['f'])
+            self.assertIs(Foo.g, result['g'])
+            self.assertIsInstance(Foo.f, Thing)
+            self.assertIsInstance(Foo.g, Thing)
+            self.assertIsNot(Foo.f, Foo.g)
+        finally:
+            patcher.stop()
+
+"""
 A nested set of patches, where *one* of them raises an exception starting
 (e.g. because the patched attribute doesn't exist) may have problems - will
 __exit__ be called correctly on all started patchers?
