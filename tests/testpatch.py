@@ -1372,11 +1372,55 @@ class PatchTest(unittest2.TestCase):
         finally:
             patcher.stop()
 
-"""
-A nested set of patches, where *one* of them raises an exception starting
-(e.g. because the patched attribute doesn't exist) may have problems - will
-__exit__ be called correctly on all started patchers?
-"""
+
+    def test_nested_patch_failure(self):
+        original_f = Foo.f
+        original_g = Foo.g
+
+        @patch.object(Foo, 'g', 1)
+        @patch.object(Foo, 'missing', 1)
+        @patch.object(Foo, 'f', 1)
+        def thing1():
+            pass
+
+        @patch.object(Foo, 'missing', 1)
+        @patch.object(Foo, 'g', 1)
+        @patch.object(Foo, 'f', 1)
+        def thing2():
+            pass
+
+        @patch.object(Foo, 'g', 1)
+        @patch.object(Foo, 'f', 1)
+        @patch.object(Foo, 'missing', 1)
+        def thing3():
+            pass
+
+        for func in thing1, thing2, thing3:
+            self.assertRaises(AttributeError, func)
+            self.assertEqual(Foo.f, original_f)
+            self.assertEqual(Foo.g, original_g)
+
+
+    def DONTtest_patch_multiple_failure(self):
+        original_f = Foo.f
+        original_g = Foo.g
+
+        p = patch.object(Foo, 'f', 1)
+
+        good = patch.object(Foo, 'g', 1)
+        good.attribute_name = 'g'
+
+        bad = patch.object(Foo, 'missing', 1)
+        bad.attribute_name = 'missing'
+
+        for patchers in [good, bad], [bad, good]:
+            p.additional_patchers = patchers
+
+            func = p(lambda: None)
+
+            self.assertRaises(AttributeError, func)
+            self.assertEqual(Foo.f, original_f)
+            self.assertEqual(Foo.g, original_g)
 
 
 if __name__ == '__main__':
