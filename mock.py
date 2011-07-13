@@ -914,20 +914,22 @@ class _patch(object):
         def patched(*args, **keywargs):
             # don't use a with here (backwards compatability with Python 2.4)
             extra_args = []
-            for patching in patched.patchings:
-                arg = patching.__enter__()
-                if patching.new is DEFAULT:
-                    # arg will either be a mock or a dict
-                    if patching.attribute_name is not None:
-                        keywargs.update(arg)
-                    else:
-                        extra_args.append(arg)
-
-            args += tuple(extra_args)
+            entered_patchers = []
             try:
+                for patching in patched.patchings:
+                    arg = patching.__enter__()
+                    entered_patchers.append(patching)
+                    if patching.new is DEFAULT:
+                        # arg will either be a mock or a dict
+                        if patching.attribute_name is not None:
+                            keywargs.update(arg)
+                        else:
+                            extra_args.append(arg)
+
+                args += tuple(extra_args)
                 return func(*args, **keywargs)
             finally:
-                for patching in reversed(patched.patchings):
+                for patching in reversed(entered_patchers):
                     patching.__exit__()
 
         patched.patchings = [self]

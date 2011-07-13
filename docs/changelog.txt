@@ -90,6 +90,8 @@ CHANGELOG
 * Removed the "inherit" argument from `create_autospec`
 * Calling `stop` on an unstarted patcher dies with  a more meaningful error
   message
+* BUGFIX: an error creating a patch, with nested patch decorators, won't leave
+  patches in place
 * BUGFIX: `__truediv__` and `__rtruediv__` not available as magic methods on
   mocks in Python 3
 * BUGFIX: `assert_called_with` / `assert_called_once_with` can be used with
