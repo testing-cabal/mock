@@ -1,2 +1,2 @@
 include tests/*.py
-recursive-include docs *.txt *.py *.png *.css *.html
+recursive-include docs *.txt *.py *.png *.css *.html *.js

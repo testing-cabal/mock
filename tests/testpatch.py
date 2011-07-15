@@ -1401,7 +1401,7 @@ class PatchTest(unittest2.TestCase):
             self.assertEqual(Foo.g, original_g)
 
 
-    def DONTtest_patch_multiple_failure(self):
+    def test_patch_multiple_failure(self):
         original_f = Foo.f
         original_g = Foo.g
 
@@ -1421,6 +1421,7 @@ class PatchTest(unittest2.TestCase):
             self.assertRaises(AttributeError, func)
             self.assertEqual(Foo.f, original_f)
             self.assertEqual(Foo.g, original_g)
+
 
 
 if __name__ == '__main__':
