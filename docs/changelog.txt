@@ -74,6 +74,7 @@ CHANGELOG
 --------------------------------
 
 * Added the public `instance` argument to `create_autospec`
+* Support for using Java exceptions as mock `side_effect` on Jython
 
 
 2011/07/16 Version 0.8.0 alpha 2

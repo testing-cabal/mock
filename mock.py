@@ -41,11 +41,6 @@ except ImportError:
     # may not have inspect
     inspect = None
 
-try:
-    BaseException
-except NameError:
-    # Python 2.4 compatibility
-    BaseException = Exception
 
 try:
     from functools import wraps
@@ -70,6 +65,18 @@ try:
 except NameError:
     # Python 3
     long = int
+
+try:
+    BaseException
+except NameError:
+    # Python 2.4 compatibility
+    BaseException = Exception
+
+BaseExceptions = (BaseException,)
+if 'java' in sys.platform:
+    # jython
+    import java
+    BaseExceptions = (BaseException, java.lang.Throwable)
 
 try:
     _isidentifier = str.isidentifier
@@ -103,6 +110,13 @@ def _is_instance_mock(obj):
     # can't use isinstance on Mock objects because they override __class__
     # The base class for all mocks is NonCallableMock
     return issubclass(type(obj), NonCallableMock)
+
+
+def _is_exception(obj):
+    return (
+        isinstance(obj, BaseExceptions) or
+        isinstance(obj, ClassTypes) and issubclass(obj, BaseExceptions)
+    )
 
 
 class _slotted(object):
@@ -799,9 +813,7 @@ class CallableMixin(Base):
 
         ret_val = DEFAULT
         if self.side_effect is not None:
-            if (isinstance(self.side_effect, BaseException) or
-                isinstance(self.side_effect, ClassTypes) and
-                issubclass(self.side_effect, BaseException)):
+            if _is_exception(self.side_effect):
                 raise self.side_effect
 
             ret_val = self.side_effect(*args, **kwargs)
