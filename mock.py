@@ -630,8 +630,8 @@ class NonCallableMock(Base):
 
         elif isinstance(result, _SpecState):
             result = create_autospec(
-                result.spec, result.spec_set, None,
-                result.parent, result.name, result.instance
+                result.spec, result.spec_set, result.instance,
+                None, result.parent, result.name
             )
             self._mock_children[name]  = result
 
@@ -1547,8 +1547,8 @@ call = _Call()
 
 
 
-def create_autospec(spec, spec_set=False, configure=None,
-                    _parent=None, _name=None, _instance=False):
+def create_autospec(spec, spec_set=False, instance=False,
+                         configure=None, _parent=None, _name=None):
     """XXXX needs docstring!"""
     if configure is None:
         configure = {}
@@ -1576,7 +1576,7 @@ def create_autospec(spec, spec_set=False, configure=None,
         kwargs = {}
     elif not _callable(spec):
         Klass = NonCallableMagicMock
-    elif is_type and _instance and not _instance_callable(spec):
+    elif is_type and instance and not _instance_callable(spec):
         Klass = NonCallableMagicMock
 
     mock = Klass(parent=_parent, name=_name, **kwargs)
@@ -1591,9 +1591,9 @@ def create_autospec(spec, spec_set=False, configure=None,
     if _parent is not None:
         _parent._mock_children[_name] = mock
 
-    if is_type and not _instance:
+    if is_type and not instance:
         # XXXX could give a name to the return_value mock?
-        mock.return_value = create_autospec(spec, spec_set, _instance=True)
+        mock.return_value = create_autospec(spec, spec_set, instance=True)
 
     for entry in dir(spec):
         if _is_magic(entry):
@@ -1619,7 +1619,7 @@ def create_autospec(spec, spec_set=False, configure=None,
             kwargs = {'spec_set': original}
 
         if not isinstance(original, FunctionTypes):
-            new = _SpecState(original, spec_set, mock, entry, _instance)
+            new = _SpecState(original, spec_set, mock, entry, instance)
             mock._mock_children[entry] = new
         else:
             parent = mock

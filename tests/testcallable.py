@@ -147,3 +147,14 @@ class TestCallable(unittest2.TestCase):
         mock = create_autospec(X())
         self.assertRaises(TypeError, mock)
 
+
+    def test_create_autospec_instance(self):
+        mock = create_autospec(SomeClass, instance=True)
+
+        self.assertRaises(TypeError, mock)
+        mock.wibble()
+        mock.wibble.assert_called_once_with()
+
+        self.assertRaises(TypeError, mock.wibble, 'some',  'args')
+
+

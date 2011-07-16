@@ -73,7 +73,7 @@ CHANGELOG
 2011/XX/XX Version 0.8.0 alpha 3
 --------------------------------
 
-XXXX instance argument to create_autospec should be public.
+* Added the public `instance` argument to `create_autospec`
 
 
 2011/07/16 Version 0.8.0 alpha 2
