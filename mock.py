@@ -920,26 +920,31 @@ class _patch(object):
             # don't use a with here (backwards compatability with Python 2.4)
             extra_args = []
             entered_patchers = []
-            try:
-                for patching in patched.patchings:
-                    arg = patching.__enter__()
-                    entered_patchers.append(patching)
-                    if patching.new is DEFAULT:
-                        # arg will either be a mock or a dict
-                        if patching.attribute_name is not None:
-                            keywargs.update(arg)
-                        else:
-                            extra_args.append(arg)
 
-                args += tuple(extra_args)
-                return func(*args, **keywargs)
-            except:
-                if (patching not in entered_patchers and _is_started(patching)):
-                    # the patcher may have been started, but an exception raised
-                    # whilst entering one of its "additional_patchers"
-                    entered_patchers.append(patching)
-                # re-raise the exception
-                raise
+            # can't use try...except...finally because of Python 2.4
+            # compatibility
+            try:
+                try:
+                    for patching in patched.patchings:
+                        arg = patching.__enter__()
+                        entered_patchers.append(patching)
+                        if patching.new is DEFAULT:
+                            # arg will either be a mock or a dict
+                            if patching.attribute_name is not None:
+                                keywargs.update(arg)
+                            else:
+                                extra_args.append(arg)
+
+                    args += tuple(extra_args)
+                    return func(*args, **keywargs)
+                except:
+                    if (patching not in entered_patchers and
+                        _is_started(patching)):
+                        # the patcher may have been started, but an exception
+                        # raised whilst entering one of its additional_patchers
+                        entered_patchers.append(patching)
+                    # re-raise the exception
+                    raise
             finally:
                 for patching in reversed(entered_patchers):
                     patching.__exit__()
