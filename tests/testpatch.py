@@ -1223,6 +1223,28 @@ class PatchTest(unittest2.TestCase):
         self.assertEqual(Foo.g, original_g)
 
 
+    def test_patch_multiple_create_mocks_different_order(self):
+        # bug revealed by Jython!
+        original_f = Foo.f
+        original_g = Foo.g
+
+        patcher = patch.object(Foo, 'f', 3)
+        patcher.attribute_name = 'f'
+
+        other = patch.object(Foo, 'g', DEFAULT)
+        other.attribute_name = 'g'
+        patcher.additional_patchers = [other]
+
+        @patcher
+        def test(g):
+            self.assertIs(Foo.g, g)
+            self.assertEqual(Foo.f, 3)
+
+        test()
+        self.assertEqual(Foo.f, original_f)
+        self.assertEqual(Foo.g, original_g)
+
+
     def test_patch_multiple_stacked_decorators(self):
         original_foo = Foo
         original_f = Foo.f
