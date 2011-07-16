@@ -73,6 +73,8 @@ CHANGELOG
 2011/XX/XX Version 0.8.0 alpha 3
 --------------------------------
 
+* BUGFIX: Fixed bug in `patch.multiple` for argument passing when creating
+  mocks
 * Added the public `instance` argument to `create_autospec`
 * Support for using Java exceptions as mock `side_effect` on Jython
 

@@ -941,12 +941,10 @@ class _patch(object):
                     for patching in patched.patchings:
                         arg = patching.__enter__()
                         entered_patchers.append(patching)
-                        if patching.new is DEFAULT:
-                            # arg will either be a mock or a dict
-                            if patching.attribute_name is not None:
-                                keywargs.update(arg)
-                            else:
-                                extra_args.append(arg)
+                        if patching.attribute_name is not None:
+                            keywargs.update(arg)
+                        elif patching.new is DEFAULT:
+                            extra_args.append(arg)
 
                     args += tuple(extra_args)
                     return func(*args, **keywargs)
