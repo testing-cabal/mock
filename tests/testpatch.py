@@ -139,7 +139,7 @@ class PatchTest(unittest2.TestCase):
     def test_object_lookup_is_quite_lazy(self):
         global something
         original = something
-        @patch('tests.testpatch.something', sentinel.Something2)
+        @patch('%s.something' % __name__, sentinel.Something2)
         def test():
             pass
 
@@ -161,8 +161,8 @@ class PatchTest(unittest2.TestCase):
         self.assertEqual(PTModule.something, sentinel.Something,
                          "patch not restored")
 
-        @patch('tests.testpatch.something', sentinel.Something2)
-        @patch('tests.testpatch.something_else', sentinel.SomethingElse)
+        @patch('%s.something' % __name__, sentinel.Something2)
+        @patch('%s.something_else' % __name__, sentinel.SomethingElse)
         def test():
             self.assertEqual(PTModule.something, sentinel.Something2,
                              "unpatched")
@@ -195,7 +195,7 @@ class PatchTest(unittest2.TestCase):
 
 
     def test_patch_class_attribute(self):
-        @patch('tests.testpatch.SomeClass.class_attribute',
+        @patch('%s.SomeClass.class_attribute' % __name__,
                sentinel.ClassAttribute)
         def test():
             self.assertEqual(PTModule.SomeClass.class_attribute,
@@ -249,7 +249,7 @@ class PatchTest(unittest2.TestCase):
 
 
     def test_patch_with_spec(self):
-        @patch('tests.testpatch.SomeClass', spec=SomeClass)
+        @patch('%s.SomeClass' % __name__, spec=SomeClass)
         def test(MockSomeClass):
             self.assertEqual(SomeClass, MockSomeClass)
             self.assertTrue(is_instance(SomeClass.wibble, MagicMock))
@@ -271,7 +271,7 @@ class PatchTest(unittest2.TestCase):
 
 
     def test_patch_with_spec_as_list(self):
-        @patch('tests.testpatch.SomeClass', spec=['wibble'])
+        @patch('%s.SomeClass' % __name__, spec=['wibble'])
         def test(MockSomeClass):
             self.assertEqual(SomeClass, MockSomeClass)
             self.assertTrue(is_instance(SomeClass.wibble, MagicMock))
@@ -295,7 +295,7 @@ class PatchTest(unittest2.TestCase):
     def test_nested_patch_with_spec_as_list(self):
         # regression test for nested decorators
         @patch('%s.open' % builtin_string)
-        @patch('tests.testpatch.SomeClass', spec=['wibble'])
+        @patch('%s.SomeClass' % __name__, spec=['wibble'])
         def test(MockSomeClass, MockOpen):
             self.assertEqual(SomeClass, MockSomeClass)
             self.assertTrue(is_instance(SomeClass.wibble, MagicMock))
@@ -304,7 +304,7 @@ class PatchTest(unittest2.TestCase):
 
 
     def test_patch_with_spec_as_boolean(self):
-        @patch('tests.testpatch.SomeClass', spec=True)
+        @patch('%s.SomeClass' % __name__, spec=True)
         def test(MockSomeClass):
             self.assertEqual(SomeClass, MockSomeClass)
             # Should not raise attribute error
@@ -316,8 +316,7 @@ class PatchTest(unittest2.TestCase):
 
 
     def test_patch_object_with_spec_as_boolean(self):
-        from tests import testpatch
-        @patch.object(testpatch, 'SomeClass', spec=True)
+        @patch.object(PTModule, 'SomeClass', spec=True)
         def test(MockSomeClass):
             self.assertEqual(SomeClass, MockSomeClass)
             # Should not raise attribute error
@@ -329,7 +328,7 @@ class PatchTest(unittest2.TestCase):
 
 
     def test_patch_class_acts_with_spec_is_inherited(self):
-        @patch('tests.testpatch.SomeClass', spec=True)
+        @patch('%s.SomeClass' % __name__, spec=True)
         def test(MockSomeClass):
             self.assertTrue(is_instance(MockSomeClass, MagicMock))
             instance = MockSomeClass()
@@ -609,8 +608,8 @@ class PatchTest(unittest2.TestCase):
     def test_name_preserved(self):
         foo = {}
 
-        @patch('tests.testpatch.SomeClass', object())
-        @patch('tests.testpatch.SomeClass', object(), mocksignature=True)
+        @patch('%s.SomeClass' % __name__, object())
+        @patch('%s.SomeClass' % __name__, object(), mocksignature=True)
         @patch.object(SomeClass, object())
         @patch.dict(foo)
         def some_name():
@@ -687,7 +686,7 @@ class PatchTest(unittest2.TestCase):
 
 
     def test_patch_spec_set(self):
-        @patch('tests.testpatch.SomeClass', spec=SomeClass, spec_set=True)
+        @patch('%s.SomeClass' % __name__, spec=SomeClass, spec_set=True)
         def test(MockClass):
             MockClass.z = 'foo'
 
@@ -698,7 +697,7 @@ class PatchTest(unittest2.TestCase):
             MockClass.z = 'foo'
 
         self.assertRaises(AttributeError, test)
-        @patch('tests.testpatch.SomeClass', spec_set=True)
+        @patch('%s.SomeClass' % __name__, spec_set=True)
         def test(MockClass):
             MockClass.z = 'foo'
 
@@ -712,7 +711,7 @@ class PatchTest(unittest2.TestCase):
 
 
     def test_spec_set_inherit(self):
-        @patch('tests.testpatch.SomeClass', spec_set=True)
+        @patch('%s.SomeClass' % __name__, spec_set=True)
         def test(MockClass):
             instance = MockClass()
             instance.z = 'foo'
