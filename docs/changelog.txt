@@ -103,9 +103,6 @@ CHANGELOG
   mock (the "instance")
 * BUGFIX: remove the `__unittest` marker causing traceback truncation
 
-`MagicMock` is no longer a subclass of `Mock`, but a subclass of
-`NonCallableMock` with the callability mixed in.
-
 
 2011/06/14 Version 0.8.0 alpha 1
 --------------------------------
