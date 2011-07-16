@@ -840,6 +840,11 @@ def _importer(target):
     return thing
 
 
+def _is_started(patcher):
+    # XXXX horrible
+    return hasattr(patcher, 'is_local')
+
+
 class _patch(object):
 
     attribute_name = None
@@ -928,6 +933,13 @@ class _patch(object):
 
                 args += tuple(extra_args)
                 return func(*args, **keywargs)
+            except:
+                if (patching not in entered_patchers and _is_started(patching)):
+                    # the patcher may have been started, but an exception raised
+                    # whilst entering one of its "additional_patchers"
+                    entered_patchers.append(patching)
+                # re-raise the exception
+                raise
             finally:
                 for patching in reversed(entered_patchers):
                     patching.__exit__()
@@ -1050,7 +1062,7 @@ class _patch(object):
 
     def __exit__(self, *_):
         """Undo the patch."""
-        if not hasattr(self, 'is_local'):
+        if not _is_started(self):
             raise RuntimeError('stop called on unstarted patcher')
 
         if self.is_local and self.temp_original is not DEFAULT:
@@ -1064,7 +1076,8 @@ class _patch(object):
         del self.temp_original
         del self.is_local
         for patcher in reversed(self.additional_patchers):
-            patcher.__exit__()
+            if _is_started(patcher):
+                patcher.__exit__()
 
     start = __enter__
     stop = __exit__

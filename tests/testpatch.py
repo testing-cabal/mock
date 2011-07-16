@@ -1401,11 +1401,44 @@ class PatchTest(unittest2.TestCase):
             self.assertEqual(Foo.g, original_g)
 
 
-    def test_patch_multiple_failure(self):
+    def test_new_callable_failure(self):
+        original_f = Foo.f
+        original_g = Foo.g
+        original_foo = Foo.foo
+
+        def crasher():
+            raise NameError('crasher')
+
+        @patch.object(Foo, 'g', 1)
+        @patch.object(Foo, 'foo', new_callable=crasher)
+        @patch.object(Foo, 'f', 1)
+        def thing1():
+            pass
+
+        @patch.object(Foo, 'foo', new_callable=crasher)
+        @patch.object(Foo, 'g', 1)
+        @patch.object(Foo, 'f', 1)
+        def thing2():
+            pass
+
+        @patch.object(Foo, 'g', 1)
+        @patch.object(Foo, 'f', 1)
+        @patch.object(Foo, 'foo', new_callable=crasher)
+        def thing3():
+            pass
+
+        for func in thing1, thing2, thing3:
+            self.assertRaises(NameError, func)
+            self.assertEqual(Foo.f, original_f)
+            self.assertEqual(Foo.g, original_g)
+            self.assertEqual(Foo.foo, original_foo)
+
+
+    def DONTtest_patch_multiple_failure(self):
         original_f = Foo.f
         original_g = Foo.g
 
-        p = patch.object(Foo, 'f', 1)
+        patcher = patch.object(Foo, 'f', 1)
 
         good = patch.object(Foo, 'g', 1)
         good.attribute_name = 'g'
@@ -1413,11 +1446,14 @@ class PatchTest(unittest2.TestCase):
         bad = patch.object(Foo, 'missing', 1)
         bad.attribute_name = 'missing'
 
-        for patchers in [good, bad], [bad, good]:
-            p.additional_patchers = patchers
+        for additionals in [good, bad], [bad, good]:
+            patcher.additional_patchers = additionals
 
-            func = p(lambda: None)
+            @patcher
+            def func():
+                pass
 
+            #import pdb;pdb.set_trace()
             self.assertRaises(AttributeError, func)
             self.assertEqual(Foo.f, original_f)
             self.assertEqual(Foo.g, original_g)
