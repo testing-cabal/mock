@@ -9,6 +9,7 @@ Contributions, bug reports and comments welcomed!
 Feature requests and bug reports are handled on the issue tracker:
 
  * `mock issue tracker <http://code.google.com/p/mock/issues/list>`_
+
 `wraps` is not integrated with magic methods.
 
 Should magic method calls (including `__call__`?) be tracked in `method_calls`?
@@ -70,7 +71,7 @@ CHANGELOG
 =========
 
 
-2011/XX/XX Version 0.8.0 alpha 2
+2011/07/16 Version 0.8.0 alpha 2
 --------------------------------
 
 * `patch.multiple` for doing multiple patches in a single call, using keyword
