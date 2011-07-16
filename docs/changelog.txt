@@ -89,7 +89,7 @@ CHANGELOG
 * `autospec` creates a `MagicMock` without a spec for properties and slot
   descriptors, because we don't know the type of object they return
 * Removed the "inherit" argument from `create_autospec`
-* Calling `stop` on an unstarted patcher dies with  a more meaningful error
+* Calling `stop` on an unstarted patcher fails with  a more meaningful error
   message
 * BUGFIX: an error creating a patch, with nested patch decorators, won't leave
   patches in place
