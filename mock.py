@@ -817,6 +817,7 @@ class CallableMixin(Base):
 
 
 class Mock(CallableMixin, NonCallableMock):
+    """XXXX needs docstring"""
     pass
 
 
@@ -1467,6 +1468,7 @@ class MagicMixin(object):
 
 
 class NonCallableMagicMock(MagicMixin, NonCallableMock):
+    """XXXX needs docstring"""
     pass
 
 
