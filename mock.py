@@ -1454,10 +1454,9 @@ def _set_return_value(mock, method, name):
         method.return_value = return_value
 
 
-
-class NonCallableMagicMock(NonCallableMock):
+class MagicMixin(object):
     def __init__(self, *args, **kw):
-        _super(NonCallableMagicMock, self).__init__(*args, **kw)
+        _super(MagicMixin, self).__init__(*args, **kw)
 
         these_magics = _magics
         if self._mock_methods is not None:
@@ -1467,8 +1466,11 @@ class NonCallableMagicMock(NonCallableMock):
             setattr(self, entry, _create_proxy(entry, self))
 
 
+class NonCallableMagicMock(MagicMixin, NonCallableMock):
+    pass
 
-class MagicMock(CallableMixin, NonCallableMagicMock):
+
+class MagicMock(MagicMixin, Mock):
     """
     MagicMock is a subclass of Mock with default implementations
     of most of the magic methods. You can use MagicMock without having to
