@@ -749,5 +749,10 @@ class MockTest(unittest2.TestCase):
         self.assertEqual(mock.mock_calls, expected)
 
 
+    def DONTtest_named_mock_calls(self):
+        mock = MagicMock(name='foo')
+        mock()
+
+
 if __name__ == '__main__':
     unittest2.main()
