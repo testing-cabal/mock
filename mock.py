@@ -729,6 +729,30 @@ class NonCallableMock(Base):
         return object.__delattr__(self, name)
 
 
+    def _format_mock_call_signature(self, args, kwargs):
+        name = self._mock_name or 'mock'
+        message = '%s(%%s)' % name
+        formatted_args = ''
+        args_string = ', '.join([repr(arg) for arg in args])
+        kwargs_string = ', '.join([
+            '%s=%r' % (key, value) for key, value in kwargs.items()
+        ])
+        if args_string:
+            formatted_args = args_string
+        if kwargs_string:
+            if formatted_args:
+                formatted_args += ', '
+            formatted_args += kwargs_string
+
+        return message % formatted_args
+
+
+    def _format_mock_failure_message(self, args, kwargs):
+        message = 'Expected call: %s\nActual call: %s'
+        expected_string = self._format_mock_call_signature(args, kwargs)
+        actual_string = self._format_mock_call_signature(*self.call_args)
+        return message % (expected_string, actual_string)
+
     def assert_called_with(_mock_self, *args, **kwargs):
         """
         assert that the mock was called with the specified arguments.
@@ -738,11 +762,12 @@ class NonCallableMock(Base):
         """
         self = _mock_self
         if self.call_args is None:
-            raise AssertionError('Expected: %s\nNot called' % ((args, kwargs),))
-        if not self.call_args == (args, kwargs):
-            raise AssertionError(
-                'Expected: %s\nCalled with: %s' % ((args, kwargs), self.call_args)
-            )
+            expected = self._format_mock_call_signature(args, kwargs)
+            raise AssertionError('Expected call: %s\nNot called' % (expected,))
+
+        if self.call_args != (args, kwargs):
+            msg = self._format_mock_failure_message(args, kwargs)
+            raise AssertionError(msg)
 
 
     def assert_called_once_with(_mock_self, *args, **kwargs):
