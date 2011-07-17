@@ -515,10 +515,15 @@ class NonCallableMock(Base):
         return object.__new__(new)
 
 
-    def __init__(self, spec=None, wraps=None, name=None, spec_set=None,
-                 parent=None, _spec_state=None, **kwargs):
+    def __init__(
+            self, spec=None, wraps=None, name=None, spec_set=None,
+            parent=None, _spec_state=None, _new_name='', _new_parent=None,
+            **kwargs
+        ):
         self._mock_parent = parent
         self._mock_name = name
+        self._new_name = _new_name
+        self._new_parent = _new_parent
 
         self._spec_state = _spec_state
 
@@ -563,7 +568,9 @@ class NonCallableMock(Base):
             ret = self._mock_signature.return_value
 
         if ret is DEFAULT:
-            ret = self._get_child_mock()
+            ret = self._get_child_mock(
+                _new_parent=self, _new_name='()'
+            )
             self.return_value = ret
         return ret
 
@@ -639,7 +646,11 @@ class NonCallableMock(Base):
                 # XXXX should we get the attribute without triggering code
                 # execution?
                 wraps = getattr(self._mock_wraps, name)
-            result = self._get_child_mock(parent=self, name=name, wraps=wraps)
+
+            result = self._get_child_mock(
+                parent=self, name=name, wraps=wraps, _new_name=name,
+                _new_parent=self
+            )
             self._mock_children[name]  = result
 
         elif isinstance(result, _SpecState):
@@ -753,6 +764,7 @@ class NonCallableMock(Base):
         actual_string = self._format_mock_call_signature(*self.call_args)
         return message % (expected_string, actual_string)
 
+
     def assert_called_with(_mock_self, *args, **kwargs):
         """
         assert that the mock was called with the specified arguments.
@@ -800,13 +812,13 @@ class CallableMixin(Base):
 
     def __init__(self, spec=None, side_effect=None, return_value=DEFAULT,
                  wraps=None, name=None, spec_set=None, parent=None,
-                 _spec_state=None, **kwargs):
+                 _spec_state=None, _new_name='', _new_parent=None, **kwargs):
         self._mock_return_value = return_value
         self._mock_side_effect = side_effect
 
         _super(CallableMixin, self).__init__(
             spec, wraps, name, spec_set, parent,
-            _spec_state, **kwargs
+            _spec_state, _new_name, _new_parent, **kwargs
         )
 
 
@@ -814,11 +826,13 @@ class CallableMixin(Base):
         # stub method that can be replaced with one with a specific signature
         pass
 
+
     def __call__(_mock_self, *args, **kwargs):
         # can't use self in-case a function / method we are mocking uses self
         # in the signature
         _mock_self._mock_check_sig(*args, **kwargs)
         return _mock_self._mock_call(*args, **kwargs)
+
 
     def _mock_call(_mock_self, *args, **kwargs):
         self = _mock_self
@@ -826,6 +840,26 @@ class CallableMixin(Base):
         self.call_count += 1
         self.call_args = callargs((args, kwargs))
         self.call_args_list.append(callargs((args, kwargs)))
+
+        _new_name = self._new_name
+        _new_parent = self._new_parent
+        self.mock_calls.append(callargs(('', args, kwargs)))
+
+        skip_next_dot = _new_name == '()'
+        while _new_parent is not None:
+            if _new_parent._new_name:
+                dot = '.'
+                if skip_next_dot:
+                    dot = ''
+                _new_name = _new_parent._new_name + dot + _new_name
+
+                skip_next_dot = False
+                if _new_parent._new_name == '()':
+                    skip_next_dot = True
+
+            this_call = callargs((_new_name, args, kwargs))
+            _new_parent.mock_calls.append(this_call)
+            _new_parent = _new_parent._new_parent
 
         parent = self._mock_parent
         name = self._mock_name
@@ -845,7 +879,8 @@ class CallableMixin(Base):
             if ret_val is DEFAULT:
                 ret_val = self.return_value
 
-        if self._mock_wraps is not None and self._mock_return_value is DEFAULT:
+        if (self._mock_wraps is not None and
+             self._mock_return_value is DEFAULT):
             return self._mock_wraps(*args, **kwargs)
         if ret_val is DEFAULT:
             ret_val = self.return_value
@@ -1490,6 +1525,7 @@ def _set_return_value(mock, method, name):
         method.return_value = return_value
 
 
+
 class MagicMixin(object):
     def __init__(self, *args, **kw):
         _super(MagicMixin, self).__init__(*args, **kw)
@@ -1502,9 +1538,11 @@ class MagicMixin(object):
             setattr(self, entry, _create_proxy(entry, self))
 
 
+
 class NonCallableMagicMock(MagicMixin, NonCallableMock):
     """XXXX needs docstring"""
     pass
+
 
 
 class MagicMock(MagicMixin, Mock):
@@ -1524,7 +1562,7 @@ class MagicMock(MagicMixin, Mock):
 def _create_proxy(entry, self):
     # could specify parent?
     def create_mock():
-        m = MagicMock(name=entry)
+        m = MagicMock(name=entry, _new_name=entry, _new_parent=self)
         setattr(self, entry, m)
         _set_return_value(self, m, entry)
         return m
