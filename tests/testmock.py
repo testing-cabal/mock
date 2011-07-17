@@ -8,7 +8,10 @@ import copy
 import sys
 
 import mock
-from mock import MagicMock, Mock, NonCallableMock, patch, sentinel, DEFAULT
+from mock import (
+    call, DEFAULT, patch, sentinel,
+    MagicMock, Mock, NonCallableMock
+)
 
 
 try:
@@ -713,45 +716,72 @@ class MockTest(unittest2.TestCase):
             )
 
 
-    def DONTtest_mock_calls(self):
+    def test_mock_calls(self):
         mock = MagicMock()
 
         # need to do this because MagicMock.mock_calls used to just return
         # a MagicMock which also returned a MagicMock when __eq__ was called
         self.assertIs(mock.mock_calls == [], True)
 
+        mock = MagicMock()
         mock()
         expected = [('', (), {})]
         self.assertEqual(mock.mock_calls, expected)
 
         mock.foo()
-        expected.append(('foo', (), {}))
+        expected.append(call.foo())
         self.assertEqual(mock.mock_calls, expected)
+        # intermediate mock_calls work too
+        self.assertEqual(mock.foo.mock_calls, [('', (), {})])
 
-        mock().foo()
-        expected.append(('().foo', (), {}))
+        mock = MagicMock()
+        mock().foo(1, 2, 3, a=4, b=5)
+        expected = [
+            ('', (), {}), ('().foo', (1, 2, 3), dict(a=4, b=5))
+        ]
         self.assertEqual(mock.mock_calls, expected)
+        self.assertEqual(mock.return_value.foo.mock_calls,
+                         [('', (1, 2, 3), dict(a=4, b=5))])
 
+
+        mock = MagicMock()
         mock().foo.bar().baz()
-        expected.append(('().foo.bar().baz', (), {}))
+        expected = [
+            ('', (), {}), ('().foo.bar', (), {}),
+            ('().foo.bar().baz', (), {})
+        ]
         self.assertEqual(mock.mock_calls, expected)
 
+        mock = MagicMock()
         int(mock.foo)
-        expected.append(('foo.__int__', (), {}))
+        expected = [('foo.__int__', (), {})]
         self.assertEqual(mock.mock_calls, expected)
 
+        mock = MagicMock()
+        mock.a()()
+        expected = [('a', (), {}), ('a()', (), {})]
+        self.assertEqual(mock.mock_calls, expected)
+
+        mock = MagicMock()
         int(mock().foo.bar().baz())
-        expected.append(('().foo.bar().baz().__int__', (), {}))
-        self.assertEqual(mock.mock_calls, expected)
-
-        int(mock().foo.bar().baz()).fish()
-        expected.append(('().foo.bar().baz().__int__().fish', (), {}))
-        self.assertEqual(mock.mock_calls, expected)
+        last_call = ('().foo.bar().baz().__int__', (), {})
+        self.assertEqual(mock.mock_calls[-1], last_call)
 
 
     def DONTtest_named_mock_calls(self):
-        mock = MagicMock(name='foo')
+        mock = MagicMock(name='thing')
+
         mock()
+        expected = [call.thing()]
+        self.assertEqual(mock.mock_calls, expected)
+
+
+
+"""
+repr should use new name (so new name should default to name if not None)
+reset_mock should clear mock_calls (including children)
+call object should be able to create call tuples for sub-calls
+"""
 
 
 if __name__ == '__main__':
