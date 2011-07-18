@@ -856,6 +856,71 @@ mock methods and attributes:
     {'a': 1, 'c': 3, 'b': 'fish', 'd': 'eggs'}
 
 
+Mock subclasses and their attributes
+====================================
+
+There are various reasons why you might want to subclass `Mock`. One reason
+might be to add helper methods. Here's a silly example:
+
+.. doctest::
+
+    >>> class MyMock(MagicMock):
+    ...     def has_been_called(self):
+    ...         return self.called
+    ...
+    >>> mymock = MyMock(return_value=None)
+    >>> mymock.has_been_called()
+    False
+    >>> mymock()
+    >>> mymock.has_been_called()
+    True
+
+The standard behaviour for `Mock` instances is that attributes and the return
+value are of the same type as the mock they are accessed on. This is so
+that `Mock` attributes are `Mocks` and `MagicMock` attributes are `MagicMocks`
+[#]_. So if you're subclassing to add helper methods then they'll also be
+available on the attributes and return value mock of instances of your
+subclass.
+
+.. doctest::
+
+    >>> mymock.foo.has_been_called()
+    False
+    >>> mymock.foo()
+    <mock.MyMock object at 0x...>
+    >>> mymock.foo.has_been_called()
+    True
+
+Sometimes this is inconvenient. For example, `one user
+<https://code.google.com/p/mock/issues/detail?id=105>`_ is subclassing mock to
+created a `Twisted adaptor
+<http://twistedmatrix.com/documents/11.0.0/api/twisted.python.components.html>`_.
+Having this applied to attributes too actually causes errors.
+
+`Mock` (in all its flavours) uses a method called `_get_child_mock` to create
+these "sub-mocks" for attributes and return values. You can prevent your
+subclass being used for attributes by overriding this method. The signature is
+that it takes arbitrary keyword arguments (`**kwargs`) which are then passed
+onto the mock constructor:
+
+.. doctest::
+
+    >>> class Subclass(MagicMock):
+    ...     def _get_child_mock(self, **kwargs):
+    ...         return MagicMock(**kwargs)
+    ...
+    >>> mymock = Subclass()
+    >>> mymock.foo
+    <MagicMock name='mock.foo' id='...'>
+    >>> assert isinstance(mymock, Subclass)
+    >>> assert not isinstance(mymock.foo, Subclass)
+    >>> assert not isinstance(mymock(), Subclass)
+
+.. [#] An exception to this rule are the non-callable mocks. Attributes use the
+   callable variant because otherwise non-callable mocks couldn't have callable
+   methods.
+
+
 Less verbose configuration of mock objects
 ==========================================
 
