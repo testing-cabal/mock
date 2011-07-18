@@ -769,6 +769,7 @@ class MockTest(unittest2.TestCase):
 
 
     def DONTtest_named_mock_calls(self):
+        # XXXX should mock_calls use name?
         mock = MagicMock(name='thing')
 
         mock()
@@ -781,6 +782,7 @@ class MockTest(unittest2.TestCase):
 repr should use new name (so new name should default to name if not None)
 reset_mock should clear mock_calls (including children)
 call object should be able to create call tuples for sub-calls
+rename _new_name and _new_parent to _mock_new_name and _mock_new_parent
 """
 
 

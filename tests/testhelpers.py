@@ -4,8 +4,10 @@
 
 from tests.support import unittest2, inPy3k
 
-from mock import MagicMock, Mock, ANY, call, create_autospec
-
+from mock import (
+    call, callargs, create_autospec,
+    MagicMock, Mock, ANY
+)
 
 class SomeClass(object):
     def one(self, a, b):
@@ -36,18 +38,48 @@ class AnyTest(unittest2.TestCase):
 
 
 
+class CallargsTest(unittest2.TestCase):
+
+    def test_empty_callargs(self):
+        args = callargs(((), {}))
+
+        self.assertEqual(args, ())
+        self.assertEqual(args, ('foo',))
+        self.assertEqual(args, ((),))
+        self.assertEqual(args, ('foo', ()))
+        self.assertEqual(args, ('foo',(), {}))
+        self.assertEqual(args, ('foo', {}))
+        self.assertEqual(args, ({},))
+
+
+    def test_callargs_with_name(self):
+        args = callargs(('foo', (), {}))
+        self.assertEqual(args, ('foo',))
+        self.assertEqual(args, ('foo', ()))
+        self.assertEqual(args, ('foo',(), {}))
+        self.assertEqual(args, ('foo', {}))
+
+        self.assertNotEqual(args, ((),))
+        self.assertNotEqual(args, ())
+        self.assertNotEqual(args, ({},))
+
+
+
 class CallTest(unittest2.TestCase):
 
     def test_repr(self):
         self.assertEqual(repr(call), '<call>')
         self.assertEqual(str(call), '<call>')
 
-        self.assertEqual(repr(call.foo), '<call foo>')
+        self.assertEqual(repr(call.foo), "<call name='foo' values=()>")
+
+        #self.fail('need more tests')
+
 
     def test_call(self):
-        self.assertEqual(call(), ((), {}))
+        self.assertEqual(call(), ('', (), {}))
         self.assertEqual(call('foo', 'bar', one=3, two=4),
-                         (('foo', 'bar'), {'one': 3, 'two': 4}))
+                         ('', ('foo', 'bar'), {'one': 3, 'two': 4}))
 
         mock = Mock()
         mock(1, 2, 3)
@@ -65,6 +97,21 @@ class CallTest(unittest2.TestCase):
         mock.bar.baz(a=3, b=6)
         self.assertEqual(mock.method_calls,
                          [call.foo(1, 2, 3), call.bar.baz(a=3, b=6)])
+
+
+    def test_extended_call(self):
+        result = call(1).foo(2).bar(3, a=4)
+        self.assertEqual(result, ('().foo().bar', (3,), dict(a=4)))
+
+        mock = MagicMock()
+        mock(1, 2, a=3, b=4)
+        self.assertEqual(mock.call_args, call(1, 2, a=3, b=4))
+        self.assertNotEqual(mock.call_args, call(1, 2, 3))
+
+        self.assertEqual(mock.call_args_list, [call(1, 2, a=3, b=4)])
+        self.assertEqual(mock.mock_calls, [call(1, 2, a=3, b=4)])
+
+
 
 
 

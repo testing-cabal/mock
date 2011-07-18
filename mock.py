@@ -438,15 +438,29 @@ class callargs(tuple):
 
         if len(other_args_kwargs) == 0:
             other_args, other_kwargs = (), {}
+        elif len(other_args_kwargs) == 3:
+            # the first unused argument is the name
+            _, other_args, other_kwargs = other_args_kwargs
         elif len(other_args_kwargs) == 1:
             if isinstance(other_args_kwargs[0], tuple):
                 other_args = other_args_kwargs[0]
                 other_kwargs = {}
+            elif isinstance(other_args_kwargs[0], basestring):
+                other_args, other_kwargs = (), {}
             else:
                 other_args = ()
                 other_kwargs = other_args_kwargs[0]
         else:
-            other_args, other_kwargs = other_args_kwargs
+            # len 2
+            # could be (name, args) or (name, kwargs) or (args, kwargs)
+            first, second = other_args_kwargs
+            if isinstance(first, basestring):
+                if isinstance(second, tuple):
+                    other_args, other_kwargs = second, {}
+                else:
+                    other_args, other_kwargs = (), second
+            else:
+                other_args, other_kwargs = first, second
 
         return tuple(args_kwargs) == (other_args, other_kwargs)
 
@@ -1594,27 +1608,35 @@ ANY = _ANY()
 
 
 
-class _Call(object):
+class _Call(tuple):
     "Call helper object"
 
-    def __init__(self, name=None):
+    def __new__(cls, values=(), name=None):
+        return tuple.__new__(cls, values)
+
+    def __init__(self, values=(), name=None):
         self.name = name
 
     def __call__(self, *args, **kwargs):
         if self.name is None:
-            return (args, kwargs)
-        return (self.name, args, kwargs)
+            return _Call(('', args, kwargs), name='()')
+
+        name = self.name + '()'
+        return _Call((self.name, args, kwargs), name=name)
 
     def __getattr__(self, attr):
         if self.name is None:
-            return _Call(attr)
+            return _Call(name=attr)
         name = '%s.%s' % (self.name, attr)
-        return _Call(name)
+        return _Call(name=name)
 
     def __repr__(self):
         if self.name is None:
             return '<call>'
-        return '<call %s>' % self.name
+        return '<call name=%r values=%s>' % (
+            self.name, tuple.__repr__(self)
+        )
+
 
 call = _Call()
 
