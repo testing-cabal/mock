@@ -787,12 +787,35 @@ class MockTest(unittest2.TestCase):
         self.assertNotIsInstance(mock(), Subclass)
 
 
+    def DONTtest_args_list_contains_call_list(self):
+        mock = Mock()
+        mock(1, 2)
+        mock(a=3)
+        mock(3, 4)
+        mock(b=6)
+
+        for kall in call(1, 2), call(a=3), call(3, 4), call(b=6):
+            self.assertTrue(kall in mock.call_args_list)
+
+        calls = [call(a=3), call(3, 4)]
+        self.assertTrue(calls in mock.call_args_list)
+        calls = [call(1, 2), call(a=3)]
+        self.assertTrue(calls in mock.call_args_list)
+        calls = [call(3, 4), call(b=6)]
+        self.assertTrue(calls in mock.call_args_list)
+        calls = [call(3, 4)]
+        self.assertTrue(calls in mock.call_args_list)
+
+        self.assertFalse(call('fish') in mock.call_args_list)
+        self.assertFalse([call('fish')] in mock.call_args_list)
+
 """
 * repr should use new name (so new name should default to name if not None)
 * args lists (call_args_list, method_calls and mock_calls) could allow a
   membership test ('in') for lists - to see if a call chain is contained in
   them. Lists for ordered membership tests, sets for unordered.
 * arg lists could use pretty-print for their reprs
+* callargs and _Call need an __ne__ implementation
 """
 
 
