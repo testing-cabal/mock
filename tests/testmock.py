@@ -769,22 +769,14 @@ class MockTest(unittest2.TestCase):
         self.assertEqual(mock.mock_calls[-1], last_call)
 
 
-    def DONTtest_named_mock_calls(self):
-        # XXXX should mock_calls use name?
-        mock = MagicMock(name='thing')
-
-        mock()
-        expected = [call.thing()]
-        self.assertEqual(mock.mock_calls, expected)
-
-
 
 """
-repr should use new name (so new name should default to name if not None)
-reset_mock should clear mock_calls (including children)
-rename _new_name and _new_parent to _mock_new_name and _mock_new_parent
-args lists (call_args_list, method_calls and mock_calls) could allow a
-membership test ('in') for lists - to see if a call chain is contained in them.
+* repr should use new name (so new name should default to name if not None)
+* reset_mock should clear mock_calls (including children)
+* rename _new_name and _new_parent to _mock_new_name and _mock_new_parent
+* args lists (call_args_list, method_calls and mock_calls) could allow a
+  membership test ('in') for lists - to see if a call chain is contained in
+  them. Lists for ordered membership tests, sets for unordered.
 """
 
 

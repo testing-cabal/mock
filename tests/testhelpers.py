@@ -169,6 +169,25 @@ class CallTest(unittest2.TestCase):
         self.assertEqual(mock.mock_calls, last_call.call_list())
 
 
+    def test_call_list(self):
+        mock = MagicMock()
+        mock(1)
+        self.assertEqual(call(1).call_list(), mock.mock_calls)
+
+        mock = MagicMock()
+        mock(1).method(2)
+        self.assertEqual(call(1).method(2).call_list(),
+                         mock.mock_calls)
+
+        mock = MagicMock()
+        mock(1).method(2)(3)
+        self.assertEqual(call(1).method(2)(3).call_list(),
+                         mock.mock_calls)
+
+        mock = MagicMock()
+        int(mock(1).method(2)(3).foo.bar.baz(4)(5))
+        kall = call(1).method(2)(3).foo.bar.baz(4)(5).__int__()
+        self.assertEqual(kall.call_list(), mock.mock_calls)
 
 
 
