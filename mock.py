@@ -1611,24 +1611,25 @@ ANY = _ANY()
 class _Call(tuple):
     "Call helper object"
 
-    def __new__(cls, values=(), name=None):
+    def __new__(cls, values=(), name=None, parent=None):
         return tuple.__new__(cls, values)
 
-    def __init__(self, values=(), name=None):
+    def __init__(self, values=(), name=None, parent=None):
         self.name = name
+        self.parent = parent
 
     def __call__(self, *args, **kwargs):
         if self.name is None:
             return _Call(('', args, kwargs), name='()')
 
         name = self.name + '()'
-        return _Call((self.name, args, kwargs), name=name)
+        return _Call((self.name, args, kwargs), name=name, parent=self)
 
     def __getattr__(self, attr):
         if self.name is None:
             return _Call(name=attr)
         name = '%s.%s' % (self.name, attr)
-        return _Call(name=name)
+        return _Call(name=name, parent=self)
 
     def __repr__(self):
         if self.name is None:
@@ -1637,6 +1638,10 @@ class _Call(tuple):
             self.name, tuple.__repr__(self)
         )
 
+    def call_list(self):
+        vals = []
+
+        return vals
 
 call = _Call()
 
