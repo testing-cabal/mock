@@ -103,6 +103,13 @@ class CallargsTest(unittest2.TestCase):
         self.assertNotEqual(args, ((), dict(a=3, b=4)))
 
 
+    def test_callargs_with_args_call_empty_name(self):
+        args = callargs(((1, 2, 3), {}))
+        self.assertEqual(args, call(1, 2, 3))
+        self.assertEqual(call(1, 2, 3), args)
+        self.assertTrue(call(1, 2, 3) in [args])
+
+
 
 class CallTest(unittest2.TestCase):
 

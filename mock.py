@@ -428,6 +428,7 @@ class callargs(tuple):
     """
     def __eq__(self, other):
         if len(self) == 3:
+            # an empty name is the equivalent of no name
             if other[0] != self[0]:
                 return False
             args_kwargs = self[1:]
@@ -1646,6 +1647,13 @@ class _Call(tuple):
                 vals.append(thing)
             thing = thing.parent
         return list(reversed(vals))
+
+
+    def __eq__(self, other):
+        if isinstance(other, callargs):
+            return callargs.__eq__(other, self)
+        return tuple.__eq__(self, other)
+
 
 call = _Call()
 
