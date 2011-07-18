@@ -64,6 +64,44 @@ class CallargsTest(unittest2.TestCase):
         self.assertNotEqual(args, ({},))
 
 
+    def test_callargs_with_args(self):
+        args = callargs(((1, 2, 3), {}))
+
+        self.assertEqual(args, ((1, 2, 3),))
+        self.assertEqual(args, ('foo', (1, 2, 3)))
+        self.assertEqual(args, ('foo', (1, 2, 3), {}))
+        self.assertEqual(args, ((1, 2, 3), {}))
+
+
+    def test_named_callargs_with_args(self):
+        args = callargs(('foo', (1, 2, 3), {}))
+
+        self.assertEqual(args, ('foo', (1, 2, 3)))
+        self.assertEqual(args, ('foo', (1, 2, 3), {}))
+
+        self.assertNotEqual(args, ((1, 2, 3),))
+        self.assertNotEqual(args, ((1, 2, 3), {}))
+
+
+    def test_callargs_with_kwargs(self):
+        args = callargs(((), dict(a=3, b=4)))
+
+        self.assertEqual(args, (dict(a=3, b=4),))
+        self.assertEqual(args, ('foo', dict(a=3, b=4)))
+        self.assertEqual(args, ('foo', (), dict(a=3, b=4)))
+        self.assertEqual(args, ((), dict(a=3, b=4)))
+
+
+    def test_named_callargs_with_kwargs(self):
+        args = callargs(('foo', (), dict(a=3, b=4)))
+
+        self.assertEqual(args, ('foo', dict(a=3, b=4)))
+        self.assertEqual(args, ('foo', (), dict(a=3, b=4)))
+
+        self.assertNotEqual(args, (dict(a=3, b=4),))
+        self.assertNotEqual(args, ((), dict(a=3, b=4)))
+
+
 
 class CallTest(unittest2.TestCase):
 
