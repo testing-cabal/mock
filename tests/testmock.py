@@ -174,6 +174,7 @@ class MockTest(unittest2.TestCase):
         self.assertEqual(mock.method_calls, [],
                         "method_calls not initialised correctly: %r != %r" %
                         (mock.method_calls, []))
+        self.assertEqual(mock.mock_calls, [])
 
         self.assertEqual(mock.side_effect, sentinel.SideEffect,
                           "side_effect incorrectly reset")
@@ -769,7 +770,6 @@ class MockTest(unittest2.TestCase):
         self.assertEqual(mock.mock_calls[-1], last_call)
 
 
-
     def test_subclassing(self):
         class Subclass(Mock):
             pass
@@ -794,6 +794,7 @@ class MockTest(unittest2.TestCase):
 * args lists (call_args_list, method_calls and mock_calls) could allow a
   membership test ('in') for lists - to see if a call chain is contained in
   them. Lists for ordered membership tests, sets for unordered.
+* arg lists could use pretty-print for their reprs
 """
 
 
