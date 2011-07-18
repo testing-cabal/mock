@@ -869,6 +869,8 @@ might be to add helper methods. Here's a silly example:
     ...         return self.called
     ...
     >>> mymock = MyMock(return_value=None)
+    >>> mymock
+    <mock.MyMock object at 0x...>
     >>> mymock.has_been_called()
     False
     >>> mymock()
@@ -876,7 +878,7 @@ might be to add helper methods. Here's a silly example:
     True
 
 The standard behaviour for `Mock` instances is that attributes and the return
-value are of the same type as the mock they are accessed on. This is so
+value mocks are of the same type as the mock they are accessed on. This ensures
 that `Mock` attributes are `Mocks` and `MagicMock` attributes are `MagicMocks`
 [#]_. So if you're subclassing to add helper methods then they'll also be
 available on the attributes and return value mock of instances of your
@@ -884,6 +886,8 @@ subclass.
 
 .. doctest::
 
+    >>> mymock.foo
+    <MyMock name='mock.foo' id='...'>
     >>> mymock.foo.has_been_called()
     False
     >>> mymock.foo()
