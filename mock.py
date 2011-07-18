@@ -1640,8 +1640,12 @@ class _Call(tuple):
 
     def call_list(self):
         vals = []
-
-        return vals
+        thing = self
+        while thing is not None:
+            if tuple(thing):
+                vals.append(thing)
+            thing = thing.parent
+        return list(reversed(vals))
 
 call = _Call()
 

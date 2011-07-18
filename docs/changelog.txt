@@ -73,6 +73,11 @@ CHANGELOG
 2011/XX/XX Version 0.8.0 alpha 3
 --------------------------------
 
+* Addition of `mock_calls` list for *all* calls (including magic methods and
+  chained calls)
+* Extension of `call` object to support chained calls and `callargs` for better
+  comparisons with or without names. `call` object has a `call_list` method for
+  chained calls
 * Improved failure messages for `assert_called_with` and
   `assert_called_once_with`
 * BUGFIX: Fixed bug in `patch.multiple` for argument passing when creating
