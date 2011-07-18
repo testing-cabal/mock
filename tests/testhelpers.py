@@ -111,8 +111,19 @@ class CallTest(unittest2.TestCase):
         self.assertEqual(str(call), '<call>')
 
         self.assertEqual(repr(call.foo), "<call name='foo' values=()>")
-
-        #self.fail('need more tests')
+        self.assertEqual(
+            repr(call().foo(1, 2, a=3)),
+            "<call name='().foo()' values=('().foo', (1, 2), {'a': 3})>"
+        )
+        self.assertEqual(
+            repr(call()()),
+            "<call name='()()' values=('()', (), {})>"
+        )
+        self.assertEqual(
+            repr(call()().bar().baz.beep(1)),
+            "<call name='()().bar().baz.beep()' "
+            "values=('()().bar().baz.beep', (1,), {})>"
+        )
 
 
     def test_call(self):
@@ -150,6 +161,10 @@ class CallTest(unittest2.TestCase):
         self.assertEqual(mock.call_args_list, [call(1, 2, a=3, b=4)])
         self.assertEqual(mock.mock_calls, [call(1, 2, a=3, b=4)])
 
+        mock = MagicMock()
+        mock.foo(1).bar()().baz.beep(a=6)
+
+        self.assertEqual(mock.mock_calls[-1], call.foo().bar()().baz.beep(a=6))
 
 
 
