@@ -770,6 +770,23 @@ class MockTest(unittest2.TestCase):
 
 
 
+    def test_subclassing(self):
+        class Subclass(Mock):
+            pass
+
+        mock = Subclass()
+        self.assertIsInstance(mock.foo, Subclass)
+        self.assertIsInstance(mock(), Subclass)
+
+        class Subclass(Mock):
+            def _get_child_mock(self, **kwargs):
+                return Mock(**kwargs)
+
+        mock = Subclass()
+        self.assertNotIsInstance(mock.foo, Subclass)
+        self.assertNotIsInstance(mock(), Subclass)
+
+
 """
 * repr should use new name (so new name should default to name if not None)
 * reset_mock should clear mock_calls (including children)
