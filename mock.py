@@ -559,7 +559,6 @@ class NonCallableMock(Base):
         self._mock_methods = spec
         self._mock_children = {}
         self._mock_wraps = wraps
-        self.mock_calls = []
         self._mock_signature = None
 
         self._mock_called = False
@@ -618,6 +617,7 @@ class NonCallableMock(Base):
         self.called = False
         self.call_args = None
         self.call_count = 0
+        self.mock_calls = []
         self.call_args_list = []
         self.method_calls = []
 
