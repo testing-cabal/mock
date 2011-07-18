@@ -164,7 +164,10 @@ class CallTest(unittest2.TestCase):
         mock = MagicMock()
         mock.foo(1).bar()().baz.beep(a=6)
 
-        self.assertEqual(mock.mock_calls[-1], call.foo().bar()().baz.beep(a=6))
+        last_call = call.foo(1).bar()().baz.beep(a=6)
+        self.assertEqual(mock.mock_calls[-1], last_call)
+        self.assertEqual(mock.mock_calls, last_call.call_list())
+
 
 
 
