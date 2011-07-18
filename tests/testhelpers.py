@@ -52,8 +52,9 @@ class CallargsTest(unittest2.TestCase):
         self.assertEqual(args, ({},))
 
 
-    def test_callargs_with_name(self):
+    def test_named_empty_callargs(self):
         args = callargs(('foo', (), {}))
+
         self.assertEqual(args, ('foo',))
         self.assertEqual(args, ('foo', ()))
         self.assertEqual(args, ('foo',(), {}))
