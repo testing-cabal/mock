@@ -536,8 +536,8 @@ class NonCallableMock(Base):
         ):
         self._mock_parent = parent
         self._mock_name = name
-        self._new_name = _new_name
-        self._new_parent = _new_parent
+        self._mock_new_name = _new_name
+        self._mock_new_parent = _new_parent
 
         self._spec_state = _spec_state
 
@@ -855,25 +855,25 @@ class CallableMixin(Base):
         self.call_args = callargs((args, kwargs))
         self.call_args_list.append(callargs((args, kwargs)))
 
-        _new_name = self._new_name
-        _new_parent = self._new_parent
+        _new_name = self._mock_new_name
+        _new_parent = self._mock_new_parent
         self.mock_calls.append(callargs(('', args, kwargs)))
 
         skip_next_dot = _new_name == '()'
         while _new_parent is not None:
-            if _new_parent._new_name:
+            if _new_parent._mock_new_name:
                 dot = '.'
                 if skip_next_dot:
                     dot = ''
-                _new_name = _new_parent._new_name + dot + _new_name
+                _new_name = _new_parent._mock_new_name + dot + _new_name
 
                 skip_next_dot = False
-                if _new_parent._new_name == '()':
+                if _new_parent._mock_new_name == '()':
                     skip_next_dot = True
 
             this_call = callargs((_new_name, args, kwargs))
             _new_parent.mock_calls.append(this_call)
-            _new_parent = _new_parent._new_parent
+            _new_parent = _new_parent._mock_new_parent
 
         parent = self._mock_parent
         name = self._mock_name
@@ -1576,7 +1576,7 @@ class MagicMock(MagicMixin, Mock):
 def _create_proxy(entry, self):
     # could specify parent?
     def create_mock():
-        m = MagicMock(name=entry, _new_name=entry, _new_parent=self)
+        m = MagicMock(name=entry, _mock_new_name=entry, _mock_new_parent=self)
         setattr(self, entry, m)
         _set_return_value(self, m, entry)
         return m
