@@ -816,6 +816,8 @@ class MockTest(unittest2.TestCase):
   them. Lists for ordered membership tests, sets for unordered.
 * arg lists could use pretty-print for their reprs
 * callargs and _Call need an __ne__ implementation
+* test callargs repr
+* test comparing callargs instances with each other
 """
 
 
