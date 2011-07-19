@@ -851,6 +851,10 @@ class NonCallableMock(Base):
 
 
     def _get_child_mock(self, **kw):
+        """Create the child mocks for attributes and return value.
+        By default child mocks will be the same type as the parent.
+        Subclasses of Mock may want to override this to customize the way
+        child mocks are made."""
         _type = type(self)
         if not issubclass(_type, CallableMixin):
             if issubclass(_type, NonCallableMagicMock):
