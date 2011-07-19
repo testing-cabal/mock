@@ -110,6 +110,11 @@ class CallargsTest(unittest2.TestCase):
         self.assertTrue(call(1, 2, 3) in [args])
 
 
+    def test_callargs_ne(self):
+        self.assertFalse(callargs(((1, 2, 3),)) != call(1, 2, 3))
+        self.assertTrue(callargs(((1, 2), {})) != call(1, 2, 3))
+
+
 
 class CallTest(unittest2.TestCase):
 
