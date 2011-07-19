@@ -451,14 +451,11 @@ class callargs(tuple):
             else:
                 kwargs = value
 
-        self = tuple.__new__(cls, (args, kwargs))
-        self.name = name
-        return self
+        return tuple.__new__(cls, (name, args, kwargs))
 
 
     def __eq__(self, other):
-        self_args, self_kwargs = self
-        self_name = self.name
+        self_name, self_args, self_kwargs = self
 
         other_name = ''
         if len(other) == 0:
@@ -499,11 +496,9 @@ class callargs(tuple):
 
 
     def __repr__(self):
-        if self.name:
-            return 'callargs((%r, %r, %r))' % (
-                self.name, self[0], self[1]
-            )
-        return 'callargs(%r, %r))' % (self[0], self[1])
+        if self[0]:
+            return tuple.__repr__(self)
+        return tuple.__repr__(self[1:])
 
 
 
@@ -816,7 +811,7 @@ class NonCallableMock(Base):
     def _format_mock_failure_message(self, args, kwargs):
         message = 'Expected call: %s\nActual call: %s'
         expected_string = self._format_mock_call_signature(args, kwargs)
-        actual_string = self._format_mock_call_signature(*self.call_args)
+        actual_string = self._format_mock_call_signature(*self.call_args[1:])
         return message % (expected_string, actual_string)
 
 
