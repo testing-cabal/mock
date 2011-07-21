@@ -115,6 +115,12 @@ class CallargsTest(unittest2.TestCase):
         self.assertTrue(callargs(((1, 2), {})) != call(1, 2, 3))
 
 
+    def test_callargs_non_tuples(self):
+        kall = callargs(((1, 2, 3),))
+        for value in 1, None, self, int:
+            self.assertNotEqual(kall, value)
+            self.assertFalse(kall == value)
+
 
 class CallTest(unittest2.TestCase):
 

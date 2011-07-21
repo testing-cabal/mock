@@ -455,6 +455,11 @@ class callargs(tuple):
 
 
     def __eq__(self, other):
+        try:
+            len(other)
+        except TypeError:
+            return False
+
         self_name, self_args, self_kwargs = self
 
         other_name = ''
@@ -501,12 +506,28 @@ class callargs(tuple):
         return tuple.__repr__(self[1:])
 
 
+
 class _CallList(list):
 
     def __contains__(self, value):
         if not isinstance(value, list):
             return list.__contains__(self, value)
-        return True
+        len_value = len(value)
+        len_self = len(self)
+        if len_value > len_self:
+            return False
+
+        for i in range(0, len_self - len_value + 1):
+            sub_list = self[i:i+len_value]
+            if sub_list == value:
+                return True
+        return False
+
+    def assert_has_calls(self, calls):
+        for kall in calls:
+            if kall not in self:
+                raise AssertionError('%r not found in call list' % (kall,))
+
 
 
 
@@ -1658,6 +1679,9 @@ ANY = _ANY()
 
 class _Call(tuple):
     "Call helper object"
+
+    # needed for pdb!
+    name = None
 
     def __new__(cls, values=(), name=None, parent=None):
         return tuple.__new__(cls, values)
