@@ -335,7 +335,7 @@ def _setup_func(funcopy, mock):
     funcopy.called = False
     funcopy.call_count = 0
     funcopy.call_args = None
-    funcopy.call_args_list = []
+    funcopy.call_args_list = _CallList()
     funcopy.method_calls = []
 
     funcopy.return_value = mock.return_value
@@ -501,6 +501,14 @@ class callargs(tuple):
         return tuple.__repr__(self[1:])
 
 
+class _CallList(list):
+
+    def __contains__(self, value):
+        if not isinstance(value, list):
+            return list.__contains__(self, value)
+        return True
+
+
 
 class Base(object):
     _mock_return_value = DEFAULT
@@ -600,7 +608,7 @@ class NonCallableMock(Base):
         self._mock_called = False
         self._mock_call_args = None
         self._mock_call_count = 0
-        self._mock_call_args_list = []
+        self._mock_call_args_list = _CallList()
 
         self.reset_mock()
         self.configure_mock(**kwargs)
@@ -654,7 +662,7 @@ class NonCallableMock(Base):
         self.call_args = None
         self.call_count = 0
         self.mock_calls = []
-        self.call_args_list = []
+        self.call_args_list = _CallList()
         self.method_calls = []
 
         for child in self._mock_children.values():
