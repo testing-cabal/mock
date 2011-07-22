@@ -834,6 +834,26 @@ class MockTest(unittest2.TestCase):
                     [kall]
                 )
 
+            kall_lists = [
+                [call(1, 2), call(b=6)],
+                [call(3, 4), call(1, 2)],
+                [call(b=6), call(b=6)],
+            ]
+
+            for kall_list in kall_lists:
+                mock.call_args_list.assert_has_calls(kall_list)
+
+            kall_lists = [
+                [call(b=6), call(b=6), call(b=6)],
+                [call(1, 2), call(1, 2)],
+                [call(3, 4), call(1, 2), call(5, 7)],
+                [call(b=6), call(3, 4), call(b=6), call(1, 2), call(b=6)],
+            ]
+            for kall_list in kall_lists:
+                self.assertRaises(
+                    AssertionError, mock.call_args_list.assert_has_calls,
+                    kall_list
+                )
 
 """
 * repr should use new name (so new name should default to name if not None)

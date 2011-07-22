@@ -523,11 +523,18 @@ class _CallList(list):
                 return True
         return False
 
-    def assert_has_calls(self, calls):
-        for kall in calls:
-            if kall not in self:
-                raise AssertionError('%r not found in call list' % (kall,))
 
+    def assert_has_calls(self, calls):
+        self_copy = list(self)
+
+        for kall in calls:
+            try:
+                self_copy.remove(kall)
+            except ValueError:
+                # XXXX failure message could be better here
+                raise AssertionError(
+                    '%r not all found in call list' % (calls,)
+                )
 
 
 
