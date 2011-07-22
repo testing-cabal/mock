@@ -426,7 +426,7 @@ class callargs(tuple):
         callargs('name', (1,), {}) == ('name', (1,))
         callargs((), {'a': 'b'}) == ({'a': 'b'},)
     """
-    def __new__(cls, value):
+    def __new__(cls, value=()):
         name = ''
         args = ()
         kwargs = {}
