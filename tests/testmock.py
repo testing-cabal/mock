@@ -10,7 +10,8 @@ import sys
 import mock
 from mock import (
     call, DEFAULT, patch, sentinel,
-    MagicMock, Mock, NonCallableMock
+    MagicMock, Mock, NonCallableMock,
+    _CallList, mocksignature
 )
 
 
@@ -786,6 +787,40 @@ class MockTest(unittest2.TestCase):
         self.assertNotIsInstance(mock.foo, Subclass)
         self.assertNotIsInstance(mock(), Subclass)
 
+
+    def test_arg_lists(self):
+        mocks = [
+            Mock(), mocksignature(lambda *args, **kwargs: None),
+            MagicMock(),
+            Mock().foo.bar(),
+        ]
+        def assert_attrs(mock):
+            names = 'call_args_list', 'method_calls', 'mock_calls'
+            for name in names:
+                attr = getattr(mock, name)
+                self.assertIsInstance(attr, _CallList)
+                self.assertIsInstance(attr, list)
+                self.assertEqual(attr, [])
+
+        for mock in mocks:
+            assert_attrs(mock)
+
+            mock()
+            mock(1, 2)
+            mock(a=3)
+
+            mock.reset_mock()
+            assert_attrs(mock)
+            if not isinstance(mock, Mock):
+                # the mocksignature
+                continue
+
+            mock.foo()
+            mock(1, a=5)
+            mock.foo(1).bar().baz(3)
+
+            mock.reset_mock()
+            assert_attrs(mock)
 
 
 if __name__ == '__main__':

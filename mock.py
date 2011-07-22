@@ -326,7 +326,8 @@ def _setup_func(funcopy, mock):
     def assert_called_once_with(*args, **kwargs):
         return mock.assert_called_once_with(*args, **kwargs)
     def reset_mock():
-        funcopy.method_calls = []
+        funcopy.method_calls = _CallList()
+        funcopy.mock_calls = _CallList()
         mock.reset_mock()
         ret = funcopy.return_value
         if _is_instance_mock(ret) and not ret is mock:
@@ -336,7 +337,8 @@ def _setup_func(funcopy, mock):
     funcopy.call_count = 0
     funcopy.call_args = None
     funcopy.call_args_list = _CallList()
-    funcopy.method_calls = []
+    funcopy.method_calls = _CallList()
+    funcopy.mock_calls = _CallList()
 
     funcopy.return_value = mock.return_value
     funcopy.side_effect = mock.side_effect
@@ -696,9 +698,9 @@ class NonCallableMock(Base):
         self.called = False
         self.call_args = None
         self.call_count = 0
-        self.mock_calls = []
+        self.mock_calls = _CallList()
         self.call_args_list = _CallList()
-        self.method_calls = []
+        self.method_calls = _CallList()
 
         for child in self._mock_children.values():
             child.reset_mock()

@@ -164,6 +164,11 @@ class CallargsTest(unittest2.TestCase):
             self.assertFalse(kall == value)
 
 
+    def test_repr(self):
+        self.assertEqual(repr(callargs()), repr(((), {})))
+        self.assertEqual(repr(callargs(('foo',))), repr(('foo', (), {})))
+
+
 
 class CallTest(unittest2.TestCase):
 
@@ -765,5 +770,4 @@ class TestCallList(unittest2.TestCase):
 * repr should use new name (so new name should default to name if not None)
 * arg lists could use pretty-print for their str (should import of pprint
   be optional?)
-* test callargs repr
 """
