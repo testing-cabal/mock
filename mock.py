@@ -422,9 +422,16 @@ class callargs(tuple):
     If args or kwargs are empty then a callargs tuple will compare equal to
     a tuple without those values. This makes comparisons less verbose::
 
-        callargs('name', (), {}) == ('name',)
-        callargs('name', (1,), {}) == ('name', (1,))
-        callargs((), {'a': 'b'}) == ({'a': 'b'},)
+        callargs(('name', (), {})) == ('name',)
+        callargs(('name', (1,), {})) == ('name', (1,))
+        callargs(((), {'a': 'b'})) == ({'a': 'b'},)
+
+    The `call` object provides a useful shortcut for comparing with callargs::
+
+        callargs(((1, 2), {'a': 3})) == call(1, 2, a=3)
+        callargs(('foo', (1, 2), {'a': 3})) == call.foo(1, 2, a=3)
+
+    If the callargs has no name then it will match any name.
     """
     def __new__(cls, value=()):
         name = ''
