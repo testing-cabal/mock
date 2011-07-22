@@ -101,6 +101,9 @@ class CallargsTest(unittest2.TestCase):
         self.assertNotEqual(args, ((),))
         self.assertNotEqual(args, ())
         self.assertNotEqual(args, ({},))
+        self.assertNotEqual(args, ('bar',))
+        self.assertNotEqual(args, ('bar', ()))
+        self.assertNotEqual(args, ('bar', {}))
 
 
     def test_callargs_with_args(self):
@@ -149,6 +152,7 @@ class CallargsTest(unittest2.TestCase):
 
 
     def test_callargs_ne(self):
+        self.assertNotEqual(callargs(((1, 2, 3),)), call(1, 2))
         self.assertFalse(callargs(((1, 2, 3),)) != call(1, 2, 3))
         self.assertTrue(callargs(((1, 2), {})) != call(1, 2, 3))
 
