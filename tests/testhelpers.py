@@ -168,6 +168,11 @@ class CallargsTest(unittest2.TestCase):
         self.assertEqual(repr(callargs()), repr(((), {})))
         self.assertEqual(repr(callargs(('foo',))), repr(('foo', (), {})))
 
+        self.assertEqual(repr(callargs(((1, 2, 3), {'a': 'b'}))),
+                         repr(((1, 2, 3), {'a': 'b'})))
+        self.assertEqual(repr(callargs(('bar', (1, 2, 3), {'a': 'b'}))),
+                         repr(('bar', (1, 2, 3), {'a': 'b'})))
+
 
 
 class CallTest(unittest2.TestCase):
