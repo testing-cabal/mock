@@ -6,7 +6,8 @@ from tests.support import unittest2, inPy3k
 
 from mock import (
     call, callargs, create_autospec,
-    MagicMock, Mock, ANY
+    MagicMock, Mock, ANY, _CallList,
+    mocksignature
 )
 
 class SomeClass(object):
@@ -40,8 +41,45 @@ class AnyTest(unittest2.TestCase):
 
 class CallargsTest(unittest2.TestCase):
 
+    def test_callargs_with_callargs(self):
+        kall = callargs()
+        self.assertEqual(kall, callargs())
+        self.assertEqual(kall, callargs(('',)))
+        self.assertEqual(kall, callargs(((),)))
+        self.assertEqual(kall, callargs(({},)))
+        self.assertEqual(kall, callargs(('', ())))
+        self.assertEqual(kall, callargs(('', {})))
+        self.assertEqual(kall, callargs(('', (), {})))
+        self.assertEqual(kall, callargs(('foo',)))
+        self.assertEqual(kall, callargs(('bar', ())))
+        self.assertEqual(kall, callargs(('baz', {})))
+        self.assertEqual(kall, callargs(('spam', (), {})))
+
+        kall = callargs(((1, 2, 3),))
+        self.assertEqual(kall, callargs(((1, 2, 3),)))
+        self.assertEqual(kall, callargs(('', (1, 2, 3))))
+        self.assertEqual(kall, callargs(((1, 2, 3), {})))
+        self.assertEqual(kall, callargs(('', (1, 2, 3), {})))
+
+        kall = callargs(((1, 2, 4),))
+        self.assertNotEqual(kall, callargs(('', (1, 2, 3))))
+        self.assertNotEqual(kall, callargs(('', (1, 2, 3), {})))
+
+        kall = callargs(('foo', (1, 2, 4),))
+        self.assertNotEqual(kall, callargs(('', (1, 2, 4))))
+        self.assertNotEqual(kall, callargs(('', (1, 2, 4), {})))
+        self.assertNotEqual(kall, callargs(('bar', (1, 2, 4))))
+        self.assertNotEqual(kall, callargs(('bar', (1, 2, 4), {})))
+
+        kall = callargs(({'a': 3},))
+        self.assertEqual(kall, callargs(('', (), {'a': 3})))
+        self.assertEqual(kall, callargs(('', {'a': 3})))
+        self.assertEqual(kall, callargs(((), {'a': 3})))
+        self.assertEqual(kall, callargs(({'a': 3},)))
+
+
     def test_empty_callargs(self):
-        args = callargs(((), {}))
+        args = callargs()
 
         self.assertEqual(args, ())
         self.assertEqual(args, ('foo',))
@@ -120,6 +158,7 @@ class CallargsTest(unittest2.TestCase):
         for value in 1, None, self, int:
             self.assertNotEqual(kall, value)
             self.assertFalse(kall == value)
+
 
 
 class CallTest(unittest2.TestCase):
@@ -643,3 +682,84 @@ class SpecSignatureTest(unittest2.TestCase):
         mock_slot.abc(4, 5, 6)
         mock_slot.assert_called_once_with(1, 2, 3)
         mock_slot.abc.assert_called_once_with(4, 5, 6)
+
+
+class TestCallList(unittest2.TestCase):
+
+    def test_args_list_contains_call_list(self):
+        for mock in Mock(), mocksignature(lambda *args, **kwargs: None):
+            self.assertIsInstance(mock.call_args_list, _CallList)
+
+            mock(1, 2)
+            mock(a=3)
+            mock(3, 4)
+            mock(b=6)
+
+            for kall in call(1, 2), call(a=3), call(3, 4), call(b=6):
+                self.assertTrue(kall in mock.call_args_list)
+
+            calls = [call(a=3), call(3, 4)]
+            self.assertTrue(calls in mock.call_args_list)
+            calls = [call(1, 2), call(a=3)]
+            self.assertTrue(calls in mock.call_args_list)
+            calls = [call(3, 4), call(b=6)]
+            self.assertTrue(calls in mock.call_args_list)
+            calls = [call(3, 4)]
+            self.assertTrue(calls in mock.call_args_list)
+
+            self.assertFalse(call('fish') in mock.call_args_list)
+            self.assertFalse([call('fish')] in mock.call_args_list)
+
+
+    def test_args_list_assert_has_calls(self):
+        for mock in Mock(), mocksignature(lambda *args, **kwargs: None):
+            mock(1, 2)
+            mock(a=3)
+            mock(3, 4)
+            mock(b=6)
+            mock(b=6)
+
+            kalls = [
+                call(1, 2), ({'a': 3},),
+                ((3, 4),), ((), {'a': 3}),
+                ('', (1, 2)), ('', {'a': 3}),
+                ('', (1, 2), {}), ('', (), {'a': 3})
+            ]
+            for kall in kalls:
+                mock.call_args_list.assert_has_calls([kall])
+
+            for kall in call(1, '2'), call(b=3), call(), 3, None, 'foo':
+                self.assertRaises(
+                    AssertionError, mock.call_args_list.assert_has_calls,
+                    [kall]
+                )
+
+            kall_lists = [
+                [call(1, 2), call(b=6)],
+                [call(3, 4), call(1, 2)],
+                [call(b=6), call(b=6)],
+            ]
+
+            for kall_list in kall_lists:
+                mock.call_args_list.assert_has_calls(kall_list)
+
+            kall_lists = [
+                [call(b=6), call(b=6), call(b=6)],
+                [call(1, 2), call(1, 2)],
+                [call(3, 4), call(1, 2), call(5, 7)],
+                [call(b=6), call(3, 4), call(b=6), call(1, 2), call(b=6)],
+            ]
+            for kall_list in kall_lists:
+                self.assertRaises(
+                    AssertionError, mock.call_args_list.assert_has_calls,
+                    kall_list
+                )
+
+
+
+"""
+* repr should use new name (so new name should default to name if not None)
+* arg lists could use pretty-print for their str (should import of pprint
+  be optional?)
+* test callargs repr
+"""

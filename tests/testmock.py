@@ -10,8 +10,7 @@ import sys
 import mock
 from mock import (
     call, DEFAULT, patch, sentinel,
-    MagicMock, Mock, NonCallableMock,
-    mocksignature
+    MagicMock, Mock, NonCallableMock
 )
 
 
@@ -787,84 +786,6 @@ class MockTest(unittest2.TestCase):
         self.assertNotIsInstance(mock.foo, Subclass)
         self.assertNotIsInstance(mock(), Subclass)
 
-
-    def test_args_list_contains_call_list(self):
-        for mock in Mock(), mocksignature(lambda *args, **kwargs: None):
-            mock(1, 2)
-            mock(a=3)
-            mock(3, 4)
-            mock(b=6)
-
-            for kall in call(1, 2), call(a=3), call(3, 4), call(b=6):
-                self.assertTrue(kall in mock.call_args_list)
-
-            calls = [call(a=3), call(3, 4)]
-            self.assertTrue(calls in mock.call_args_list)
-            calls = [call(1, 2), call(a=3)]
-            self.assertTrue(calls in mock.call_args_list)
-            calls = [call(3, 4), call(b=6)]
-            self.assertTrue(calls in mock.call_args_list)
-            calls = [call(3, 4)]
-            self.assertTrue(calls in mock.call_args_list)
-
-            self.assertFalse(call('fish') in mock.call_args_list)
-            self.assertFalse([call('fish')] in mock.call_args_list)
-
-
-    def test_args_list_assert_has_calls(self):
-        for mock in Mock(), mocksignature(lambda *args, **kwargs: None):
-            mock(1, 2)
-            mock(a=3)
-            mock(3, 4)
-            mock(b=6)
-            mock(b=6)
-
-            kalls = [
-                call(1, 2), ({'a': 3},),
-                ((3, 4),), ((), {'a': 3}),
-                ('', (1, 2)), ('', {'a': 3}),
-                ('', (1, 2), {}), ('', (), {'a': 3})
-            ]
-            for kall in kalls:
-                mock.call_args_list.assert_has_calls([kall])
-
-            for kall in call(1, '2'), call(b=3), call(), 3, None, 'foo':
-                self.assertRaises(
-                    AssertionError, mock.call_args_list.assert_has_calls,
-                    [kall]
-                )
-
-            kall_lists = [
-                [call(1, 2), call(b=6)],
-                [call(3, 4), call(1, 2)],
-                [call(b=6), call(b=6)],
-            ]
-
-            for kall_list in kall_lists:
-                mock.call_args_list.assert_has_calls(kall_list)
-
-            kall_lists = [
-                [call(b=6), call(b=6), call(b=6)],
-                [call(1, 2), call(1, 2)],
-                [call(3, 4), call(1, 2), call(5, 7)],
-                [call(b=6), call(3, 4), call(b=6), call(1, 2), call(b=6)],
-            ]
-            for kall_list in kall_lists:
-                self.assertRaises(
-                    AssertionError, mock.call_args_list.assert_has_calls,
-                    kall_list
-                )
-
-"""
-* repr should use new name (so new name should default to name if not None)
-* args lists (call_args_list, method_calls and mock_calls) could allow a
-  membership test ('in') for lists - to see if a call chain is contained in
-  them. Lists for ordered membership tests, sets for unordered.
-* arg lists could use pretty-print for their str (should import of pprint
-  be optional?)
-* test callargs repr
-* test comparing callargs instances with each other
-"""
 
 
 if __name__ == '__main__':
