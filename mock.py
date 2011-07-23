@@ -32,6 +32,7 @@ __all__ = (
 __version__ = '0.8.0alpha3'
 
 
+import pprint
 import sys
 
 try:
@@ -550,6 +551,10 @@ class _CallList(list):
                 raise AssertionError(
                     '%r not all found in call list' % (calls,)
                 )
+
+
+    def __str__(self):
+        return pprint.pformat(self)
 
 
 
@@ -1703,9 +1708,6 @@ ANY = _ANY()
 
 class _Call(tuple):
     "Call helper object"
-
-    # needed for pdb!
-    name = None
 
     def __new__(cls, values=(), name=None, parent=None):
         return tuple.__new__(cls, values)

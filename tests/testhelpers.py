@@ -770,6 +770,21 @@ class TestCallList(unittest2.TestCase):
                 )
 
 
+    def test_call_list_str(self):
+        mock = Mock()
+        mock(1, 2)
+        mock.foo(a=3)
+        mock.foo.bar().baz('fish', cat='dog')
+
+        expected = (
+            "[((1, 2), {}),\n"
+            " ('foo', (), {'a': 3}),\n"
+            " ('foo.bar', (), {}),\n"
+            " ('foo.bar().baz', ('fish',), {'cat': 'dog'})]"
+        )
+        self.assertEqual(str(mock.mock_calls), expected)
+
+
 
 """
 * repr should use new name (so new name should default to name if not None)
