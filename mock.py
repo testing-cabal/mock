@@ -1302,7 +1302,7 @@ def _patch_multiple(target, spec=None, create=False,
         new_callable=None, **kwargs
     ):
     """ XXXX needs docstring"""
-    if isinstance(target, basestring):
+    if type(target) in (unicode, str):
         target = _importer(target)
 
     if not kwargs:
