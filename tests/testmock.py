@@ -2,7 +2,7 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
-from tests.support import unittest2, inPy3k, is_instance
+from tests.support import callable, unittest2, inPy3k, is_instance
 
 import copy
 import sys
@@ -11,7 +11,8 @@ import mock
 from mock import (
     call, DEFAULT, patch, sentinel,
     MagicMock, Mock, NonCallableMock,
-    _CallList, mocksignature
+    NonCallableMagicMock, _CallList,
+    mocksignature
 )
 
 
@@ -790,10 +791,13 @@ class MockTest(unittest2.TestCase):
 
     def test_arg_lists(self):
         mocks = [
-            Mock(), mocksignature(lambda *args, **kwargs: None),
+            Mock(),
+            mocksignature(lambda *args, **kwargs: None),
             MagicMock(),
-            Mock().foo.bar(),
+            NonCallableMock(),
+            NonCallableMagicMock()
         ]
+
         def assert_attrs(mock):
             names = 'call_args_list', 'method_calls', 'mock_calls'
             for name in names:
@@ -805,18 +809,20 @@ class MockTest(unittest2.TestCase):
         for mock in mocks:
             assert_attrs(mock)
 
-            mock()
-            mock(1, 2)
-            mock(a=3)
+            if callable(mock):
+                mock()
+                mock(1, 2)
+                mock(a=3)
 
-            mock.reset_mock()
-            assert_attrs(mock)
+                mock.reset_mock()
+                assert_attrs(mock)
+
             if not isinstance(mock, Mock):
                 # the mocksignature
                 continue
 
             mock.foo()
-            mock(1, a=5)
+            mock.foo.bar(1, a=3)
             mock.foo(1).bar().baz(3)
 
             mock.reset_mock()
