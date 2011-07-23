@@ -66,6 +66,10 @@ getting / setting. They also have the `assert_called_with` and
 fetching them would create a mock (attribute) that could be called without
 error.
 
+Should the repr of `call` and `callargs` be `call(1, 2, 3)` and
+`callargs((name, args, kwargs))`? The str could reconstruct the actual call,
+which could then be used in the `str` of `_CallList`.
+
 
 CHANGELOG
 =========
