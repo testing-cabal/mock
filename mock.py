@@ -1077,7 +1077,7 @@ class _patch(object):
 
     def decorate_class(self, klass):
         for attr in dir(klass):
-            if not attr.startswith("test"):
+            if not attr.startswith(patch.TEST_PREFIX):
                 continue
 
             attr_value = getattr(klass, attr)
@@ -1433,7 +1433,8 @@ class _patch_dict(object):
     def decorate_class(self, klass):
         for attr in dir(klass):
             attr_value = getattr(klass, attr)
-            if attr.startswith("test") and hasattr(attr_value, "__call__"):
+            if (attr.startswith(patch.TEST_PREFIX) and
+                 hasattr(attr_value, "__call__")):
                 decorator = _patch_dict(self.in_dict, self.values, self.clear)
                 decorated = decorator(attr_value)
                 setattr(klass, attr, decorated)
@@ -1505,7 +1506,7 @@ def _clear_dict(in_dict):
 patch.object = _patch_object
 patch.dict = _patch_dict
 patch.multiple = _patch_multiple
-
+patch.TEST_PREFIX = 'test'
 
 magic_methods = (
     "lt le gt ge eq ne "
