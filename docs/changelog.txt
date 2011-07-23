@@ -73,6 +73,8 @@ CHANGELOG
 2011/XX/XX Version 0.8.0 alpha 3
 --------------------------------
 
+* `patch.TEST_PREFIX` for controlling how patchers recognise test methods when
+  used to decorate a class
 * `Mock` call lists (`call_args_list`, `method_calls` & `mock_calls`) are now
   custom list objects that allow membership tests for "sub lists" and have
   an `assert_has_calls` method for unordered call checks

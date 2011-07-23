@@ -17,6 +17,7 @@ from mock import (
 builtin_string = '__builtin__'
 if inPy3k:
     builtin_string = 'builtins'
+    unicode = str
 
 PTModule = sys.modules[__name__]
 
@@ -1521,6 +1522,51 @@ class PatchTest(unittest2.TestCase):
             test()
             self.assertEqual(foo.fish, 'tasty')
 
+
+    @patch('mock.patch.TEST_PREFIX', 'foo')
+    def test_patch_test_prefix(self):
+        class Foo(object):
+            thing = 'original'
+
+            def foo_one(self):
+                return self.thing
+            def foo_two(self):
+                return self.thing
+            def test_one(self):
+                return self.thing
+            def test_two(self):
+                return self.thing
+
+
+        Foo = patch.object(Foo, 'thing', 'changed')(Foo)
+
+        foo =Foo()
+        self.assertEqual(foo.foo_one(), 'changed')
+        self.assertEqual(foo.foo_two(), 'changed')
+        self.assertEqual(foo.test_one(), 'original')
+        self.assertEqual(foo.test_two(), 'original')
+
+
+    @patch('mock.patch.TEST_PREFIX', 'bar')
+    def test_patch_test_prefix(self):
+        class Foo(object):
+            def bar_one(self):
+                return dict(the_dict)
+            def bar_two(self):
+                return dict(the_dict)
+            def test_one(self):
+                return dict(the_dict)
+            def test_two(self):
+                return dict(the_dict)
+
+        the_dict = {'key': 'original'}
+        Foo = patch.dict(the_dict, key='changed')(Foo)
+
+        foo =Foo()
+        self.assertEqual(foo.bar_one(), {'key': 'changed'})
+        self.assertEqual(foo.bar_two(), {'key': 'changed'})
+        self.assertEqual(foo.test_one(), {'key': 'original'})
+        self.assertEqual(foo.test_two(), {'key': 'original'})
 
 
 if __name__ == '__main__':
