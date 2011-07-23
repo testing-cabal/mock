@@ -1510,6 +1510,18 @@ class PatchTest(unittest2.TestCase):
             self.assertEqual(Foo.foo, original_foo)
 
 
+    def test_patch_multiple_string_subclasses(self):
+        for base in (str, unicode):
+            Foo = type('Foo', (base,), {'fish': 'tasty'})
+            foo = Foo()
+            @patch.multiple(foo, fish='nearly gone')
+            def test():
+                self.assertEqual(foo.fish, 'nearly gone')
+
+            test()
+            self.assertEqual(foo.fish, 'tasty')
+
+
 
 if __name__ == '__main__':
     unittest2.main()
