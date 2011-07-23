@@ -165,9 +165,12 @@ class MockTest(unittest2.TestCase):
 
         mock.reset_mock()
 
-        self.assertEqual(mock._mock_name, "child", "name incorrectly reset")
-        self.assertEqual(mock._mock_parent, parent, "parent incorrectly reset")
-        self.assertEqual(mock._mock_methods, spec, "methods incorrectly reset")
+        self.assertEqual(mock._mock_name, "child",
+                         "name incorrectly reset")
+        self.assertEqual(mock._mock_parent, parent,
+                         "parent incorrectly reset")
+        self.assertEqual(mock._mock_methods, spec,
+                         "methods incorrectly reset")
 
         self.assertFalse(mock.called, "called not reset")
         self.assertEqual(mock.call_count, 0, "call_count not reset")
@@ -352,14 +355,17 @@ class MockTest(unittest2.TestCase):
 
 
     def test_only_allowed_methods_exist(self):
-        spec = ["something"]
-        mock = Mock(spec=spec)
+        for spec in ['something'], ('something',):
+            for arg in 'spec', 'spec_set':
+                mock = Mock(**{arg: spec})
 
-        # this should be allowed
-        mock.something
-        self.assertRaisesRegexp(AttributeError,
-                                "Mock object has no attribute 'something_else'",
-                                lambda: mock.something_else)
+                # this should be allowed
+                mock.something
+                self.assertRaisesRegexp(
+                    AttributeError,
+                    "Mock object has no attribute 'something_else'",
+                    getattr, mock, 'something_else'
+                )
 
 
     def test_from_spec(self):
@@ -451,6 +457,7 @@ class MockTest(unittest2.TestCase):
 
         mock.__name__ = 'foo'
         self.assertEqual(mock.__name__, 'foo')
+
 
     def test_spec_list_subclass(self):
         class Sub(list):

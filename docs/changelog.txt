@@ -86,6 +86,8 @@ CHANGELOG
 * Support for using Java exceptions as a `side_effect` on Jython
 * Improved failure messages for `assert_called_with` and
   `assert_called_once_with`
+* Tuples as well as lists can be used to specify allowed methods for `spec` &
+  `spec_set` arguments
 * BUGFIX: Fixed bug in `patch.multiple` for argument passing when creating
   mocks
 

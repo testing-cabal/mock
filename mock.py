@@ -232,6 +232,12 @@ def _callable(obj):
     return False
 
 
+def _is_list(obj):
+    # checks for list or tuples
+    # XXXX badly named!
+    return type(obj) in (list, tuple)
+
+
 def _instance_callable(obj):
     """Given an object, return True if the object is callable.
     For classes, return True if instances would be callable."""
@@ -627,7 +633,7 @@ class NonCallableMock(Base):
             spec = spec_set
             spec_set = True
 
-        if spec is not None and type(spec) is not list:
+        if spec is not None and not _is_list(spec):
             if isinstance(spec, ClassTypes):
                 _spec_class = spec
             else:
@@ -804,8 +810,9 @@ class NonCallableMock(Base):
             # allow all attribute setting until initialisation is complete
             return object.__setattr__(self, name, value)
 
-        if (self._spec_set and self._mock_methods is not None and name not in
-            self._mock_methods and name not in self.__dict__ and
+        if (self._spec_set and self._mock_methods is not None and
+            name not in self._mock_methods and
+            name not in self.__dict__ and
             name not in _allowed_names):
             raise AttributeError("Mock object has no attribute '%s'" % name)
         if name in _unsupported_magics:
@@ -1190,7 +1197,7 @@ class _patch(object):
             if inherit and _is_instance_mock(new):
                 # we can only tell if the instance should be callable if the
                 # spec is not a list
-                if (not isinstance(spec or spec_set, list) and not
+                if (not _is_list(spec or spec_set) and not
                     _instance_callable(spec or spec_set)):
                     Klass = NonCallableMagicMock
                 new.return_value = Klass(spec=spec, spec_set=spec_set)
@@ -1756,10 +1763,10 @@ def create_autospec(spec, spec_set=False, instance=False,
     if configure is None:
         configure = {}
 
-    if type(spec) == list:
+    if _is_list(spec):
         # can't pass a list instance to the mock constructor as it will be
         # interpreted as a list of strings
-        spec = list
+        spec = type(spec)
 
     is_type = isinstance(spec, ClassTypes)
 
