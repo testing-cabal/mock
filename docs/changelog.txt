@@ -96,6 +96,7 @@ CHANGELOG
   `spec_set` arguments
 * BUGFIX: Fixed bug in `patch.multiple` for argument passing when creating
   mocks
+* Added license file to the distribution
 
 
 2011/07/16 Version 0.8.0 alpha 2
