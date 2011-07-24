@@ -378,7 +378,10 @@ Override new instances of a class
     assertEqual(some_other_object, some_module.SomeClass())
 
     # Mocker
-    # (TODO)
+    instance = mocker.mock()
+    klass = mocker.replace(SomeClass, spec=None)
+    klass('expected', 'args')
+    mocker.result(instance)
 
 ::
 
