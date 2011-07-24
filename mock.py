@@ -29,7 +29,7 @@ __all__ = (
 )
 
 
-__version__ = '0.8.0alpha3'
+__version__ = '0.8.0beta1'
 
 
 import pprint

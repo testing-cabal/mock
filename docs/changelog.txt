@@ -74,8 +74,8 @@ which could then be used in the `str` of `_CallList`.
 CHANGELOG
 =========
 
-2011/XX/XX Version 0.8.0 alpha 3
---------------------------------
+2011/XX/XX Version 0.8.0 beta 1
+-------------------------------
 
 * `patch.TEST_PREFIX` for controlling how patchers recognise test methods when
   used to decorate a class
