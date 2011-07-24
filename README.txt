@@ -8,8 +8,8 @@ mock is tested on Python versions 2.4-2.7 and Python 3.
 
 .. note::
 
-    You can install the latest alpha version of `mock (0.8 alpha 1)
-    <http://www.voidspace.org.uk/downloads/mock-0.8.0alpha1.tar.gz#egg=mock-dev>`_
+    You can install the latest alpha version of `mock (0.8 beta 1)
+    <http://www.voidspace.org.uk/downloads/mock-0.8.0beta1.tar.gz#egg=mock-dev>`_
     with `pip install mock==dev`.
 
 The mock module also provides utility functions / objects to assist with
