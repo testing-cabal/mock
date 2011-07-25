@@ -151,6 +151,13 @@ mock 0.8.0 is the last version that will support Python 2.4.
 * Added license file to the distribution
 
 
+2011/XX/XX Version 0.8.0 beta 2
+-------------------------------
+
+* BUGFIX: `call_args` and all members of `call_args_list` are two tuples of
+  `(args, kwargs)` again instead of three tuples of `(name, args, kwargs)`
+
+
 2011/07/25 Version 0.8.0 beta 1
 -------------------------------
 

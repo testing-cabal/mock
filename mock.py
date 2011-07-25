@@ -29,7 +29,7 @@ __all__ = (
 )
 
 
-__version__ = '0.8.0beta1'
+__version__ = '0.8.0beta2'
 
 
 import pprint
@@ -442,7 +442,7 @@ class callargs(tuple):
 
     If the callargs has no name then it will match any name.
     """
-    def __new__(cls, value=()):
+    def __new__(cls, value=(), two=False):
         name = ''
         args = ()
         kwargs = {}
@@ -467,7 +467,13 @@ class callargs(tuple):
             else:
                 kwargs = value
 
+        if two:
+            return tuple.__new__(cls, (args, kwargs))
         return tuple.__new__(cls, (name, args, kwargs))
+
+
+    def __init__(self, value=(), two=False):
+        pass
 
 
     def __eq__(self, other):
@@ -476,7 +482,11 @@ class callargs(tuple):
         except TypeError:
             return False
 
-        self_name, self_args, self_kwargs = self
+        self_name = ''
+        if len(self) == 2:
+            self_args, self_kwargs = self
+        else:
+            self_name, self_args, self_kwargs = self
 
         other_name = ''
         if len(other) == 0:
@@ -517,7 +527,7 @@ class callargs(tuple):
 
 
     def __repr__(self):
-        if self[0]:
+        if self[0] or len(self) == 2:
             return tuple.__repr__(self)
         return tuple.__repr__(self[1:])
 
@@ -868,7 +878,8 @@ class NonCallableMock(Base):
     def _format_mock_failure_message(self, args, kwargs):
         message = 'Expected call: %s\nActual call: %s'
         expected_string = self._format_mock_call_signature(args, kwargs)
-        actual_string = self._format_mock_call_signature(*self.call_args[1:])
+        kall = self.call_args
+        actual_string = self._format_mock_call_signature(kall.args, kall.kwargs)
         return message % (expected_string, actual_string)
 
 
@@ -949,8 +960,8 @@ class CallableMixin(Base):
         self = _mock_self
         self.called = True
         self.call_count += 1
-        self.call_args = callargs((args, kwargs))
-        self.call_args_list.append(callargs((args, kwargs)))
+        self.call_args = callargs((args, kwargs), two=True)
+        self.call_args_list.append(callargs((args, kwargs), two=True))
 
         _new_name = self._mock_new_name
         _new_parent = self._mock_new_parent
