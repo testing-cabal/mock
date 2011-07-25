@@ -140,8 +140,6 @@ mock 0.8.0 is the last version that will support Python 2.4.
   mocks in Python 3
 * BUGFIX: `assert_called_with` / `assert_called_once_with` can be used with
   `self` as a keyword argument
-* BUGFIX: autospec for functions / methods with an argument named self that
-  isn't the first argument no longer broken
 * BUGFIX: when patching a class with an explicit spec / spec_set (not a
   boolean) it applies "spec inheritance" to the return value of the created
   mock (the "instance")
