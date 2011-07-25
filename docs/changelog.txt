@@ -19,10 +19,11 @@ Destructors aren't called in CPython where there are cycles, but a weak
 reference with a callback can be used to get round this.
 
 `Mock` has several attributes. This makes it unsuitable for mocking objects
-that use these attribute names. A way round this would be to provide `start`
-and `stop` (or similar) methods that *hide* these attributes when needed.
-In 0.8 many, but not all, of these attributes are renamed to gain a `_mock`
-prefix, making it less likely that they will clash.
+that use these attribute names. A way round this would be to provide methods
+that *hide* these attributes when needed. In 0.8 many, but not all, of these
+attributes are renamed to gain a `_mock` prefix, making it less likely that
+they will clash. Any outstanding attributes that haven't been modified with
+the prefix should be changed.
 
 If a patch is started using `patch.start` and then not stopped correctly then
 the unpatching is not done. Using weak references it would be possible to
@@ -65,12 +66,15 @@ Should the repr of `call` and `callargs` be `call(1, 2, 3)` and
 which could then be used in the `str` of `_CallList`.
 
 Some outstanding technical debt. `call` and `callargs` are similar and could
-be unified or share code. The way autospeccing mocks signatures was copied and
-modified from `mocksignature`. This could all be refactored into one set of
-functions instead of two. The way we tell if patchers are started and if a
-patcher is being used for a `patch.multiple` call are both horrible. There are
-now a host of helper functions that should be rationalised. (Probably time to
-split mock into a package instead of a module.)
+be unified or share code. The way autospeccing mocks function signatures was
+copied and modified from `mocksignature`. This could all be refactored into
+one set of functions instead of two. The way we tell if patchers are started
+and if a patcher is being used for a `patch.multiple` call are both horrible.
+There are now a host of helper functions that should be rationalised.
+(Probably time to split mock into a package instead of a module.)
+
+`mocksignature`, plus the `call_args_list` and `method_calls` attributes of
+`Mock` could all be deprecated.
 
 
 CHANGELOG
