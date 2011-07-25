@@ -174,6 +174,31 @@ class CallargsTest(unittest2.TestCase):
                          repr(('bar', (1, 2, 3), {'a': 'b'})))
 
 
+    def test_attributes(self):
+        args = (1, 2, 3)
+        kwargs = dict(a=4, b=6)
+
+        kall = callargs((args, kwargs))
+        self.assertEqual(kall.args, args)
+        self.assertEqual(kall.kwargs, kwargs)
+        self.assertEqual(kall.name, '')
+
+        kall = callargs(('foo', args, kwargs))
+        self.assertEqual(kall.args, args)
+        self.assertEqual(kall.kwargs, kwargs)
+        self.assertEqual(kall.name, 'foo')
+
+        kall = callargs((args, kwargs), two=True)
+        self.assertEqual(kall.args, args)
+        self.assertEqual(kall.kwargs, kwargs)
+        self.assertEqual(kall.name, '')
+
+        kall = callargs(('foo', args, kwargs), two=True)
+        self.assertEqual(kall.args, args)
+        self.assertEqual(kall.kwargs, kwargs)
+        self.assertEqual(kall.name, '')
+
+
 
 class CallTest(unittest2.TestCase):
 
@@ -260,6 +285,15 @@ class CallTest(unittest2.TestCase):
         kall = call(1).method(2)(3).foo.bar.baz(4)(5).__int__()
         self.assertEqual(kall.call_list(), mock.mock_calls)
 
+
+    def test_two_args_callargs(self):
+        args = callargs(((1, 2), {'a': 3}), two=True)
+        self.assertEqual(len(args), 2)
+        self.assertEqual(args[0], (1, 2))
+        self.assertEqual(args[1], {'a': 3})
+
+        other_args = callargs(((1, 2), {'a': 3}))
+        self.assertEqual(args, other_args)
 
 
 class SpecSignatureTest(unittest2.TestCase):
