@@ -12,14 +12,11 @@ Feature requests and bug reports are handled on the issue tracker:
 
 `wraps` is not integrated with magic methods.
 
-Should magic method calls (including `__call__`?) be tracked in `method_calls`?
-`mock_calls` that tracks all calls will solve this.
-
-`patch` could take a keyword argument and auto-do the patching in the
-constructor and unpatch in the destructor. This would be useful in itself, but
-violates TOOWTDI and would be unsafe for IronPython (non-deterministic calling
-of destructors). Destructors aren't called *anyway* where there are cycles,
-but a weak reference with a callback can be used to get round this.
+`patch` could auto-do the patching in the constructor and unpatch in the
+destructor. This would be useful in itself, but violates TOOWTDI and would be
+unsafe for IronPython & pypy (non-deterministic calling of destructors).
+Destructors aren't called in CPython where there are cycles, but a weak
+reference with a callback can be used to get round this.
 
 `Mock` has several attributes. This makes it unsuitable for mocking objects
 that use these attribute names. A way round this would be to provide `start`
@@ -44,9 +41,6 @@ from their parent), or should it be controlled by an additional keyword
 argument (`inherit`) to the Mock constructor? `create_autospec` does this, so
 an additional keyword argument to Mock is probably unnecessary.
 
-`MagicMock` is no longer a subclass of `Mock`, but a subclass of
-`NonCallableMock` with the callability mixed in.
-
 When using `new_callable` as an argument to patch, passing in a class that
 is *not* a `Mock` class, the `spec` and `spec_set` arguments are still passed
 into the constructor. There is code to avoid trying to set the `return_value`
@@ -69,6 +63,14 @@ error.
 Should the repr of `call` and `callargs` be `call(1, 2, 3)` and
 `callargs((name, args, kwargs))`? The str could reconstruct the actual call,
 which could then be used in the `str` of `_CallList`.
+
+Some outstanding technical debt. `call` and `callargs` are similar and could
+be unified or share code. The way autospeccing mocks signatures was copied and
+modified from `mocksignature`. This could all be refactored into one set of
+functions instead of two. The way we tell if patchers are started and if a
+patcher is being used for a `patch.multiple` call are both horrible. There are
+now a host of helper functions that should be rationalised. (Probably time to
+split mock into a package instead of a module.)
 
 
 CHANGELOG
