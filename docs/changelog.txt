@@ -74,6 +74,10 @@ which could then be used in the `str` of `_CallList`.
 CHANGELOG
 =========
 
+
+2011/XX/XX Version 0.8.0
+------------------------
+
 Full List of changes since 0.7:
 
 mock 0.8.0 is the last version that will support Python 2.4.
@@ -143,7 +147,7 @@ mock 0.8.0 is the last version that will support Python 2.4.
 * Added license file to the distribution
 
 
-2011/XX/XX Version 0.8.0 beta 1
+2011/07/25 Version 0.8.0 beta 1
 -------------------------------
 
 * `patch.TEST_PREFIX` for controlling how patchers recognise test methods when
