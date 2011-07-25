@@ -174,31 +174,6 @@ class CallargsTest(unittest2.TestCase):
                          repr(('bar', (1, 2, 3), {'a': 'b'})))
 
 
-    def test_attributes(self):
-        args = (1, 2, 3)
-        kwargs = dict(a=4, b=6)
-
-        kall = callargs((args, kwargs))
-        self.assertEqual(kall.args, args)
-        self.assertEqual(kall.kwargs, kwargs)
-        self.assertEqual(kall.name, '')
-
-        kall = callargs(('foo', args, kwargs))
-        self.assertEqual(kall.args, args)
-        self.assertEqual(kall.kwargs, kwargs)
-        self.assertEqual(kall.name, 'foo')
-
-        kall = callargs((args, kwargs), two=True)
-        self.assertEqual(kall.args, args)
-        self.assertEqual(kall.kwargs, kwargs)
-        self.assertEqual(kall.name, '')
-
-        kall = callargs(('foo', args, kwargs), two=True)
-        self.assertEqual(kall.args, args)
-        self.assertEqual(kall.kwargs, kwargs)
-        self.assertEqual(kall.name, '')
-
-
 
 class CallTest(unittest2.TestCase):
 

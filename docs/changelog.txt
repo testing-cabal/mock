@@ -145,7 +145,6 @@ mock 0.8.0 is the last version that will support Python 2.4.
   mock (the "instance")
 * BUGFIX: remove the `__unittest` marker causing traceback truncation
 * Removal of deprecated `patch_object`
-* `callargs` changed to *always* be a three-tuple of `(name, args, kwargs)`
 * Private attributes `_name`, `_methods`, '_children', `_wraps` and `_parent`
   (etc) renamed to reduce likelihood of clash with user attributes.
 * Added license file to the distribution
