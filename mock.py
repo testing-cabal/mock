@@ -641,8 +641,6 @@ class NonCallableMock(Base):
         self._mock_new_name = _new_name
         self._mock_new_parent = _new_parent
 
-        self._spec_state = _spec_state
-
         _spec_class = None
         if spec_set is not None:
             spec = spec_set
@@ -878,8 +876,10 @@ class NonCallableMock(Base):
     def _format_mock_failure_message(self, args, kwargs):
         message = 'Expected call: %s\nActual call: %s'
         expected_string = self._format_mock_call_signature(args, kwargs)
-        kall = self.call_args
-        actual_string = self._format_mock_call_signature(kall.args, kall.kwargs)
+        call_args = self.call_args
+        if len(call_args) == 3:
+            call_args = call_args[1:]
+        actual_string = self._format_mock_call_signature(*call_args)
         return message % (expected_string, actual_string)
 
 
