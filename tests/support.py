@@ -33,3 +33,9 @@ class SomeClass(object):
 
 class X(object):
     pass
+
+try:
+    next = next
+except NameError:
+    def next(obj):
+        return obj.next()

@@ -73,6 +73,13 @@ except NameError:
     # Python 2.4 compatibility
     BaseException = Exception
 
+try:
+    next
+except NameError:
+    def next(obj):
+        return obj.next()
+
+
 BaseExceptions = (BaseException,)
 if 'java' in sys.platform:
     # jython
@@ -403,7 +410,10 @@ ClassTypes = (type,)
 if not inPy3k:
     ClassTypes = (type, ClassType)
 
-_allowed_names = set(['return_value', '_mock_return_value'])
+_allowed_names = set(
+    ['return_value', '_mock_return_value', 'side_effect', '_mock_side_effect']
+)
+
 
 def _mock_signature_property(name):
     _allowed_names.add(name)
@@ -709,7 +719,23 @@ class NonCallableMock(Base):
     call_count = _mock_signature_property('call_count')
     call_args = _mock_signature_property('call_args')
     call_args_list = _mock_signature_property('call_args_list')
-    side_effect = _mock_signature_property('side_effect')
+
+
+    def __get_side_effect(self):
+        sig = self._mock_signature
+        if sig is None:
+            return self._mock_side_effect
+        return sig.side_effect
+
+    def __set_side_effect(self, value):
+        value = _try_iter(value)
+        sig = self._mock_signature
+        if sig is None:
+            self._mock_side_effect = value
+        else:
+            sig.side_effect = value
+
+    side_effect = property(__get_side_effect, __set_side_effect)
 
 
     def reset_mock(self):
@@ -930,18 +956,37 @@ class NonCallableMock(Base):
 
 
 
+def _try_iter(obj):
+    if obj is None:
+        return obj
+    if _is_exception(obj):
+        return obj
+    if _callable(obj):
+        return obj
+    try:
+        return iter(obj)
+    except TypeError:
+        # XXXX backwards compatibility
+        # but this will blow up on first call - so maybe we should fail early?
+        return obj
+
+
+
 class CallableMixin(Base):
 
     def __init__(self, spec=None, side_effect=None, return_value=DEFAULT,
                  wraps=None, name=None, spec_set=None, parent=None,
                  _spec_state=None, _new_name='', _new_parent=None, **kwargs):
         self._mock_return_value = return_value
-        self._mock_side_effect = side_effect
 
         _super(CallableMixin, self).__init__(
             spec, wraps, name, spec_set, parent,
             _spec_state, _new_name, _new_parent, **kwargs
         )
+
+        self.side_effect = side_effect
+
+
 
 
     def _mock_check_sig(self, *args, **kwargs):
@@ -996,6 +1041,9 @@ class CallableMixin(Base):
         if self.side_effect is not None:
             if _is_exception(self.side_effect):
                 raise self.side_effect
+
+            if not _callable(self.side_effect):
+                return next(self.side_effect)
 
             ret_val = self.side_effect(*args, **kwargs)
             if ret_val is DEFAULT:

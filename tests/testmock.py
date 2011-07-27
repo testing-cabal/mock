@@ -2,7 +2,9 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
-from tests.support import callable, unittest2, inPy3k, is_instance
+from tests.support import (
+    callable, unittest2, inPy3k, is_instance, next
+)
 
 import copy
 import sys
@@ -20,6 +22,21 @@ try:
     unicode
 except NameError:
     unicode = str
+
+
+
+class Iter(object):
+    def __init__(self):
+        self.thing = iter(['this', 'is', 'an', 'iter'])
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        return next(self.thing)
+
+    __next__ = next
+
 
 
 class MockTest(unittest2.TestCase):
@@ -851,6 +868,52 @@ class MockTest(unittest2.TestCase):
             self.assertEqual(len(call_args), 2)
             self.assertEqual(expected[0], call_args[0])
             self.assertEqual(expected[1], call_args[1])
+
+
+    def test_side_effect_iterator(self):
+        mock = Mock(side_effect=iter([1, 2, 3]))
+        self.assertEqual([mock(), mock(), mock()], [1, 2, 3])
+        self.assertRaises(StopIteration, mock)
+
+        mock = MagicMock(side_effect=['a', 'b', 'c'])
+        self.assertEqual([mock(), mock(), mock()], ['a', 'b', 'c'])
+        self.assertRaises(StopIteration, mock)
+
+        mock = Mock(side_effect='ghi')
+        self.assertEqual([mock(), mock(), mock()], ['g', 'h', 'i'])
+        self.assertRaises(StopIteration, mock)
+
+        class Foo(object):
+            pass
+        mock = MagicMock(side_effect=Foo)
+        self.assertIsInstance(mock(), Foo)
+
+        mock = Mock(side_effect=Iter())
+        self.assertEqual([mock(), mock(), mock(), mock()],
+                         ['this', 'is', 'an', 'iter'])
+        self.assertRaises(StopIteration, mock)
+
+
+    def test_side_effect_setting_iterator(self):
+        mock = Mock()
+        mock.side_effect = iter([1, 2, 3])
+        self.assertEqual([mock(), mock(), mock()], [1, 2, 3])
+        self.assertRaises(StopIteration, mock)
+        side_effect = mock.side_effect
+        self.assertIsInstance(side_effect, type(iter([])))
+
+        mock.side_effect = ['a', 'b', 'c']
+        self.assertEqual([mock(), mock(), mock()], ['a', 'b', 'c'])
+        self.assertRaises(StopIteration, mock)
+        side_effect = mock.side_effect
+        self.assertIsInstance(side_effect, type(iter([])))
+
+        this_iter = Iter()
+        mock.side_effect = this_iter
+        self.assertEqual([mock(), mock(), mock(), mock()],
+                         ['this', 'is', 'an', 'iter'])
+        self.assertRaises(StopIteration, mock)
+        self.assertIs(mock.side_effect, this_iter)
 
 
 if __name__ == '__main__':
