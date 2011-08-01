@@ -152,7 +152,7 @@ mock 0.8.0 is the last version that will support Python 2.4.
 * Added license file to the distribution
 
 
-2011/XX/XX Version 0.8.0 beta 2
+2011/08/01 Version 0.8.0 beta 2
 -------------------------------
 
 * Setting `side_effect` to an iterable will cause calls to the mock to return
