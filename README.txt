@@ -22,9 +22,7 @@ testing, particularly monkey patching.
 Mock is very easy to use and is designed for use with
 `unittest <http://pypi.python.org/pypi/unittest2>`_. Mock is based on
 the 'action -> assertion' pattern instead of 'record -> replay' used by many
-mocking frameworks. See the
-`mock documentation <http://www.voidspace.org.uk/python/mock/>`_ for full
-details.
+mocking frameworks. See the `mock documentation`_ for full details.
 
 Mock objects create all attributes and methods as you access them and store
 details of how they have been used. You can configure them, to specify return
