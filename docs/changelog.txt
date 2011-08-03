@@ -92,14 +92,14 @@ mock 0.8.0 is the last version that will support Python 2.4.
   chained calls)
 * `Mock` call lists (`call_args_list`, `method_calls` & `mock_calls`) are now
   custom list objects that allow membership tests for "sub lists" and have
-  an `assert_has_calls` method for unordered call checks, plus a nicer
-  representation if you `str` or `print` them
+  a nicer representation if you `str` or `print` them
 * `patch` and `patch.object` now create a `MagicMock` instead of a `Mock` by
   default
 * The patchers (`patch`, `patch.object` and `patch.dict`), plus `Mock` and
   `MagicMock`, take arbitrary keyword arguments for configuration
 * New mock method `configure_mock` for setting attributes and return values /
   side effects on the mock and its attributes
+* New mock assert methods `assert_any_call` and `assert_has_calls`
 * Implemented auto-speccing (recursive, lazy speccing of mocks with mocked
   signatures for functions/methods), as the `autospec` argument to `patch`
 * Added the `create_autospec` function for manually creating 'auto-specced'
