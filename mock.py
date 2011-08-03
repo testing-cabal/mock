@@ -339,6 +339,8 @@ def _setup_func(funcopy, mock):
         return mock.assert_called_with(*args, **kwargs)
     def assert_called_once_with(*args, **kwargs):
         return mock.assert_called_once_with(*args, **kwargs)
+    def assert_has_calls(*args, **kwargs):
+        return mock.assert_has_calls(*args, **kwargs)
     def reset_mock():
         funcopy.method_calls = _CallList()
         funcopy.mock_calls = _CallList()
@@ -360,6 +362,7 @@ def _setup_func(funcopy, mock):
 
     funcopy.assert_called_with = assert_called_with
     funcopy.assert_called_once_with = assert_called_once_with
+    funcopy.assert_has_calls = assert_has_calls
     funcopy.reset_mock = reset_mock
 
     mock._mock_signature = funcopy
@@ -558,20 +561,6 @@ class _CallList(list):
             if sub_list == value:
                 return True
         return False
-
-
-    def assert_has_calls(self, calls):
-        self_copy = list(self)
-
-        for kall in calls:
-            try:
-                self_copy.remove(kall)
-            except ValueError:
-                # XXXX failure message could be better here
-                raise AssertionError(
-                    '%r not all found in call list' % (calls,)
-                )
-
 
     def __str__(self):
         return pprint.pformat(self)
@@ -938,6 +927,33 @@ class NonCallableMock(Base):
             raise AssertionError(msg)
         return self.assert_called_with(*args, **kwargs)
 
+
+    def assert_has_calls(self, calls, any_order=False):
+        """ XXXX needs docstring """
+        if not any_order:
+            assert calls in self.mock_calls
+            return
+
+        all_calls = list(self.mock_calls)
+
+        not_found = []
+        for kall in calls:
+            try:
+                all_calls.remove(kall)
+            except ValueError:
+                not_found.append(kall)
+        if not_found:
+            raise AssertionError(
+                '%r not all found in call list' % (tuple(not_found),)
+            )
+
+    def assert_any_call(*args, **kwargs):
+        call = call(*args, **kwargs)
+        if not call in self.call_args_list:
+            expected_string = self._format_mock_call_signature(args, kwargs)
+            raise AssertionError(
+                '%s call not found' % expected_string
+            )
 
     def _get_child_mock(self, **kw):
         """Create the child mocks for attributes and return value.
