@@ -961,24 +961,70 @@ class MockTest(unittest2.TestCase):
                 )
 
     def test_assert_has_calls(self):
+        kalls1 = [
+                call(1, 2), ({'a': 3},),
+                ((3, 4),), call(b=6),
+                ('', (1,), {'b': 6}),
+        ]
+        kalls2 = [call.foo(), call.bar(1)]
+        kalls2.extend(call.spam().baz(a=3).call_list())
+        kalls2.extend(call.bam(set(), foo={}).fish([1]).call_list())
+
+        mocks = []
         for mock in Mock(), mocksignature(lambda *args, **kwargs: None):
             mock(1, 2)
             mock(a=3)
             mock(3, 4)
             mock(b=6)
-            mock(b=6)
+            mock(1, b=6)
+            mocks.append((mock, kalls1))
 
-            kalls = [
-                call(1, 2), ({'a': 3},),
-                ((3, 4),), ((), {'a': 3}),
-                ('', (1, 2)), ('', {'a': 3}),
-                ('', (1, 2), {}), ('', (), {'a': 3})
-            ]
-            for kall in kalls:
-                mock.assert_has_calls([kall])
+        mock = Mock()
+        mock.foo()
+        mock.bar(1)
+        mock.spam().baz(a=3)
+        mock.bam(set(), foo={}).fish([1])
+        mocks.append((mock, kalls2))
 
+        for mock, kalls in mocks:
             for i in range(len(kalls)):
-                mock.assert_has_calls(kalls[i:i+1])
+                for step in 1, 2, 3:
+                    these = kalls[i:i+step]
+                    mock.assert_has_calls(these)
+
+                    if len(these) > 1:
+                        self.assertRaises(
+                            AssertionError,
+                            mock.assert_has_calls,
+                            list(reversed(these))
+                        )
+
+
+    def test_assert_any_call(self):
+        for mock in Mock(), mocksignature(lambda *args, **kwargs: None):
+            mock(1, 2)
+            mock(a=3)
+            mock(1, b=6)
+
+            mock.assert_any_call(1, 2)
+            mock.assert_any_call(a=3)
+            mock.assert_any_call(1, b=6)
+
+            self.assertRaises(
+                AssertionError,
+                mock.assert_any_call
+            )
+            self.assertRaises(
+                AssertionError,
+                mock.assert_any_call,
+                1, 3
+            )
+            self.assertRaises(
+                AssertionError,
+                mock.assert_any_call,
+                a=4
+            )
+
 
 if __name__ == '__main__':
     unittest2.main()
