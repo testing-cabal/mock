@@ -916,7 +916,7 @@ class MockTest(unittest2.TestCase):
         self.assertIs(mock.side_effect, this_iter)
 
 
-    def test_assert_has_calls(self):
+    def test_assert_has_calls_any_order(self):
         for mock in Mock(), mocksignature(lambda *args, **kwargs: None):
             mock(1, 2)
             mock(a=3)
@@ -960,7 +960,25 @@ class MockTest(unittest2.TestCase):
                     kall_list, any_order=True
                 )
 
+    def test_assert_has_calls(self):
+        for mock in Mock(), mocksignature(lambda *args, **kwargs: None):
+            mock(1, 2)
+            mock(a=3)
+            mock(3, 4)
+            mock(b=6)
+            mock(b=6)
 
+            kalls = [
+                call(1, 2), ({'a': 3},),
+                ((3, 4),), ((), {'a': 3}),
+                ('', (1, 2)), ('', {'a': 3}),
+                ('', (1, 2), {}), ('', (), {'a': 3})
+            ]
+            for kall in kalls:
+                mock.assert_has_calls([kall])
+
+            for i in range(len(kalls)):
+                mock.assert_has_calls(kalls[i:i+1])
 
 if __name__ == '__main__':
     unittest2.main()

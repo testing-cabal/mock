@@ -931,7 +931,11 @@ class NonCallableMock(Base):
     def assert_has_calls(self, calls, any_order=False):
         """ XXXX needs docstring """
         if not any_order:
-            assert calls in self.mock_calls
+            if calls not in self.mock_calls:
+                raise AssertionError(
+                    'Calls not found.\nExpected: %r\n'
+                    'Actual: %r' % (calls, self.mock_calls)
+                )
             return
 
         all_calls = list(self.mock_calls)
@@ -947,9 +951,10 @@ class NonCallableMock(Base):
                 '%r not all found in call list' % (tuple(not_found),)
             )
 
-    def assert_any_call(*args, **kwargs):
-        call = call(*args, **kwargs)
-        if not call in self.call_args_list:
+
+    def assert_any_call(self, *args, **kwargs):
+        kall = call(*args, **kwargs)
+        if not kall in self.call_args_list:
             expected_string = self._format_mock_call_signature(args, kwargs)
             raise AssertionError(
                 '%s call not found' % expected_string

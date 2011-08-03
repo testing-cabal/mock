@@ -157,6 +157,8 @@ mock 0.8.0 is the last version that will support Python 2.4.
 
 * Setting `side_effect` to an iterable will cause calls to the mock to return
   the next value from the iterable
+* Added `assert_any_call` method
+* Moved `assert_has_calls` from call lists onto mocks
 * BUGFIX: `call_args` and all members of `call_args_list` are two tuples of
   `(args, kwargs)` again instead of three tuples of `(name, args, kwargs)`
 
