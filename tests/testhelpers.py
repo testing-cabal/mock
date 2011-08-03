@@ -734,51 +734,6 @@ class TestCallList(unittest2.TestCase):
             self.assertFalse([call('fish')] in mock.call_args_list)
 
 
-    def test_args_list_assert_has_calls(self):
-        for mock in Mock(), mocksignature(lambda *args, **kwargs: None):
-            mock(1, 2)
-            mock(a=3)
-            mock(3, 4)
-            mock(b=6)
-            mock(b=6)
-
-            kalls = [
-                call(1, 2), ({'a': 3},),
-                ((3, 4),), ((), {'a': 3}),
-                ('', (1, 2)), ('', {'a': 3}),
-                ('', (1, 2), {}), ('', (), {'a': 3})
-            ]
-            for kall in kalls:
-                mock.call_args_list.assert_has_calls([kall])
-
-            for kall in call(1, '2'), call(b=3), call(), 3, None, 'foo':
-                self.assertRaises(
-                    AssertionError, mock.call_args_list.assert_has_calls,
-                    [kall]
-                )
-
-            kall_lists = [
-                [call(1, 2), call(b=6)],
-                [call(3, 4), call(1, 2)],
-                [call(b=6), call(b=6)],
-            ]
-
-            for kall_list in kall_lists:
-                mock.call_args_list.assert_has_calls(kall_list)
-
-            kall_lists = [
-                [call(b=6), call(b=6), call(b=6)],
-                [call(1, 2), call(1, 2)],
-                [call(3, 4), call(1, 2), call(5, 7)],
-                [call(b=6), call(3, 4), call(b=6), call(1, 2), call(b=6)],
-            ]
-            for kall_list in kall_lists:
-                self.assertRaises(
-                    AssertionError, mock.call_args_list.assert_has_calls,
-                    kall_list
-                )
-
-
     def test_call_list_str(self):
         mock = Mock()
         mock(1, 2)
@@ -794,9 +749,5 @@ class TestCallList(unittest2.TestCase):
         self.assertEqual(str(mock.mock_calls), expected)
 
 
-
-"""
-* repr should use new name (so new name should default to name if not None)
-* arg lists could use pretty-print for their str (should import of pprint
-  be optional?)
-"""
+if __name__ == '__main__':
+    unittest2.main()
