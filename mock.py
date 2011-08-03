@@ -341,6 +341,8 @@ def _setup_func(funcopy, mock):
         return mock.assert_called_once_with(*args, **kwargs)
     def assert_has_calls(*args, **kwargs):
         return mock.assert_has_calls(*args, **kwargs)
+    def assert_any_call(*args, **kwargs):
+        return mock.assert_any_call(*args, **kwargs)
     def reset_mock():
         funcopy.method_calls = _CallList()
         funcopy.mock_calls = _CallList()
@@ -363,6 +365,7 @@ def _setup_func(funcopy, mock):
     funcopy.assert_called_with = assert_called_with
     funcopy.assert_called_once_with = assert_called_once_with
     funcopy.assert_has_calls = assert_has_calls
+    funcopy.assert_any_call = assert_any_call
     funcopy.reset_mock = reset_mock
 
     mock._mock_signature = funcopy
@@ -953,6 +956,7 @@ class NonCallableMock(Base):
 
 
     def assert_any_call(self, *args, **kwargs):
+        """ XXXX needs docstring """
         kall = call(*args, **kwargs)
         if not kall in self.call_args_list:
             expected_string = self._format_mock_call_signature(args, kwargs)
