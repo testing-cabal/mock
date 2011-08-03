@@ -577,47 +577,47 @@ class Base(object):
 
 class NonCallableMock(Base):
     """
-    Create a new ``Mock`` object. ``Mock`` takes several optional arguments
+    Create a new `Mock` object. `Mock` takes several optional arguments
     that specify the behaviour of the Mock object:
 
-    * ``spec``: This can be either a list of strings or an existing object (a
+    * `spec`: This can be either a list of strings or an existing object (a
       class or instance) that acts as the specification for the mock object. If
       you pass in an object then a list of strings is formed by calling dir on
       the object (excluding unsupported magic attributes and methods). Accessing
-      any attribute not in this list will raise an ``AttributeError``.
+      any attribute not in this list will raise an `AttributeError`.
 
-      If ``spec`` is an object (rather than a list of strings) then
+      If `spec` is an object (rather than a list of strings) then
       `mock.__class__` returns the class of the spec object. This allows mocks
       to pass `isinstance` tests.
 
-    * ``spec_set``: A stricter variant of ``spec``. If used, attempting to *set*
+    * `spec_set`: A stricter variant of `spec`. If used, attempting to *set*
       or get an attribute on the mock that isn't on the object passed as
-      ``spec_set`` will raise an ``AttributeError``.
+      `spec_set` will raise an `AttributeError`.
 
-    * ``side_effect``: A function to be called whenever the Mock is called. See
+    * `side_effect`: A function to be called whenever the Mock is called. See
       the :attr:`Mock.side_effect` attribute. Useful for raising exceptions or
       dynamically changing return values. The function is called with the same
       arguments as the mock, and unless it returns :data:`DEFAULT`, the return
       value of this function is used as the return value.
 
-      Alternatively ``side_effect`` can be an exception class or instance. In
+      Alternatively `side_effect` can be an exception class or instance. In
       this case the exception will be raised when the mock is called.
 
-    * ``return_value``: The value returned when the mock is called. By default
+    * `return_value`: The value returned when the mock is called. By default
       this is a new Mock (created on first access). See the
       :attr:`Mock.return_value` attribute.
 
-    * ``wraps``: Item for the mock object to wrap. If ``wraps`` is not None
+    * `wraps`: Item for the mock object to wrap. If `wraps` is not None
       then calling the Mock will pass the call through to the wrapped object
-      (returning the real result and ignoring ``return_value``). Attribute
+      (returning the real result and ignoring `return_value`). Attribute
       access on the mock will return a Mock object that wraps the corresponding
       attribute of the wrapped object (so attempting to access an attribute that
-      doesn't exist will raise an ``AttributeError``).
+      doesn't exist will raise an `AttributeError`).
 
-      If the mock has an explicit ``return_value`` set then calls are not passed
-      to the wrapped object and the ``return_value`` is returned instead.
+      If the mock has an explicit `return_value` set then calls are not passed
+      to the wrapped object and the `return_value` is returned instead.
 
-    * ``name``: If the mock has a name then it will be used in the repr of the
+    * `name`: If the mock has a name then it will be used in the repr of the
       mock. This can be useful for debugging. The name is propagated to child
       mocks.
     """
@@ -1418,32 +1418,32 @@ def patch(
         new_callable=None, **kwargs
     ):
     """
-    ``patch`` acts as a function decorator, class decorator or a context
-    manager. Inside the body of the function or with statement, the ``target``
+    `patch` acts as a function decorator, class decorator or a context
+    manager. Inside the body of the function or with statement, the `target`
     (specified in the form `'PackageName.ModuleName.ClassName'`) is patched
-    with a ``new`` object. When the function/with statement exits the patch is
+    with a `new` object. When the function/with statement exits the patch is
     undone.
 
-    The ``target`` is imported and the specified attribute patched with the new
+    The `target` is imported and the specified attribute patched with the new
     object, so it must be importable from the environment you are calling the
     decorator from.
 
-    If ``new`` is omitted, then a new ``Mock`` is created and passed in as an
+    If `new` is omitted, then a new `Mock` is created and passed in as an
     extra argument to the decorated function.
 
-    The ``spec`` and ``spec_set`` keyword arguments are passed to the ``Mock``
+    The `spec` and `spec_set` keyword arguments are passed to the `Mock`
     if patch is creating one for you.
 
-    In addition you can pass ``spec=True`` or ``spec_set=True``, which causes
+    In addition you can pass `spec=True` or `spec_set=True`, which causes
     patch to pass in the object being mocked as the spec/spec_set object.
 
-    If ``mocksignature`` is True then the patch will be done with a function
+    If `mocksignature` is True then the patch will be done with a function
     created by mocking the one being replaced. If the object being replaced is
     a class then the signature of `__init__` will be copied. If the object
     being replaced is a callable object then the signature of `__call__` will
     be copied.
 
-    By default ``patch`` will fail to replace attributes that don't exist. If
+    By default `patch` will fail to replace attributes that don't exist. If
     you pass in 'create=True' and the attribute doesn't exist, patch will
     create the attribute for you when the patched function is called, and
     delete it again afterwards. This is useful for writing tests against
@@ -1484,7 +1484,7 @@ class _patch_dict(object):
     will then be fetched by importing it.
 
     `values` can be a dictionary of values to set in the dictionary. `values`
-    can also be an iterable of ``(key, value)`` pairs.
+    can also be an iterable of `(key, value)` pairs.
 
     If `clear` is True then the dictionary will be cleared before the new
     values are set.
@@ -1743,7 +1743,7 @@ class MagicMock(MagicMixin, Mock):
     of most of the magic methods. You can use MagicMock without having to
     configure the magic methods yourself.
 
-    If you use the ``spec`` or ``spec_set`` arguments then *only* magic
+    If you use the `spec` or `spec_set` arguments then *only* magic
     methods that exist in the spec will be created.
 
     Attributes and the return value of a `MagicMock` will also be `MagicMocks`.
