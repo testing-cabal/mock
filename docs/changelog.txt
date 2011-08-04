@@ -90,9 +90,6 @@ mock 0.8.0 is the last version that will support Python 2.4.
 
 * Addition of `mock_calls` list for *all* calls (including magic methods and
   chained calls)
-* `Mock` call lists (`call_args_list`, `method_calls` & `mock_calls`) are now
-  custom list objects that allow membership tests for "sub lists" and have
-  a nicer representation if you `str` or `print` them
 * `patch` and `patch.object` now create a `MagicMock` instead of a `Mock` by
   default
 * The patchers (`patch`, `patch.object` and `patch.dict`), plus `Mock` and
@@ -128,6 +125,9 @@ mock 0.8.0 is the last version that will support Python 2.4.
 * `patch.TEST_PREFIX` for controlling how patchers recognise test methods when
   used to decorate a class
 * Support for using Java exceptions as a `side_effect` on Jython
+* `Mock` call lists (`call_args_list`, `method_calls` & `mock_calls`) are now
+  custom list objects that allow membership tests for "sub lists" and have
+  a nicer representation if you `str` or `print` them
 * Improved failure messages for `assert_called_with` and
   `assert_called_once_with`
 * Added the Mock API (`assert_called_with` etc) to functions created by
