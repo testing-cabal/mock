@@ -14,7 +14,7 @@ from mock import (
     call, DEFAULT, patch, sentinel,
     MagicMock, Mock, NonCallableMock,
     NonCallableMagicMock, _CallList,
-    mocksignature
+    mocksignature, create_autospec
 )
 
 
@@ -22,7 +22,6 @@ try:
     unicode
 except NameError:
     unicode = str
-
 
 
 class Iter(object):
@@ -1024,6 +1023,26 @@ class MockTest(unittest2.TestCase):
                 mock.assert_any_call,
                 a=4
             )
+
+
+    def test_mock_calls_mocksignature(self):
+        def f(a, b):
+            pass
+        obj = Iter()
+        obj.f = f
+
+        funcs = [
+            mocksignature(f), create_autospec(f),
+            create_autospec(obj).f
+        ]
+        for func in funcs:
+            func(1, 2)
+            func(3, 4)
+
+            self.assertEqual(
+                func.mock_calls, [call(1, 2), call(3, 4)]
+            )
+
 
 
 if __name__ == '__main__':
