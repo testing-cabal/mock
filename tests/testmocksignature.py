@@ -339,3 +339,7 @@ class TestMockSignature(unittest2.TestCase):
 
         mock.side_effect = NameError
         self.assertRaises(NameError, func, 1, 2, 3)
+
+
+if __name__ == '__main__':
+    unittest2.main()

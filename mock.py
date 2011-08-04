@@ -667,6 +667,7 @@ class NonCallableMock(Base):
         self._mock_call_args = None
         self._mock_call_count = 0
         self._mock_call_args_list = _CallList()
+        self._mock_mock_calls = _CallList()
 
         self.reset_mock()
         self.configure_mock(**kwargs)
@@ -711,6 +712,7 @@ class NonCallableMock(Base):
     call_count = _mock_signature_property('call_count')
     call_args = _mock_signature_property('call_args')
     call_args_list = _mock_signature_property('call_args_list')
+    mock_calls = _mock_signature_property('mock_calls')
 
 
     def __get_side_effect(self):
