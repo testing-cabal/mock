@@ -902,12 +902,10 @@ class NonCallableMock(Base):
 
 
     def assert_called_with(_mock_self, *args, **kwargs):
-        """
-        assert that the mock was called with the specified arguments.
+        """assert that the mock was called with the specified arguments.
 
         Raises an AssertionError if the args and keyword args passed in are
-        different to the last call to the mock.
-        """
+        different to the last call to the mock."""
         self = _mock_self
         if self.call_args is None:
             expected = self._format_mock_call_signature(args, kwargs)
@@ -919,10 +917,8 @@ class NonCallableMock(Base):
 
 
     def assert_called_once_with(_mock_self, *args, **kwargs):
-        """
-        assert that the mock was called exactly once and with the specified
-        arguments.
-        """
+        """assert that the mock was called exactly once and with the specified
+        arguments."""
         self = _mock_self
         if not self.call_count == 1:
             msg = ("Expected to be called once. Called %s times." %
@@ -932,7 +928,15 @@ class NonCallableMock(Base):
 
 
     def assert_has_calls(self, calls, any_order=False):
-        """ XXXX needs docstring """
+        """assert the mock has been called with the specified calls.
+        The `mock_calls` list is checked for the calls.
+
+        If `any_order` is False (the default) then the calls must be
+        sequentially. There can be extra calls before or after the
+        specified calls.
+
+        If `any_order` is True then the calls can be in any order, but
+        they must all appear in `mock_calls`."""
         if not any_order:
             if calls not in self.mock_calls:
                 raise AssertionError(
