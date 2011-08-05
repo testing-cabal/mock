@@ -439,116 +439,6 @@ def _mock_signature_property(name):
 
 
 
-class callargs(tuple):
-    """
-    A tuple for holding the results of a call to a mock, either in the form
-    `(args, kwargs)` or `(name, args, kwargs)`.
-
-    If args or kwargs are empty then a callargs tuple will compare equal to
-    a tuple without those values. This makes comparisons less verbose::
-
-        callargs(('name', (), {})) == ('name',)
-        callargs(('name', (1,), {})) == ('name', (1,))
-        callargs(((), {'a': 'b'})) == ({'a': 'b'},)
-
-    The `call` object provides a useful shortcut for comparing with callargs::
-
-        callargs(((1, 2), {'a': 3})) == call(1, 2, a=3)
-        callargs(('foo', (1, 2), {'a': 3})) == call.foo(1, 2, a=3)
-
-    If the callargs has no name then it will match any name.
-    """
-    def __new__(cls, value=(), two=False):
-        name = ''
-        args = ()
-        kwargs = {}
-        if len(value) == 3:
-            name, args, kwargs = value
-        elif len(value) == 2:
-            first, second = value
-            if isinstance(first, basestring):
-                name = first
-                if isinstance(second, tuple):
-                    args = second
-                else:
-                    kwargs = second
-            else:
-                args, kwargs = first, second
-        elif len(value) == 1:
-            value, = value
-            if isinstance(value, basestring):
-                name = value
-            elif isinstance(value, tuple):
-                args = value
-            else:
-                kwargs = value
-
-        if two:
-            return tuple.__new__(cls, (args, kwargs))
-        return tuple.__new__(cls, (name, args, kwargs))
-
-
-    def __init__(self, value=(), two=False):
-        pass
-
-
-    def __eq__(self, other):
-        try:
-            len(other)
-        except TypeError:
-            return False
-
-        self_name = ''
-        if len(self) == 2:
-            self_args, self_kwargs = self
-        else:
-            self_name, self_args, self_kwargs = self
-
-        other_name = ''
-        if len(other) == 0:
-            other_args, other_kwargs = (), {}
-        elif len(other) == 3:
-            other_name, other_args, other_kwargs = other
-        elif len(other) == 1:
-            value, = other
-            if isinstance(value, tuple):
-                other_args = value
-                other_kwargs = {}
-            elif isinstance(value, basestring):
-                other_name = value
-                other_args, other_kwargs = (), {}
-            else:
-                other_args = ()
-                other_kwargs = value
-        else:
-            # len 2
-            # could be (name, args) or (name, kwargs) or (args, kwargs)
-            first, second = other
-            if isinstance(first, basestring):
-                other_name = first
-                if isinstance(second, tuple):
-                    other_args, other_kwargs = second, {}
-                else:
-                    other_args, other_kwargs = (), second
-            else:
-                other_args, other_kwargs = first, second
-
-        if self_name and other_name != self_name:
-            return False
-        return (self_args, self_kwargs) == (other_args, other_kwargs)
-
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-
-    def __repr__(self):
-        if self[0] or len(self) == 2:
-            return tuple.__repr__(self)
-        return tuple.__repr__(self[1:])
-
-
-
 class _CallList(list):
 
     def __contains__(self, value):
@@ -1796,16 +1686,110 @@ ANY = _ANY()
 
 
 
-class _Call(callargs):
-    "Call helper object"
+class _Call(tuple):
+    """
+    A tuple for holding the results of a call to a mock, either in the form
+    `(args, kwargs)` or `(name, args, kwargs)`.
 
-    def __new__(cls, values=(), name=None, parent=None, two=False, from_kall=True):
-        return callargs.__new__(cls, values, two)
+    If args or kwargs are empty then a callargs tuple will compare equal to
+    a tuple without those values. This makes comparisons less verbose::
 
-    def __init__(self, values=(), name=None, parent=None, two=False, from_kall=True):
+        callargs(('name', (), {})) == ('name',)
+        callargs(('name', (1,), {})) == ('name', (1,))
+        callargs(((), {'a': 'b'})) == ({'a': 'b'},)
+
+    The `call` object provides a useful shortcut for comparing with callargs::
+
+        callargs(((1, 2), {'a': 3})) == call(1, 2, a=3)
+        callargs(('foo', (1, 2), {'a': 3})) == call.foo(1, 2, a=3)
+
+    If the callargs has no name then it will match any name.
+    """
+    def __new__(cls, value=(), name=None, parent=None, two=False, from_kall=True):
+        name = ''
+        args = ()
+        kwargs = {}
+        if len(value) == 3:
+            name, args, kwargs = value
+        elif len(value) == 2:
+            first, second = value
+            if isinstance(first, basestring):
+                name = first
+                if isinstance(second, tuple):
+                    args = second
+                else:
+                    kwargs = second
+            else:
+                args, kwargs = first, second
+        elif len(value) == 1:
+            value, = value
+            if isinstance(value, basestring):
+                name = value
+            elif isinstance(value, tuple):
+                args = value
+            else:
+                kwargs = value
+
+        if two:
+            return tuple.__new__(cls, (args, kwargs))
+
+        return tuple.__new__(cls, (name, args, kwargs))
+
+    def __init__(self, value=(), name=None, parent=None, two=False, from_kall=True):
         self.name = name
         self.parent = parent
         self.from_kall = from_kall
+
+
+    def __eq__(self, other):
+        try:
+            len(other)
+        except TypeError:
+            return False
+
+        self_name = ''
+        if len(self) == 2:
+            self_args, self_kwargs = self
+        else:
+            self_name, self_args, self_kwargs = self
+
+        other_name = ''
+        if len(other) == 0:
+            other_args, other_kwargs = (), {}
+        elif len(other) == 3:
+            other_name, other_args, other_kwargs = other
+        elif len(other) == 1:
+            value, = other
+            if isinstance(value, tuple):
+                other_args = value
+                other_kwargs = {}
+            elif isinstance(value, basestring):
+                other_name = value
+                other_args, other_kwargs = (), {}
+            else:
+                other_args = ()
+                other_kwargs = value
+        else:
+            # len 2
+            # could be (name, args) or (name, kwargs) or (args, kwargs)
+            first, second = other
+            if isinstance(first, basestring):
+                other_name = first
+                if isinstance(second, tuple):
+                    other_args, other_kwargs = second, {}
+                else:
+                    other_args, other_kwargs = (), second
+            else:
+                other_args, other_kwargs = first, second
+
+        if self_name and other_name != self_name:
+            return False
+        return (self_args, self_kwargs) == (other_args, other_kwargs)
+
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
 
     def __call__(self, *args, **kwargs):
         if self.name is None:
@@ -1813,6 +1797,7 @@ class _Call(callargs):
 
         name = self.name + '()'
         return _Call((self.name, args, kwargs), name=name, parent=self)
+
 
     def __getattr__(self, attr):
         if self.name is None:
@@ -1822,9 +1807,9 @@ class _Call(callargs):
 
     def __repr__(self):
         if self.name is None:
-            return '<call values=%s>' % callargs.__repr__(self)
+            return '<call values=%s>' % tuple.__repr__(self)
         return '<call name=%r values=%s>' % (
-            self.name, callargs.__repr__(self)
+            self.name, tuple.__repr__(self)
         )
 
     def call_list(self):
@@ -1834,7 +1819,7 @@ class _Call(callargs):
             if thing.from_kall:
                 vals.append(thing)
             thing = thing.parent
-        return list(reversed(vals))
+        return _CallList(reversed(vals))
 
 
 call = _Call(from_kall=False)

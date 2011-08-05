@@ -1064,14 +1064,14 @@ class PatchTest(unittest2.TestCase):
                 Bar.kwargs = kwargs
 
         patcher = patch(foo_name, new_callable=Bar, spec=Bar)
-        m = patcher.start()
+        patcher.start()
         try:
             self.assertEqual(Bar.kwargs, dict(spec=Bar))
         finally:
             patcher.stop()
 
         patcher = patch(foo_name, new_callable=Bar, spec_set=Bar)
-        m = patcher.start()
+        patcher.start()
         try:
             self.assertEqual(Bar.kwargs, dict(spec_set=Bar))
         finally:
@@ -1537,10 +1537,9 @@ class PatchTest(unittest2.TestCase):
             def test_two(self):
                 return self.thing
 
-
         Foo = patch.object(Foo, 'thing', 'changed')(Foo)
 
-        foo =Foo()
+        foo = Foo()
         self.assertEqual(foo.foo_one(), 'changed')
         self.assertEqual(foo.foo_two(), 'changed')
         self.assertEqual(foo.test_one(), 'original')
@@ -1548,7 +1547,7 @@ class PatchTest(unittest2.TestCase):
 
 
     @patch('mock.patch.TEST_PREFIX', 'bar')
-    def test_patch_test_prefix(self):
+    def test_patch_dict_test_prefix(self):
         class Foo(object):
             def bar_one(self):
                 return dict(the_dict)
