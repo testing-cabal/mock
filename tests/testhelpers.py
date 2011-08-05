@@ -5,7 +5,7 @@
 from tests.support import unittest2, inPy3k
 
 from mock import (
-    call, callargs, create_autospec,
+    call, _Call, create_autospec,
     MagicMock, Mock, ANY, _CallList,
     mocksignature
 )
@@ -39,47 +39,47 @@ class AnyTest(unittest2.TestCase):
 
 
 
-class CallargsTest(unittest2.TestCase):
+class CallTest(unittest2.TestCase):
 
-    def test_callargs_with_callargs(self):
-        kall = callargs()
-        self.assertEqual(kall, callargs())
-        self.assertEqual(kall, callargs(('',)))
-        self.assertEqual(kall, callargs(((),)))
-        self.assertEqual(kall, callargs(({},)))
-        self.assertEqual(kall, callargs(('', ())))
-        self.assertEqual(kall, callargs(('', {})))
-        self.assertEqual(kall, callargs(('', (), {})))
-        self.assertEqual(kall, callargs(('foo',)))
-        self.assertEqual(kall, callargs(('bar', ())))
-        self.assertEqual(kall, callargs(('baz', {})))
-        self.assertEqual(kall, callargs(('spam', (), {})))
+    def test_call_with_call(self):
+        kall = _Call()
+        self.assertEqual(kall, _Call())
+        self.assertEqual(kall, _Call(('',)))
+        self.assertEqual(kall, _Call(((),)))
+        self.assertEqual(kall, _Call(({},)))
+        self.assertEqual(kall, _Call(('', ())))
+        self.assertEqual(kall, _Call(('', {})))
+        self.assertEqual(kall, _Call(('', (), {})))
+        self.assertEqual(kall, _Call(('foo',)))
+        self.assertEqual(kall, _Call(('bar', ())))
+        self.assertEqual(kall, _Call(('baz', {})))
+        self.assertEqual(kall, _Call(('spam', (), {})))
 
-        kall = callargs(((1, 2, 3),))
-        self.assertEqual(kall, callargs(((1, 2, 3),)))
-        self.assertEqual(kall, callargs(('', (1, 2, 3))))
-        self.assertEqual(kall, callargs(((1, 2, 3), {})))
-        self.assertEqual(kall, callargs(('', (1, 2, 3), {})))
+        kall = _Call(((1, 2, 3),))
+        self.assertEqual(kall, _Call(((1, 2, 3),)))
+        self.assertEqual(kall, _Call(('', (1, 2, 3))))
+        self.assertEqual(kall, _Call(((1, 2, 3), {})))
+        self.assertEqual(kall, _Call(('', (1, 2, 3), {})))
 
-        kall = callargs(((1, 2, 4),))
-        self.assertNotEqual(kall, callargs(('', (1, 2, 3))))
-        self.assertNotEqual(kall, callargs(('', (1, 2, 3), {})))
+        kall = _Call(((1, 2, 4),))
+        self.assertNotEqual(kall, _Call(('', (1, 2, 3))))
+        self.assertNotEqual(kall, _Call(('', (1, 2, 3), {})))
 
-        kall = callargs(('foo', (1, 2, 4),))
-        self.assertNotEqual(kall, callargs(('', (1, 2, 4))))
-        self.assertNotEqual(kall, callargs(('', (1, 2, 4), {})))
-        self.assertNotEqual(kall, callargs(('bar', (1, 2, 4))))
-        self.assertNotEqual(kall, callargs(('bar', (1, 2, 4), {})))
+        kall = _Call(('foo', (1, 2, 4),))
+        self.assertNotEqual(kall, _Call(('', (1, 2, 4))))
+        self.assertNotEqual(kall, _Call(('', (1, 2, 4), {})))
+        self.assertNotEqual(kall, _Call(('bar', (1, 2, 4))))
+        self.assertNotEqual(kall, _Call(('bar', (1, 2, 4), {})))
 
-        kall = callargs(({'a': 3},))
-        self.assertEqual(kall, callargs(('', (), {'a': 3})))
-        self.assertEqual(kall, callargs(('', {'a': 3})))
-        self.assertEqual(kall, callargs(((), {'a': 3})))
-        self.assertEqual(kall, callargs(({'a': 3},)))
+        kall = _Call(({'a': 3},))
+        self.assertEqual(kall, _Call(('', (), {'a': 3})))
+        self.assertEqual(kall, _Call(('', {'a': 3})))
+        self.assertEqual(kall, _Call(((), {'a': 3})))
+        self.assertEqual(kall, _Call(({'a': 3},)))
 
 
-    def test_empty_callargs(self):
-        args = callargs()
+    def test_empty__Call(self):
+        args = _Call()
 
         self.assertEqual(args, ())
         self.assertEqual(args, ('foo',))
@@ -90,8 +90,8 @@ class CallargsTest(unittest2.TestCase):
         self.assertEqual(args, ({},))
 
 
-    def test_named_empty_callargs(self):
-        args = callargs(('foo', (), {}))
+    def test_named_empty_call(self):
+        args = _Call(('foo', (), {}))
 
         self.assertEqual(args, ('foo',))
         self.assertEqual(args, ('foo', ()))
@@ -106,8 +106,8 @@ class CallargsTest(unittest2.TestCase):
         self.assertNotEqual(args, ('bar', {}))
 
 
-    def test_callargs_with_args(self):
-        args = callargs(((1, 2, 3), {}))
+    def test_call_with_args(self):
+        args = _Call(((1, 2, 3), {}))
 
         self.assertEqual(args, ((1, 2, 3),))
         self.assertEqual(args, ('foo', (1, 2, 3)))
@@ -115,8 +115,8 @@ class CallargsTest(unittest2.TestCase):
         self.assertEqual(args, ((1, 2, 3), {}))
 
 
-    def test_named_callargs_with_args(self):
-        args = callargs(('foo', (1, 2, 3), {}))
+    def test_named_call_with_args(self):
+        args = _Call(('foo', (1, 2, 3), {}))
 
         self.assertEqual(args, ('foo', (1, 2, 3)))
         self.assertEqual(args, ('foo', (1, 2, 3), {}))
@@ -125,8 +125,8 @@ class CallargsTest(unittest2.TestCase):
         self.assertNotEqual(args, ((1, 2, 3), {}))
 
 
-    def test_callargs_with_kwargs(self):
-        args = callargs(((), dict(a=3, b=4)))
+    def test_call_with_kwargs(self):
+        args = _Call(((), dict(a=3, b=4)))
 
         self.assertEqual(args, (dict(a=3, b=4),))
         self.assertEqual(args, ('foo', dict(a=3, b=4)))
@@ -134,8 +134,8 @@ class CallargsTest(unittest2.TestCase):
         self.assertEqual(args, ((), dict(a=3, b=4)))
 
 
-    def test_named_callargs_with_kwargs(self):
-        args = callargs(('foo', (), dict(a=3, b=4)))
+    def test_named_call_with_kwargs(self):
+        args = _Call(('foo', (), dict(a=3, b=4)))
 
         self.assertEqual(args, ('foo', dict(a=3, b=4)))
         self.assertEqual(args, ('foo', (), dict(a=3, b=4)))
@@ -144,40 +144,37 @@ class CallargsTest(unittest2.TestCase):
         self.assertNotEqual(args, ((), dict(a=3, b=4)))
 
 
-    def test_callargs_with_args_call_empty_name(self):
-        args = callargs(((1, 2, 3), {}))
+    def test_call_with_args_call_empty_name(self):
+        args = _Call(((1, 2, 3), {}))
         self.assertEqual(args, call(1, 2, 3))
         self.assertEqual(call(1, 2, 3), args)
         self.assertTrue(call(1, 2, 3) in [args])
 
 
-    def test_callargs_ne(self):
-        self.assertNotEqual(callargs(((1, 2, 3),)), call(1, 2))
-        self.assertFalse(callargs(((1, 2, 3),)) != call(1, 2, 3))
-        self.assertTrue(callargs(((1, 2), {})) != call(1, 2, 3))
+    def test_call_ne(self):
+        self.assertNotEqual(_Call(((1, 2, 3),)), call(1, 2))
+        self.assertFalse(_Call(((1, 2, 3),)) != call(1, 2, 3))
+        self.assertTrue(_Call(((1, 2), {})) != call(1, 2, 3))
 
 
-    def test_callargs_non_tuples(self):
-        kall = callargs(((1, 2, 3),))
+    def test_call_non_tuples(self):
+        kall = _Call(((1, 2, 3),))
         for value in 1, None, self, int:
             self.assertNotEqual(kall, value)
             self.assertFalse(kall == value)
 
 
     def test_repr(self):
-        self.assertEqual(repr(callargs()), repr(((), {})))
-        self.assertEqual(repr(callargs(('foo',))), repr(('foo', (), {})))
+        self.assertEqual(repr(_Call()), repr(((), {})))
+        self.assertEqual(repr(_Call(('foo',))), repr(('foo', (), {})))
 
-        self.assertEqual(repr(callargs(((1, 2, 3), {'a': 'b'}))),
+        self.assertEqual(repr(_Call(((1, 2, 3), {'a': 'b'}))),
                          repr(((1, 2, 3), {'a': 'b'})))
-        self.assertEqual(repr(callargs(('bar', (1, 2, 3), {'a': 'b'}))),
+        self.assertEqual(repr(_Call(('bar', (1, 2, 3), {'a': 'b'}))),
                          repr(('bar', (1, 2, 3), {'a': 'b'})))
 
 
 
-class CallTest(unittest2.TestCase):
-
-    def test_repr(self):
         self.assertEqual(repr(call), '<call>')
         self.assertEqual(str(call), '<call>')
 
@@ -261,13 +258,13 @@ class CallTest(unittest2.TestCase):
         self.assertEqual(kall.call_list(), mock.mock_calls)
 
 
-    def test_two_args_callargs(self):
-        args = callargs(((1, 2), {'a': 3}), two=True)
+    def test_two_args_call(self):
+        args = _Call(((1, 2), {'a': 3}), two=True)
         self.assertEqual(len(args), 2)
         self.assertEqual(args[0], (1, 2))
         self.assertEqual(args[1], {'a': 3})
 
-        other_args = callargs(((1, 2), {'a': 3}))
+        other_args = _Call(((1, 2), {'a': 3}))
         self.assertEqual(args, other_args)
 
 
