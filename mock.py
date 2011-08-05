@@ -1821,10 +1821,12 @@ class _Call(tuple):
             args, kwargs = self
         else:
             name, args, kwargs = self
-            if not name:
+            if not name or name == '()':
                 name = 'call'
-            else:
+            elif not name.startswith('()'):
                 name = 'call.%s' % name
+            else:
+                name = 'call%s' % name
         return _format_call_signature(name, args, kwargs)
 
 
