@@ -565,8 +565,8 @@ class _CallList(list):
                 return True
         return False
 
-    def __str__(self):
-        return pprint.pformat(self)
+    def __repr__(self):
+        return pprint.pformat(list(self))
 
 
 
@@ -1036,12 +1036,12 @@ class CallableMixin(Base):
         self = _mock_self
         self.called = True
         self.call_count += 1
-        self.call_args = callargs((args, kwargs), two=True)
-        self.call_args_list.append(callargs((args, kwargs), two=True))
+        self.call_args = _Call((args, kwargs), two=True)
+        self.call_args_list.append(_Call((args, kwargs), two=True))
 
         _new_name = self._mock_new_name
         _new_parent = self._mock_new_parent
-        self.mock_calls.append(callargs(('', args, kwargs)))
+        self.mock_calls.append(_Call(('', args, kwargs)))
 
         skip_next_dot = _new_name == '()'
         while _new_parent is not None:
@@ -1055,14 +1055,14 @@ class CallableMixin(Base):
                 if _new_parent._mock_new_name == '()':
                     skip_next_dot = True
 
-            this_call = callargs((_new_name, args, kwargs))
+            this_call = _Call((_new_name, args, kwargs))
             _new_parent.mock_calls.append(this_call)
             _new_parent = _new_parent._mock_new_parent
 
         parent = self._mock_parent
         name = self._mock_name
         while parent is not None:
-            parent.method_calls.append(callargs((name, args, kwargs)))
+            parent.method_calls.append(_Call((name, args, kwargs)))
             if parent._mock_parent is None:
                 break
             name = parent._mock_name + '.' + name
@@ -1796,15 +1796,16 @@ ANY = _ANY()
 
 
 
-class _Call(tuple):
+class _Call(callargs):
     "Call helper object"
 
-    def __new__(cls, values=(), name=None, parent=None):
-        return tuple.__new__(cls, values)
+    def __new__(cls, values=(), name=None, parent=None, two=False, from_kall=True):
+        return callargs.__new__(cls, values, two)
 
-    def __init__(self, values=(), name=None, parent=None):
+    def __init__(self, values=(), name=None, parent=None, two=False, from_kall=True):
         self.name = name
         self.parent = parent
+        self.from_kall = from_kall
 
     def __call__(self, *args, **kwargs):
         if self.name is None:
@@ -1815,38 +1816,28 @@ class _Call(tuple):
 
     def __getattr__(self, attr):
         if self.name is None:
-            return _Call(name=attr)
+            return _Call(name=attr, from_kall=False)
         name = '%s.%s' % (self.name, attr)
-        return _Call(name=name, parent=self)
+        return _Call(name=name, parent=self, from_kall=False)
 
     def __repr__(self):
         if self.name is None:
-            return '<call>'
+            return '<call values=%s>' % callargs.__repr__(self)
         return '<call name=%r values=%s>' % (
-            self.name, tuple.__repr__(self)
+            self.name, callargs.__repr__(self)
         )
 
     def call_list(self):
         vals = []
         thing = self
         while thing is not None:
-            if tuple(thing):
+            if thing.from_kall:
                 vals.append(thing)
             thing = thing.parent
         return list(reversed(vals))
 
 
-    def __eq__(self, other):
-        if isinstance(other, callargs):
-            return callargs.__eq__(other, self)
-        return tuple.__eq__(self, other)
-
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-
-call = _Call()
+call = _Call(from_kall=False)
 
 
 
