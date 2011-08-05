@@ -767,20 +767,7 @@ class NonCallableMock(Base):
 
     def _format_mock_call_signature(self, args, kwargs):
         name = self._mock_name or 'mock'
-        message = '%s(%%s)' % name
-        formatted_args = ''
-        args_string = ', '.join([repr(arg) for arg in args])
-        kwargs_string = ', '.join([
-            '%s=%r' % (key, value) for key, value in kwargs.items()
-        ])
-        if args_string:
-            formatted_args = args_string
-        if kwargs_string:
-            if formatted_args:
-                formatted_args += ', '
-            formatted_args += kwargs_string
-
-        return message % formatted_args
+        return _format_call_signature(name, args, kwargs)
 
 
     def _format_mock_failure_message(self, args, kwargs):
@@ -1686,24 +1673,42 @@ ANY = _ANY()
 
 
 
+def _format_call_signature(name, args, kwargs):
+    message = '%s(%%s)' % name
+    formatted_args = ''
+    args_string = ', '.join([repr(arg) for arg in args])
+    kwargs_string = ', '.join([
+        '%s=%r' % (key, value) for key, value in kwargs.items()
+    ])
+    if args_string:
+        formatted_args = args_string
+    if kwargs_string:
+        if formatted_args:
+            formatted_args += ', '
+        formatted_args += kwargs_string
+
+    return message % formatted_args
+
+
+
 class _Call(tuple):
     """
     A tuple for holding the results of a call to a mock, either in the form
     `(args, kwargs)` or `(name, args, kwargs)`.
 
-    If args or kwargs are empty then a callargs tuple will compare equal to
+    If args or kwargs are empty then a call tuple will compare equal to
     a tuple without those values. This makes comparisons less verbose::
 
-        callargs(('name', (), {})) == ('name',)
-        callargs(('name', (1,), {})) == ('name', (1,))
-        callargs(((), {'a': 'b'})) == ({'a': 'b'},)
+        _Call(('name', (), {})) == ('name',)
+        _Call(('name', (1,), {})) == ('name', (1,))
+        _Call(((), {'a': 'b'})) == ({'a': 'b'},)
 
-    The `call` object provides a useful shortcut for comparing with callargs::
+    The `_Call` object provides a useful shortcut for comparing with call::
 
-        callargs(((1, 2), {'a': 3})) == call(1, 2, a=3)
-        callargs(('foo', (1, 2), {'a': 3})) == call.foo(1, 2, a=3)
+        _Call(((1, 2), {'a': 3})) == call(1, 2, a=3)
+        _Call(('foo', (1, 2), {'a': 3})) == call.foo(1, 2, a=3)
 
-    If the callargs has no name then it will match any name.
+    If the _Call has no name then it will match any name.
     """
     def __new__(cls, value=(), name=None, parent=None, two=False, from_kall=True):
         name = ''
@@ -1734,6 +1739,7 @@ class _Call(tuple):
             return tuple.__new__(cls, (args, kwargs))
 
         return tuple.__new__(cls, (name, args, kwargs))
+
 
     def __init__(self, value=(), name=None, parent=None, two=False, from_kall=True):
         self.name = name
@@ -1805,14 +1811,27 @@ class _Call(tuple):
         name = '%s.%s' % (self.name, attr)
         return _Call(name=name, parent=self, from_kall=False)
 
+
     def __repr__(self):
-        if self.name is None:
-            return '<call values=%s>' % tuple.__repr__(self)
-        return '<call name=%r values=%s>' % (
-            self.name, tuple.__repr__(self)
-        )
+        if not self.from_kall:
+            return self.name
+
+        if len(self) == 2:
+            name = 'call'
+            args, kwargs = self
+        else:
+            name, args, kwargs = self
+            if not name:
+                name = 'call'
+            else:
+                name = 'call.%s' % name
+        return _format_call_signature(name, args, kwargs)
+
 
     def call_list(self):
+        """For a call object that represents multiple calls, `call_list`
+        returns a list of all the intermediate calls as well as the
+        final call."""
         vals = []
         thing = self
         while thing is not None:
