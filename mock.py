@@ -29,7 +29,7 @@ __all__ = (
 )
 
 
-__version__ = '0.8.0beta2'
+__version__ = '0.8.0beta3'
 
 
 import pprint
@@ -1814,14 +1814,17 @@ class _Call(tuple):
 
     def __repr__(self):
         if not self.from_kall:
-            return self.name
+            name = self.name or 'call'
+            if name.startswith('()'):
+                name = 'call%s' % name
+            return name
 
         if len(self) == 2:
             name = 'call'
             args, kwargs = self
         else:
             name, args, kwargs = self
-            if not name or name == '()':
+            if not name:
                 name = 'call'
             elif not name.startswith('()'):
                 name = 'call.%s' % name

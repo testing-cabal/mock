@@ -165,32 +165,33 @@ class CallTest(unittest2.TestCase):
 
 
     def test_repr(self):
-        self.assertEqual(repr(_Call()), repr(((), {})))
-        self.assertEqual(repr(_Call(('foo',))), repr(('foo', (), {})))
+        self.assertEqual(repr(_Call()), 'call()')
+        self.assertEqual(repr(_Call(('foo',))), 'call.foo()')
 
         self.assertEqual(repr(_Call(((1, 2, 3), {'a': 'b'}))),
-                         repr(((1, 2, 3), {'a': 'b'})))
+                         "call(1, 2, 3, a='b')")
         self.assertEqual(repr(_Call(('bar', (1, 2, 3), {'a': 'b'}))),
-                         repr(('bar', (1, 2, 3), {'a': 'b'})))
+                         "call.bar(1, 2, 3, a='b')")
 
+        self.assertEqual(repr(call), 'call')
+        self.assertEqual(str(call), 'call')
 
+        self.assertEqual(repr(call()), 'call()')
+        self.assertEqual(repr(call(1)), 'call(1)')
+        self.assertEqual(repr(call(zz='thing')), "call(zz='thing')")
 
-        self.assertEqual(repr(call), '<call>')
-        self.assertEqual(str(call), '<call>')
-
-        self.assertEqual(repr(call.foo), "<call name='foo' values=()>")
+        self.assertEqual(repr(call().foo), 'call().foo')
+        self.assertEqual(repr(call(1).foo.bar(a=3).bing),
+                         'call().foo.bar().bing')
         self.assertEqual(
             repr(call().foo(1, 2, a=3)),
-            "<call name='().foo()' values=('().foo', (1, 2), {'a': 3})>"
+            "call().foo(1, 2, a=3)"
         )
-        self.assertEqual(
-            repr(call()()),
-            "<call name='()()' values=('()', (), {})>"
-        )
+        self.assertEqual(repr(call()()), "call()()")
+        self.assertEqual(repr(call(1)(2)), "call()(2)")
         self.assertEqual(
             repr(call()().bar().baz.beep(1)),
-            "<call name='()().bar().baz.beep()' "
-            "values=('()().bar().baz.beep', (1,), {})>"
+            "call()().bar().baz.beep(1)"
         )
 
 
@@ -738,10 +739,10 @@ class TestCallList(unittest2.TestCase):
         mock.foo.bar().baz('fish', cat='dog')
 
         expected = (
-            "[((1, 2), {}),\n"
-            " ('foo', (), {'a': 3}),\n"
-            " ('foo.bar', (), {}),\n"
-            " ('foo.bar().baz', ('fish',), {'cat': 'dog'})]"
+            "[call(1, 2),\n"
+            " call.foo(a=3),\n"
+            " call.foo.bar(),\n"
+            " call.foo.bar().baz('fish', cat='dog')]"
         )
         self.assertEqual(str(mock.mock_calls), expected)
 
