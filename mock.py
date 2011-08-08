@@ -688,31 +688,47 @@ class NonCallableMock(Base):
 
 
     def __repr__(self):
-        if self._mock_name is None and self._spec_class is None:
-            return object.__repr__(self)
+        _name_list = [self._mock_new_name]
+        _parent = self._mock_new_parent
+        last = self
+
+        dot = '.'
+        if _name_list == ['()']:
+            dot = ''
+        while _parent is not None:
+            last = _parent
+
+            _name_list.append(_parent._mock_new_name + dot)
+            dot = '.'
+            if _parent._mock_new_name == '()':
+                dot = ''
+
+            _parent = _parent._mock_new_parent
+
+        _name_list = list(reversed(_name_list))
+        _first = last._mock_name or 'mock'
+        if len(_name_list) > 1:
+            if _name_list[1] not in ('()', '().'):
+                _first += '.'
+        _name_list[0] = _first
+        name = ''.join(_name_list)
 
         name_string = ''
-        spec_string = ''
-        if self._mock_name is not None:
-            def get_name(name):
-                if name is None:
-                    return 'mock'
-                return name
-            parent = self._mock_parent
-            name = self._mock_name
-            while parent is not None:
-                name = get_name(parent._mock_name) + '.' + name
-                parent = parent._mock_parent
+        if name not in ('mock', 'mock.'):
             name_string = ' name=%r' % name
+
+        spec_string = ''
         if self._spec_class is not None:
             spec_string = ' spec=%r'
             if self._spec_set:
                 spec_string = ' spec_set=%r'
             spec_string = spec_string % self._spec_class.__name__
-        return "<%s%s%s id='%s'>" % (type(self).__name__,
-                                      name_string,
-                                      spec_string,
-                                      id(self))
+        return "<%s%s%s id='%s'>" % (
+            type(self).__name__,
+            name_string,
+            spec_string,
+            id(self)
+        )
 
 
     def __dir__(self):
