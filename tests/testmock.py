@@ -90,8 +90,15 @@ class MockTest(unittest2.TestCase):
         self.assertIn('foo', repr(mock))
         self.assertIn("'%s'" % id(mock), repr(mock))
 
-        self.assertIn('foo.bar', repr(mock.bar))
-        self.assertIn('mock.baz', repr(mock().baz))
+        mocks = [(Mock(), 'mock'), (Mock(name='bar'), 'bar')]
+        for mock, name in mocks:
+            self.assertIn('%s.bar' % name, repr(mock.bar))
+            self.assertIn('%s.foo()' % name, repr(mock.foo()))
+            self.assertIn('%s.foo().bing' % name, repr(mock.foo().bing))
+            self.assertIn('%s()' % name, repr(mock()))
+            self.assertIn('%s()()' % name, repr(mock()()))
+            self.assertIn('%s()().foo.bar.baz().bing' % name,
+                          repr(mock()()).foo.bar.baz().bing)
 
 
     def test_repr_with_spec(self):
