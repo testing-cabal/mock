@@ -63,11 +63,12 @@ class MockTest(unittest2.TestCase):
         self.assertEqual(mock.method_calls, [],
                           "method_calls not initialised correctly")
 
-        # Can't use hasattr for this test as it always returns True on a mock...
+        # Can't use hasattr for this test as it always returns True on a mock
         self.assertFalse('_items' in mock.__dict__,
                          "default mock should not have '_items' attribute")
 
-        self.assertIsNone(mock._mock_parent, "parent not initialised correctly")
+        self.assertIsNone(mock._mock_parent,
+                          "parent not initialised correctly")
         self.assertIsNone(mock._mock_methods,
                           "methods not initialised correctly")
         self.assertEqual(mock._mock_children, {},
@@ -363,7 +364,8 @@ class MockTest(unittest2.TestCase):
         mock = Mock()
         mock.something('different')
         self.assertEqual(mock.method_calls, [('something', ('different',))])
-        self.assertEqual(mock.method_calls, [('something', ('different',), {})])
+        self.assertEqual(mock.method_calls,
+                         [('something', ('different',), {})])
 
         mock = Mock()
         mock.something(x=1)
@@ -403,12 +405,16 @@ class MockTest(unittest2.TestCase):
             mock.x
             mock.y
             mock.__something__
-            self.assertRaisesRegexp(AttributeError,
-                                    "Mock object has no attribute 'z'",
-                                    lambda: mock.z)
-            self.assertRaisesRegexp(AttributeError,
-                                    "Mock object has no attribute '__foobar__'",
-                                    lambda: mock.__foobar__)
+            self.assertRaisesRegexp(
+                AttributeError,
+                "Mock object has no attribute 'z'",
+                getattr, mock, 'z'
+            )
+            self.assertRaisesRegexp(
+                AttributeError,
+                "Mock object has no attribute '__foobar__'",
+                getattr, mock, '__foobar__'
+            )
 
         test_attributes(Mock(spec=Something))
         test_attributes(Mock(spec=Something()))
@@ -779,7 +785,6 @@ class MockTest(unittest2.TestCase):
         self.assertEqual(mock.return_value.mock_calls,
                          [('foo', (1, 2, 3), dict(a=4, b=5))])
 
-
         mock = MagicMock()
         mock().foo.bar().baz()
         expected = [
@@ -790,73 +795,43 @@ class MockTest(unittest2.TestCase):
         self.assertEqual(mock().mock_calls,
                          call.foo.bar().baz().call_list())
 
-        mock = MagicMock()
-        int(mock.foo)
-        expected = [('foo.__int__', (), {})]
-        self.assertEqual(mock.mock_calls, expected)
+        for kwargs in dict(), dict(name='bar'):
+            mock = MagicMock(**kwargs)
+            int(mock.foo)
+            expected = [('foo.__int__', (), {})]
+            self.assertEqual(mock.mock_calls, expected)
 
-        mock = MagicMock()
-        mock.a()()
-        expected = [('a', (), {}), ('a()', (), {})]
-        self.assertEqual(mock.mock_calls, expected)
-        self.assertEqual(mock.a().mock_calls, [call()])
+            mock = MagicMock(**kwargs)
+            mock.a()()
+            expected = [('a', (), {}), ('a()', (), {})]
+            self.assertEqual(mock.mock_calls, expected)
+            self.assertEqual(mock.a().mock_calls, [call()])
 
-        mock = MagicMock()
-        mock(1)(2)(3)
-        self.assertEqual(mock.mock_calls, call(1)(2)(3).call_list())
-        self.assertEqual(mock().mock_calls, call(2)(3).call_list())
-        self.assertEqual(mock()().mock_calls, call(3).call_list())
+            mock = MagicMock(**kwargs)
+            mock(1)(2)(3)
+            self.assertEqual(mock.mock_calls, call(1)(2)(3).call_list())
+            self.assertEqual(mock().mock_calls, call(2)(3).call_list())
+            self.assertEqual(mock()().mock_calls, call(3).call_list())
 
-        mock = MagicMock()
-        mock(1)(2)(3).a.b.c(4)
-        self.assertEqual(mock.mock_calls, call(1)(2)(3).a.b.c(4).call_list())
-        self.assertEqual(mock().mock_calls, call(2)(3).a.b.c(4).call_list())
-        self.assertEqual(mock()().mock_calls, call(3).a.b.c(4).call_list())
+            mock = MagicMock(**kwargs)
+            mock(1)(2)(3).a.b.c(4)
+            self.assertEqual(mock.mock_calls,
+                             call(1)(2)(3).a.b.c(4).call_list())
+            self.assertEqual(mock().mock_calls,
+                             call(2)(3).a.b.c(4).call_list())
+            self.assertEqual(mock()().mock_calls,
+                             call(3).a.b.c(4).call_list())
 
-        mock = MagicMock()
-        int(mock().foo.bar().baz())
-        last_call = ('().foo.bar().baz().__int__', (), {})
-        self.assertEqual(mock.mock_calls[-1], last_call)
-        self.assertEqual(mock().mock_calls,
-                         call.foo.bar().baz().__int__().call_list())
-        self.assertEqual(mock().foo.bar().mock_calls,
-                         call.baz().__int__().call_list())
-        self.assertEqual(mock().foo.bar().baz.mock_calls,
-                         call().__int__().call_list())
-
-        mock = MagicMock(name='bar')
-        int(mock.foo)
-        expected = [('foo.__int__', (), {})]
-        self.assertEqual(mock.mock_calls, expected)
-
-        mock = MagicMock(name='bar')
-        mock.a()()
-        expected = [('a', (), {}), ('a()', (), {})]
-        self.assertEqual(mock.mock_calls, expected)
-        self.assertEqual(mock.a().mock_calls, [call()])
-
-        mock = MagicMock(name='bar')
-        mock(1)(2)(3)
-        self.assertEqual(mock.mock_calls, call(1)(2)(3).call_list())
-        self.assertEqual(mock().mock_calls, call(2)(3).call_list())
-        self.assertEqual(mock()().mock_calls, call(3).call_list())
-
-        mock = MagicMock(name='bar')
-        mock(1)(2)(3).a.b.c(4)
-        self.assertEqual(mock.mock_calls, call(1)(2)(3).a.b.c(4).call_list())
-        self.assertEqual(mock().mock_calls, call(2)(3).a.b.c(4).call_list())
-        self.assertEqual(mock()().mock_calls, call(3).a.b.c(4).call_list())
-
-        mock = MagicMock(name='bar')
-        int(mock().foo.bar().baz())
-        last_call = ('().foo.bar().baz().__int__', (), {})
-        self.assertEqual(mock.mock_calls[-1], last_call)
-        self.assertEqual(mock().mock_calls,
-                         call.foo.bar().baz().__int__().call_list())
-        self.assertEqual(mock().foo.bar().mock_calls,
-                         call.baz().__int__().call_list())
-        self.assertEqual(mock().foo.bar().baz.mock_calls,
-                         call().__int__().call_list())
+            mock = MagicMock(**kwargs)
+            int(mock().foo.bar().baz())
+            last_call = ('().foo.bar().baz().__int__', (), {})
+            self.assertEqual(mock.mock_calls[-1], last_call)
+            self.assertEqual(mock().mock_calls,
+                             call.foo.bar().baz().__int__().call_list())
+            self.assertEqual(mock().foo.bar().mock_calls,
+                             call.baz().__int__().call_list())
+            self.assertEqual(mock().foo.bar().baz.mock_calls,
+                             call().__int__().call_list())
 
 
     def test_subclassing(self):
