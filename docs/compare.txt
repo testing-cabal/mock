@@ -7,6 +7,7 @@
 
     import sys
     import mock
+    from mock import call
 
     def assertEqual(a, b):
         assert a == b, ("%r != %r" % (a, b))
@@ -243,10 +244,10 @@ Ensure calls are made in specific order
     >>> # mock
     >>> my_mock = mock.Mock(spec=SomeObject)
     >>> my_mock.method1()
-    <mock.Mock object at 0x...>
+    <Mock name='mock.method1()' id='...'>
     >>> my_mock.method2()
-    <mock.Mock object at 0x...>
-    >>> assertEqual(my_mock.method_calls, [('method1',), ('method2',)])
+    <Mock name='mock.method2()' id='...'>
+    >>> assertEqual(my_mock.mock_calls, [call.method1(), call.method2()])
 
 ::
 
@@ -417,9 +418,9 @@ Call the same method multiple times
     >>> # mock
     >>> my_mock = mock.Mock()
     >>> my_mock.some_method()
-    <mock.Mock object at 0x...>
+    <Mock name='mock.some_method()' id='...'>
     >>> my_mock.some_method()
-    <mock.Mock object at 0x...>
+    <Mock name='mock.some_method()' id='...'>
     >>> assert my_mock.some_method.call_count >= 2
 
 ::

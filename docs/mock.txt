@@ -56,7 +56,7 @@ Methods
 
         >>> mock = Mock()
         >>> mock.method(1, 2, 3, test='wow')
-        <mock.Mock object at 0x...>
+        <Mock name='mock.method()' id='...'>
         >>> mock.method.assert_called_with(1, 2, 3, test='wow')
 
 
@@ -166,7 +166,7 @@ Attributes
         >>> mock = Mock()
         >>> mock.return_value.attribute = sentinel.Attribute
         >>> mock.return_value()
-        <mock.Mock object at 0x...>
+        <Mock name='mock()()' id='...'>
         >>> mock.return_value.assert_called_with()
 
     `return_value` can also be set in the constructor:

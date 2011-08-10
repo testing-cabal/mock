@@ -44,9 +44,9 @@ Mock Patching Methods
 
     >>> from mock import Mock
     >>> real = SomeClass()
-    >>> real.method = Mock()
+    >>> real.method = Mock(name='method')
     >>> real.method(3, 4, 5, key='value')
-    <mock.Mock object at 0x...>
+    <Mock name='method()' id='...'>
 
 Once the mock has been used it has methods and attributes that allow you to
 make assertions about how it has been used.
@@ -251,11 +251,11 @@ a convenient way of looking at all method calls:
 
     >>> mock = Mock()
     >>> mock.method()
-    <mock.Mock object at 0x...>
+    <Mock name='mock.method()' id='...'>
     >>> mock.Property.method(10, x=53)
-    <mock.Mock object at 0x...>
+    <Mock name='mock.Property.method()' id='...'>
     >>> mock.method_calls
-    [('method', (), {}), ('Property.method', (10,), {'x': 53})]
+    [call.method(), call.Property.method(10, x=53)]
 
 If you make an assertion about ``method_calls`` and any unexpected methods
 have been called, then the assertion will fail.
@@ -267,9 +267,9 @@ less verbose comparisons:
 
     >>> mock = Mock()
     >>> mock.method1()
-    <mock.Mock object at 0x...>
+    <Mock name='mock.method1()' id='...'>
     >>> mock.method2()
-    <mock.Mock object at 0x...>
+    <Mock name='mock.method2()' id='...'>
     >>> assert mock.method_calls == [('method1',), ('method2',)]
 
 
@@ -312,7 +312,7 @@ If you need an attribute setting on your mock, just do it:
     3
 
 Sometimes you want to mock up a more complex situation, like for example
-``mock.connection.cursor().execute("SELECT 1")``:
+`mock.connection.cursor().execute("SELECT 1")`:
 
 
 .. doctest::
@@ -322,9 +322,9 @@ Sometimes you want to mock up a more complex situation, like for example
     >>> cursor.execute.return_value = None
     >>> mock.connection.cursor().execute("SELECT 1")
     >>> mock.method_calls
-    [('connection.cursor', (), {})]
+    [call.connection.cursor()]
     >>> cursor.method_calls
-    [('execute', ('SELECT 1',), {})]
+    [call.execute('SELECT 1')]
 
 
 Creating a Mock from an Existing Object
