@@ -265,12 +265,12 @@ Attributes
         True
         >>> mock(3, 4)
         >>> mock.call_args
-        ((3, 4), {})
+        call(3, 4)
         >>> mock.call_args == ((3, 4),)
         True
         >>> mock(3, 4, 5, key='fish', next='w00t!')
         >>> mock.call_args
-        ((3, 4, 5), {'key': 'fish', 'next': 'w00t!'})
+        call(3, 4, 5, key='fish', next='w00t!')
 
     The tuple is lenient when comparing against tuples with empty
     elements skipped. This can make tests less verbose:
@@ -296,7 +296,7 @@ Attributes
         >>> mock(3, 4)
         >>> mock(key='fish', next='w00t!')
         >>> mock.call_args_list
-        [((), {}), ((3, 4), {}), ((), {'key': 'fish', 'next': 'w00t!'})]
+        [call(), call(3, 4), call(key='fish', next='w00t!')]
         >>> expected = [(), ((3, 4),), ({'key': 'fish', 'next': 'w00t!'},)]
         >>> mock.call_args_list == expected
         True
@@ -311,11 +311,11 @@ Attributes
 
         >>> mock = Mock()
         >>> mock.method()
-        <mock.Mock object at 0x...>
+        <Mock name='mock.method()' id='...'>
         >>> mock.property.method.attribute()
-        <mock.Mock object at 0x...>
+        <Mock name='mock.property.method.attribute()' id='...'>
         >>> mock.method_calls
-        [('method', (), {}), ('property.method.attribute', (), {})]
+        [call.method(), call.property.method.attribute()]
 
     The tuples in method_calls compare equal even if empty positional and
     keyword arguments are skipped.
@@ -324,16 +324,16 @@ Attributes
 
         >>> mock = Mock()
         >>> mock.method()
-        <mock.Mock object at 0x...>
+        <Mock name='mock.method()' id='...'>
         >>> mock.method(1, 2)
-        <mock.Mock object at 0x...>
+        <Mock name='mock.method()' id='...'>
         >>> mock.method(a="b")
-        <mock.Mock object at 0x...>
+        <Mock name='mock.method()' id='...'>
         >>> mock.method_calls == [('method',), ('method', (1, 2)),
         ... ('method', {"a": "b"})]
         True
 
-The ``Mock`` class has support for mocking magic methods. See :ref:`magic
+The `Mock` class has support for mocking magic methods. See :ref:`magic
 methods <magic-methods>` for the full details.
 
 -----
