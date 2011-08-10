@@ -528,6 +528,9 @@ class NonCallableMock(Base):
             parent=None, _spec_state=None, _new_name='', _new_parent=None,
             **kwargs
         ):
+        if _new_parent is None:
+            _new_parent = parent
+
         self._mock_parent = parent
         self._mock_name = name
         self._mock_new_name = _new_name
@@ -938,17 +941,18 @@ class CallableMixin(Base):
 
         skip_next_dot = _new_name == '()'
         while _new_parent is not None:
+            this_call = _Call((_new_name, args, kwargs))
             if _new_parent._mock_new_name:
                 dot = '.'
                 if skip_next_dot:
                     dot = ''
-                _new_name = _new_parent._mock_new_name + dot + _new_name
 
                 skip_next_dot = False
                 if _new_parent._mock_new_name == '()':
                     skip_next_dot = True
 
-            this_call = _Call((_new_name, args, kwargs))
+                _new_name = _new_parent._mock_new_name + dot + _new_name
+
             _new_parent.mock_calls.append(this_call)
             _new_parent = _new_parent._mock_new_parent
 
@@ -1179,6 +1183,11 @@ class _patch(object):
             if spec_set is not None:
                 _kwargs['spec_set'] = spec_set
 
+            # add a name to mocks
+            if (isinstance(Klass, type) and
+                issubclass(Klass, NonCallableMock) and self.attribute):
+                _kwargs['name'] = self.attribute
+
             _kwargs.update(kwargs)
             new = Klass(**_kwargs)
 
@@ -1188,7 +1197,10 @@ class _patch(object):
                 if (not _is_list(spec or spec_set) and not
                     _instance_callable(spec or spec_set)):
                     Klass = NonCallableMagicMock
-                new.return_value = Klass(spec=spec, spec_set=spec_set)
+
+                _kwargs.pop('name')
+                new.return_value = Klass(_new_parent=new, _new_name='()',
+                                         **_kwargs)
         elif autospec is not False:
             # spec is ignored, new *must* be default, spec_set is treated
             # as a boolean. Should we check spec is not None and that spec_set
@@ -1200,11 +1212,10 @@ class _patch(object):
                     "autospec and new."
                 )
             spec_set = bool(spec_set)
-            _kwargs = {'_name': getattr(original, '__name__', None)}
             if autospec is True:
                 autospec = original
-            new = create_autospec(autospec, spec_set, configure=kwargs,
-                                  **_kwargs)
+            new = create_autospec(autospec, spec_set=spec_set, configure=kwargs,
+                                  _name=self.attribute)
         elif kwargs:
             # can't set keyword args when we aren't creating the mock
             # XXXX If new is a Mock we could call new.configure_mock(**kwargs)
@@ -1657,7 +1668,7 @@ class MagicMock(MagicMixin, Mock):
 def _create_proxy(entry, self):
     # could specify parent?
     def create_mock():
-        m = MagicMock(name=entry, _mock_new_name=entry, _mock_new_parent=self)
+        m = MagicMock(name=entry, _new_name=entry, _new_parent=self)
         setattr(self, entry, m)
         _set_return_value(self, m, entry)
         return m
@@ -1867,7 +1878,7 @@ call = _Call(from_kall=False)
 
 
 def create_autospec(spec, spec_set=False, instance=False,
-                         configure=None, _parent=None, _name=None):
+                    configure=None, _parent=None, _name=None):
     """XXXX needs docstring!"""
     if configure is None:
         configure = {}
@@ -1898,7 +1909,13 @@ def create_autospec(spec, spec_set=False, instance=False,
     elif is_type and instance and not _instance_callable(spec):
         Klass = NonCallableMagicMock
 
-    mock = Klass(parent=_parent, name=_name, **kwargs)
+    _new_name = _name
+    if _parent is None:
+        # for a top level object no _new_name should be set
+        _new_name = ''
+
+    mock = Klass(parent=_parent, _new_parent=_parent, _new_name=_new_name,
+                 name=_name, **kwargs)
 
     if isinstance(spec, FunctionTypes):
         # should only happen at the top level because we don't
@@ -1907,12 +1924,13 @@ def create_autospec(spec, spec_set=False, instance=False,
     else:
         _check_signature(spec, mock, is_type)
 
-    if _parent is not None:
+    if _parent is not None and not instance:
         _parent._mock_children[_name] = mock
 
     if is_type and not instance:
         # XXXX could give a name to the return_value mock?
-        mock.return_value = create_autospec(spec, spec_set, instance=True)
+        mock.return_value = create_autospec(spec, spec_set, instance=True,
+                                            _name='()', _parent=mock)
 
     for entry in dir(spec):
         if _is_magic(entry):
@@ -1945,7 +1963,8 @@ def create_autospec(spec, spec_set=False, instance=False,
             if isinstance(spec, FunctionTypes):
                 parent = mock.mock
 
-            new = MagicMock(parent=parent, name=entry, **kwargs)
+            new = MagicMock(parent=parent, name=entry, _new_name=entry,
+                            _new_parent=parent, **kwargs)
             mock._mock_children[entry] = new
             skipfirst = _must_skip(spec, entry, is_type)
             _check_signature(original, new, skipfirst=skipfirst)

@@ -11,7 +11,7 @@ from tests.support import unittest2, inPy3k, SomeClass, is_instance
 from mock import (
     NonCallableMock, CallableMixin, patch, sentinel,
     MagicMock, Mock, NonCallableMagicMock, patch,
-    DEFAULT
+    DEFAULT, call
 )
 
 builtin_string = '__builtin__'
@@ -995,9 +995,12 @@ class PatchTest(unittest2.TestCase):
     def test_autospec_name(self):
         patcher = patch(foo_name, autospec=True)
         mock = patcher.start()
+
         try:
-            self.assertIn("name='Foo'", repr(mock))
-            self.assertIn("name='Foo.f'", repr(mock.f))
+            self.assertIn(" name='Foo'", repr(mock))
+            self.assertIn(" name='Foo.f'", repr(mock.f))
+            self.assertIn(" name='Foo()'", repr(mock(None)))
+            self.assertIn(" name='Foo().f'", repr(mock(None).f))
         finally:
             patcher.stop()
 
@@ -1566,6 +1569,61 @@ class PatchTest(unittest2.TestCase):
         self.assertEqual(foo.bar_two(), {'key': 'changed'})
         self.assertEqual(foo.test_one(), {'key': 'original'})
         self.assertEqual(foo.test_two(), {'key': 'original'})
+
+
+    def test_patch_with_spec_mock_repr(self):
+        for arg in ('spec', 'autospec', 'spec_set'):
+            p = patch('%s.SomeClass' % __name__, **{arg: True})
+            m = p.start()
+            try:
+                self.assertIn(" name='SomeClass'", repr(m))
+                self.assertIn(" name='SomeClass.class_attribute'",
+                              repr(m.class_attribute))
+                self.assertIn(" name='SomeClass()'", repr(m()))
+                self.assertIn(" name='SomeClass().class_attribute'",
+                              repr(m().class_attribute))
+            finally:
+                p.stop()
+
+
+    def test_patch_nested_autospec_repr(self):
+        p = patch('tests.support', autospec=True)
+        m = p.start()
+        try:
+            self.assertIn(" name='support.SomeClass.wibble()'",
+                          repr(m.SomeClass.wibble()))
+            self.assertIn(" name='support.SomeClass().wibble()'",
+                          repr(m.SomeClass().wibble()))
+        finally:
+            p.stop()
+
+
+    def test_mock_calls_with_patch(self):
+        for arg in ('spec', 'autospec', 'spec_set'):
+            p = patch('%s.SomeClass' % __name__, **{arg: True})
+            m = p.start()
+            try:
+                m.wibble()
+
+                kalls = [call.wibble()]
+                self.assertEqual(m.mock_calls, kalls)
+                self.assertEqual(m.method_calls, kalls)
+                self.assertEqual(m.wibble.mock_calls, [call()])
+
+                result = m()
+                kalls.append(call())
+                self.assertEqual(m.mock_calls, kalls)
+
+                result.wibble()
+                kalls.append(call().wibble())
+                self.assertEqual(m.mock_calls, kalls)
+
+                self.assertEqual(result.mock_calls, [call.wibble()])
+                self.assertEqual(result.wibble.mock_calls, [call()])
+                self.assertEqual(result.method_calls, [call.wibble()])
+            finally:
+                p.stop()
+
 
 
 if __name__ == '__main__':

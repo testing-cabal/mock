@@ -115,6 +115,7 @@ mock 0.8.0 is the last version that will support Python 2.4.
   MagicMock instead of a Mock as it was previously
 * Added `ANY` for ignoring arguments in `assert_called_with` calls
 * Addition of `call` helper object
+* Improved repr for mocks
 * Improved repr for `Mock.call_args` and entries in `Mock.call_args_list`,
   `Mock.method_calls` and `Mock.mock_calls`
 * In Python 2.6 or more recent, `dir` on a mock will report all the dynamically
@@ -159,6 +160,9 @@ mock 0.8.0 is the last version that will support Python 2.4.
 
 * Improved repr for `Mock.call_args` and entries in `Mock.call_args_list`,
   `Mock.method_calls` and `Mock.mock_calls`
+* Improved repr for mocks
+* BUGFIX: minor fixes in the way `mock_calls` is worked out,
+  especially for "intermediate" mocks in a call chain
 
 
 2011/08/05 Version 0.8.0 beta 2

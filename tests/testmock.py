@@ -776,6 +776,8 @@ class MockTest(unittest2.TestCase):
         self.assertEqual(mock.mock_calls, expected)
         self.assertEqual(mock.return_value.foo.mock_calls,
                          [('', (1, 2, 3), dict(a=4, b=5))])
+        self.assertEqual(mock.return_value.mock_calls,
+                         [('foo', (1, 2, 3), dict(a=4, b=5))])
 
 
         mock = MagicMock()
@@ -785,6 +787,8 @@ class MockTest(unittest2.TestCase):
             ('().foo.bar().baz', (), {})
         ]
         self.assertEqual(mock.mock_calls, expected)
+        self.assertEqual(mock().mock_calls,
+                         call.foo.bar().baz().call_list())
 
         mock = MagicMock()
         int(mock.foo)
@@ -795,11 +799,30 @@ class MockTest(unittest2.TestCase):
         mock.a()()
         expected = [('a', (), {}), ('a()', (), {})]
         self.assertEqual(mock.mock_calls, expected)
+        self.assertEqual(mock.a().mock_calls, [call()])
+
+        mock = MagicMock()
+        mock(1)(2)(3)
+        self.assertEqual(mock.mock_calls, call(1)(2)(3).call_list())
+        self.assertEqual(mock().mock_calls, call(2)(3).call_list())
+        self.assertEqual(mock()().mock_calls, call(3).call_list())
+
+        mock = MagicMock()
+        mock(1)(2)(3).a.b.c(4)
+        self.assertEqual(mock.mock_calls, call(1)(2)(3).a.b.c(4).call_list())
+        self.assertEqual(mock().mock_calls, call(2)(3).a.b.c(4).call_list())
+        self.assertEqual(mock()().mock_calls, call(3).a.b.c(4).call_list())
 
         mock = MagicMock()
         int(mock().foo.bar().baz())
         last_call = ('().foo.bar().baz().__int__', (), {})
         self.assertEqual(mock.mock_calls[-1], last_call)
+        self.assertEqual(mock().mock_calls,
+                         call.foo.bar().baz().__int__().call_list())
+        self.assertEqual(mock().foo.bar().mock_calls,
+                         call.baz().__int__().call_list())
+        self.assertEqual(mock().foo.bar().baz.mock_calls,
+                         call().__int__().call_list())
 
 
     def test_subclassing(self):
