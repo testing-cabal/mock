@@ -77,7 +77,7 @@ object has been used by interrogating the `return_value` mock:
 
     >>> mock = Mock()
     >>> mock().foo(a=2, b=3)
-    <mock.Mock object at 0x...>
+    <Mock name='mock().foo()' id='...'>
     >>> mock.return_value.foo.assert_called_with(a=2, b=3)
 
 From here it is a simple step to configure and then make assertions about
@@ -240,7 +240,7 @@ function in the module under test instead of patching it globally:
     ...     with open('/some/path', 'w') as f:
     ...         f.write('something')
     ...
-    <mock.MagicMock object at 0x...>
+    <MagicMock name='mock.__enter__().write()' id='...'>
     >>> file_handle = mock_open.return_value.__enter__.return_value
     >>> file_handle.write.assert_called_with('something')
 
@@ -517,7 +517,7 @@ All of the calls, in order, are stored in `call_args_list` as tuples of
     >>> mock(4, 5, 6)
     >>> mock()
     >>> mock.call_args_list
-    [((1, 2, 3), {}), ((4, 5, 6), {}), ((), {})]
+    [call(1, 2, 3), call(4, 5, 6), call()]
 
 
 Because it stores positional args *and* keyword args, even if they are empty,
@@ -531,7 +531,7 @@ keyword arguments from tuples you compare against.
 .. doctest::
 
     >>> mock.call_args_list
-    [((1, 2, 3), {}), ((4, 5, 6), {}), ((), {})]
+    [call(1, 2, 3), call(4, 5, 6), call()]
     >>> expected = [((1, 2, 3),), ((4, 5, 6),), ()]
     >>> mock.call_args_list == expected
     True
@@ -639,7 +639,7 @@ me.
     ...
     >>> new_mock.assert_called_with(set([6]))
     >>> new_mock.call_args
-    ((set([6]),), {})
+    call(set([6]))
 
 `copy_call_args` is called with the mock that will be called. It returns a new
 mock that we do the assertion on. The `side_effect` function makes a copy of
@@ -849,9 +849,9 @@ mock methods and attributes:
 .. doctest::
 
     >>> mock.__getitem__.call_args_list
-    [(('a',), {}), (('c',), {}), (('d',), {}), (('b',), {}), (('d',), {})]
+    [call('a'), call('c'), call('d'), call('b'), call('d')]
     >>> mock.__setitem__.call_args_list
-    [(('b', 'fish'), {}), (('d', 'eggs'), {})]
+    [call('b', 'fish'), call('d', 'eggs')]
     >>> my_dict
     {'a': 1, 'c': 3, 'b': 'fish', 'd': 'eggs'}
 
@@ -870,7 +870,7 @@ might be to add helper methods. Here's a silly example:
     ...
     >>> mymock = MyMock(return_value=None)
     >>> mymock
-    <mock.MyMock object at 0x...>
+    <MyMock id='...'>
     >>> mymock.has_been_called()
     False
     >>> mymock()
@@ -891,7 +891,7 @@ subclass.
     >>> mymock.foo.has_been_called()
     False
     >>> mymock.foo()
-    <mock.MyMock object at 0x...>
+    <MyMock name='mock.foo()' id='...'>
     >>> mymock.foo.has_been_called()
     True
 
@@ -947,7 +947,7 @@ set. For example, to set `mock.foo` to 3 and `mock.bar` to None, you call:
 
     >>> mock = Mock()
     >>> configure_mock(mock, foo=3, bar=None)
-    <mock.Mock object at 0x...>
+    <Mock id='...'>
     >>> mock.foo
     3
     >>> print mock.bar
@@ -960,7 +960,7 @@ mock *anyway* as they are just attributes.
 
     >>> mock = Mock()
     >>> configure_mock(mock, side_effect=KeyError)
-    <mock.Mock object at 0x...>
+    <Mock id='...'>
     >>> mock()
     Traceback (most recent call last):
       ...
@@ -1045,7 +1045,7 @@ Here's an example that mocks out the 'fooble' module.
     ...    import fooble
     ...    fooble.blob()
     ...
-    <mock.Mock object at 0x...>
+    <Mock name='mock.blob()' id='...'>
     >>> assert 'fooble' not in sys.modules
     >>> mock.blob.assert_called_once_with()
 
@@ -1061,7 +1061,7 @@ This also works for the `from module import name` form:
     ...    from fooble import blob
     ...    blob.blip()
     ...
-    <mock.Mock object at 0x...>
+    <Mock name='mock.blob.blip()' id='...'>
     >>> mock.blob.blip.assert_called_once_with()
 
 With slightly more work you can also mock package imports:
@@ -1074,7 +1074,7 @@ With slightly more work you can also mock package imports:
     ...    from package.module import fooble
     ...    fooble()
     ...
-    <mock.Mock object at 0x...>
+    <Mock name='mock.module.fooble()' id='...'>
     >>> mock.module.fooble.assert_called_once_with()
 
 Unfortunately it seems that using `patch.dict` as a test *decorator* on
@@ -1110,12 +1110,12 @@ in order, in the `method_calls` of the parent:
     >>> mock_bar = manager.bar
 
     >>> mock_foo.something()
-    <mock.Mock object at 0x...>
+    <Mock name='mock.foo.something()' id='...'>
     >>> mock_bar.other.thing()
-    <mock.Mock object at 0x...>
+    <Mock name='mock.bar.other.thing()' id='...'>
 
-    >>> manager.method_calls
-    [('foo.something', (), {}), ('bar.other.thing', (), {})]
+    >>> manager.mock_calls
+    [call.foo.something(), call.bar.other.thing()]
 
 Using the "soft comparisons" feature of mock 0.7.0 we can make the final
 assertion about the expected calls less verbose:
@@ -1161,9 +1161,9 @@ You can then use it like this:
 
     >>> mock = Mock()
     >>> mock.foo(1, 2 ,3)
-    <mock.Mock object at 0x...>
+    <Mock name='mock.foo()' id='...'>
     >>> mock.bar.baz(a=3, b=6)
-    <mock.Mock object at 0x...>
+    <Mock name='mock.bar.baz()' id='...'>
     >>> mock.method_calls == [call.foo(1, 2, 3), call.bar.baz(a=3, b=6)]
     True
 
@@ -1178,9 +1178,9 @@ mocks) using the new `call` object for assertions:
     >>> mock_bar = manager.bar
 
     >>> mock_foo.something()
-    <mock.Mock object at 0x...>
+    <Mock name='mock.foo.something()' id='...'>
     >>> mock_bar.other.thing()
-    <mock.Mock object at 0x...>
+    <Mock name='mock.bar.other.thing()' id='...'>
 
     >>> manager.method_calls == [call.foo.something(), call.bar.other.thing()]
     True
