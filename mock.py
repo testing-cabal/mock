@@ -536,22 +536,11 @@ class NonCallableMock(Base):
         self._mock_new_name = _new_name
         self._mock_new_parent = _new_parent
 
-        _spec_class = None
         if spec_set is not None:
             spec = spec_set
             spec_set = True
+        self.mock_add_spec(spec, spec_set)
 
-        if spec is not None and not _is_list(spec):
-            if isinstance(spec, ClassTypes):
-                _spec_class = spec
-            else:
-                _spec_class = _get_class(spec)
-
-            spec = dir(spec)
-
-        self._spec_class = _spec_class
-        self._spec_set = spec_set
-        self._mock_methods = spec
         self._mock_children = {}
         self._mock_wraps = wraps
         self._mock_signature = None
@@ -569,6 +558,22 @@ class NonCallableMock(Base):
             spec, wraps, name, spec_set, parent,
             _spec_state, **kwargs
         )
+
+
+    def mock_add_spec(self, spec, spec_set=False):
+        _spec_class = None
+
+        if spec is not None and not _is_list(spec):
+            if isinstance(spec, ClassTypes):
+                _spec_class = spec
+            else:
+                _spec_class = _get_class(spec)
+
+            spec = dir(spec)
+
+        self._spec_class = _spec_class
+        self._spec_set = spec_set
+        self._mock_methods = spec
 
 
     def __get_return_value(self):
@@ -1737,7 +1742,8 @@ class _Call(tuple):
 
     If the _Call has no name then it will match any name.
     """
-    def __new__(cls, value=(), name=None, parent=None, two=False, from_kall=True):
+    def __new__(cls, value=(), name=None, parent=None, two=False,
+                from_kall=True):
         name = ''
         args = ()
         kwargs = {}
@@ -1768,7 +1774,8 @@ class _Call(tuple):
         return tuple.__new__(cls, (name, args, kwargs))
 
 
-    def __init__(self, value=(), name=None, parent=None, two=False, from_kall=True):
+    def __init__(self, value=(), name=None, parent=None, two=False,
+                 from_kall=True):
         self.name = name
         self.parent = parent
         self.from_kall = from_kall
