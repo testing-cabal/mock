@@ -824,6 +824,40 @@ class MockTest(unittest2.TestCase):
         self.assertEqual(mock().foo.bar().baz.mock_calls,
                          call().__int__().call_list())
 
+        mock = MagicMock(name='bar')
+        int(mock.foo)
+        expected = [('foo.__int__', (), {})]
+        self.assertEqual(mock.mock_calls, expected)
+
+        mock = MagicMock(name='bar')
+        mock.a()()
+        expected = [('a', (), {}), ('a()', (), {})]
+        self.assertEqual(mock.mock_calls, expected)
+        self.assertEqual(mock.a().mock_calls, [call()])
+
+        mock = MagicMock(name='bar')
+        mock(1)(2)(3)
+        self.assertEqual(mock.mock_calls, call(1)(2)(3).call_list())
+        self.assertEqual(mock().mock_calls, call(2)(3).call_list())
+        self.assertEqual(mock()().mock_calls, call(3).call_list())
+
+        mock = MagicMock(name='bar')
+        mock(1)(2)(3).a.b.c(4)
+        self.assertEqual(mock.mock_calls, call(1)(2)(3).a.b.c(4).call_list())
+        self.assertEqual(mock().mock_calls, call(2)(3).a.b.c(4).call_list())
+        self.assertEqual(mock()().mock_calls, call(3).a.b.c(4).call_list())
+
+        mock = MagicMock(name='bar')
+        int(mock().foo.bar().baz())
+        last_call = ('().foo.bar().baz().__int__', (), {})
+        self.assertEqual(mock.mock_calls[-1], last_call)
+        self.assertEqual(mock().mock_calls,
+                         call.foo.bar().baz().__int__().call_list())
+        self.assertEqual(mock().foo.bar().mock_calls,
+                         call.baz().__int__().call_list())
+        self.assertEqual(mock().foo.bar().baz.mock_calls,
+                         call().__int__().call_list())
+
 
     def test_subclassing(self):
         class Subclass(Mock):
