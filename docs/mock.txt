@@ -260,7 +260,7 @@ Attributes
         None
         >>> mock()
         >>> mock.call_args
-        ((), {})
+        call()
         >>> mock.call_args == ()
         True
         >>> mock(3, 4)
