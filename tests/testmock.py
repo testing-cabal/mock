@@ -1136,19 +1136,21 @@ class MockTest(unittest2.TestCase):
             # *then* setting a spec doesn't work. Not the intended use case
 
 
-    def DONTtest_mock_add_spec_magic_methods(self):
-        mock = MagicMock()
-        int(mock)
+    def test_mock_add_spec_magic_methods(self):
+        for Klass in MagicMock, NonCallableMagicMock:
+            mock = Klass()
+            int(mock)
 
-        mock.mock_add_spec(object)
-        self.assertRaises(TypeError, int, mock)
+            mock.mock_add_spec(object)
+            self.assertRaises(TypeError, int, mock)
 
-        mock = MagicMock()
-        mock['foo']
+            mock = Klass()
+            mock['foo']
+            mock.__int__.return_value =4
 
-        mock.mock_add_spec(int)
-        int(mock)
-        self.assertRaises(TypeError, lambda: mock['foo'])
+            mock.mock_add_spec(int)
+            self.assertEqual(int(mock), 4)
+            self.assertRaises(TypeError, lambda: mock['foo'])
 
 
 

@@ -30,6 +30,19 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertFalse(hasattr(mock, '__getitem__'))
 
 
+    def test_magicmock_del(self):
+        mock = MagicMock()
+        # before using getitem
+        del mock.__getitem__
+        self.assertRaises(TypeError, lambda: mock['foo'])
+
+        mock = MagicMock()
+        # this time use it first
+        mock['foo']
+        del mock.__getitem__
+        self.assertRaises(TypeError, lambda: mock['foo'])
+
+
     def test_magic_method_wrapping(self):
         mock = Mock()
         def f(self, name):

@@ -110,6 +110,8 @@ mock 0.8.0 is the last version that will support Python 2.4.
   called to replace the object being patched
 * Addition of `NonCallableMock` and `NonCallableMagicMock`, mocks without a
   `__call__` method
+* Addition of `mock_add_spec` method for adding (or changing) a spec on an
+  existing mock
 * Protocol methods on `MagicMock` are magic mocks, and are created lazily on
   first lookup. This means the result of calling a protocol method is a
   MagicMock instead of a Mock as it was previously
@@ -158,6 +160,8 @@ mock 0.8.0 is the last version that will support Python 2.4.
 2011/XX/XX Version 0.8.0 beta 3
 -------------------------------
 
+* Addition of `mock_add_spec` method for adding (or changing) a spec on an
+  existing mock
 * Addition of `mock_add_spec` method for adding a spec to an existing mock
 * Improved repr for `Mock.call_args` and entries in `Mock.call_args_list`,
   `Mock.method_calls` and `Mock.mock_calls`

@@ -539,7 +539,7 @@ class NonCallableMock(Base):
         if spec_set is not None:
             spec = spec_set
             spec_set = True
-        self.mock_add_spec(spec, spec_set)
+        self._mock_add_spec(spec, spec_set)
 
         self._mock_children = {}
         self._mock_wraps = wraps
@@ -561,6 +561,11 @@ class NonCallableMock(Base):
 
 
     def mock_add_spec(self, spec, spec_set=False):
+        """ XXXX needs docstring """
+        self._mock_add_spec(spec, spec_set)
+
+
+    def _mock_add_spec(self, spec, spec_set):
         _spec_class = None
 
         if spec is not None and not _is_list(spec):
@@ -786,6 +791,10 @@ class NonCallableMock(Base):
     def __delattr__(self, name):
         if name in _all_magics and name in type(self).__dict__:
             delattr(type(self), name)
+            if name not in self.__dict__:
+                # for magic methods that are still MagicProxy objects and
+                # not set on the instance itself
+                return
         return object.__delattr__(self, name)
 
 
@@ -1640,19 +1649,34 @@ def _set_return_value(mock, method, name):
 class MagicMixin(object):
     def __init__(self, *args, **kw):
         _super(MagicMixin, self).__init__(*args, **kw)
+        self._mock_set_magics()
 
+    def _mock_set_magics(self):
         these_magics = _magics
         if self._mock_methods is not None:
             these_magics = _magics.intersection(self._mock_methods)
 
+        remove_magics = _magics - these_magics
+
+        for entry in remove_magics:
+            if entry in type(self).__dict__:
+                # remove unneeded magic methods
+                delattr(self, entry)
+
         for entry in these_magics:
+            if entry in type(self).__dict__:
+                # don't overwrite existing attributes if called a second time
+                continue
             setattr(self, entry, _create_proxy(entry, self))
 
 
 
 class NonCallableMagicMock(MagicMixin, NonCallableMock):
     """XXXX needs docstring"""
-    pass
+    def mock_add_spec(self, spec, spec_set=False):
+        """ XXXX needs docstring """
+        self._mock_add_spec(spec, spec_set)
+        self._mock_set_magics()
 
 
 
@@ -1667,6 +1691,10 @@ class MagicMock(MagicMixin, Mock):
 
     Attributes and the return value of a `MagicMock` will also be `MagicMocks`.
     """
+    def mock_add_spec(self, spec, spec_set=False):
+        """ XXXX needs docstring """
+        self._mock_add_spec(spec, spec_set)
+        self._mock_set_magics()
 
 
 
