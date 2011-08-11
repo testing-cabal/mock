@@ -489,51 +489,7 @@ class Base(object):
 
 
 class NonCallableMock(Base):
-    """
-    Create a new `Mock` object. `Mock` takes several optional arguments
-    that specify the behaviour of the Mock object:
-
-    * `spec`: This can be either a list of strings or an existing object (a
-      class or instance) that acts as the specification for the mock object. If
-      you pass in an object then a list of strings is formed by calling dir on
-      the object (excluding unsupported magic attributes and methods). Accessing
-      any attribute not in this list will raise an `AttributeError`.
-
-      If `spec` is an object (rather than a list of strings) then
-      `mock.__class__` returns the class of the spec object. This allows mocks
-      to pass `isinstance` tests.
-
-    * `spec_set`: A stricter variant of `spec`. If used, attempting to *set*
-      or get an attribute on the mock that isn't on the object passed as
-      `spec_set` will raise an `AttributeError`.
-
-    * `side_effect`: A function to be called whenever the Mock is called. See
-      the :attr:`Mock.side_effect` attribute. Useful for raising exceptions or
-      dynamically changing return values. The function is called with the same
-      arguments as the mock, and unless it returns :data:`DEFAULT`, the return
-      value of this function is used as the return value.
-
-      Alternatively `side_effect` can be an exception class or instance. In
-      this case the exception will be raised when the mock is called.
-
-    * `return_value`: The value returned when the mock is called. By default
-      this is a new Mock (created on first access). See the
-      :attr:`Mock.return_value` attribute.
-
-    * `wraps`: Item for the mock object to wrap. If `wraps` is not None
-      then calling the Mock will pass the call through to the wrapped object
-      (returning the real result and ignoring `return_value`). Attribute
-      access on the mock will return a Mock object that wraps the corresponding
-      attribute of the wrapped object (so attempting to access an attribute that
-      doesn't exist will raise an `AttributeError`).
-
-      If the mock has an explicit `return_value` set then calls are not passed
-      to the wrapped object and the `return_value` is returned instead.
-
-    * `name`: If the mock has a name then it will be used in the repr of the
-      mock. This can be useful for debugging. The name is propagated to child
-      mocks.
-    """
+    """A non-callable version of `Mock`"""
 
     def __new__(cls, *args, **kw):
         # every instance has its own class
@@ -581,7 +537,11 @@ class NonCallableMock(Base):
 
 
     def mock_add_spec(self, spec, spec_set=False):
-        """ XXXX needs docstring """
+        """Add a spec to a mock. `spec` can either be an object or a
+        list of strings. Only attributes on the `spec` can be fetched as
+        attributes from the mock.
+
+        If `spec_set` is True then only attributes on the spec can be set."""
         self._mock_add_spec(spec, spec_set)
 
 
@@ -898,7 +858,11 @@ class NonCallableMock(Base):
 
 
     def assert_any_call(self, *args, **kwargs):
-        """ XXXX needs docstring """
+        """assert the mock has been called with the specified arguments.
+
+        The assert passes if the mock has *ever* been called, unlike
+        `assert_called_with` and `assert_called_once_with` that only pass if
+        the call is the most recent one."""
         kall = call(*args, **kwargs)
         if not kall in self.call_args_list:
             expected_string = self._format_mock_call_signature(args, kwargs)
@@ -1027,8 +991,54 @@ class CallableMixin(Base):
 
 
 class Mock(CallableMixin, NonCallableMock):
-    """XXXX needs docstring"""
-    pass
+    """
+    Create a new `Mock` object. `Mock` takes several optional arguments
+    that specify the behaviour of the Mock object:
+
+    * `spec`: This can be either a list of strings or an existing object (a
+      class or instance) that acts as the specification for the mock object. If
+      you pass in an object then a list of strings is formed by calling dir on
+      the object (excluding unsupported magic attributes and methods). Accessing
+      any attribute not in this list will raise an `AttributeError`.
+
+      If `spec` is an object (rather than a list of strings) then
+      `mock.__class__` returns the class of the spec object. This allows mocks
+      to pass `isinstance` tests.
+
+    * `spec_set`: A stricter variant of `spec`. If used, attempting to *set*
+      or get an attribute on the mock that isn't on the object passed as
+      `spec_set` will raise an `AttributeError`.
+
+    * `side_effect`: A function to be called whenever the Mock is called. See
+      the :attr:`Mock.side_effect` attribute. Useful for raising exceptions or
+      dynamically changing return values. The function is called with the same
+      arguments as the mock, and unless it returns :data:`DEFAULT`, the return
+      value of this function is used as the return value.
+
+      Alternatively `side_effect` can be an exception class or instance. In
+      this case the exception will be raised when the mock is called.
+
+    * `return_value`: The value returned when the mock is called. By default
+      this is a new Mock (created on first access). See the
+      :attr:`Mock.return_value` attribute.
+
+    * `wraps`: Item for the mock object to wrap. If `wraps` is not None
+      then calling the Mock will pass the call through to the wrapped object
+      (returning the real result and ignoring `return_value`). Attribute
+      access on the mock will return a Mock object that wraps the corresponding
+      attribute of the wrapped object (so attempting to access an attribute that
+      doesn't exist will raise an `AttributeError`).
+
+      If the mock has an explicit `return_value` set then calls are not passed
+      to the wrapped object and the `return_value` is returned instead.
+
+    * `name`: If the mock has a name then it will be used in the repr of the
+      mock. This can be useful for debugging. The name is propagated to child
+      mocks.
+
+    Mocks can also be called with arbitrary keyword arguments. These will be
+    used to set attributes on the mock after it is created.
+    """
 
 
 
@@ -1340,7 +1350,19 @@ def _patch_multiple(target, spec=None, create=False,
         mocksignature=False, spec_set=None, autospec=False,
         new_callable=None, **kwargs
     ):
-    """ XXXX needs docstring"""
+    """Perform multiple patches in a single call. It takes the object to be
+    patched (either as an object or a string to fetch the object by importing)
+    and keyword arguments for the patches::
+
+        with patch.multiple(settings, FIRST_PATCH='one', SECOND_PATCH='two'):
+            ...
+
+    Like `patch` it can be used as a decorator, class decorator or a context
+    manager. The arguments `spec`, `spec_set`, `create`, `mocksignature`,
+    `autospec` and `new_callable` have the same meaning as for `patch`. These
+    arguments will be applied to *all* the patches being done by
+    `patch.multiple`.
+    """
     if type(target) in (unicode, str):
         target = _importer(target)
 
@@ -1374,7 +1396,7 @@ def patch(
     """
     `patch` acts as a function decorator, class decorator or a context
     manager. Inside the body of the function or with statement, the `target`
-    (specified in the form `'PackageName.ModuleName.ClassName'`) is patched
+    (specified in the form `'package.module.ClassName'`) is patched
     with a `new` object. When the function/with statement exits the patch is
     undone.
 
@@ -1382,14 +1404,30 @@ def patch(
     object, so it must be importable from the environment you are calling the
     decorator from.
 
-    If `new` is omitted, then a new `Mock` is created and passed in as an
+    If `new` is omitted, then a new `MagicMock` is created and passed in as an
     extra argument to the decorated function.
 
-    The `spec` and `spec_set` keyword arguments are passed to the `Mock`
+    The `spec` and `spec_set` keyword arguments are passed to the `MagicMock`
     if patch is creating one for you.
 
     In addition you can pass `spec=True` or `spec_set=True`, which causes
     patch to pass in the object being mocked as the spec/spec_set object.
+
+    `new_callable` allows you to specify a different class, or callable object,
+    that will be called to create the `new` object. By default `MagicMock` is
+    used.
+
+    A more powerful form of `spec` is `autospec`. If you set `autospec=True`
+    then the mock with be created with a spec from the object being replaced.
+    All attributes of the mock will also have the spec of the corresponding
+    attribute of the object being replaced. Methods and functions being mocked
+    will have their arguments checked and will raise a `TypeError` if they are
+    called with the wrong signature (similar to `mocksignature`). For mocks
+    replacing a class, their return value (the 'instance') will have the same
+    spec as the class.
+
+    Instead of `autospec=True` you can pass `autospec=some_object` to use an
+    arbitrary object as the spec instead of the one being replaced.
 
     If `mocksignature` is True then the patch will be done with a function
     created by mocking the one being replaced. If the object being replaced is
@@ -1407,7 +1445,10 @@ def patch(
 
     Patch can be used as a TestCase class decorator. It works by
     decorating each test method in the class. This reduces the boilerplate
-    code when your test methods share a common patchings set.
+    code when your test methods share a common patchings set. `patch` finds
+    tests by looking for method names that start with `patch.TEST_PREFIX`.
+    By default this is `test`, which matches the way `unittest` finds tests.
+    You can specify an alternative prefix by setting `patch.TEST_PREFIX`.
 
     Patch can be used with the with statement, if this is available in your
     version of Python. Here the patching applies to the indented block after
@@ -1415,8 +1456,11 @@ def patch(
     to the name after the "as"; very useful if `patch` is creating a mock
     object for you.
 
-    `patch.dict(...)` and `patch.object(...)` are available for alternate
-    use-cases.
+    `patch` also takes arbitrary keyword arguments. These will be passed to
+    the `Mock` (or `new_callable`) on construction.
+
+    `patch.dict(...)`, `patch.multiple(...)` and `patch.object(...)` are
+    available for alternate use-cases.
     """
     target, attribute = _get_target(target)
     return _patch(
@@ -1442,6 +1486,12 @@ class _patch_dict(object):
 
     If `clear` is True then the dictionary will be cleared before the new
     values are set.
+
+    `patch.dict` can also be called with arbitrary keyword arguments to set
+    values in the dictionary::
+
+        with patch.dict('sys.modules', mymodule=Mock(), other_module=Mock()):
+            ...
     """
 
     def __init__(self, in_dict, values=(), clear=False, **kwargs):
@@ -1486,7 +1536,6 @@ class _patch_dict(object):
 
 
     def _patch_dict(self):
-        """Unpatch the dict."""
         values = self.values
         in_dict = self.in_dict
         clear = self.clear
@@ -1526,6 +1575,7 @@ class _patch_dict(object):
 
 
     def __exit__(self, *args):
+        """Unpatch the dict."""
         self._unpatch_dict()
         return False
 
@@ -1698,9 +1748,13 @@ class MagicMixin(object):
 
 
 class NonCallableMagicMock(MagicMixin, NonCallableMock):
-    """XXXX needs docstring"""
+    """A version of `MagicMock` that isn't callable."""
     def mock_add_spec(self, spec, spec_set=False):
-        """ XXXX needs docstring """
+        """Add a spec to a mock. `spec` can either be an object or a
+        list of strings. Only attributes on the `spec` can be fetched as
+        attributes from the mock.
+
+        If `spec_set` is True then only attributes on the spec can be set."""
         self._mock_add_spec(spec, spec_set)
         self._mock_set_magics()
 
@@ -1718,7 +1772,11 @@ class MagicMock(MagicMixin, Mock):
     Attributes and the return value of a `MagicMock` will also be `MagicMocks`.
     """
     def mock_add_spec(self, spec, spec_set=False):
-        """ XXXX needs docstring """
+        """Add a spec to a mock. `spec` can either be an object or a
+        list of strings. Only attributes on the `spec` can be fetched as
+        attributes from the mock.
+
+        If `spec_set` is True then only attributes on the spec can be set."""
         self._mock_add_spec(spec, spec_set)
         self._mock_set_magics()
 
@@ -1940,7 +1998,24 @@ call = _Call(from_kall=False)
 
 def create_autospec(spec, spec_set=False, instance=False,
                     configure=None, _parent=None, _name=None):
-    """XXXX needs docstring!"""
+    """Create a mock object using another object as a spec. Attributes on the
+    mock will use the corresponding attribute on the `spec` object as their
+    spec.
+
+    Functions or methods being mocked will have their arguments checked in a
+    similar way to `mocksignature` to check that they are called with the
+    correct signature.
+
+    If `spec_set` is True then attempting to set attributes that don't exist
+    on the spec object will raise an `AttributeError`.
+
+    If a class is used as a spec then the return value of the mock (the
+    instance of the class) will have the same spec. You can use a class as the
+    spec for an instance object by passing `instance=True`. The returned mock
+    will only be callable if instances of the mock are callable.
+
+    `configure` is a dictionary that will be used as keyword arguments for the
+    created mock."""
     if configure is None:
         configure = {}
 
