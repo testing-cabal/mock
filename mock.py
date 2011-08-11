@@ -417,7 +417,11 @@ if not inPy3k:
     ClassTypes = (type, ClassType)
 
 _allowed_names = set(
-    ['return_value', '_mock_return_value', 'side_effect', '_mock_side_effect']
+    [
+        'return_value', '_mock_return_value', 'side_effect',
+        '_mock_side_effect', '_mock_parent', '_mock_new_parent',
+        '_mock_name', '_mock_new_name'
+    ]
 )
 
 
@@ -457,6 +461,22 @@ class _CallList(list):
 
     def __repr__(self):
         return pprint.pformat(list(self))
+
+
+def _check_and_set_parent(parent, value, name, new_name):
+    if not _is_instance_mock(value):
+        return False
+    if (value._mock_name or value._mock_new_name or
+        value._mock_parent or value._mock_new_parent):
+        return False
+
+    if new_name:
+        value._mock_new_parent = parent
+        value._mock_new_name = new_name
+    if name:
+        value._mock_parent = parent
+        value._mock_name = name
+    return True
 
 
 
@@ -599,6 +619,7 @@ class NonCallableMock(Base):
             self._mock_signature.return_value = value
         else:
             self._mock_return_value = value
+            _check_and_set_parent(self, value, None, '()')
 
     __return_value_doc = "The value to be returned when the mock is called."
     return_value = property(__get_return_value, __set_return_value,
@@ -767,7 +788,7 @@ class NonCallableMock(Base):
             name not in self.__dict__ and
             name not in _allowed_names):
             raise AttributeError("Mock object has no attribute '%s'" % name)
-        if name in _unsupported_magics:
+        elif name in _unsupported_magics:
             msg = 'Attempting to set unsupported magic method %r.' % name
             raise AttributeError(msg)
         elif name in _all_magics:
@@ -785,6 +806,11 @@ class NonCallableMock(Base):
                 value = mocksignature(value, real, skipfirst=True)
             else:
                 setattr(type(self), name, value)
+        elif name in _allowed_names:
+            pass
+        elif _check_and_set_parent(self, value, name, name):
+            self._mock_children[name] = value
+            return
         return object.__setattr__(self, name, value)
 
 

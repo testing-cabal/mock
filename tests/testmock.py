@@ -1153,6 +1153,38 @@ class MockTest(unittest2.TestCase):
             self.assertRaises(TypeError, lambda: mock['foo'])
 
 
+    def test_adding_child_mock(self):
+        for Klass in NonCallableMock, Mock, MagicMock, NonCallableMagicMock:
+            mock = Klass()
+
+            mock.foo = Mock()
+            mock.foo()
+
+            self.assertEqual(mock.method_calls, [call.foo()])
+            self.assertEqual(mock.mock_calls, [call.foo()])
+
+            mock = Klass()
+            mock.bar = Mock(name='bar')
+            mock.bar()
+            self.assertEqual(mock.method_calls, [])
+            self.assertEqual(mock.mock_calls, [])
+
+            # mock with an existing _new_parent but no name
+            mock.baz = MagicMock()()
+            mock.baz()
+            self.assertEqual(mock.method_calls, [])
+            self.assertEqual(mock.mock_calls, [])
+
+
+    def test_adding_return_value_mock(self):
+        for Klass in Mock, MagicMock:
+            mock = Klass()
+            mock.return_value = MagicMock()
+
+            mock()()
+            self.assertEqual(mock.mock_calls, [call(), call()()])
+
+
 
 if __name__ == '__main__':
     unittest2.main()
