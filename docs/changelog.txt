@@ -133,6 +133,9 @@ mock 0.8.0 is the last version that will support Python 2.4.
 * `Mock` call lists (`call_args_list`, `method_calls` & `mock_calls`) are now
   custom list objects that allow membership tests for "sub lists" and have
   a nicer representation if you `str` or `print` them
+* Mocks attached as attributes or return values to other mocks have calls
+  recorded in `method_calls` and `mock_calls` of the parent (unless a name is
+  already set on the child)
 * Improved failure messages for `assert_called_with` and
   `assert_called_once_with`
 * Added the Mock API (`assert_called_with` etc) to functions created by
@@ -160,6 +163,9 @@ mock 0.8.0 is the last version that will support Python 2.4.
 2011/XX/XX Version 0.8.0 beta 3
 -------------------------------
 
+* Mocks attached as attributes or return values to other mocks have calls
+  recorded in `method_calls` and `mock_calls` of the parent (unless a name is
+  already set on the child)
 * Addition of `mock_add_spec` method for adding (or changing) a spec on an
   existing mock
 * Addition of `mock_add_spec` method for adding a spec to an existing mock
