@@ -160,7 +160,7 @@ mock 0.8.0 is the last version that will support Python 2.4.
 * Added license file to the distribution
 
 
-2011/XX/XX Version 0.8.0 beta 3
+2011/08/15 Version 0.8.0 beta 3
 -------------------------------
 
 * Mocks attached as attributes or return values to other mocks have calls
@@ -168,7 +168,6 @@ mock 0.8.0 is the last version that will support Python 2.4.
   already set on the child)
 * Addition of `mock_add_spec` method for adding (or changing) a spec on an
   existing mock
-* Addition of `mock_add_spec` method for adding a spec to an existing mock
 * Improved repr for `Mock.call_args` and entries in `Mock.call_args_list`,
   `Mock.method_calls` and `Mock.mock_calls`
 * Improved repr for mocks
