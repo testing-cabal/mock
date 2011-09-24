@@ -23,4 +23,4 @@ proj.directory-list = [{'dirloc': loc('.'),
                         'recursive': 1,
                         'watch_for_changes': 1}]
 proj.file-type = 'shared'
-testing.auto-test-file-specs = ('*test.py',)
+testing.auto-test-file-specs = ('test*.py',)
