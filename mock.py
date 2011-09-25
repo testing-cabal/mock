@@ -29,7 +29,7 @@ __all__ = (
 )
 
 
-__version__ = '0.8.0beta3'
+__version__ = '0.8.0beta4'
 
 
 import pprint
@@ -467,7 +467,7 @@ def _check_and_set_parent(parent, value, name, new_name):
     if not _is_instance_mock(value):
         return False
     if (value._mock_name or value._mock_new_name or
-        value._mock_parent or value._mock_new_parent):
+        value._mock_parent is not None or value._mock_new_parent is not None):
         return False
 
     if new_name:
@@ -1071,7 +1071,7 @@ class _patch(object):
     attribute_name = None
 
     def __init__(
-            self, target, attribute, new, spec, create,
+            self, getter, attribute, new, spec, create,
             mocksignature, spec_set, autospec, new_callable, kwargs
         ):
         if new_callable is not None:
@@ -1084,7 +1084,7 @@ class _patch(object):
                     "Cannot use 'autospec' and 'new_callable' together"
                 )
 
-        self.target = target
+        self.getter = getter
         self.attribute = attribute
         self.new = new
         self.new_callable = new_callable
@@ -1100,7 +1100,7 @@ class _patch(object):
 
     def copy(self):
         patcher = _patch(
-            self.target, self.attribute, self.new, self.spec,
+            self.getter, self.attribute, self.new, self.spec,
             self.create, self.mocksignature, self.spec_set,
             self.autospec, self.new_callable, self.kwargs
         )
@@ -1179,7 +1179,7 @@ class _patch(object):
 
 
     def get_original(self):
-        target = self.target
+        target = self.getter()
         name = self.attribute
 
         original = DEFAULT
@@ -1204,6 +1204,7 @@ class _patch(object):
         new, spec, spec_set = self.new, self.spec, self.spec_set
         autospec, kwargs = self.autospec, self.kwargs
         new_callable = self.new_callable
+        self.target = self.getter()
 
         original, local = self.get_original()
 
@@ -1306,6 +1307,7 @@ class _patch(object):
 
         del self.temp_original
         del self.is_local
+        del self.target
         for patcher in reversed(self.additional_patchers):
             if _is_started(patcher):
                 patcher.__exit__()
@@ -1321,8 +1323,8 @@ def _get_target(target):
     except (TypeError, ValueError):
         raise TypeError("Need a valid target to patch. You supplied: %r" %
                         (target,))
-    target = _importer(target)
-    return target, attribute
+    getter = lambda: _importer(target)
+    return getter, attribute
 
 
 def _patch_object(
@@ -1340,8 +1342,9 @@ def _patch_object(
     Arguments new, spec, create, mocksignature and spec_set have the same
     meaning as for patch.
     """
+    getter = lambda: target
     return _patch(
-        target, attribute, new, spec, create, mocksignature,
+        getter, attribute, new, spec, create, mocksignature,
         spec_set, autospec, new_callable, kwargs
     )
 
@@ -1364,7 +1367,9 @@ def _patch_multiple(target, spec=None, create=False,
     `patch.multiple`.
     """
     if type(target) in (unicode, str):
-        target = _importer(target)
+        getter = lambda: _importer(target)
+    else:
+        getter = lambda: target
 
     if not kwargs:
         raise ValueError(
@@ -1374,13 +1379,13 @@ def _patch_multiple(target, spec=None, create=False,
     items = list(kwargs.items())
     attribute, new = items[0]
     patcher = _patch(
-        target, attribute, new, spec, create, mocksignature, spec_set,
+        getter, attribute, new, spec, create, mocksignature, spec_set,
         autospec, new_callable, {}
     )
     patcher.attribute_name = attribute
     for attribute, new in items[1:]:
         this_patcher = _patch(
-            target, attribute, new, spec, create, mocksignature, spec_set,
+            getter, attribute, new, spec, create, mocksignature, spec_set,
             autospec, new_callable, {}
         )
         this_patcher.attribute_name = attribute
@@ -1462,9 +1467,9 @@ def patch(
     `patch.dict(...)`, `patch.multiple(...)` and `patch.object(...)` are
     available for alternate use-cases.
     """
-    target, attribute = _get_target(target)
+    getter, attribute = _get_target(target)
     return _patch(
-        target, attribute, new, spec, create, mocksignature,
+        getter, attribute, new, spec, create, mocksignature,
         spec_set, autospec, new_callable, kwargs
     )
 

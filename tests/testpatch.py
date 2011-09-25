@@ -1625,6 +1625,11 @@ class PatchTest(unittest2.TestCase):
                 p.stop()
 
 
+    def test_patch_imports_lazily(self):
+        p1 = patch('squizz.squozz')
+        self.assertRaises(ImportError, p1.start)
+
+
 
 if __name__ == '__main__':
     unittest2.main()

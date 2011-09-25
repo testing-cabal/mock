@@ -1185,6 +1185,28 @@ class MockTest(unittest2.TestCase):
             self.assertEqual(mock.mock_calls, [call(), call()()])
 
 
+    @unittest2.expectedFailure
+    def test_manager_mock(self):
+        class Foo(object):
+            one = 'one'
+            two = 'two'
+        manager = Mock()
+        p1 = patch.object(Foo, 'one')
+        p2 = patch.object(Foo, 'two')
+
+        mock_one = p1.start()
+        self.addCleanup(p1.stop)
+        mock_two = p2.start()
+        self.addCleanup(p2.stop)
+
+        manager.one = mock_one
+        manager.two = mock_two
+
+        Foo.two()
+        Foo.one()
+
+        self.assertEqual(manager.mock_calls, [call.two(), call.one()])
+
 
 if __name__ == '__main__':
     unittest2.main()
