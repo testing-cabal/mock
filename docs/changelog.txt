@@ -145,6 +145,8 @@ mock 0.8.0 is the last version that will support Python 2.4.
   `spec_set` arguments
 * Calling `stop` on an unstarted patcher fails with  a more meaningful error
   message
+* Deleting an attribute from a Mock removes the child mock (accessing it again
+  will create a new one)
 * BUGFIX: an error creating a patch, with nested patch decorators, won't leave
   patches in place
 * BUGFIX: `__truediv__` and `__rtruediv__` not available as magic methods on
@@ -165,6 +167,10 @@ mock 0.8.0 is the last version that will support Python 2.4.
 -------------------------------
 
 * patch lookup is done at use time not at decoration time
+* When attaching a Mock to another Mock as a magic method, calls are recorded
+  in mock_calls
+* Deleting an attribute from a Mock removes the child mock (accessing it again
+  will create a new one)
 
 
 2011/08/15 Version 0.8.0 beta 3

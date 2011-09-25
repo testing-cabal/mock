@@ -44,11 +44,12 @@ class WithTest(unittest2.TestCase):
 
 
     def test_patch_object_with_statement(self):
-        mock = Mock()
-        original = mock.something
-        with patch.object(mock, 'something'):
-            self.assertNotEqual(mock.something, original, "unpatched")
-        self.assertEqual(mock.something, original)
+        class Foo(object):
+            something = 'foo'
+        original = Foo.something
+        with patch.object(Foo, 'something'):
+            self.assertNotEqual(Foo.something, original, "unpatched")
+        self.assertEqual(Foo.something, original)
 
 
     def test_with_statement_nested(self):

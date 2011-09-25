@@ -1164,12 +1164,13 @@ class MockTest(unittest2.TestCase):
             self.assertEqual(mock.mock_calls, [call.foo()])
 
             mock = Klass()
-            mock.bar = Mock(name='bar')
+            mock.bar = Mock(name='name')
             mock.bar()
             self.assertEqual(mock.method_calls, [])
             self.assertEqual(mock.mock_calls, [])
 
             # mock with an existing _new_parent but no name
+            mock = Klass()
             mock.baz = MagicMock()()
             mock.baz()
             self.assertEqual(mock.method_calls, [])
@@ -1206,6 +1207,18 @@ class MockTest(unittest2.TestCase):
         Foo.one()
 
         self.assertEqual(manager.mock_calls, [call.two(), call.one()])
+
+
+    def test_magic_methods_mock_calls(self):
+        for Klass in Mock, MagicMock:
+            m = Klass()
+            m.__int__ = Mock(return_value=3)
+            m.__float__ = MagicMock(return_value=3.0)
+            int(m)
+            float(m)
+
+            self.assertEqual(m.mock_calls, [call.__int__(), call.__float__()])
+            self.assertEqual(m.method_calls, [])
 
 
 if __name__ == '__main__':
