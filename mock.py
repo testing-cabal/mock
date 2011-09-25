@@ -765,6 +765,9 @@ class NonCallableMock(Base):
                 real = lambda *args, **kw: original(self, *args, **kw)
                 value = mocksignature(value, real, skipfirst=True)
             else:
+                # only set _new_name and not name so that mock_calls is tracked
+                # but not method calls
+                _check_and_set_parent(self, value, None, name)
                 setattr(type(self), name, value)
         elif name in _allowed_names:
             pass
@@ -781,6 +784,10 @@ class NonCallableMock(Base):
                 # for magic methods that are still MagicProxy objects and
                 # not set on the instance itself
                 return
+        elif name in self._mock_children:
+            del self._mock_children[name]
+            return
+
         return object.__delattr__(self, name)
 
 
