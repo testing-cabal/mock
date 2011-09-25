@@ -14,14 +14,16 @@ something  = sentinel.Something
 something_else  = sentinel.SomethingElse
 
 
+
 class WithTest(unittest2.TestCase):
 
-    def testWithStatement(self):
+    def test_with_statement(self):
         with patch('tests._testwith.something', sentinel.Something2):
             self.assertEqual(something, sentinel.Something2, "unpatched")
         self.assertEqual(something, sentinel.Something)
 
-    def testWithStatementException(self):
+
+    def test_with_statement_exception(self):
         try:
             with patch('tests._testwith.something', sentinel.Something2):
                 self.assertEqual(something, sentinel.Something2, "unpatched")
@@ -33,7 +35,7 @@ class WithTest(unittest2.TestCase):
         self.assertEqual(something, sentinel.Something)
 
 
-    def testWithStatementAs(self):
+    def test_with_statement_as(self):
         with patch('tests._testwith.something') as mock_something:
             self.assertEqual(something, mock_something, "unpatched")
             self.assertTrue(is_instance(mock_something, MagicMock),
@@ -41,7 +43,7 @@ class WithTest(unittest2.TestCase):
         self.assertEqual(something, sentinel.Something)
 
 
-    def testPatchObjectWithStatementAs(self):
+    def test_patch_object_with_statement(self):
         mock = Mock()
         original = mock.something
         with patch.object(mock, 'something'):
@@ -49,7 +51,7 @@ class WithTest(unittest2.TestCase):
         self.assertEqual(mock.something, original)
 
 
-    def testWithStatementNested(self):
+    def test_with_statement_nested(self):
         with catch_warnings(record=True):
             # nested is deprecated in Python 2.7
             with nested(patch('tests._testwith.something'),
@@ -61,7 +63,7 @@ class WithTest(unittest2.TestCase):
         self.assertEqual(something_else, sentinel.SomethingElse)
 
 
-    def testWithStatementSpecified(self):
+    def test_with_statement_specified(self):
         with patch('tests._testwith.something', sentinel.Patched) as mock_something:
             self.assertEqual(something, mock_something, "unpatched")
             self.assertEqual(mock_something, sentinel.Patched, "wrong patch")
@@ -80,7 +82,7 @@ class WithTest(unittest2.TestCase):
         mock.__exit__.assert_called_with(None, None, None)
 
 
-    def testContextManagerWithMagicMock(self):
+    def test_context_manager_with_magic_mock(self):
         mock = MagicMock()
 
         with self.assertRaises(TypeError):
@@ -90,7 +92,7 @@ class WithTest(unittest2.TestCase):
         self.assertTrue(mock.__exit__.called)
 
 
-    def testWithStatementSameAttribute(self):
+    def test_with_statement_same_attribute(self):
         with patch('tests._testwith.something', sentinel.Patched) as mock_something:
             self.assertEqual(something, mock_something, "unpatched")
 
@@ -102,7 +104,8 @@ class WithTest(unittest2.TestCase):
 
         self.assertEqual(something, sentinel.Something, "not restored")
 
-    def testWithStatementImbricated(self):
+
+    def test_with_statement_imbricated(self):
         with patch('tests._testwith.something') as mock_something:
             self.assertEqual(something, mock_something, "unpatched")
 
@@ -113,7 +116,8 @@ class WithTest(unittest2.TestCase):
         self.assertEqual(something, sentinel.Something)
         self.assertEqual(something_else, sentinel.SomethingElse)
 
-    def testDictContextManager(self):
+
+    def test_dict_context_manager(self):
         foo = {}
         with patch.dict(foo, {'a': 'b'}):
             self.assertEqual(foo, {'a': 'b'})
@@ -125,6 +129,7 @@ class WithTest(unittest2.TestCase):
                 raise NameError('Konrad')
 
         self.assertEqual(foo, {})
+
 
 
 if __name__ == '__main__':
