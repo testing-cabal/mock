@@ -773,7 +773,6 @@ class NonCallableMock(Base):
             pass
         elif _check_and_set_parent(self, value, name, name):
             self._mock_children[name] = value
-            return
         return object.__setattr__(self, name, value)
 
 
@@ -784,9 +783,6 @@ class NonCallableMock(Base):
                 # for magic methods that are still MagicProxy objects and
                 # not set on the instance itself
                 return
-        elif name in self._mock_children:
-            del self._mock_children[name]
-            return
 
         return object.__delattr__(self, name)
 
