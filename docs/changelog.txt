@@ -50,7 +50,7 @@ class inherits the spec). Would it make more sense for `spec` and `spec_set`
 to be *invalid* (`ValueError`) when a non-Mock class is used with
 `new_callable`?
 
-The `mocksignature` argument to `patch` with non a `Mock` passed into
+The `mocksignature` argument to `patch` with a non `Mock` passed into
 `new_callable` will *probably* cause an error. Should it just be invalid?
 
 Note that `NonCallableMock` and `NonCallableMagicMock` still have the unused
@@ -61,12 +61,7 @@ getting / setting. They also have the `assert_called_with` and
 fetching them would create a mock (attribute) that could be called without
 error.
 
-Should the repr of `call` and `callargs` be `call(1, 2, 3)` and
-`callargs((name, args, kwargs))`? The str could reconstruct the actual call,
-which could then be used in the `str` of `_CallList`.
-
-Some outstanding technical debt. `call` and `callargs` are similar and could
-be unified or share code. The way autospeccing mocks function signatures was
+Some outstanding technical debt. The way autospeccing mocks function signatures was
 copied and modified from `mocksignature`. This could all be refactored into
 one set of functions instead of two. The way we tell if patchers are started
 and if a patcher is being used for a `patch.multiple` call are both horrible.
@@ -169,8 +164,6 @@ mock 0.8.0 is the last version that will support Python 2.4.
 * patch lookup is done at use time not at decoration time
 * When attaching a Mock to another Mock as a magic method, calls are recorded
   in mock_calls
-* Deleting an attribute from a Mock removes the child mock (accessing it again
-  will create a new one)
 
 
 2011/08/15 Version 0.8.0 beta 3
