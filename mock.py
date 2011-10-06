@@ -375,7 +375,7 @@ def _is_magic(name):
     return '__%s__' % name[2:-2] == name
 
 
-class SentinelObject(object):
+class _SentinelObject(object):
     "A unique, named, sentinel object."
     def __init__(self, name):
         self.name = name
@@ -384,7 +384,7 @@ class SentinelObject(object):
         return '<SentinelObject "%s">' % self.name
 
 
-class Sentinel(object):
+class _Sentinel(object):
     """Access attributes to return a named object, usable as a sentinel."""
     def __init__(self):
         self._sentinels = {}
@@ -393,10 +393,10 @@ class Sentinel(object):
         if name == '__bases__':
             # Without this help(mock) raises an exception
             raise AttributeError
-        return self._sentinels.setdefault(name, SentinelObject(name))
+        return self._sentinels.setdefault(name, _SentinelObject(name))
 
 
-sentinel = Sentinel()
+sentinel = _Sentinel()
 
 DEFAULT = sentinel.DEFAULT
 
