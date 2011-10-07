@@ -466,8 +466,9 @@ class _CallList(list):
 def _check_and_set_parent(parent, value, name, new_name):
     if not _is_instance_mock(value):
         return False
-    if (value._mock_name or value._mock_new_name or
-        value._mock_parent is not None or value._mock_new_parent is not None):
+    if ((value._mock_name or value._mock_new_name) or
+        (value._mock_parent is not None) or
+        (value._mock_new_parent is not None)):
         return False
 
     if new_name:
@@ -515,6 +516,7 @@ class NonCallableMock(Base):
         if spec_set is not None:
             spec = spec_set
             spec_set = True
+
         self._mock_add_spec(spec, spec_set)
 
         self._mock_children = {}
@@ -689,6 +691,7 @@ class NonCallableMock(Base):
         dot = '.'
         if _name_list == ['()']:
             dot = ''
+        seen = set()
         while _parent is not None:
             last = _parent
 
@@ -698,6 +701,11 @@ class NonCallableMock(Base):
                 dot = ''
 
             _parent = _parent._mock_new_parent
+
+            # use ids here so as not to call __hash__ on the mocks
+            if id(_parent) in seen:
+                break
+            seen.add(id(_parent))
 
         _name_list = list(reversed(_name_list))
         _first = last._mock_name or 'mock'
@@ -946,6 +954,7 @@ class CallableMixin(Base):
         _new_parent = self._mock_new_parent
         self.mock_calls.append(_Call(('', args, kwargs)))
 
+        seen = set()
         skip_next_dot = _new_name == '()'
         while _new_parent is not None:
             this_call = _Call((_new_name, args, kwargs))
@@ -962,6 +971,11 @@ class CallableMixin(Base):
 
             _new_parent.mock_calls.append(this_call)
             _new_parent = _new_parent._mock_new_parent
+
+            # use ids here so as not to call __hash__ on the mocks
+            if id(_new_parent) in seen:
+                break
+            seen.add(id(_new_parent))
 
         parent = self._mock_parent
         name = self._mock_name
