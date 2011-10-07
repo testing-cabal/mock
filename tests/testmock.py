@@ -1235,6 +1235,29 @@ class MockTest(unittest2.TestCase):
             self.assertEqual(m.foo, new)
 
 
+    def test_mock_parents(self):
+        for Klass in Mock, MagicMock:
+            m = Klass(name='foo')
+            m.return_value = m
+            self.assertIs(m(), m)
+            self.assertIn("name='foo'", repr(m))
+
+            m.b = m.a
+            self.assertIn("name='foo.a'", repr(m.b))
+            self.assertIn("name='foo.a'", repr(m.a))
+            m.reset_mock()
+            self.assertIn("name='foo.a'", repr(m.b))
+            self.assertIn("name='foo.a'", repr(m.a))
+
+            m = Klass()
+            original_repr = repr(m)
+            m.a = m()
+            m.a.return_value = m
+
+            self.assertEqual(repr(m.a()), original_repr)
+            self.assertEqual(repr(m), original_repr)
+
+
 
 if __name__ == '__main__':
     unittest2.main()
