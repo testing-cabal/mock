@@ -164,8 +164,8 @@ mock 0.8.0 is the last version that will support Python 2.4.
 * When attaching a Mock to another Mock as a magic method, calls are recorded
   in mock_calls
 * Renamed the internal classes `Sentinel` and `SentinelObject` to prevent abuse
-* BUGFIX: setting a mock return_value to itself no longer fails
-  (and associated issues)
+* BUGFIX: various issues around circular references with mocks (setting a mock
+  return value to be itself etc)
 
 
 2011/08/15 Version 0.8.0 beta 3
