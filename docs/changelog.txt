@@ -110,6 +110,7 @@ mock 0.8.0 is the last version that will support Python 2.4.
 * Protocol methods on `MagicMock` are magic mocks, and are created lazily on
   first lookup. This means the result of calling a protocol method is a
   MagicMock instead of a Mock as it was previously
+* Addition of `attach_mock` method
 * Added `ANY` for ignoring arguments in `assert_called_with` calls
 * Addition of `call` helper object
 * Improved repr for mocks
@@ -163,6 +164,7 @@ mock 0.8.0 is the last version that will support Python 2.4.
 * patch lookup is done at use time not at decoration time
 * When attaching a Mock to another Mock as a magic method, calls are recorded
   in mock_calls
+* Addition of `attach_mock` method
 * Renamed the internal classes `Sentinel` and `SentinelObject` to prevent abuse
 * BUGFIX: various issues around circular references with mocks (setting a mock
   return value to be itself etc)

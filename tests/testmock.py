@@ -1264,6 +1264,38 @@ class MockTest(unittest2.TestCase):
             self.assertEqual(repr(m.a()), original_repr)
 
 
+    def test_attach_mock(self):
+        classes = Mock, MagicMock, NonCallableMagicMock, NonCallableMock
+        for Klass in classes:
+            for Klass2 in classes:
+                m = Klass()
+
+                m2 = Klass2(name='foo')
+                m.attach_mock(m2, 'bar')
+
+                self.assertIs(m.bar, m2)
+                self.assertIn("name='mock.bar'", repr(m2))
+
+                m.bar.baz(1)
+                self.assertEqual(m.mock_calls, [call.bar.baz(1)])
+                self.assertEqual(m.method_calls, [call.bar.baz(1)])
+
+
+    def test_attach_mock_return_value(self):
+        classes = Mock, MagicMock, NonCallableMagicMock, NonCallableMock
+        for Klass in Mock, MagicMock:
+            for Klass2 in classes:
+                m = Klass()
+
+                m2 = Klass2(name='foo')
+                m.attach_mock(m2, 'return_value')
+
+                self.assertIs(m(), m2)
+                self.assertIn("name='mock()'", repr(m2))
+
+                m2.foo()
+                self.assertEqual(m.mock_calls, call().foo().call_list())
+
 
 if __name__ == '__main__':
     unittest2.main()
