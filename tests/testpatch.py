@@ -1626,8 +1626,18 @@ class PatchTest(unittest2.TestCase):
 
 
     def test_patch_imports_lazily(self):
+        sys.modules.pop('squizz', None)
+
         p1 = patch('squizz.squozz')
         self.assertRaises(ImportError, p1.start)
+
+        squizz = Mock()
+        sys.modules['squizz'] = squizz
+        p1 = patch('squizz.squozz')
+        squizz.squozz = 3
+        p1.start()
+        p1.stop()
+        self.assertEqual(squizz.squozz, 3)
 
 
 
