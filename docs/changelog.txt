@@ -158,7 +158,7 @@ mock 0.8.0 is the last version that will support Python 2.4.
 * Added license file to the distribution
 
 
-2011/XX/XX Version 0.8.0 beta 4
+2011/10/09 Version 0.8.0 beta 4
 -------------------------------
 
 * patch lookup is done at use time not at decoration time
