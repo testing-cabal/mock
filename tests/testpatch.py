@@ -1632,6 +1632,7 @@ class PatchTest(unittest2.TestCase):
         self.assertRaises(ImportError, p1.start)
 
         squizz = Mock()
+        squizz.squozz = 6
         sys.modules['squizz'] = squizz
         p1 = patch('squizz.squozz')
         squizz.squozz = 3
