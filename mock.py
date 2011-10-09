@@ -546,6 +546,19 @@ class NonCallableMock(Base):
         )
 
 
+    def attach_mock(self, mock, attribute):
+        """
+        Attach a mock as an attribute of this one, replacing its name and
+        parent. Calls to the attached mock will be recorded in the
+        `method_calls` and `mock_calls` attributes of this one."""
+        mock._mock_parent = None
+        mock._mock_new_parent = None
+        mock._mock_name = ''
+        mock._mock_new_name = None
+
+        setattr(self, attribute, mock)
+
+
     def mock_add_spec(self, spec, spec_set=False):
         """Add a spec to a mock. `spec` can either be an object or a
         list of strings. Only attributes on the `spec` can be fetched as
