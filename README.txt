@@ -4,7 +4,8 @@ action, you can make assertions about which methods / attributes were used and
 arguments they were called with. You can also specify return values and set
 needed attributes in the normal way.
 
-mock is tested on Python versions 2.4-2.7 and Python 3.
+mock is tested on Python versions 2.4-2.7 and Python 3. mock is also tested
+with the latest versions of Jython and pypy.
 
 The mock module also provides utility functions / objects to assist with
 testing, particularly monkey patching.

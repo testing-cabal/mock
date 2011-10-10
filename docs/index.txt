@@ -45,7 +45,8 @@ Mock is very easy to use and is designed for use with
 the 'action -> assertion' pattern instead of `'record -> replay'` used by many
 mocking frameworks.
 
-mock is tested on Python versions 2.4-2.7 and Python 3.
+mock is tested on Python versions 2.4-2.7 and Python 3. mock is also tested with
+the latest versions of Jython and pypy.
 
 .. testsetup::
 
