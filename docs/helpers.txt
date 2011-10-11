@@ -1,0 +1,23 @@
+=========
+ Helpers
+=========
+
+.. currentmodule:: mock
+
+.. testsetup::
+
+    import sys, unittest2
+    from mock import MagicMock, Mock, patch
+
+
+call
+====
+
+create_autospec
+===============
+
+
+
+ANY
+===
+

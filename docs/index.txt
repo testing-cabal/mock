@@ -29,24 +29,29 @@
 
 .. index:: introduction
 
-mock is a Python module that provides a core :class:`Mock` class. It removes
-the need to create a host of stubs throughout your test suite. After
-performing an action, you can make assertions about which methods / attributes
-were used and arguments they were called with. You can also specify return
-values and set needed attributes in the normal way.
+mock is a library for testing in Python. It allows you to replace parts of
+your system under test with mock objects and make assertions about how they
+have been used.
 
-The mock module also provides a :func:`patch` decorator that handles
-patching module and class level attributes within the scope of a test, along
-with :const:`sentinel` for creating unique objects. See the `quick guide`_ for
-some examples of how to use :class:`Mock`, :class:`MagicMock` and :func:`patch`.
+mock provides a core :class:`Mock` class removing the need to create a host
+of stubs throughout your test suite. After performing an action, you can make
+assertions about which methods / attributes were used and arguments they were
+called with. You can also specify return values and set needed attributes in
+the normal way.
+
+Additionally, mock provides a :func:`patch` decorator that handles patching
+module and class level attributes within the scope of a test, along with
+:const:`sentinel` for creating unique objects. See the `quick guide`_ for
+some examples of how to use :class:`Mock`, :class:`MagicMock` and
+:func:`patch`.
 
 Mock is very easy to use and is designed for use with
 `unittest <http://pypi.python.org/pypi/unittest2>`_. Mock is based on
 the 'action -> assertion' pattern instead of `'record -> replay'` used by many
 mocking frameworks.
 
-mock is tested on Python versions 2.4-2.7 and Python 3. mock is also tested with
-the latest versions of Jython and pypy.
+mock is tested on Python versions 2.4-2.7 and Python 3. mock is also tested
+with the latest versions of Jython and pypy.
 
 .. testsetup::
 
@@ -70,6 +75,7 @@ API Documentation
 
    mock
    patch
+   helpers
    sentinel
    magicmock
    mocksignature
@@ -85,6 +91,7 @@ User Guide
    examples
    compare
    changelog
+
 
 .. index:: installing
 
@@ -127,10 +134,10 @@ unpacking run:
 Quick Guide
 ===========
 
-:class:`Mock` objects create all attributes and methods as you access them and store
-details of how they have been used. You can configure them, to specify return
-values or limit what attributes are available, and then make assertions about
-how they have been used:
+:class:`Mock` and :class:`MagicMock` objects create all attributes and
+methods as you access them and store details of how they have been used. You
+can configure them, to specify return values or limit what attributes are
+available, and then make assertions about how they have been used:
 
 .. doctest::
 
@@ -151,13 +158,16 @@ values or raise an exception when a mock is called:
    Traceback (most recent call last):
     ...
    KeyError: 'foo'
-   >>> values = [1, 2, 3]
-   >>> def side_effect():
-   ...     return values.pop()
+   >>> values = {'a': 1, 'b': 2, 'c': 3}
+   >>> def side_effect(arg):
+   ...     return values[arg]
    ...
    >>> mock.side_effect = side_effect
-   >>> mock(), mock(), mock()
+   >>> mock('a'), mock('b'), mock('c')
    (3, 2, 1)
+   >>> mock.side_effect = [5, 4, 3, 2, 1]
+   >>> mock(), mock(), mock()
+   (5, 4, 3)
 
 Mock has many other ways you can configure it and control its behaviour. For
 example the ``spec`` argument configures the mock to take its specification from

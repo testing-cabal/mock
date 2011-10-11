@@ -646,6 +646,11 @@ class SpecSignatureTest(unittest2.TestCase):
         mock.assert_called_once_with()
         self.assertRaises(TypeError, mock, 'a')
 
+        instance = mock()
+        self.assertRaises(TypeError, instance)
+        instance(a='a')
+        instance.assert_called_once_with(a='a')
+
         mock = create_autospec(Callable())
         mock(a='a')
         mock.assert_called_once_with(a='a')
