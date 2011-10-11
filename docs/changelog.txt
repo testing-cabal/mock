@@ -116,7 +116,7 @@ mock 0.8.0 is the last version that will support Python 2.4.
 * Improved repr for mocks
 * Improved repr for `Mock.call_args` and entries in `Mock.call_args_list`,
   `Mock.method_calls` and `Mock.mock_calls`
-* patch lookup is done at use time not at decoration time
+* `patch` lookup is done at use time not at decoration time
 * In Python 2.6 or more recent, `dir` on a mock will report all the dynamically
   created attributes (or the full list of attributes if there is a spec) as
   well as all the mock methods and attributes.
@@ -158,10 +158,17 @@ mock 0.8.0 is the last version that will support Python 2.4.
 * Added license file to the distribution
 
 
+2011/XX/XX Version 0.8.0 release candidate 1
+--------------------------------------------
+
+* `create_autospec` on the return value of a mock class will use `__call__`
+  for the signature rather than `__init__`
+
+
 2011/10/09 Version 0.8.0 beta 4
 -------------------------------
 
-* patch lookup is done at use time not at decoration time
+* `patch` lookup is done at use time not at decoration time
 * When attaching a Mock to another Mock as a magic method, calls are recorded
   in mock_calls
 * Addition of `attach_mock` method
