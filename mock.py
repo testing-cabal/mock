@@ -172,18 +172,22 @@ def _getsignature(func, skipfirst):
     return signature[1:-1], func
 
 
-def _getsignature2(func, skipfirst):
+def _getsignature2(func, skipfirst, instance=False):
     if inspect is None:
         raise ImportError('inspect module not available')
 
-    if isinstance(func, ClassTypes):
+    if isinstance(func, ClassTypes) and not instance:
         try:
             func = func.__init__
         except AttributeError:
             return
         skipfirst = True
     elif not isinstance(func, FunctionTypes):
-        func = func.__call__
+        # for classes where instance is True we end up here too
+        try:
+            func = func.__call__
+        except AttributeError:
+            return
 
     try:
         regargs, varargs, varkwargs, defaults = inspect.getargspec(func)
@@ -203,11 +207,11 @@ def _getsignature2(func, skipfirst):
     return signature[1:-1], func
 
 
-def _check_signature(func, mock, skipfirst):
+def _check_signature(func, mock, skipfirst, instance=False):
     if not _callable(func):
         return
 
-    result = _getsignature2(func, skipfirst)
+    result = _getsignature2(func, skipfirst, instance)
     if result is None:
         return
     signature, func = result
@@ -263,7 +267,7 @@ def _instance_callable(obj):
     return False
 
 
-def _set_signature(mock, original):
+def _set_signature(mock, original, instance=False):
     # creates a function with signature (*args, **kwargs) that delegates to a
     # mock. It still does signature checking by calling a lambda with the same
     # signature as the original. This is effectively mocksignature2.
@@ -271,7 +275,7 @@ def _set_signature(mock, original):
         return
 
     skipfirst = isinstance(original, ClassTypes)
-    result = _getsignature2(original, skipfirst)
+    result = _getsignature2(original, skipfirst, instance)
     if result is None:
         # was a C function (e.g. object().__init__ ) that can't be mocked
         return
@@ -2101,7 +2105,7 @@ def create_autospec(spec, spec_set=False, instance=False,
         # recurse for functions
         mock = _set_signature(mock, spec)
     else:
-        _check_signature(spec, mock, is_type)
+        _check_signature(spec, mock, is_type, instance)
 
     if _parent is not None and not instance:
         _parent._mock_children[_name] = mock
