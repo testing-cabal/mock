@@ -661,6 +661,23 @@ class SpecSignatureTest(unittest2.TestCase):
         mock.assert_called_with('a')
 
 
+    def test_signature_noncallable(self):
+        class NonCallable(object):
+            def __init__(self):
+                pass
+
+        mock = create_autospec(NonCallable)
+        instance = mock()
+        mock.assert_called_once_with()
+        self.assertRaises(TypeError, mock, 'a')
+        self.assertRaises(TypeError, instance)
+        self.assertRaises(TypeError, instance, 'a')
+
+        mock = create_autospec(NonCallable())
+        self.assertRaises(TypeError, mock)
+        self.assertRaises(TypeError, mock, 'a')
+
+
     def test_create_autospec_none(self):
         class Foo(object):
             bar = None
