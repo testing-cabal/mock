@@ -448,5 +448,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
         foo = Foo()
         self.assertIsInstance(foo.__int__, Foo)
 
+
+
 if __name__ == '__main__':
     unittest2.main()
