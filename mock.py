@@ -1775,15 +1775,16 @@ def _set_return_value(mock, method, name):
 class MagicMixin(object):
     def __init__(self, *args, **kw):
         _super(MagicMixin, self).__init__(*args, **kw)
-        self._mock_set_magics(_first=True)
+        self._mock_set_magics()
 
 
-    def _mock_set_magics(self, _first=False):
+    def _mock_set_magics(self):
         these_magics = _magics
 
         if self._mock_methods is not None:
             these_magics = _magics.intersection(self._mock_methods)
 
+            remove_magics = set()
             remove_magics = _magics - these_magics
 
             for entry in remove_magics:
@@ -1791,9 +1792,8 @@ class MagicMixin(object):
                     # remove unneeded magic methods
                     delattr(self, entry)
 
-        if not _first:
-            # don't overwrite existing attributes if called a second time
-            these_magics = these_magics - set(type(self).__dict__)
+        # don't overwrite existing attributes if called a second time
+        these_magics = these_magics - set(type(self).__dict__)
 
         for entry in these_magics:
             setattr(type(self), entry, MagicProxy(entry, self))
