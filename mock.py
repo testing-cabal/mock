@@ -509,7 +509,9 @@ class NonCallableMock(Base):
         # so we can create magic methods on the
         # class without stomping on other mocks
         new = type(cls.__name__, (cls,), {'__doc__': cls.__doc__})
-        return object.__new__(new)
+        instance = object.__new__(new)
+        new.__mock_instance__ = instance
+        return instance
 
 
     def __init__(
@@ -901,6 +903,7 @@ class NonCallableMock(Base):
             raise AssertionError(
                 '%s call not found' % expected_string
             )
+
 
     def _get_child_mock(self, **kw):
         """Create the child mocks for attributes and return value.
@@ -1793,7 +1796,23 @@ class MagicMixin(object):
 
         _type = type(self)
         for entry in these_magics:
-            setattr(_type, entry, MagicProxy(entry, self))
+            setattr(_type, entry, _get_proxy(entry, self))
+
+
+_cached_proxies = {}
+
+def _get_proxy(entry, parent):
+    if entry == '__unicode__':
+        # workaround for Python 2.6 bug where unicode(foo) bypasses descriptor
+        # protocol to look up __unicode__
+        return MagicProxy(entry, parent)
+
+    proxy = _cached_proxies.get(entry)
+    if proxy is not None:
+        return proxy
+    proxy = MagicProxy(entry)
+    _cached_proxies[entry] = proxy
+    return proxy
 
 
 
@@ -1833,12 +1852,16 @@ class MagicMock(MagicMixin, Mock):
 
 
 class MagicProxy(object):
-    def __init__(self, name, parent):
+    def __init__(self, name, parent=None):
         self.name = name
+        # only used by __unicode__ as a workaround for a Python 2.6 bug
         self.parent = parent
 
-    def create_mock(self):
-        parent = self.parent
+    def __call__(self, *args, **kwargs):
+        m = self.create_mock(self.parent)
+        return m(*args, **kwargs)
+
+    def create_mock(self, parent):
         entry = self.name
         m = parent._get_child_mock(name=entry, _new_name=entry,
                                    _new_parent=parent)
@@ -1846,12 +1869,10 @@ class MagicProxy(object):
         _set_return_value(parent, m, entry)
         return m
 
-    def __call__(self, *args, **kwargs):
-        m = self.create_mock()
-        return m(*args, **kwargs)
-
     def __get__(self, obj, _type=None):
-        return self.create_mock()
+        if obj is None:
+            obj = _type.__mock_instance__
+        return self.create_mock(obj)
 
 
 
