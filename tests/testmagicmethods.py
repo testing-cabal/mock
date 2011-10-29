@@ -449,6 +449,12 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertIsInstance(foo.__int__, Foo)
 
 
+    def test_descriptor_from_class(self):
+        m = MagicMock()
+        type(m).__str__.return_value = 'foo'
+        self.assertEqual(str(m), 'foo')
+
+
 
 if __name__ == '__main__':
     unittest2.main()

@@ -29,7 +29,7 @@ __all__ = (
 )
 
 
-__version__ = '0.8.0beta4'
+__version__ = '0.8.0rc1'
 
 
 import pprint
@@ -42,6 +42,15 @@ except ImportError:
     # may not have inspect
     inspect = None
 
+try:
+    from weakref import ref
+except ImportError:
+    # for alternative platforms that
+    # may not have weakref
+    def ref(obj):
+        def _ref():
+            return obj
+        return _ref
 
 try:
     from functools import wraps
@@ -255,12 +264,13 @@ def _instance_callable(obj):
     For classes, return True if instances would be callable."""
     if not isinstance(obj, ClassTypes):
         # already an instance
-        return hasattr(obj, '__call__')
+        return getattr(obj, '__call__', None) is not None
 
     klass = obj
     # uses __bases__ instead of __mro__ so that we work with old style classes
-    if '__call__' in klass.__dict__:
+    if klass.__dict__.get('__call__') is not None:
         return True
+
     for base in klass.__bases__:
         if _instance_callable(base):
             return True
@@ -510,7 +520,7 @@ class NonCallableMock(Base):
         # class without stomping on other mocks
         new = type(cls.__name__, (cls,), {'__doc__': cls.__doc__})
         instance = object.__new__(new)
-        new.__mock_instance__ = instance
+        new.__mock_instance__ = ref(instance)
         return instance
 
 
@@ -548,7 +558,7 @@ class NonCallableMock(Base):
 
         _super(NonCallableMock, self).__init__(
             spec, wraps, name, spec_set, parent,
-            _spec_state, **kwargs
+            _spec_state
         )
 
 
@@ -1871,7 +1881,7 @@ class MagicProxy(object):
 
     def __get__(self, obj, _type=None):
         if obj is None:
-            obj = _type.__mock_instance__
+            obj = _type.__mock_instance__()
         return self.create_mock(obj)
 
 
