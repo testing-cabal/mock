@@ -1791,8 +1791,9 @@ class MagicMixin(object):
         # don't overwrite existing attributes if called a second time
         these_magics = these_magics - set(type(self).__dict__)
 
+        _type = type(self)
         for entry in these_magics:
-            setattr(type(self), entry, MagicProxy(entry, self))
+            setattr(_type, entry, MagicProxy(entry, self))
 
 
 
