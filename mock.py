@@ -1775,10 +1775,10 @@ def _set_return_value(mock, method, name):
 class MagicMixin(object):
     def __init__(self, *args, **kw):
         _super(MagicMixin, self).__init__(*args, **kw)
-        self._mock_set_magics()
+        self._mock_set_magics(_first=True)
 
 
-    def _mock_set_magics(self):
+    def _mock_set_magics(self, _first=False):
         these_magics = _magics
 
         if self._mock_methods is not None:
@@ -1791,10 +1791,12 @@ class MagicMixin(object):
                     # remove unneeded magic methods
                     delattr(self, entry)
 
-        existing = set(type(self).__dict__)
-        # don't overwrite existing attributes if called a second time
-        for entry in these_magics - existing:
-            setattr(self, entry, _create_proxy(entry, self))
+        if not _first:
+            # don't overwrite existing attributes if called a second time
+            these_magics = these_magics - set(type(self).__dict__)
+
+        for entry in these_magics:
+            setattr(type(self), entry, MagicProxy(entry, self))
 
 
 
@@ -1833,23 +1835,25 @@ class MagicMock(MagicMixin, Mock):
 
 
 
-def _create_proxy(entry, self):
-    # could specify parent?
-    def create_mock():
-        m = self._get_child_mock(name=entry, _new_name=entry, _new_parent=self)
-        setattr(self, entry, m)
-        _set_return_value(self, m, entry)
-        return m
-    return MagicProxy(create_mock)
-
-
-
 class MagicProxy(object):
-    def __init__(self, create_mock):
-        self.create_mock = create_mock
+    __slots__ = ['name', 'parent']
+    def __init__(self, name, parent):
+        self.name = name
+        self.parent = parent
+
+    def create_mock(self):
+        parent = self.parent
+        entry = self.name
+        m = parent._get_child_mock(name=entry, _new_name=entry,
+                                   _new_parent=parent)
+        setattr(parent, entry, m)
+        _set_return_value(parent, m, entry)
+        return m
+
     def __call__(self, *args, **kwargs):
         m = self.create_mock()
         return m(*args, **kwargs)
+
     def __get__(self, obj, _type=None):
         return self.create_mock()
 
