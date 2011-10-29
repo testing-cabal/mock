@@ -163,6 +163,9 @@ mock 0.8.0 is the last version that will support Python 2.4.
 
 * `create_autospec` on the return value of a mock class will use `__call__`
   for the signature rather than `__init__`
+* Minor performance improvement instantiating `MagicMock`
+* Mocks used as magic methods have the same type as their parent instead of
+  being hardcoded to `MagicMock`
 
 
 2011/10/09 Version 0.8.0 beta 4
