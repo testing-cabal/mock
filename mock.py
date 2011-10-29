@@ -788,10 +788,6 @@ class NonCallableMock(Base):
             if self._mock_methods is not None and name not in self._mock_methods:
                 raise AttributeError("Mock object has no attribute '%s'" % name)
 
-            if isinstance(value, MagicProxy):
-                setattr(type(self), name, value)
-                return
-
             if not _is_instance_mock(value):
                 setattr(type(self), name, _get_method(name, value))
                 original = value
@@ -1836,7 +1832,6 @@ class MagicMock(MagicMixin, Mock):
 
 
 class MagicProxy(object):
-    __slots__ = ['name', 'parent']
     def __init__(self, name, parent):
         self.name = name
         self.parent = parent
