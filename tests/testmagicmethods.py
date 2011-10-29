@@ -441,6 +441,12 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertRaises(TypeError, setattr, m, '__iter__', [3].__iter__)
 
 
+    def test_magic_method_type(self):
+        class Foo(MagicMock):
+            pass
+
+        foo = Foo()
+        self.assertIsInstance(foo.__int__, Foo)
 
 if __name__ == '__main__':
     unittest2.main()

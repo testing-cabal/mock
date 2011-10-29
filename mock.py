@@ -910,7 +910,10 @@ class NonCallableMock(Base):
         """Create the child mocks for attributes and return value.
         By default child mocks will be the same type as the parent.
         Subclasses of Mock may want to override this to customize the way
-        child mocks are made."""
+        child mocks are made.
+
+        For non-callable mocks the callable variant will be used (rather than
+        any custom subclass)."""
         _type = type(self)
         if not issubclass(_type, CallableMixin):
             if issubclass(_type, NonCallableMagicMock):
@@ -1774,22 +1777,23 @@ class MagicMixin(object):
         _super(MagicMixin, self).__init__(*args, **kw)
         self._mock_set_magics()
 
+
     def _mock_set_magics(self):
         these_magics = _magics
+
         if self._mock_methods is not None:
             these_magics = _magics.intersection(self._mock_methods)
 
-        remove_magics = _magics - these_magics
+            remove_magics = _magics - these_magics
 
-        for entry in remove_magics:
-            if entry in type(self).__dict__:
-                # remove unneeded magic methods
-                delattr(self, entry)
+            for entry in remove_magics:
+                if entry in type(self).__dict__:
+                    # remove unneeded magic methods
+                    delattr(self, entry)
 
-        for entry in these_magics:
-            if entry in type(self).__dict__:
-                # don't overwrite existing attributes if called a second time
-                continue
+        existing = set(type(self).__dict__)
+        # don't overwrite existing attributes if called a second time
+        for entry in these_magics - existing:
             setattr(self, entry, _create_proxy(entry, self))
 
 
@@ -1832,7 +1836,7 @@ class MagicMock(MagicMixin, Mock):
 def _create_proxy(entry, self):
     # could specify parent?
     def create_mock():
-        m = MagicMock(name=entry, _new_name=entry, _new_parent=self)
+        m = self._get_child_mock(name=entry, _new_name=entry, _new_parent=self)
         setattr(self, entry, m)
         _set_return_value(self, m, entry)
         return m
