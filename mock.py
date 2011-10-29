@@ -1881,6 +1881,7 @@ class MagicProxy(object):
 
     def __get__(self, obj, _type=None):
         if obj is None:
+            # fetch the instance from a weak reference on its class
             obj = _type.__mock_instance__()
         return self.create_mock(obj)
 
@@ -1941,9 +1942,10 @@ class _Call(tuple):
         name = ''
         args = ()
         kwargs = {}
-        if len(value) == 3:
+        _len = len(value)
+        if _len == 3:
             name, args, kwargs = value
-        elif len(value) == 2:
+        elif _len == 2:
             first, second = value
             if isinstance(first, basestring):
                 name = first
@@ -1953,7 +1955,7 @@ class _Call(tuple):
                     kwargs = second
             else:
                 args, kwargs = first, second
-        elif len(value) == 1:
+        elif _len == 1:
             value, = value
             if isinstance(value, basestring):
                 name = value
