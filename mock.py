@@ -662,7 +662,14 @@ class NonCallableMock(Base):
 
 
     def configure_mock(self, **kwargs):
-        """XXX needs docstring"""
+        """Set attributes on the mock through keyword arguments.
+
+        Attributes plus return values and side effects can be set on child
+        mocks using standard dot notation and unpacking a dictionary in the
+        method call:
+
+        >>> attrs = {'method.return_value': 3, 'other.side_effect': KeyError}
+        >>> mock.configure_mock(**attrs)"""
         for arg, val in sorted(kwargs.items(),
                                # we sort on the number of dots so that
                                # attributes are set before we set attributes on
@@ -2131,14 +2138,14 @@ def create_autospec(spec, spec_set=False, instance=False,
             # allow a mock to actually be a function from mocksignature
             continue
 
-        # XXXX do we need a better way of getting attributes
-        # without triggering code execution (?) Probably not - we need the
-        # actual object to mock it so we would rather trigger a property than
-        # mock the property descriptor. Likewise we want to mock out
-        # dynamically provided attributes.
+        # XXXX do we need a better way of getting attributes without
+        # triggering code execution (?) Probably not - we need the actual
+        # object to mock it so we would rather trigger a property than mock
+        # the property descriptor. Likewise we want to mock out dynamically
+        # provided attributes.
         # XXXX what about attributes that raise exceptions on being fetched
-        # we could be resilient against it, or catch and propagate the exception
-        # when the attribute is fetched from the mock
+        # we could be resilient against it, or catch and propagate the
+        # exception when the attribute is fetched from the mock
         original = getattr(spec, entry)
 
         kwargs = {'spec': original}
