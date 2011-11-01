@@ -43,16 +43,6 @@ except ImportError:
     inspect = None
 
 try:
-    from weakref import ref
-except ImportError:
-    # for alternative platforms that
-    # may not have weakref
-    def ref(obj):
-        def _ref():
-            return obj
-        return _ref
-
-try:
     from functools import wraps
 except ImportError:
     # Python 2.4 compatibility
@@ -520,7 +510,6 @@ class NonCallableMock(Base):
         # class without stomping on other mocks
         new = type(cls.__name__, (cls,), {'__doc__': cls.__doc__})
         instance = object.__new__(new)
-        new.__mock_instance__ = ref(instance)
         return instance
 
 
@@ -1806,23 +1795,7 @@ class MagicMixin(object):
 
         _type = type(self)
         for entry in these_magics:
-            setattr(_type, entry, _get_proxy(entry, self))
-
-
-_cached_proxies = {}
-
-def _get_proxy(entry, parent):
-    if entry == '__unicode__':
-        # workaround for Python 2.6 bug where unicode(foo) bypasses descriptor
-        # protocol to look up __unicode__
-        return MagicProxy(entry, parent)
-
-    proxy = _cached_proxies.get(entry)
-    if proxy is not None:
-        return proxy
-    proxy = MagicProxy(entry)
-    _cached_proxies[entry] = proxy
-    return proxy
+            setattr(_type, entry, MagicProxy(entry, self))
 
 
 
@@ -1862,17 +1835,17 @@ class MagicMock(MagicMixin, Mock):
 
 
 class MagicProxy(object):
-    def __init__(self, name, parent=None):
+    def __init__(self, name, parent):
         self.name = name
-        # only used by __unicode__ as a workaround for a Python 2.6 bug
         self.parent = parent
 
     def __call__(self, *args, **kwargs):
-        m = self.create_mock(self.parent)
+        m = self.create_mock()
         return m(*args, **kwargs)
 
-    def create_mock(self, parent):
+    def create_mock(self):
         entry = self.name
+        parent = self.parent
         m = parent._get_child_mock(name=entry, _new_name=entry,
                                    _new_parent=parent)
         setattr(parent, entry, m)
@@ -1880,10 +1853,7 @@ class MagicProxy(object):
         return m
 
     def __get__(self, obj, _type=None):
-        if obj is None:
-            # fetch the instance from a weak reference on its class
-            obj = _type.__mock_instance__()
-        return self.create_mock(obj)
+        return self.create_mock()
 
 
 
