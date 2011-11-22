@@ -440,7 +440,7 @@ def _mock_signature_property(name):
     def _set(self, value, name=name, _the_name=_the_name):
         sig = self._mock_signature
         if sig is None:
-            setattr(self, _the_name, value)
+            self.__dict__[_the_name] = value
         else:
             setattr(sig, name, value)
 
@@ -784,10 +784,11 @@ class NonCallableMock(Base):
 
 
     def __setattr__(self, name, value):
-        if (self._spec_set and self._mock_methods is not None and
+        if name in _allowed_names:
+            pass
+        elif (self._spec_set and self._mock_methods is not None and
             name not in self._mock_methods and
-            name not in self.__dict__ and
-            name not in _allowed_names):
+            name not in self.__dict__):
             raise AttributeError("Mock object has no attribute '%s'" % name)
         elif name in _unsupported_magics:
             msg = 'Attempting to set unsupported magic method %r.' % name
@@ -806,8 +807,6 @@ class NonCallableMock(Base):
                 # but not method calls
                 _check_and_set_parent(self, value, None, name)
                 setattr(type(self), name, value)
-        elif name in _allowed_names:
-            pass
         elif _check_and_set_parent(self, value, name, name):
             self._mock_children[name] = value
         return object.__setattr__(self, name, value)
