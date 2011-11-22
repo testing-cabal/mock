@@ -431,15 +431,16 @@ _allowed_names = set(
 
 def _mock_signature_property(name):
     _allowed_names.add(name)
-    def _get(self):
+    _the_name = '_mock_' + name
+    def _get(self, name=name, _the_name=_the_name):
         sig = self._mock_signature
         if sig is None:
-            return getattr(self, '_mock_' + name)
+            return getattr(self, _the_name)
         return getattr(sig, name)
-    def _set(self, value):
+    def _set(self, value, name=name, _the_name=_the_name):
         sig = self._mock_signature
         if sig is None:
-            setattr(self, '_mock_' + name, value)
+            setattr(self, _the_name, value)
         else:
             setattr(sig, name, value)
 
@@ -521,10 +522,11 @@ class NonCallableMock(Base):
         if _new_parent is None:
             _new_parent = parent
 
-        self._mock_parent = parent
-        self._mock_name = name
-        self._mock_new_name = _new_name
-        self._mock_new_parent = _new_parent
+        __dict__ = self.__dict__
+        __dict__['_mock_parent'] = parent
+        __dict__['_mock_name'] = name
+        __dict__['_mock_new_name'] = _new_name
+        __dict__['_mock_new_parent'] = _new_parent
 
         if spec_set is not None:
             spec = spec_set
@@ -532,17 +534,18 @@ class NonCallableMock(Base):
 
         self._mock_add_spec(spec, spec_set)
 
-        self._mock_children = {}
-        self._mock_wraps = wraps
-        self._mock_signature = None
+        __dict__['_mock_children'] = {}
+        __dict__['_mock_wraps'] = wraps
+        __dict__['_mock_signature'] = None
 
-        self._mock_called = False
-        self._mock_call_args = None
-        self._mock_call_count = 0
-        self._mock_call_args_list = _CallList()
-        self._mock_mock_calls = _CallList()
+        __dict__['_mock_called'] = False
+        __dict__['_mock_call_args'] = None
+        __dict__['_mock_call_count'] = 0
+        __dict__['_mock_call_args_list'] = _CallList()
+        __dict__['_mock_mock_calls'] = _CallList()
 
-        self.reset_mock()
+        __dict__['method_calls'] = _CallList()
+
         self.configure_mock(**kwargs)
 
         _super(NonCallableMock, self).__init__(
@@ -584,9 +587,10 @@ class NonCallableMock(Base):
 
             spec = dir(spec)
 
-        self._spec_class = _spec_class
-        self._spec_set = spec_set
-        self._mock_methods = spec
+        __dict__ = self.__dict__
+        __dict__['_spec_class'] = _spec_class
+        __dict__['_spec_set'] = spec_set
+        __dict__['_mock_methods'] = spec
 
 
     def __get_return_value(self):
@@ -780,10 +784,6 @@ class NonCallableMock(Base):
 
 
     def __setattr__(self, name, value):
-        if not 'method_calls' in self.__dict__:
-            # allow all attribute setting until initialisation is complete
-            return object.__setattr__(self, name, value)
-
         if (self._spec_set and self._mock_methods is not None and
             name not in self._mock_methods and
             name not in self.__dict__ and
@@ -952,7 +952,7 @@ class CallableMixin(Base):
     def __init__(self, spec=None, side_effect=None, return_value=DEFAULT,
                  wraps=None, name=None, spec_set=None, parent=None,
                  _spec_state=None, _new_name='', _new_parent=None, **kwargs):
-        self._mock_return_value = return_value
+        self.__dict__['_mock_return_value'] = return_value
 
         _super(CallableMixin, self).__init__(
             spec, wraps, name, spec_set, parent,
@@ -960,8 +960,6 @@ class CallableMixin(Base):
         )
 
         self.side_effect = side_effect
-
-
 
 
     def _mock_check_sig(self, *args, **kwargs):
