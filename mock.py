@@ -546,7 +546,8 @@ class NonCallableMock(Base):
 
         __dict__['method_calls'] = _CallList()
 
-        self.configure_mock(**kwargs)
+        if kwargs:
+            self.configure_mock(**kwargs)
 
         _super(NonCallableMock, self).__init__(
             spec, wraps, name, spec_set, parent,
@@ -663,6 +664,7 @@ class NonCallableMock(Base):
         ret = self._mock_return_value
         if _is_instance_mock(ret) and ret is not self:
             ret.reset_mock()
+        # XXXX this doesn't reset the return value on a mocksignature mock
 
 
     def configure_mock(self, **kwargs):
@@ -785,7 +787,8 @@ class NonCallableMock(Base):
 
     def __setattr__(self, name, value):
         if name in _allowed_names:
-            pass
+            # property setters go through here
+            return object.__setattr__(self, name, value)
         elif (self._spec_set and self._mock_methods is not None and
             name not in self._mock_methods and
             name not in self.__dict__):
@@ -807,8 +810,9 @@ class NonCallableMock(Base):
                 # but not method calls
                 _check_and_set_parent(self, value, None, name)
                 setattr(type(self), name, value)
-        elif _check_and_set_parent(self, value, name, name):
-            self._mock_children[name] = value
+        else:
+            if _check_and_set_parent(self, value, name, name):
+                self._mock_children[name] = value
         return object.__setattr__(self, name, value)
 
 
@@ -986,8 +990,10 @@ class CallableMixin(Base):
 
         seen = set()
         skip_next_dot = _new_name == '()'
+        do_method_calls = self._mock_parent is not None
+        name = self._mock_name
         while _new_parent is not None:
-            this_call = _Call((_new_name, args, kwargs))
+            this_mock_call = _Call((_new_name, args, kwargs))
             if _new_parent._mock_new_name:
                 dot = '.'
                 if skip_next_dot:
@@ -999,32 +1005,36 @@ class CallableMixin(Base):
 
                 _new_name = _new_parent._mock_new_name + dot + _new_name
 
-            _new_parent.mock_calls.append(this_call)
+            if do_method_calls:
+                if _new_name == name:
+                    this_method_call = this_mock_call
+                else:
+                    this_method_call = _Call((name, args, kwargs))
+                _new_parent.method_calls.append(this_method_call)
+
+                do_method_calls = _new_parent._mock_parent is not None
+                if do_method_calls:
+                    name = _new_parent._mock_name + '.' + name
+
+            _new_parent.mock_calls.append(this_mock_call)
             _new_parent = _new_parent._mock_new_parent
 
             # use ids here so as not to call __hash__ on the mocks
-            if id(_new_parent) in seen:
+            _new_parent_id = id(_new_parent)
+            if _new_parent_id in seen:
                 break
-            seen.add(id(_new_parent))
-
-        parent = self._mock_parent
-        name = self._mock_name
-        while parent is not None:
-            parent.method_calls.append(_Call((name, args, kwargs)))
-            if parent._mock_parent is None:
-                break
-            name = parent._mock_name + '.' + name
-            parent = parent._mock_parent
+            seen.add(_new_parent_id)
 
         ret_val = DEFAULT
-        if self.side_effect is not None:
-            if _is_exception(self.side_effect):
-                raise self.side_effect
+        effect = self.side_effect
+        if effect is not None:
+            if _is_exception(effect):
+                raise effect
 
-            if not _callable(self.side_effect):
-                return next(self.side_effect)
+            if not _callable(effect):
+                return next(effect)
 
-            ret_val = self.side_effect(*args, **kwargs)
+            ret_val = effect(*args, **kwargs)
             if ret_val is DEFAULT:
                 ret_val = self.return_value
 
