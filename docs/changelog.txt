@@ -158,7 +158,7 @@ mock 0.8.0 is the last version that will support Python 2.4.
 * Added license file to the distribution
 
 
-2011/XX/XX Version 0.8.0 release candidate 1
+2011/12/29 Version 0.8.0 release candidate 1
 --------------------------------------------
 
 * `create_autospec` on the return value of a mock class will use `__call__`
