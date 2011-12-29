@@ -185,6 +185,10 @@ algorithm as the code under test, which is a classic testing anti-pattern.
 Calls to the date constructor are recorded in the `mock_date` attributes
 (`call_count` and friends) which may also be useful for your tests.
 
+An alternative way of dealing with mocking dates, or other builtin classes,
+is discussed in `this blog entry
+<http://williamjohnbert.com/2011/07/how-to-unit-testing-in-django-with-mocking-and-patching/>`_.
+
 
 Mocking open
 ============

@@ -664,7 +664,6 @@ class NonCallableMock(Base):
         ret = self._mock_return_value
         if _is_instance_mock(ret) and ret is not self:
             ret.reset_mock()
-        # XXXX this doesn't reset the return value on a mocksignature mock
 
 
     def configure_mock(self, **kwargs):
