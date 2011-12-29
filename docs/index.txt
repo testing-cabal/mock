@@ -352,8 +352,6 @@ Older Versions
 
 Documentation for older versions of mock:
 
-# XXXX
-
 * `mock 0.7 <http://www.voidspace.org.uk/python/mock/0.7/>`_
 * `mock 0.6 <http://www.voidspace.org.uk/python/mock/0.6.0/>`_
 

@@ -2,8 +2,8 @@ mock is a library for testing in Python. It allows you to replace parts of
 your system under test with mock objects and make assertions about how they
 have been used.
 
-mock provides a core Mock class removing the need to create a host of stubs
-throughout your test suite. After performing an action, you can make
+mock provides a core `MagicMock` class removing the need to create a host of
+stubs throughout your test suite. After performing an action, you can make
 assertions about which methods / attributes were used and arguments they were
 called with. You can also specify return values and set needed attributes in
 the normal way.
@@ -101,7 +101,7 @@ statement::
     ...     real = ProductionClass()
     ...     real.method(1, 2, 3)
     ...
-    >>> mock_method.assert_called_with(1, 2, 3)
+    >>> mock_method.assert_called_once_with(1, 2, 3)
 
 There is also `patch.dict` for setting values in a dictionary just during the
 scope of a test and restoring the dictionary to its original state when the
@@ -114,7 +114,7 @@ test ends::
    ...
    >>> assert foo == original
 
-Mock now supports the mocking of Python magic methods. The easiest way of
+Mock supports the mocking of Python magic methods. The easiest way of
 using magic methods is with the `MagicMock` class. It allows you to do
 things like::
 
@@ -123,7 +123,7 @@ things like::
     >>> mock.__str__.return_value = 'foobarbaz'
     >>> str(mock)
     'foobarbaz'
-    >>> mock.__str__.assert_called_with()
+    >>> mock.__str__.assert_called_once_with()
 
 Mock allows you to assign functions (or other Mock instances) to magic methods
 and they will be called appropriately. The MagicMock class is just a Mock
@@ -135,8 +135,7 @@ class::
 
     >>> from mock import Mock
     >>> mock = Mock()
-    >>> mock.__str__ = Mock()
-    >>> mock.__str__.return_value = 'wheeeeee'
+    >>> mock.__str__ = Mock(return_value = 'wheeeeee')
     >>> str(mock)
     'wheeeeee'
 
