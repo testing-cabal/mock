@@ -167,6 +167,9 @@ mock 0.8.0 is the last version that will support Python 2.4.
 * Mocks used as magic methods have the same type as their parent instead of
   being hardcoded to `MagicMock`
 
+Special thanks to Julian Berman for his help with diagnosing and improving
+performance in this release.
+
 
 2011/10/09 Version 0.8.0 beta 4
 -------------------------------
