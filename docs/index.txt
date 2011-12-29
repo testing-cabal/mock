@@ -297,6 +297,8 @@ Articles and blog entries on testing with Mock:
 
 * `PyCon 2011 Video: Testing with mock <https://blip.tv/file/4881513>`_
 * `Mocking Django <http://www.mattjmorrison.com/2011/09/mocking-django.html>`_
+* `Mocking dates and other classes that can't be modified
+  <http://williamjohnbert.com/2011/07/how-to-unit-testing-in-django-with-mocking-and-patching/>`_
 * `Mock recipes <http://konryd.blogspot.com/2010/06/mock-recipies.html>`_
 * `Mockity mock mock - some love for the mock module
   <http://konryd.blogspot.com/2010/05/mockity-mock-mock-some-love-for-mock.html>`_
