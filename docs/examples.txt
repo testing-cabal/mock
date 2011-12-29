@@ -663,6 +663,37 @@ the args and calls our `new_mock` with the copy.
          ...
         AssertionError
 
+An alternative approach is to create a subclass of `Mock` or `MagicMock` that
+copies (using `copy.deepcopy
+<http://docs.python.org/library/copy.html#copy.deepcopy>`_) the arguments.
+Here's an example implementation:
+
+.. doctest::
+
+    >>> from copy import deepcopy
+    >>> class CopyingMock(MagicMock):
+    ...     def __call__(self, *args, **kwargs):
+    ...         args = deepcopy(args)
+    ...         kwargs = deepcopy(kwargs)
+    ...         return super(CopyingMock, self).__call__(*args, **kwargs)
+    ...
+    >>> c = CopyingMock(return_value=None)
+    >>> arg = set()
+    >>> c(arg)
+    >>> arg.add(1)
+    >>> c.assert_called_with(set())
+    >>> c.assert_called_with(arg)
+    Traceback (most recent call last):
+      ...
+    AssertionError: Expected call: mock(set([1]))
+    Actual call: mock(set([]))
+    >>> c.foo
+    <CopyingMock name='mock.foo' id='...'>
+
+When you subclass `Mock` or `MagicMock` all dynamically created attributes,
+and the `return_value` will use your subclass automatically. That means all
+children of a `CopyingMock` will also have the type `CopyingMock`.
+
 
 Multiple calls with different effects
 =====================================
