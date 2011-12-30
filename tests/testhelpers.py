@@ -304,6 +304,26 @@ class SpecSignatureTest(unittest2.TestCase):
             self._check_someclass_mock(mock)
 
 
+    def test_create_autospec_return_value(self):
+        def f():
+            pass
+        mock = create_autospec(f, return_value='foo')
+        self.assertEqual(mock(), 'foo')
+
+        class Foo(object):
+            pass
+
+        mock = create_autospec(Foo, return_value='foo')
+        self.assertEqual(mock(), 'foo')
+
+
+    def test_create_autospec_keyword_arguments(self):
+        class Foo(object):
+            a = 3
+        m = create_autospec(Foo, a='3')
+        self.assertEqual(m.a, '3')
+
+
     def test_function_as_instance_attribute(self):
         obj = SomeClass()
         def f(a):

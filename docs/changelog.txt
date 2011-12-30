@@ -158,6 +158,13 @@ mock 0.8.0 is the last version that will support Python 2.4.
 * Added license file to the distribution
 
 
+2011/XX/XX Version 0.8.0 release candidate 2
+--------------------------------------------
+
+* Removed the `configure` keyword argument to `create_autospec` and allow
+  arbitrary keyword arguments (for the `Mock` constructor) instead
+
+
 2011/12/29 Version 0.8.0 release candidate 1
 --------------------------------------------
 
