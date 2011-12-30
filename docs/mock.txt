@@ -14,14 +14,20 @@
     class SomeClass:
         pass
 
-``Mock`` is a flexible mock object intended to replace the use of stubs and
+`Mock` is a flexible mock object intended to replace the use of stubs and
 test doubles throughout your code. Mocks are callable and create attributes as
 new mocks when you access them [#]_. Accessing the same attribute will always
 return the same mock. Mocks record how you use them, allowing you to make
 assertions about what your code has done to them.
 
+:class:`MagicMock` is a subclass of `Mock` with all the magic methods
+pre-created and ready to use.
+
 The :func:`mock.patch` decorators makes it easy to temporarily replace classes
-in a particular module with a Mock object.
+in a particular module with a `Mock` object. By default `patch` will create
+a `MagicMock` for you. You can specify an alternative class of `Mock` using
+the `new_callable` argument to `patch`.
+
 
 .. index:: side_effect
 .. index:: return_value
@@ -29,7 +35,7 @@ in a particular module with a Mock object.
 .. index:: name
 .. index:: spec
 
-.. autoclass:: Mock
+.. class:: Mock
 
 Mock objects that use a class or an instance as a `spec` or `spec_set` are able
 to pass `isintance` tests:
@@ -77,6 +83,22 @@ Methods
         AssertionError: Expected to be called once. Called 2 times.
 
 
+.. method:: Mock.assert_any_call(*args, **kwargs)
+
+    assert the mock has been called with the specified arguments.
+
+    The assert passes if the mock has *ever* been called, unlike
+    `assert_called_with` and `assert_called_once_with` that only pass if
+    the call is the most recent one.
+
+    .. doctest::
+
+        >>> mock = Mock(return_value=None)
+        >>> mock(1, 2, arg='thing')
+        >>> mock('some', 'thing', 'else')
+        >>> mock.assert_any_call(1, 2, arg='thing')
+
+
 .. method:: Mock.reset_mock()
 
     The reset_mock method resets all the call attributes on a mock object:
@@ -92,10 +114,64 @@ Methods
         False
 
     This can be useful where you want to make a series of assertions that
-    reuse the same object. Note that ``reset`` *doesn't* clear the return
-    value, ``side_effect`` or any child attributes. Attributes you have set
-    using normal assignment are also left in place. Child mocks and the return
+    reuse the same object. Note that `reset_mock` *doesn't* clear the return
+    value, `side_effect` or any child attributes you have set
+    using normal assignment. Child mocks and the return
     value mock (if any) are reset as well.
+
+
+.. method:: Mock.mock_add_spec(spec, spec_set=False)
+
+    Mock.Add a spec to a mock. `spec` can either be an object or a
+    list of strings. Only attributes on the `spec` can be fetched as
+    attributes from the mock.
+
+    If `spec_set` is True then only attributes on the spec can be set.
+
+
+.. method:: Mock.attach_mock(mock, attribute)
+
+    Attach a mock as an attribute of this one, replacing its name and
+    parent. Calls to the attached mock will be recorded in the
+    `method_calls` and `mock_calls` attributes of this one.
+
+
+.. method:: configure_mock(**kwargs)
+
+        Set attributes on the mock through keyword arguments.
+
+        Attributes plus return values and side effects can be set on child
+        mocks using standard dot notation and unpacking a dictionary in the
+        method call:
+
+        .. doctest::
+
+            >>> mock = Mock()
+            >>> attrs = {'method.return_value': 3, 'other.side_effect': KeyError}
+            >>> mock.configure_mock(**attrs)
+            >>> mock.method()
+            3
+            >>> mock.other()
+            Traceback (most recent call last):
+              ...
+            KeyError
+
+
+.. method:: Mock.__dir__()
+
+    XXXX
+
+
+.. method:: Mock._get_child_mock(**kw)
+
+
+    Create the child mocks for attributes and return value.
+    By default child mocks will be the same type as the parent.
+    Subclasses of Mock may want to override this to customize the way
+    child mocks are made.
+
+    For non-callable mocks the callable variant will be used (rather than
+    any custom subclass).
 
 
 .. index:: __call__
@@ -331,6 +407,24 @@ Attributes
         <Mock name='mock.method()' id='...'>
         >>> mock.method_calls == [('method',), ('method', (1, 2)),
         ... ('method', {"a": "b"})]
+        True
+
+.. attribute:: Mock.mock_calls
+
+    XXXX
+
+
+.. attribute:: Mock.__class__
+
+    Normally the `__class__` attribute of an object will return its type. For
+    a mock object with a `spec` `__class__` returns the spec class instead.
+    This allows mock objects to pass `isinstance` tests for the object they
+    are replacing / masquerading as:
+
+    .. doctest::
+
+        >>> mock = Mock(spec=3)
+        >>> isinstance(mock, int)
         True
 
 The `Mock` class has support for mocking magic methods. See :ref:`magic
