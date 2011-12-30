@@ -959,6 +959,17 @@ class PatchTest(unittest2.TestCase):
         test()
 
 
+    def test_autospec_keywords(self):
+        @patch('%s.function' % __name__, autospec=True,
+               return_value=3)
+        def test(mock_function):
+            #self.assertEqual(function.abc, 'foo')
+            return function(1, 2)
+
+        result = test()
+        self.assertEqual(result, 3)
+
+
     def test_autospec_with_new(self):
         patcher = patch('%s.function' % __name__, new=3, autospec=True)
         self.assertRaises(TypeError, patcher.start)
