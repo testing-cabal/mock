@@ -2064,7 +2064,8 @@ call = _Call(from_kall=False)
 
 
 def create_autospec(spec, spec_set=False, instance=False,
-                    configure=None, _parent=None, _name=None):
+                    configure=None, _parent=None, _name=None,
+                    **kwargs):
     """Create a mock object using another object as a spec. Attributes on the
     mock will use the corresponding attribute on the `spec` object as their
     spec.
@@ -2081,11 +2082,8 @@ def create_autospec(spec, spec_set=False, instance=False,
     spec for an instance object by passing `instance=True`. The returned mock
     will only be callable if instances of the mock are callable.
 
-    `configure` is a dictionary that will be used as keyword arguments for the
-    created mock."""
-    if configure is None:
-        configure = {}
-
+    `create_autospec` also takes arbitrary keyword arguments that are passed to
+    the constructor of the created mock."""
     if _is_list(spec):
         # can't pass a list instance to the mock constructor as it will be
         # interpreted as a list of strings
@@ -2093,20 +2091,20 @@ def create_autospec(spec, spec_set=False, instance=False,
 
     is_type = isinstance(spec, ClassTypes)
 
-    kwargs = {'spec': spec}
+    _kwargs = {'spec': spec}
     if spec_set:
-        kwargs = {'spec_set': spec}
+        _kwargs = {'spec_set': spec}
     elif spec is None:
         # None we mock with a normal mock without a spec
-        kwargs = {}
+        _kwargs = {}
 
-    kwargs.update(configure)
+    _kwargs.update(kwargs)
 
     Klass = MagicMock
     if type(spec) in DescriptorTypes:
         # descriptors don't have a spec
         # because we don't know what type they return
-        kwargs = {}
+        _kwargs = {}
     elif not _callable(spec):
         Klass = NonCallableMagicMock
     elif is_type and instance and not _instance_callable(spec):
@@ -2118,7 +2116,7 @@ def create_autospec(spec, spec_set=False, instance=False,
         _new_name = ''
 
     mock = Klass(parent=_parent, _new_parent=_parent, _new_name=_new_name,
-                 name=_name, **kwargs)
+                 name=_name, **_kwargs)
 
     if isinstance(spec, FunctionTypes):
         # should only happen at the top level because we don't
@@ -2130,7 +2128,7 @@ def create_autospec(spec, spec_set=False, instance=False,
     if _parent is not None and not instance:
         _parent._mock_children[_name] = mock
 
-    if is_type and not instance:
+    if is_type and not instance and 'return_value' not in kwargs:
         # XXXX could give a name to the return_value mock?
         mock.return_value = create_autospec(spec, spec_set, instance=True,
                                             _name='()', _parent=mock)
