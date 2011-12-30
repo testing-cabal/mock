@@ -14,7 +14,7 @@ Feature requests and bug reports are handled on the issue tracker:
 
 `patch` could auto-do the patching in the constructor and unpatch in the
 destructor. This would be useful in itself, but violates TOOWTDI and would be
-unsafe for IronPython & pypy (non-deterministic calling of destructors).
+unsafe for IronPython & PyPy (non-deterministic calling of destructors).
 Destructors aren't called in CPython where there are cycles, but a weak
 reference with a callback can be used to get round this.
 
@@ -61,12 +61,20 @@ getting / setting. They also have the `assert_called_with` and
 fetching them would create a mock (attribute) that could be called without
 error.
 
-Some outstanding technical debt. The way autospeccing mocks function signatures was
-copied and modified from `mocksignature`. This could all be refactored into
-one set of functions instead of two. The way we tell if patchers are started
-and if a patcher is being used for a `patch.multiple` call are both horrible.
-There are now a host of helper functions that should be rationalised.
-(Probably time to split mock into a package instead of a module.)
+Some outstanding technical debt. The way autospeccing mocks function
+signatures was copied and modified from `mocksignature`. This could all be
+refactored into one set of functions instead of two. The way we tell if
+patchers are started and if a patcher is being used for a `patch.multiple`
+call are both horrible. There are now a host of helper functions that should
+be rationalised. (Probably time to split mock into a package instead of a
+module.)
+
+Passing arbitrary keyword arguments to `create_autospec`, or `patch` with
+`autospec`, when mocking a *function* works fine. However, the arbitrary
+attributes are set on the created mock - but `create_autospec` returns a
+real function (which doesn't have those attributes). However, what is the use
+case for using autospec to create functions with attributes that don't exist
+on the original?
 
 `mocksignature`, plus the `call_args_list` and `method_calls` attributes of
 `Mock` could all be deprecated.

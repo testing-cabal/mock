@@ -1321,8 +1321,9 @@ class _patch(object):
             spec_set = bool(spec_set)
             if autospec is True:
                 autospec = original
-            new = create_autospec(autospec, spec_set=spec_set, configure=kwargs,
-                                  _name=self.attribute)
+
+            new = create_autospec(autospec, spec_set=spec_set,
+                                  _name=self.attribute, **kwargs)
         elif kwargs:
             # can't set keyword args when we aren't creating the mock
             # XXXX If new is a Mock we could call new.configure_mock(**kwargs)
