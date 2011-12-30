@@ -16,6 +16,26 @@ call
 create_autospec
 ===============
 
+.. function:: create_autospec(spec, spec_set=False, instance=False, configure=None, _parent=None, _name=None, **kwargs)
+
+    Create a mock object using another object as a spec. Attributes on the
+    mock will use the corresponding attribute on the `spec` object as their
+    spec.
+
+    Functions or methods being mocked will have their arguments checked in a
+    similar way to `mocksignature` to check that they are called with the
+    correct signature.
+
+    If `spec_set` is True then attempting to set attributes that don't exist
+    on the spec object will raise an `AttributeError`.
+
+    If a class is used as a spec then the return value of the mock (the
+    instance of the class) will have the same spec. You can use a class as the
+    spec for an instance object by passing `instance=True`. The returned mock
+    will only be callable if instances of the mock are callable.
+
+    `create_autospec` also takes arbitrary keyword arguments that are passed to
+    the constructor of the created mock.
 
 
 ANY
