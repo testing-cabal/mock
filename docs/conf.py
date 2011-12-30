@@ -25,7 +25,7 @@ from mock import __version__
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.doctest', 'sphinx.ext.autodoc']
+extensions = ['sphinx.ext.doctest']
 
 html_theme = 'basic'
 html_theme_options = {}
