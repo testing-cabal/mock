@@ -12,6 +12,9 @@
     def dir(obj):
         print pp(original_dir(obj))
 
+    import urllib2
+    __main__.urllib2 = urllib2
+
 .. testcleanup::
 
     dir = original_dir
@@ -228,14 +231,14 @@ The spec also applies to instantiated classes (i.e. the return value of specced 
 
     >>> req = urllib2.Request('foo', 'bar')
     >>> req
-    <MagicMock spec='Request' id='...'>
+    <NonCallableMagicMock name='urllib2.Request()' spec='Request' id='...'>
 
 Because the spec also applies to methods, any typos in our asserts will raise the correct error:
 
 .. doctest::
 
     >>> req.add_header('spam', 'eggs')
-    <mock.MagicMock object at 0x...>
+    <MagicMock name='urllib2.Request().add_header()' id='...'>
     >>> req.add_header.assret_called_with
     Traceback (most recent call last):
      ...
@@ -338,7 +341,7 @@ just be ordinary mocks (well - `MagicMocks`):
     ...
     >>> mock = create_autospec(Something)
     >>> mock.member.foo.bar.baz()
-    <mock.MagicMock object at 0x...>
+    <MagicMock name='mock.member.foo.bar.baz()' id='...'>
 
 If modifying your production classes to add defaults isn't to your liking
 then there are more options. One of these is simply to use an instance as the
@@ -360,6 +363,6 @@ alternative object as the `autospec` argument:
     >>> p = patch('__main__.Something', autospec=SomethingForTest)
     >>> mock = p.start()
     >>> mock.a
-    <MagicMock name='Something.a' spec='int' id='...'>
+    <NonCallableMagicMock name='Something.a' spec='int' id='...'>
 
 
