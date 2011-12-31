@@ -6,14 +6,18 @@
 
 .. testsetup::
 
-    import sys, unittest2
-    from mock import MagicMock, Mock, patch
-    import mock
     mock.FILTER_DIR = True
     from pprint import pprint as pp
     original_dir = dir
     def dir(obj):
         print pp(original_dir(obj))
+
+.. testcleanup::
+
+    dir = original_dir
+    mock.FILTER_DIR = False
+
+
 
 call
 ====
@@ -220,7 +224,7 @@ incorrectly:
 
 The spec also applies to instantiated classes (i.e. the return value of specced mocks):
 
-.. code-block:: pycon
+.. doctest::
 
     >>> req = urllib2.Request('foo', 'bar')
     >>> req
@@ -267,7 +271,7 @@ created in the `__init__` method and not to exist on the class at all.
 `autospec` can't know about any dynamically created attributes and restricts
 the api to visible attributes.
 
-.. code-block:: pycon
+.. doctest::
 
     >>> class Something(object):
     ...   def __init__(self):
@@ -327,7 +331,7 @@ spec, and probably indicates a member that will normally of some other type,
 `autospec` doesn't use a spec for members that are set to `None`. These will
 just be ordinary mocks (well - `MagicMocks`):
 
-.. code-block:: pycon
+.. doctest::
 
     >>> class Something(object):
     ...     member = None
@@ -344,7 +348,7 @@ production class. Both of these require you to use an alternative object as
 the spec. Thankfully `patch` supports this - you can simply pass the
 alternative object as the `autospec` argument:
 
-.. code-block:: pycon
+.. doctest::
 
     >>> class Something(object):
     ...   def __init__(self):

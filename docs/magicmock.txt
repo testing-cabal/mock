@@ -1,9 +1,6 @@
 
 .. currentmodule:: mock
 
-.. testsetup::
-
-   from mock import Mock, MagicMock, patch
 
 .. _magic-methods:
 

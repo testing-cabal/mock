@@ -7,17 +7,11 @@
 
 .. testsetup::
 
-    import os, sys, unittest
-    if not os.getcwd() in sys.path:
-        sys.path.append(os.getcwd())
-
-    from mock import Mock, sentinel
-
     class ProductionClass(object):
         def something(self):
             return self.method()
 
-    class Test(unittest.TestCase):
+    class Test(unittest2.TestCase):
         def testSomething(self):
             pass
     self = Test('testSomething')

@@ -8,13 +8,6 @@
 
 .. testsetup::
 
-    import os, sys
-    if not os.getcwd() in sys.path:
-        sys.path.append(os.getcwd())
-
-    import unittest
-    from mock import Mock, sentinel, patch
-
     class SomeClass(object):
         static_method = None
         class_method = None
@@ -476,7 +469,7 @@ A nice pattern is to actually decorate test methods themselves:
 
 .. doctest::
 
-    >>> class MyTest(unittest.TestCase):
+    >>> class MyTest(unittest2.TestCase):
     ...     @patch.object(SomeClass, 'attribute', sentinel.attribute)
     ...     def test_something(self):
     ...         self.assertEqual(SomeClass.attribute, sentinel.attribute)
@@ -491,7 +484,7 @@ passed into the test function / method:
 
 .. doctest::
 
-    >>> class MyTest(unittest.TestCase):
+    >>> class MyTest(unittest2.TestCase):
     ...     @patch.object(SomeClass, 'static_method')
     ...     def test_something(self, mock_method):
     ...         SomeClass.static_method()
@@ -503,7 +496,7 @@ You can stack up multiple patch decorators using this pattern:
 
 .. doctest::
 
-    >>> class MyTest(unittest.TestCase):
+    >>> class MyTest(unittest2.TestCase):
     ...     @patch('package.module.ClassName1')
     ...     @patch('package.module.ClassName2')
     ...     def test_something(self, MockClass2, MockClass1):
