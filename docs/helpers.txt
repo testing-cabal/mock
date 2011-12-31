@@ -10,6 +10,10 @@
     from mock import MagicMock, Mock, patch
     import mock
     mock.FILTER_DIR = True
+    from pprint import pprint as pp
+    original_dir = dir
+    def dir(obj):
+        print pp(original_dir(obj))
 
 call
 ====
@@ -24,10 +28,10 @@ create_autospec
     spec.
 
     Functions or methods being mocked will have their arguments checked in a
-    similar way to `mocksignature` to check that they are called with the
+    similar way to :func:`mocksignature` to check that they are called with the
     correct signature.
 
-    If `spec_set` is True then attempting to set attributes that don't exist
+    If `spec_set` is `True` then attempting to set attributes that don't exist
     on the spec object will raise an `AttributeError`.
 
     If a class is used as a spec then the return value of the mock (the
@@ -37,6 +41,7 @@ create_autospec
 
     `create_autospec` also takes arbitrary keyword arguments that are passed to
     the constructor of the created mock.
+
 
 
 ANY
@@ -62,16 +67,19 @@ yet:
 .. doctest::
 
     >>> dir(Mock())
-    ['assert_called_once_with', 'assert_called_with', 'call_args',
-    'call_args_list', 'call_count', 'called', 'configure_mock',
-    'method_calls', 'mock_calls', 'reset_mock', 'return_value',
-    'side_effect']
+    ['assert_any_call',
+     'assert_called_once_with',
+     'assert_called_with',
+     'assert_has_calls',
+     'attach_mock',
+     ...
     >>> import urllib2
     >>> dir(Mock(spec=urllib2))
-    ['AbstractBasicAuthHandler', 'AbstractDigestAuthHandler',
-    'AbstractHTTPHandler', 'BaseHandler', 'CacheFTPHandler', 'FTPHandler',
-    'FileHandler', 'HTTPBasicAuthHandler', 'HTTPCookieProcessor',
-    'HTTPDefaultErrorHandler', 'HTTPDigestAuthHandler', 'HTTPError', ...]
+    ['AbstractBasicAuthHandler',
+     'AbstractDigestAuthHandler',
+     'AbstractHTTPHandler',
+     'BaseHandler',
+     ...
 
 Many of the not-very-useful (private to `Mock` rather than the thing being
 mocked) underscore and double underscore prefixed attributes have been
@@ -84,14 +92,18 @@ behaviour you can switch it off by setting the module level switch
     >>> import mock
     >>> mock.FILTER_DIR = False
     >>> dir(mock.Mock())
-    ['_Mock__get_return_value', '_Mock__return_value_doc', '_Mock__set_return_value', '__call__',
-    '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__format__', '__getattr__',
-    '__getattribute__', '__hash__', '__init__', '__module__', '__new__', '__reduce__',
-    ...]
+    ['_NonCallableMock__get_return_value',
+     '_NonCallableMock__get_side_effect',
+     '_NonCallableMock__return_value_doc',
+     '_NonCallableMock__set_return_value',
+     '_NonCallableMock__set_side_effect',
+     '__call__',
+     '__class__',
+     ...
 
-Alternatively you can just use `vars(my_mock)` (instance members) and `dir(type(my_mock))` (type members) to bypass the filtering irrespective of `mock.FILTER_DIR`.
-
-It was implementing the custom `dir` behaviour that prompted the blog entry `Implementing __dir__ </python/weblog/arch_d7_2011_05_21.shtml#e1212>`_.
+Alternatively you can just use `vars(my_mock)` (instance members) and
+`dir(type(my_mock))` (type members) to bypass the filtering irrespective of
+`mock.FILTER_DIR`.
 
 
 Autospeccing
@@ -239,8 +251,7 @@ can be used to create autospecced mocks directly:
     >>> import urllib2
     >>> mock_urllib2 = create_autospec(urllib2)
     >>> mock_urllib2.Request('foo', 'bar')
-    <NonCallableMagicMock spec='Request' id='...'>
-
+    <NonCallableMagicMock name='mock.Request()' spec='Request' id='...'>
 
 This isn't without caveats and limitations however, which is why it has not
 been made the default behaviour. In order to know what attributes are
