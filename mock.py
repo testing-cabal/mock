@@ -714,7 +714,7 @@ class NonCallableMock(Base):
         elif isinstance(result, _SpecState):
             result = create_autospec(
                 result.spec, result.spec_set, result.instance,
-                None, result.parent, result.name
+                result.parent, result.name
             )
             self._mock_children[name]  = result
 
@@ -2067,9 +2067,8 @@ call = _Call(from_kall=False)
 
 
 
-def create_autospec(spec, spec_set=False, instance=False,
-                    configure=None, _parent=None, _name=None,
-                    **kwargs):
+def create_autospec(spec, spec_set=False, instance=False, _parent=None,
+                    _name=None, **kwargs):
     """Create a mock object using another object as a spec. Attributes on the
     mock will use the corresponding attribute on the `spec` object as their
     spec.

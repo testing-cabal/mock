@@ -8,7 +8,8 @@
 
     import sys, unittest2
     from mock import MagicMock, Mock, patch
-
+    import mock
+    mock.FILTER_DIR = True
 
 call
 ====
@@ -16,7 +17,7 @@ call
 create_autospec
 ===============
 
-.. function:: create_autospec(spec, spec_set=False, instance=False, configure=None, _parent=None, _name=None, **kwargs)
+.. function:: create_autospec(spec, spec_set=False, instance=False, **kwargs)
 
     Create a mock object using another object as a spec. Attributes on the
     mock will use the corresponding attribute on the `spec` object as their
@@ -40,4 +41,310 @@ create_autospec
 
 ANY
 ===
+
+FILTER_DIR
+==========
+
+.. attribute:: FILTER_DIR
+
+`FILTER_DIR` is a module level variable that controls the way mock objects
+respond to `dir` (only for Python 2.6 or more recent). The default is `True`,
+which uses the filtering described below, to only show useful members. If you
+dislike this filtering, or need to switch it off for diagnostic purposes, then
+set `mock.FILTER_DIR = False`.
+
+With filtering on, `dir(some_mock)` shows only useful attributes and will
+include any dynamically created attributes that wouldn't normally be shown.
+If the mock was created with a `spec` (or `autospec` of course) then all the
+attributes from the original are shown, even if they haven't been accessed
+yet:
+
+.. doctest::
+
+    >>> dir(Mock())
+    ['assert_called_once_with', 'assert_called_with', 'call_args',
+    'call_args_list', 'call_count', 'called', 'configure_mock',
+    'method_calls', 'mock_calls', 'reset_mock', 'return_value',
+    'side_effect']
+    >>> import urllib2
+    >>> dir(Mock(spec=urllib2))
+    ['AbstractBasicAuthHandler', 'AbstractDigestAuthHandler',
+    'AbstractHTTPHandler', 'BaseHandler', 'CacheFTPHandler', 'FTPHandler',
+    'FileHandler', 'HTTPBasicAuthHandler', 'HTTPCookieProcessor',
+    'HTTPDefaultErrorHandler', 'HTTPDigestAuthHandler', 'HTTPError', ...]
+
+Many of the not-very-useful (private to `Mock` rather than the thing being
+mocked) underscore and double underscore prefixed attributes have been
+filtered from the result of calling `dir` on a `Mock`. If you dislike this
+behaviour you can switch it off by setting the module level switch
+`FILTER_DIR`:
+
+.. doctest::
+
+    >>> import mock
+    >>> mock.FILTER_DIR = False
+    >>> dir(mock.Mock())
+    ['_Mock__get_return_value', '_Mock__return_value_doc', '_Mock__set_return_value', '__call__',
+    '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__format__', '__getattr__',
+    '__getattribute__', '__hash__', '__init__', '__module__', '__new__', '__reduce__',
+    ...]
+
+Alternatively you can just use `vars(my_mock)` (instance members) and `dir(type(my_mock))` (type members) to bypass the filtering irrespective of `mock.FILTER_DIR`.
+
+It was implementing the custom `dir` behaviour that prompted the blog entry `Implementing __dir__ </python/weblog/arch_d7_2011_05_21.shtml#e1212>`_.
+
+
+Autospeccing
+============
+
+
+Autospeccing is based on the existing `spec` feature of mock. It limits the
+api of mocks to the api of an original object (the spec), but it is recursive
+(implemented lazily) so that attributes of mocks only have the same api as
+the attributes of the spec. In addition mocked functions / methods have the
+same call signature as the original so they raise a `TypeError` if they are
+called incorrectly. This feature is a better version of both the `spec` and
+`mocksignature` features in the current mock.
+
+Before I explain how auto-speccing works, here's why it is needed.
+
+`Mock` is a very powerful and flexible object, but it suffers from two flaws
+when used to mock out objects from a system under test. One of these flaws is
+specific to the `Mock` api and the other is a more general problem with using
+mock objects.
+
+First the problem specific to `Mock`. `Mock` has two assert methods that are
+extremely handy: `assert_called_with
+</python/mock/mock.html#mock.Mock.assert_called_with>`_ and
+`assert_called_once_with
+</python/mock/mock.html#mock.Mock.assert_called_once_with>`_.
+
+.. doctest::
+
+    >>> mock = Mock(name='Thing', return_value=None)
+    >>> mock(1, 2, 3)
+    >>> mock.assert_called_once_with(1, 2, 3)
+    >>> mock(1, 2, 3)
+    >>> mock.assert_called_once_with(1, 2, 3)
+    Traceback (most recent call last):
+     ...
+    AssertionError: Expected to be called once. Called 2 times.
+
+Because mocks auto-create attributes on demand, and allow you to call them
+with arbitrary arguments, if you misspell one of these assert methods then
+your assertion is gone:
+
+.. code-block:: pycon
+
+    >>> mock = Mock(name='Thing', return_value=None)
+    >>> mock(1, 2, 3)
+    >>> mock.assret_called_once_with(4, 5, 6)
+
+Your tests can pass silently and incorrectly because of the typo.
+
+The second issue is more general to mocking. If you refactor some of your
+code, rename members and so on, any tests for code that is still using the
+*old api* but uses mocks instead of the real objects will still pass. This
+means your tests can all pass even though your code is broken.
+
+Note that this is another reason why you need integration tests as well as
+unit tests. Testing everything in isolation is all fine and dandy, but if you
+don't test how your units are "wired together" there is still lots of room
+for bugs that tests might have caught.
+
+`mock` already provides a feature to help with this, called speccing. If you
+use a class or instance as the `spec` for a mock then you can only access
+attributes on the mock that exist on the real class:
+
+.. doctest::
+
+    >>> import urllib2
+    >>> mock = Mock(spec=urllib2.Request)
+    >>> mock.assret_called_with
+    Traceback (most recent call last):
+     ...
+    AttributeError: Mock object has no attribute 'assret_called_with'
+
+The spec only applies to the mock itself, so we still have the same issue
+with any methods on the mock:
+
+.. code-block:: pycon
+
+    >>> mock.has_data()
+    <mock.Mock object at 0x...>
+    >>> mock.has_data.assret_called_with()
+
+Auto-speccing solves this problem, and combines the features of
+`mocksignature`. You can either pass `autospec=True` to `patch` /
+`patch.object` or use the `create_autospec` function to create a mock with a
+spec. If you use the `autospec=True` argument to `patch` then the object that
+is being replaced will be used as the spec object. Because the speccing is
+done "lazily" (the spec is created as attributes on the mock are accessed)
+you can use it with very complex or deeply nested objects (like modules that
+import modules that import modules) without a big performance hit.
+
+Here's an example of it in use:
+
+.. doctest::
+
+    >>> import urllib2
+    >>> patcher = patch('__main__.urllib2', autospec=True)
+    >>> mock_urllib2 = patcher.start()
+    >>> urllib2 is mock_urllib2
+    True
+    >>> urllib2.Request
+    <MagicMock name='urllib2.Request' spec='Request' id='...'>
+
+You can see that `urllib2.Request` has a spec. `urllib2.Request` takes two
+arguments in the constructor, here's what happens if we try to call it
+incorrectly:
+
+.. doctest::
+
+    >>> req = urllib2.Request()
+    Traceback (most recent call last):
+     ...
+    TypeError: <lambda>() takes at least 2 arguments (1 given)
+
+The spec also applies to instantiated classes (i.e. the return value of specced mocks):
+
+.. code-block:: pycon
+
+    >>> req = urllib2.Request('foo', 'bar')
+    >>> req
+    <MagicMock spec='Request' id='...'>
+
+Because the spec also applies to methods, any typos in our asserts will raise the correct error:
+
+.. doctest::
+
+    >>> req.add_header('spam', 'eggs')
+    <mock.MagicMock object at 0x...>
+    >>> req.add_header.assret_called_with
+    Traceback (most recent call last):
+     ...
+    AttributeError: Mock object has no attribute 'assret_called_with'
+    >>> req.add_header.assert_called_with('spam', 'eggs')
+
+In many cases you will just be able to add `autospec=True` to your existing
+`patch` calls, but you will be protected against bugs due to typos and api
+changes.
+
+As well as using `autospec` through `patch` there is a `create_autospec` that
+can be used to create autospecced mocks directly:
+
+.. doctest::
+
+    >>> from mock import create_autospec
+    >>> import urllib2
+    >>> mock_urllib2 = create_autospec(urllib2)
+    >>> mock_urllib2.Request('foo', 'bar')
+    <NonCallableMagicMock spec='Request' id='...'>
+
+
+This isn't without caveats and limitations however, which is why it has not
+been made the default behaviour. In order to know what attributes are
+available on the spec object, autospec has to introspect (access attributes)
+the spec. As you traverse attributes on the mock a corresponding traversal of
+the original object is happening under the hood. If any of your specced
+objects have properties or descriptors that can trigger code execution then
+you may not be able to use autospec. On the other hand it is much better to
+design your objects so that introspection is safe [#]_.
+
+A more serious problem is that it is common for instance attributes to be
+created in the `__init__` method and not to exist on the class at all.
+`autospec` can't know about any dynamically created attributes and restricts
+the api to visible attributes.
+
+.. code-block:: pycon
+
+    >>> class Something(object):
+    ...   def __init__(self):
+    ...     self.a = 33
+    ...
+    >>> with patch('__main__.Something', autospec=True):
+    ...   thing = Something()
+    ...   thing.a
+    ...
+    Traceback (most recent call last):
+      ...
+    AttributeError: Mock object has no attribute 'a'
+
+There are a few different ways of resolving this problem. The easiest, but
+not necessarily the least annoying, way is to simply set the required
+attributes on the mock after creation. Just because `autospec` doesn't allow
+you to fetch attributes that don't exist on the spec it doesn't prevent you
+setting them:
+
+.. doctest::
+
+    >>> with patch('__main__.Something', autospec=True):
+    ...   thing = Something()
+    ...   thing.a = 33
+    ...
+
+There is a more aggressive version of both `spec` and `autospec` that *does*
+prevent you setting non-existent attributes. This is useful if you want to
+ensure your code only *sets* valid attributes too, but obviously it prevents
+this particular scenario:
+
+.. doctest::
+
+    >>> with patch('__main__.Something', autospec=True, spec_set=True):
+    ...   thing = Something()
+    ...   thing.a = 33
+    ...
+    Traceback (most recent call last):
+     ...
+    AttributeError: Mock object has no attribute 'a'
+
+Probably the best way of solving the problem is to add class attributes as
+default values for instance members initialised in `__init__`. Note that if
+you are only setting default attributes in `__init__` then providing them via
+class attributes (shared between instances of course) is faster too. e.g.
+
+.. code-block:: python
+
+    class Something(object):
+        a = 33
+
+This brings up another issue. It is relatively common to provide a default
+value of `None` for members that will later be an object of a different type.
+`None` would be useless as a spec because it wouldn't let you access *any*
+attributes or methods on it. As `None` is *never* going to be useful as a
+spec, and probably indicates a member that will normally of some other type,
+`autospec` doesn't use a spec for members that are set to `None`. These will
+just be ordinary mocks (well - `MagicMocks`):
+
+.. code-block:: pycon
+
+    >>> class Something(object):
+    ...     member = None
+    ...
+    >>> mock = create_autospec(Something)
+    >>> mock.member.foo.bar.baz()
+    <mock.MagicMock object at 0x...>
+
+If modifying your production classes to add defaults isn't to your liking
+then there are more options. One of these is simply to use an instance as the
+spec rather than the class. The other is to create a subclass of the
+production class and add the defaults to the subclass without affecting the
+production class. Both of these require you to use an alternative object as
+the spec. Thankfully `patch` supports this - you can simply pass the
+alternative object as the `autospec` argument:
+
+.. code-block:: pycon
+
+    >>> class Something(object):
+    ...   def __init__(self):
+    ...     self.a = 33
+    ...
+    >>> class SomethingForTest(Something):
+    ...   a = 33
+    ...
+    >>> p = patch('__main__.Something', autospec=SomethingForTest)
+    >>> mock = p.start()
+    >>> mock.a
+    <MagicMock name='Something.a' spec='int' id='...'>
+
 
