@@ -112,6 +112,9 @@ mock, can't be set dynamically, or can cause problems:
 Magic Mock
 ==========
 
+There are two `MagicMock` variants: `MagicMock` and `NonCallableMagicMock`.
+
+
 .. class:: MagicMock(*args, **kw)
 
    ``MagicMock`` is a subclass of :class:`Mock` with default implementations
@@ -121,7 +124,14 @@ Magic Mock
    If you use the ``spec`` argument then *only* magic methods that exist in
    the spec will be created.
 
-The magic methods are setup with ``Mock`` objects, so you can configure them
+
+.. class:: NonCallableMagicMock(*args, **kwargs)
+
+    A non-callable version of `MagicMock`. The constructor parameters have
+    the same meaning of `Mock`, with the exception of `return_value` and
+    `side_effect` which have no meaning on a non-callable mock.
+
+The magic methods are setup with `MagicMock` objects, so you can configure them
 and use them in the usual way:
 
 .. doctest::
