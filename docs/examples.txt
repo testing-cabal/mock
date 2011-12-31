@@ -6,8 +6,6 @@
 
 .. testsetup::
 
-    import sys, unittest2
-    from mock import MagicMock, Mock, patch
     from datetime import date
 
     BackendProvider = Mock()

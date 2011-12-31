@@ -6,13 +6,9 @@
 
 .. testsetup::
 
-    import os, sys
-    if not os.getcwd() in sys.path:
-        sys.path.append(os.getcwd())
-    from mock import Mock, sentinel, DEFAULT, call
-
     class SomeClass:
         pass
+
 
 `Mock` is a flexible mock object intended to replace the use of stubs and
 test doubles throughout your code. Mocks are callable and create attributes as

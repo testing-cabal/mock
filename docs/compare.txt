@@ -5,10 +5,6 @@
 
 .. testsetup::
 
-    import sys
-    import mock
-    from mock import call
-
     def assertEqual(a, b):
         assert a == b, ("%r != %r" % (a, b))
 
