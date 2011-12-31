@@ -27,6 +27,34 @@ from mock import __version__
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.doctest']
 
+doctest_global_setup = """
+import os
+import sys
+import mock
+from mock import * # yeah, I know :-/
+import unittest2
+import __main__
+
+if os.getcwd() not in sys.path:
+    sys.path.append(os.getcwd())
+
+# keep a reference to __main__
+sys.modules['__main'] = __main__
+
+class ProxyModule(object):
+    def __getattr__(self, name):
+        return globals()[name]
+    def __setattr__(self, name, value):
+        globals()[name] = value
+    def __delattr__(self, name):
+        del globals()[name]
+sys.modules['__main__'] = ProxyModule()
+"""
+
+doctest_global_cleanup = """
+sys.modules['__main__'] = sys.modules['__main']
+"""
+
 html_theme = 'basic'
 html_theme_options = {}
 

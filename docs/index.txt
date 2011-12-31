@@ -53,19 +53,6 @@ mocking frameworks.
 mock is tested on Python versions 2.4-2.7, Python 3 plus the latest versions of
 Jython and PyPy.
 
-.. doctest_global_setup::
-
-   import os
-   import sys
-   import mock
-   from mock import (
-      Mock, patch, MagicMock, call, ANY, sentinel, DEFAULT, mocksignature
-   )
-   import unittest2
-
-    if not os.getcwd() in sys.path:
-        sys.path.append(os.getcwd())
-
 
 .. testsetup::
 
