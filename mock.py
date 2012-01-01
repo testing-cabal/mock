@@ -1077,6 +1077,9 @@ class Mock(CallableMixin, NonCallableMock):
       Alternatively `side_effect` can be an exception class or instance. In
       this case the exception will be raised when the mock is called.
 
+      If `side_effect` is an iterable then each call to the mock will return
+      the next value from the iterable.
+
     * `return_value`: The value returned when the mock is called. By default
       this is a new Mock (created on first access). See the
       :attr:`Mock.return_value` attribute.
