@@ -211,10 +211,9 @@ statement:
 
 .. doctest::
 
-    >>> with patch.object(ProductionClass, 'method') as mock_method:
-    ...     mock_method.return_value = None
-    ...     real = ProductionClass()
-    ...     real.method(1, 2, 3)
+    >>> with patch.object(ProductionClass, 'method', return_value=None) as mock_method:
+    ...     thing = ProductionClass()
+    ...     thing.method(1, 2, 3)
     ...
     >>> mock_method.assert_called_once_with(1, 2, 3)
 
@@ -247,7 +246,7 @@ allows you to do things like:
 
 Mock allows you to assign functions (or other Mock instances) to magic methods
 and they will be called appropriately. The MagicMock class is just a Mock
-variant that has all of the magic methods pre-created for you (well - all the
+variant that has all of the magic methods pre-created for you (well, all the
 useful ones anyway).
 
 The following is an example of using magic methods with the ordinary Mock
@@ -256,8 +255,7 @@ class:
 .. doctest::
 
     >>> mock = Mock()
-    >>> mock.__str__ = Mock()
-    >>> mock.__str__.return_value = 'wheeeeee'
+    >>> mock.__str__ = Mock(return_value='wheeeeee')
     >>> str(mock)
     'wheeeeee'
 
