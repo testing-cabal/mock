@@ -507,7 +507,8 @@ Attributes
         1
         >>> result(1)
         <MagicMock name='mock()()' id='...'>
-        >>> expected = [call(1, 2, 3), call.first(a=3), call.second(), call.__int__(), call()(1)]
+        >>> expected = [call(1, 2, 3), call.first(a=3), call.second(),
+        ... call.__int__(), call()(1)]
         >>> mock.mock_calls == expected
         True
 
