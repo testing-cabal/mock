@@ -28,8 +28,8 @@ call
 .. function:: call(*args, **kwargs)
 
     `call` is a helper object for making simpler assertions
-	
-	XXXX
+
+    XXXX
 
 
 .. method:: call.call_list()
