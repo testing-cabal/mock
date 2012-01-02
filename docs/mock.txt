@@ -492,7 +492,23 @@ Attributes
 
 .. attribute:: Mock.mock_calls
 
-    XXXX
+    `mock_calls` records *all* calls to the mock object, its methods, magic
+    methods *and* return value mocks.
+
+    .. doctest::
+
+        >>> mock = MagicMock()
+        >>> mock(1, 2, 3)
+        <MagicMock name='mock()' id='...'>
+        >>> mock.first(a=3)
+        <MagicMock name='mock.first()' id='...'>
+        >>> mock.second()
+        <MagicMock name='mock.second()' id='...''>
+        >>> int(mock)
+        1
+        >>> expected = [call(1, 2, 3), call.first(a=3), call.second(), call.__int__()]
+        >>> mock.mock_calls == expected
+        True
 
 
 .. attribute:: Mock.__class__
