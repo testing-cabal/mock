@@ -27,12 +27,19 @@ call
 
 .. function:: call(*args, **kwargs)
 
-    XXXX
+    `call` is a helper object for making simpler assertions
+	
+	XXXX
 
 
 .. method:: call.call_list()
 
-    XXXX
+    For a call object that represents multiple calls, `call_list`
+    returns a list of all the intermediate calls as well as the
+    final call.
+
+`call_list` is particularly useful for making assertions on "chained calls". XXXX
+
 
 
 create_autospec
