@@ -84,7 +84,7 @@ CHANGELOG
 =========
 
 
-2011/XX/XX Version 0.8.0
+2012/XX/XX Version 0.8.0
 ------------------------
 
 Full List of changes since 0.7:
@@ -166,7 +166,7 @@ mock 0.8.0 is the last version that will support Python 2.4.
 * Added license file to the distribution
 
 
-2011/XX/XX Version 0.8.0 release candidate 2
+2012/XX/XX Version 0.8.0 release candidate 2
 --------------------------------------------
 
 * Removed the `configure` keyword argument to `create_autospec` and allow

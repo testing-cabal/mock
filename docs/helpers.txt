@@ -25,6 +25,14 @@
 call
 ====
 
+.. function:: call(*args, **kwargs)
+
+    XXXX
+
+
+.. method:: call.call_list()
+
+    XXXX
 
 
 create_autospec
