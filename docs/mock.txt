@@ -498,15 +498,16 @@ Attributes
     .. doctest::
 
         >>> mock = MagicMock()
-        >>> mock(1, 2, 3)
-        <MagicMock name='mock()' id='...'>
+        >>> result = mock(1, 2, 3)
         >>> mock.first(a=3)
         <MagicMock name='mock.first()' id='...'>
         >>> mock.second()
-        <MagicMock name='mock.second()' id='...''>
+        <MagicMock name='mock.second()' id='...'>
         >>> int(mock)
         1
-        >>> expected = [call(1, 2, 3), call.first(a=3), call.second(), call.__int__()]
+        >>> result(1)
+        <MagicMock name='mock()()' id='...'>
+        >>> expected = [call(1, 2, 3), call.first(a=3), call.second(), call.__int__(), call()(1)]
         >>> mock.mock_calls == expected
         True
 
