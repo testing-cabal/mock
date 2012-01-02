@@ -25,6 +25,8 @@
 call
 ====
 
+
+
 create_autospec
 ===============
 
@@ -112,6 +114,8 @@ Alternatively you can just use `vars(my_mock)` (instance members) and
 `dir(type(my_mock))` (type members) to bypass the filtering irrespective of
 `mock.FILTER_DIR`.
 
+
+.. _auto-speccing:
 
 Autospeccing
 ============
@@ -366,3 +370,13 @@ alternative object as the `autospec` argument:
     <NonCallableMagicMock name='Something.a' spec='int' id='...'>
 
 
+------
+
+.. [#] This only applies to classes or already instantiated objects. Calling
+   a mocked class to create a mock instance *does not* create a real instance.
+   It is only attribute lookups - along with calls to `dir` - that are done. A
+   way round this problem would have been to use `getattr_static
+   <http://docs.python.org/dev/library/inspect.html#inspect.getattr_static>`_,
+   which can fetch attributes without triggering code execution. Descriptors
+   like `classmethod` and `staticmethod` *need* to be fetched correctly though,
+   so that their signatures can be mocked correctly.
