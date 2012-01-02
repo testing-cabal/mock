@@ -38,7 +38,75 @@ patch
     `patch` is straightforward to use. The key is to do the patching in the
     right namespace. See the section `where to patch`_.
 
-.. autofunction:: patch
+.. function:: patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False, spec_set=None, autospec=False, new_callable=None, **kwargs)
+
+    `patch` acts as a function decorator, class decorator or a context
+    manager. Inside the body of the function or with statement, the `target`
+    (specified in the form `'package.module.ClassName'`) is patched
+    with a `new` object. When the function/with statement exits the patch is
+    undone.
+
+    The `target` is imported and the specified attribute patched with the new
+    object, so it must be importable from the environment you are calling the
+    decorator from.
+
+    If `new` is omitted, then a new `MagicMock` is created and passed in as an
+    extra argument to the decorated function.
+
+    The `spec` and `spec_set` keyword arguments are passed to the `MagicMock`
+    if patch is creating one for you.
+
+    In addition you can pass `spec=True` or `spec_set=True`, which causes
+    patch to pass in the object being mocked as the spec/spec_set object.
+
+    `new_callable` allows you to specify a different class, or callable object,
+    that will be called to create the `new` object. By default `MagicMock` is
+    used.
+
+    A more powerful form of `spec` is `autospec`. If you set `autospec=True`
+    then the mock with be created with a spec from the object being replaced.
+    All attributes of the mock will also have the spec of the corresponding
+    attribute of the object being replaced. Methods and functions being mocked
+    will have their arguments checked and will raise a `TypeError` if they are
+    called with the wrong signature (similar to `mocksignature`). For mocks
+    replacing a class, their return value (the 'instance') will have the same
+    spec as the class.
+
+    Instead of `autospec=True` you can pass `autospec=some_object` to use an
+    arbitrary object as the spec instead of the one being replaced.
+
+    If `mocksignature` is True then the patch will be done with a function
+    created by mocking the one being replaced. If the object being replaced is
+    a class then the signature of `__init__` will be copied. If the object
+    being replaced is a callable object then the signature of `__call__` will
+    be copied.
+
+    By default `patch` will fail to replace attributes that don't exist. If
+    you pass in 'create=True' and the attribute doesn't exist, patch will
+    create the attribute for you when the patched function is called, and
+    delete it again afterwards. This is useful for writing tests against
+    attributes that your production code creates at runtime. It is off by by
+    default because it can be dangerous. With it switched on you can write
+    passing tests against APIs that don't actually exist!
+
+    Patch can be used as a TestCase class decorator. It works by
+    decorating each test method in the class. This reduces the boilerplate
+    code when your test methods share a common patchings set. `patch` finds
+    tests by looking for method names that start with `patch.TEST_PREFIX`.
+    By default this is `test`, which matches the way `unittest` finds tests.
+    You can specify an alternative prefix by setting `patch.TEST_PREFIX`.
+
+    Patch can be used with the with statement, if this is available in your
+    version of Python. Here the patching applies to the indented block after
+    the with statement. If you use "as" then the patched object will be bound
+    to the name after the "as"; very useful if `patch` is creating a mock
+    object for you.
+
+    `patch` also takes arbitrary keyword arguments. These will be passed to
+    the `Mock` (or `new_callable`) on construction.
+
+    `patch.dict(...)`, `patch.multiple(...)` and `patch.object(...)` are
+    available for alternate use-cases.
 
 .. note::
 
@@ -142,6 +210,27 @@ when the test ends.
     ...
     newvalue
     >>> assert 'newkey' not in os.environ
+
+
+patch.multiple
+==============
+
+.. function:: patch.multiple(target, spec=None, create=False, mocksignature=False, spec_set=None, autospec=False, new_callable=None, **kwargs)
+
+    Perform multiple patches in a single call. It takes the object to be
+    patched (either as an object or a string to fetch the object by importing)
+    and keyword arguments for the patches::
+
+        with patch.multiple(settings, FIRST_PATCH='one', SECOND_PATCH='two'):
+            ...
+
+    Like `patch` it can be used as a decorator, class decorator or a context
+    manager. The arguments `spec`, `spec_set`, `create`, `mocksignature`,
+    `autospec` and `new_callable` have the same meaning as for `patch`. These
+    arguments will be applied to *all* the patches being done by
+    `patch.multiple`.
+
+    XXXX note about KEYWORD=DEFAULT
 
 
 .. _start-and-stop:

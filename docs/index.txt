@@ -260,11 +260,12 @@ class:
     'wheeeeee'
 
 For ensuring that the mock objects your tests use have the same api as the
-objects they are replacing, you can use "auto-speccing". Auto-speccing can be
-done through the `autospec` argument to patch, or the :func:`create_autospec`
-function. Auto-speccing creates mock objects that have the same attributes
-and methods as the objects they are replacing, and any functions and methods
-(including constructors) have the same call signature as the real object.
+objects they are replacing, you can use `auto-speccing <auto-speccing>`_.
+Auto-speccing can be done through the `autospec` argument to patch, or the
+:func:`create_autospec` function. Auto-speccing creates mock objects that
+have the same attributes and methods as the objects they are replacing, and
+any functions and methods (including constructors) have the same call
+signature as the real object.
 
 This ensures that your mocks will fail in the same way as your production
 code if they are used incorrectly:
