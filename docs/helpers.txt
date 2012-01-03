@@ -389,6 +389,30 @@ alternative object as the `autospec` argument:
     >>> mock.a
     <NonCallableMagicMock name='Something.a' spec='int' id='...'>
 
+.. note::
+
+    An additional limitation (currently) with `autospec` is that unbound
+    methods on mocked classes *don't* take an "explicit self" as the first
+    argument - so this usage will fail with `autospec`.
+
+    .. doctest::
+
+        >>> class Foo(object):
+        ...   def foo(self):
+        ...     pass
+        ...
+        >>> Foo.foo(Foo())
+        >>> from mock import create_autospec
+        >>> MockFoo = create_autospec(Foo)
+        >>> MockFoo.foo(MockFoo())
+        Traceback (most recent call last):
+          ...
+        TypeError: <lambda>() takes exactly 1 argument (2 given)
+
+    The reason is that its very hard to tell the difference between functions,
+    unbound methods and staticmethods across Python 2 & 3 and the alternative
+    implementations. This restriction may be fixed in future versions.
+
 
 ------
 
