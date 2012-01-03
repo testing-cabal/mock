@@ -319,6 +319,7 @@ class SpecSignatureTest(unittest2.TestCase):
 
     @unittest2.expectedFailure
     def test_create_autospec_unbound_methods(self):
+        # see issue 128
         class Foo(object):
             def foo(self):
                 pass

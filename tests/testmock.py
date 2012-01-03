@@ -1186,7 +1186,6 @@ class MockTest(unittest2.TestCase):
             self.assertEqual(mock.mock_calls, [call(), call()()])
 
 
-    @unittest2.expectedFailure
     def test_manager_mock(self):
         class Foo(object):
             one = 'one'
@@ -1200,8 +1199,8 @@ class MockTest(unittest2.TestCase):
         mock_two = p2.start()
         self.addCleanup(p2.stop)
 
-        manager.one = mock_one
-        manager.two = mock_two
+        manager.attach_mock(mock_one, 'one')
+        manager.attach_mock(mock_two, 'two')
 
         Foo.two()
         Foo.one()
