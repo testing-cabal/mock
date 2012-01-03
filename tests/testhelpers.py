@@ -317,6 +317,18 @@ class SpecSignatureTest(unittest2.TestCase):
         self.assertEqual(mock(), 'foo')
 
 
+    @unittest2.expectedFailure
+    def test_create_autospec_unbound_methods(self):
+        class Foo(object):
+            def foo(self):
+                pass
+
+        klass = create_autospec(Foo)
+        instance = klass()
+        self.assertRaises(TypeError, instance.foo(1))
+        self.assertRaises(TypeError, klass.foo())
+
+
     def test_create_autospec_keyword_arguments(self):
         class Foo(object):
             a = 3

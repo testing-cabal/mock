@@ -327,10 +327,10 @@ Tests
 =====
 
 Mock uses `unittest2 <http://pypi.python.org/pypi/unittest2>`_ for its own
-test suite. In order to run it, use the ``unit2`` script that comes with
-``unittest2`` module on a checkout of the source repository:
+test suite. In order to run it, use the `unit2` script that comes with
+`unittest2` module on a checkout of the source repository:
 
-   ``unit2 discover``
+   `unit2 discover`
 
 If you have `setuptools <http://pypi.python.org/pypi/distribute>`_ as well as
 unittest2 you can run:
