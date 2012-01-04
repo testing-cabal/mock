@@ -51,7 +51,7 @@ One use case for this is for mocking objects used as context managers in a
 
    >>> mock = Mock()
    >>> mock.__enter__ = Mock(return_value='foo')
-   >>> mock.__exit__ = Mock(return_value='fooble')
+   >>> mock.__exit__ = Mock(return_value=False)
    >>> with mock as m:
    ...     assert m == 'foo'
    ...
