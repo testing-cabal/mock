@@ -80,7 +80,7 @@ The full list of supported magic methods is:
 * Context manager: ``__enter__`` and ``__exit__``
 * Unary numeric methods: ``__neg__``, ``__pos__`` and ``__invert__``
 * The numeric methods (including right hand and in-place variants):
-  ``__add__``, ``__sub__``, ``__mul__``, ``__div__``, ``__truediv__``,
+  ``__add__``, ``__sub__``, ``__mul__``, ``__div__``,
   ``__floordiv__``, ``__mod__``, ``__divmod__``, ``__lshift__``,
   ``__rshift__``, ``__and__``, ``__xor__``, ``__or__``, and ``__pow__``
 * Numeric conversion methods: ``__complex__``, ``__int__``, ``__float__``,
@@ -93,6 +93,7 @@ The full list of supported magic methods is:
 The following methods are supported in Python 2 but don't exist in Python 3:
 
 * ``__unicode__``, ``__long__``, ``__oct__``, ``__hex__`` and ``__nonzero__``
+*  ``__truediv__`` and ``__rtruediv__``
 
 The following methods are supported in Python 3 but don't exist in Python 2:
 
@@ -118,16 +119,19 @@ There are two `MagicMock` variants: `MagicMock` and `NonCallableMagicMock`.
    of most of the magic methods. You can use ``MagicMock`` without having to
    configure the magic methods yourself.
 
-   If you use the ``spec`` argument then *only* magic methods that exist in
-   the spec will be created.
+   The constructor parameters have the same meaning as for :class:`Mock.
+
+   If you use the `spec` or `spec_set` arguments then *only* magic methods
+   that exist in the spec will be created.
 
 
-.. class:: NonCallableMagicMock(*args, **kwargs)
+.. class:: NonCallableMagicMock(*args, **kw)
 
-    A non-callable version of `MagicMock`. The constructor parameters have
-    the same meaning as for :class:`Mock`, with the exception of
-    `return_value` and `side_effect` which have no meaning on a non-callable
-    mock.
+    A non-callable version of `MagicMock`.
+
+    The constructor parameters have the same meaning as for
+    :class:`MagicMock`, with the exception of `return_value` and
+    `side_effect` which have no meaning on a non-callable mock.
 
 The magic methods are setup with `MagicMock` objects, so you can configure them
 and use them in the usual way:
