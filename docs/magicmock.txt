@@ -50,11 +50,10 @@ One use case for this is for mocking objects used as context managers in a
 .. doctest::
 
    >>> mock = Mock()
-   >>> mock.__enter__ = Mock()
-   >>> mock.__exit__ = Mock()
-   >>> mock.__exit__.return_value = False
-   >>> with mock:
-   ...     pass
+   >>> mock.__enter__ = Mock(return_value='foo')
+   >>> mock.__exit__ = Mock(return_value='fooble')
+   >>> with mock as m:
+   ...     assert m == 'foo'
    ...
    >>> mock.__enter__.assert_called_with()
    >>> mock.__exit__.assert_called_with(None, None, None)
