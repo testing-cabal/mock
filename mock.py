@@ -2186,7 +2186,7 @@ def create_autospec(spec, spec_set=False, instance=False, _parent=None,
     return mock
 
 
-def _must_skip(spec, entry, skipfirst):
+def _must_skip(spec, entry, is_type):
     if not isinstance(spec, ClassTypes):
         if entry in getattr(spec, '__dict__', {}):
             # instance attribute - shouldn't skip
@@ -2195,7 +2195,7 @@ def _must_skip(spec, entry, skipfirst):
         spec = spec.__class__
     if not hasattr(spec, '__mro__'):
         # old style class: can't have descriptors anyway
-        return skipfirst
+        return is_type
 
     for klass in spec.__mro__:
         result = klass.__dict__.get(entry, DEFAULT)
@@ -2203,10 +2203,11 @@ def _must_skip(spec, entry, skipfirst):
             continue
         if isinstance(result, (staticmethod, classmethod)):
             return False
-        return skipfirst
+        return is_type
 
-    # shouldn't get here unless attribute dynamically provided
-    return skipfirst
+    # shouldn't get here unless function is a dynamically provided attribute
+    # XXXX untested behaviour
+    return is_type
 
 
 def _get_class(obj):
