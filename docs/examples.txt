@@ -961,10 +961,9 @@ onto the mock constructor:
 Less verbose configuration of mock objects
 ==========================================
 
-If you have a mock object, particularly one created for you by `patch
-<http://www.voidspace.org.uk/python/mock/getting-started.html#patch-decorators>`_,
-setting up attributes and return values for methods takes one line for every
-aspect of configuration.
+If you have a mock object, particularly one created for you by :func:`patch`
+decorators, setting up attributes and return values for methods takes one
+line for every aspect of configuration.
 
 A feature I'm considering for mock 0.8.0 is an api for `making configuring
 mocks less verbose <https://code.google.com/p/mock/issues/detail?id=80>`_. As
