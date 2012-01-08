@@ -168,3 +168,6 @@ the `__call__` method.
 
 The distribution contains tests and documentation. The tests require
 `unittest2 <http://pypi.python.org/pypi/unittest2>`_ to run.
+
+Docs from the in-development version of `mock` can be found on
+`readthedocs.org <http://mock.readthedocs.org>`_.
