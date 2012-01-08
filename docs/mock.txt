@@ -1,6 +1,5 @@
-================
- The Mock Class
-================
+The Mock Class
+==============
 
 .. currentmodule:: mock
 
@@ -87,6 +86,152 @@ the `new_callable` argument to `patch`.
     :meth:`Mock.configure_mock` method for details.
 
 
+    .. method:: Mock.assert_called_with(*args, **kwargs)
+
+        This method is a convenient way of asserting that calls are made in a
+        particular way:
+
+        .. doctest::
+
+            >>> mock = Mock()
+            >>> mock.method(1, 2, 3, test='wow')
+            <Mock name='mock.method()' id='...'>
+            >>> mock.method.assert_called_with(1, 2, 3, test='wow')
+
+
+    .. method:: Mock.assert_called_once_with(*args, **kwargs)
+
+       Assert that the mock was called exactly once and with the specified
+       arguments.
+
+       .. doctest::
+
+            >>> mock = Mock(return_value=None)
+            >>> mock('foo', bar='baz')
+            >>> mock.assert_called_once_with('foo', bar='baz')
+            >>> mock('foo', bar='baz')
+            >>> mock.assert_called_once_with('foo', bar='baz')
+            Traceback (most recent call last):
+              ...
+            AssertionError: Expected to be called once. Called 2 times.
+
+
+    .. method:: Mock.assert_any_call(*args, **kwargs)
+
+        assert the mock has been called with the specified arguments.
+
+        The assert passes if the mock has *ever* been called, unlike
+        `assert_called_with` and `assert_called_once_with` that only pass if
+        the call is the most recent one.
+
+        .. doctest::
+
+            >>> mock = Mock(return_value=None)
+            >>> mock(1, 2, arg='thing')
+            >>> mock('some', 'thing', 'else')
+            >>> mock.assert_any_call(1, 2, arg='thing')
+
+
+    .. method:: Mock.assert_has_calls(calls, any_order=False)
+
+        assert the mock has been called with the specified calls.
+        The `mock_calls` list is checked for the calls.
+
+        If `any_order` is False (the default) then the calls must be
+        sequentially. There can be extra calls before or after the
+        specified calls.
+
+        If `any_order` is True then the calls can be in any order, but
+        they must all appear in `mock_calls`.
+
+        .. doctest::
+
+            >>> mock = Mock(return_value=None)
+            >>> mock(1)
+            >>> mock(2)
+            >>> mock(3)
+            >>> mock(4)
+            >>> calls = [call(2), call(3)]
+            >>> mock.assert_has_calls(calls)
+            >>> calls = [call(4), call(2), call(3)]
+            >>> mock.assert_has_calls(calls, any_order=True)
+
+
+    .. method:: Mock.reset_mock()
+
+        The reset_mock method resets all the call attributes on a mock object:
+
+        .. doctest::
+
+            >>> mock = Mock(return_value=None)
+            >>> mock('hello')
+            >>> mock.called
+            True
+            >>> mock.reset_mock()
+            >>> mock.called
+            False
+
+        This can be useful where you want to make a series of assertions that
+        reuse the same object. Note that `reset_mock` *doesn't* clear the return
+        value, `side_effect` or any child attributes you have set
+        using normal assignment. Child mocks and the return
+        value mock (if any) are reset as well.
+
+
+    .. method:: Mock.mock_add_spec(spec, spec_set=False)
+
+        Mock.Add a spec to a mock. `spec` can either be an object or a
+        list of strings. Only attributes on the `spec` can be fetched as
+        attributes from the mock.
+
+        If `spec_set` is True then only attributes on the spec can be set.
+
+
+    .. method:: Mock.attach_mock(mock, attribute)
+
+        Attach a mock as an attribute of this one, replacing its name and
+        parent. Calls to the attached mock will be recorded in the
+        `method_calls` and `mock_calls` attributes of this one.
+
+
+    .. method:: Mock.configure_mock(**kwargs)
+
+            Set attributes on the mock through keyword arguments.
+
+            Attributes plus return values and side effects can be set on child
+            mocks using standard dot notation and unpacking a dictionary in the
+            method call:
+
+            .. doctest::
+
+                >>> mock = Mock()
+                >>> attrs = {'method.return_value': 3, 'other.side_effect': KeyError}
+                >>> mock.configure_mock(**attrs)
+                >>> mock.method()
+                3
+                >>> mock.other()
+                Traceback (most recent call last):
+                  ...
+                KeyError
+
+
+    .. method:: Mock.__dir__()
+
+        XXXX
+
+
+    .. method:: Mock._get_child_mock(**kw)
+
+        Create the child mocks for attributes and return value.
+        By default child mocks will be the same type as the parent.
+        Subclasses of Mock may want to override this to customize the way
+        child mocks are made.
+
+        For non-callable mocks the callable variant will be used (rather than
+        any custom subclass).
+
+
+
 .. class:: NonCallableMock(spec=None, wraps=None, name=None, spec_set=None, **kwargs)
 
     A non-callable version of `Mock`. The constructor parameters have the same
@@ -107,152 +252,7 @@ to pass `isintance` tests:
     True
 
 
-Methods
-=======
 
-.. method:: Mock.assert_called_with(*args, **kwargs)
-
-    This method is a convenient way of asserting that calls are made in a
-    particular way:
-
-    .. doctest::
-
-        >>> mock = Mock()
-        >>> mock.method(1, 2, 3, test='wow')
-        <Mock name='mock.method()' id='...'>
-        >>> mock.method.assert_called_with(1, 2, 3, test='wow')
-
-
-.. method:: Mock.assert_called_once_with(*args, **kwargs)
-
-   Assert that the mock was called exactly once and with the specified
-   arguments.
-
-   .. doctest::
-
-        >>> mock = Mock(return_value=None)
-        >>> mock('foo', bar='baz')
-        >>> mock.assert_called_once_with('foo', bar='baz')
-        >>> mock('foo', bar='baz')
-        >>> mock.assert_called_once_with('foo', bar='baz')
-        Traceback (most recent call last):
-          ...
-        AssertionError: Expected to be called once. Called 2 times.
-
-
-.. method:: Mock.assert_any_call(*args, **kwargs)
-
-    assert the mock has been called with the specified arguments.
-
-    The assert passes if the mock has *ever* been called, unlike
-    `assert_called_with` and `assert_called_once_with` that only pass if
-    the call is the most recent one.
-
-    .. doctest::
-
-        >>> mock = Mock(return_value=None)
-        >>> mock(1, 2, arg='thing')
-        >>> mock('some', 'thing', 'else')
-        >>> mock.assert_any_call(1, 2, arg='thing')
-
-
-.. method:: Mock.assert_has_calls(calls, any_order=False)
-
-    assert the mock has been called with the specified calls.
-    The `mock_calls` list is checked for the calls.
-
-    If `any_order` is False (the default) then the calls must be
-    sequentially. There can be extra calls before or after the
-    specified calls.
-
-    If `any_order` is True then the calls can be in any order, but
-    they must all appear in `mock_calls`.
-
-    .. doctest::
-
-        >>> mock = Mock(return_value=None)
-        >>> mock(1)
-        >>> mock(2)
-        >>> mock(3)
-        >>> mock(4)
-        >>> calls = [call(2), call(3)]
-        >>> mock.assert_has_calls(calls)
-        >>> calls = [call(4), call(2), call(3)]
-        >>> mock.assert_has_calls(calls, any_order=True)
-
-
-.. method:: Mock.reset_mock()
-
-    The reset_mock method resets all the call attributes on a mock object:
-
-    .. doctest::
-
-        >>> mock = Mock(return_value=None)
-        >>> mock('hello')
-        >>> mock.called
-        True
-        >>> mock.reset_mock()
-        >>> mock.called
-        False
-
-    This can be useful where you want to make a series of assertions that
-    reuse the same object. Note that `reset_mock` *doesn't* clear the return
-    value, `side_effect` or any child attributes you have set
-    using normal assignment. Child mocks and the return
-    value mock (if any) are reset as well.
-
-
-.. method:: Mock.mock_add_spec(spec, spec_set=False)
-
-    Mock.Add a spec to a mock. `spec` can either be an object or a
-    list of strings. Only attributes on the `spec` can be fetched as
-    attributes from the mock.
-
-    If `spec_set` is True then only attributes on the spec can be set.
-
-
-.. method:: Mock.attach_mock(mock, attribute)
-
-    Attach a mock as an attribute of this one, replacing its name and
-    parent. Calls to the attached mock will be recorded in the
-    `method_calls` and `mock_calls` attributes of this one.
-
-
-.. method:: Mock.configure_mock(**kwargs)
-
-        Set attributes on the mock through keyword arguments.
-
-        Attributes plus return values and side effects can be set on child
-        mocks using standard dot notation and unpacking a dictionary in the
-        method call:
-
-        .. doctest::
-
-            >>> mock = Mock()
-            >>> attrs = {'method.return_value': 3, 'other.side_effect': KeyError}
-            >>> mock.configure_mock(**attrs)
-            >>> mock.method()
-            3
-            >>> mock.other()
-            Traceback (most recent call last):
-              ...
-            KeyError
-
-
-.. method:: Mock.__dir__()
-
-    XXXX
-
-
-.. method:: Mock._get_child_mock(**kw)
-
-    Create the child mocks for attributes and return value.
-    By default child mocks will be the same type as the parent.
-    Subclasses of Mock may want to override this to customize the way
-    child mocks are made.
-
-    For non-callable mocks the callable variant will be used (rather than
-    any custom subclass).
 
 
 .. index:: __call__
