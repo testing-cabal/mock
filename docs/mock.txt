@@ -44,7 +44,7 @@ the `new_callable` argument to `patch`.
       any attribute not in this list will raise an `AttributeError`.
 
       If `spec` is an object (rather than a list of strings) then
-      `mock.__class__` returns the class of the spec object. This allows mocks
+      :attr:`__class__` returns the class of the spec object. This allows mocks
       to pass `isinstance` tests.
 
     * `spec_set`: A stricter variant of `spec`. If used, attempting to *set*
@@ -63,9 +63,23 @@ the `new_callable` argument to `patch`.
       If `side_effect` is an iterable then each call to the mock will return
       the next value from the iterable.
 
+      A `side_effect` can be cleared by setting it to `None`:
+
+      .. doctest::
+
+        >>> from mock import Mock
+        >>> m = Mock(side_effect=KeyError, return_value=3)
+        >>> m()
+        Traceback (most recent call last):
+         ...
+        KeyError
+        >>> m.side_effect = None
+        >>> m()
+        3
+
     * `return_value`: The value returned when the mock is called. By default
       this is a new Mock (created on first access). See the
-      :attr:`Mock.return_value` attribute.
+      :attr:`return_value` attribute.
 
     * `wraps`: Item for the mock object to wrap. If `wraps` is not None
       then calling the Mock will pass the call through to the wrapped object
@@ -83,7 +97,7 @@ the `new_callable` argument to `patch`.
 
     Mocks can also be called with arbitrary keyword arguments. These will be
     used to set attributes on the mock after it is created. See the
-    :meth:`Mock.configure_mock` method for details.
+    :meth:`configure_mock` method for details.
 
 
     .. method:: assert_called_with(*args, **kwargs)
@@ -302,7 +316,7 @@ the `new_callable` argument to `patch`.
         mock and unless the function returns the :data:`DEFAULT` singleton the
         call to the mock will then return whatever the function returns. If the
         function returns :data:`DEFAULT` then the mock will return its normal
-        value (from the :attr:`Mock.return_value`.
+        value (from the :attr:`return_value`.
 
         An example of a mock that raises an exception (to test exception handling of
         an API):
@@ -333,7 +347,7 @@ the `new_callable` argument to `patch`.
         it is wise for it to take arbitrary args and keyword arguments) and
         whatever it returns is used as the return value for the call. The
         exception is if `side_effect` returns :data:`DEFAULT`, in which case the
-        normal :attr:`Mock.return_value` is used.
+        normal :attr:`return_value` is used.
 
         .. doctest::
 
