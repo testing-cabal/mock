@@ -360,8 +360,8 @@ Documentation for older versions of mock:
 * `mock 0.7 <http://www.voidspace.org.uk/python/mock/0.7/>`_
 * `mock 0.6 <http://www.voidspace.org.uk/python/mock/0.6.0/>`_
 
-Docs from the in-development version of `mock` can be found on
-`readthedocs.org <http://mock.readthedocs.org>`_.
+Docs from the in-development version of `mock` can be found at
+`mock.readthedocs.org <http://mock.readthedocs.org>`_.
 
 
 Terminology

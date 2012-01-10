@@ -171,6 +171,7 @@ mock 0.8.0 is the last version that will support Python 2.4.
 
 * Removed the `configure` keyword argument to `create_autospec` and allow
   arbitrary keyword arguments (for the `Mock` constructor) instead
+* Fixed `ANY` equality with some types in `assert_called_with` calls
 * Switched to a standard Sphinx theme (compatible with
   `readthedocs.org <http://mock.readthedocs.org>`_)
 
