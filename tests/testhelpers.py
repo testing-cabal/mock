@@ -47,6 +47,22 @@ class AnyTest(unittest2.TestCase):
         mock.assert_called_with(ANY, foo=ANY)
 
 
+    def test_any_mock_calls(self):
+        mock = Mock()
+        d = datetime.now()
+
+        mock(d, foo=d, bar=d)
+        mock.method(d, zinga=d, alpha=d)
+        mock().method(a1=d, z99=d)
+
+        expected = [
+            call(ANY, foo=ANY, bar=ANY), call.method(ANY, zinga=ANY, alpha=ANY),
+            call(), call().method(a1=ANY, z99=ANY)
+        ]
+        self.assertEqual(mock.mock_calls, expected)
+        self.assertEqual(expected, mock.mock_calls)
+
+
 
 class CallTest(unittest2.TestCase):
 
