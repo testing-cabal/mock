@@ -1883,6 +1883,9 @@ class _ANY(object):
     def __eq__(self, other):
         return True
 
+    def __ne__(self, other):
+        return False
+
     def __repr__(self):
         return '<ANY>'
 
@@ -2010,7 +2013,9 @@ class _Call(tuple):
 
         if self_name and other_name != self_name:
             return False
-        return (self_args, self_kwargs) == (other_args, other_kwargs)
+
+        # this order is important for ANY to work!
+        return (other_args, other_kwargs) == (self_args, self_kwargs)
 
 
     def __ne__(self, other):

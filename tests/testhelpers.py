@@ -10,6 +10,8 @@ from mock import (
     mocksignature
 )
 
+from datetime import datetime
+
 class SomeClass(object):
     def one(self, a, b):
         pass
@@ -36,6 +38,13 @@ class AnyTest(unittest2.TestCase):
     def test_repr(self):
         self.assertEqual(repr(ANY), '<ANY>')
         self.assertEqual(str(ANY), '<ANY>')
+
+
+    def test_any_and_datetime(self):
+        mock = Mock()
+        mock(datetime.now(), foo=datetime.now())
+
+        mock.assert_called_with(ANY, foo=ANY)
 
 
 
