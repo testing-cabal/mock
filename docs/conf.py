@@ -42,12 +42,9 @@ if os.getcwd() not in sys.path:
 sys.modules['__main'] = __main__
 
 class ProxyModule(object):
-    def __getattr__(self, name):
-        return globals()[name]
-    def __setattr__(self, name, value):
-        globals()[name] = value
-    def __delattr__(self, name):
-        del globals()[name]
+    def __init__(self):
+        self.__dict__ = globals()
+
 sys.modules['__main__'] = ProxyModule()
 """
 
