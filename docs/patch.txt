@@ -7,9 +7,6 @@
 
 .. testsetup::
 
-    if not os.getcwd() in sys.path:
-        sys.path.append(os.getcwd())
-
     class SomeClass(object):
         static_method = None
         class_method = None
