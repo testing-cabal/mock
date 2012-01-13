@@ -26,34 +26,8 @@
             out = unittest2.TestCase.run(self, result)
             assert result.wasSuccessful()
 
-    def configure_mock(mock, **kwargs):
-        if mock is None:
-            mock = Mock()
-        for arg, val in sorted(kwargs.items(), key=lambda entry: len(entry[0].split('.'))):
-            args = arg.split('.')
-            final = args.pop()
-            obj = mock
-            for entry in args:
-                obj = getattr(obj, entry)
-            setattr(obj, final, val)
-        return mock
+    from mock import inPy3k
 
-    class Call(object):
-        def __init__(self, name=None):
-            self.name = name
-
-        def __call__(self, *args, **kwargs):
-            if self.name is None:
-                return (args, kwargs)
-            return (self.name, args, kwargs)
-
-        def __getattr__(self, attr):
-            if self.name is None:
-                return Call(attr)
-            name = '%s.%s' % (self.name, attr)
-            return Call(name)
-
-    call = Call()
 
 
 Here are some more examples for some slightly more advanced scenarios than in
@@ -131,15 +105,16 @@ call:
     >>> something.backend = mock_backend
     >>> something.method()
 
-Keeping references to the intermediate methods makes our assertions easier,
-and also makes the code less ugly.
+Using :attr:`Mock.mock_calls` we can check the chained call with a single
+assert. A chained call is several calls in one line of code, so there will be
+several entries in `mock_calls`. We can use :meth:`call.call_list` to create
+this list of calls for us:
 
 .. doctest::
 
-    >>> get_endpoint.assert_called_with('foobar')
-    >>> create_call.assert_called_with('spam', 'eggs')
-    >>> start_call.assert_called_with()
-    >>> # make assertions on mock_response about how it is used
+    >>> chained = call.get_endpoint('foobar').create_call('spam', 'eggs').start_call()
+    >>> call_list = chained.call_list()
+    >>> assert mock_backend.mock_calls == call_list
 
 
 Partial mocking
@@ -191,8 +166,8 @@ is discussed in `this blog entry
 Mocking open
 ============
 
-Using `open` as a context manager is a great way to ensure your file handles are
-closed properly and is becoming common::
+Using `open` as a context manager is a great way to ensure your file handles
+are closed properly and is becoming common::
 
     with open('/some/path', 'w') as f:
         f.write('something')
@@ -201,13 +176,82 @@ The issue is that even if you mock out the call to `open` it is the
 *returned object* that is used as a context manager (and has `__enter__` and
 `__exit__` called).
 
-So first the topic of creating a mock object that can be called, with the
-return value able to act as a context manager. The easiest way of doing this
-is to use the new :class:`MagicMock`, which
-is preconfigured to be able to act as a context manger. As an added bonus
-we'll use the spec argument to ensure that the mocked object can only be used
-in the same ways a real file could be used (attempting to access a method or
-attribute not on the `file` will raise an `AttributeError`):
+Mocking context managers with a :class:`MagicMock` is common enough and fiddly
+enough that a helper function is useful. Here `mock_open` creates and
+configures a `MagicMock` that behaves as a file context manager. You can
+optionally supply a `StringIO` object as the `data` argument for the actual
+file handle:
+
+.. testcode::
+
+    from mock import inPy3k, MagicMock
+    if inPy3k:
+        file_spec = ['_CHUNK_SIZE', '__enter__', '__eq__', '__exit__',
+            '__format__', '__ge__', '__gt__', '__hash__', '__iter__', '__le__',
+            '__lt__', '__ne__', '__next__', '__repr__', '__str__',
+            '_checkClosed', '_checkReadable', '_checkSeekable',
+            '_checkWritable', 'buffer', 'close', 'closed', 'detach',
+            'encoding', 'errors', 'fileno', 'flush', 'isatty',
+            'line_buffering', 'mode', 'name',
+            'newlines', 'peek', 'raw', 'read', 'read1', 'readable',
+            'readinto', 'readline', 'readlines', 'seek', 'seekable', 'tell',
+            'truncate', 'writable', 'write', 'writelines']
+    else:
+        file_spec = file
+
+    def mock_open(mock=None, data=None):
+        if mock is None:
+            mock = MagicMock(spec=file_spec)
+
+        handle = MagicMock(spec=file_spec)
+        handle.write.return_value = None
+        if data is None:
+            handle.__enter__.return_value = handle
+        else:
+            handle.__enter__.return_value = data
+        mock.return_value = handle
+        return mock
+
+
+.. doctest::
+
+    >>> m = mock_open()
+    >>> with patch('__main__.open', m, create=True):
+    ...     with open('foo', 'w') as h:
+    ...         h.write('some stuff')
+    ...
+    >>> m.mock_calls
+    [call('foo', 'w'),
+     call().__enter__(),
+     call().write('some stuff'),
+     call().__exit__(None, None, None)]
+    >>> m.assert_called_once_with('foo', 'w')
+    >>> handle = m()
+    >>> handle.write.assert_called_once_with('some stuff')
+
+And for reading files, using a `StringIO` to represent the actual file
+handle:
+
+.. doctest::
+
+    >>> from StringIO import StringIO
+    >>> m = mock_open(data=StringIO('foo bar baz'))
+    >>> with patch('__main__.open', m, create=True):
+    ...     with open('foo') as h:
+    ...         result = h.read()
+    ...
+    >>> m.assert_called_once_with('foo')
+    >>> assert result == 'foo bar baz'
+
+Let's step through what's happening here in more detail.
+
+To mock `open` we need a mock object that can be called, with the return
+value able to act as a context manager. The easiest way of doing this is to
+use :class:`MagicMock`, which is preconfigured to be able to act as a context
+manger. As an added bonus we'll use the spec argument to ensure that the
+mocked object can only be used in the same ways a real file could be used
+(attempting to access a method or attribute not on the `file` will raise an
+`AttributeError`):
 
 .. doctest::
 
@@ -247,6 +291,59 @@ function in the module under test instead of patching it globally:
     >>> file_handle.write.assert_called_with('something')
 
 
+Mocks without some attributes
+=============================
+
+Mock objects create attributes on demand. This allows them to pretend to be
+objects of any type.
+
+What mocks aren't so good at is pretending *not* to have attributes. You may
+want a mock object to return `False` to a `hasattr` call, or raise an
+`AttributeError` when an attribute is fetched. You can do this by providing
+an object as a `spec` for a mock, but that isn't always convenient.
+
+Below is a subclass of `Mock` that allows you to "block" attributes by
+deleting them. Once deleted, accessing an attribute will raise an
+`AttributeError`.
+
+.. testcode::
+
+    deleted = object()
+    missing = object()
+
+    class DeletingMock(Mock):
+        def __delattr__(self, attr):
+            if attr in self.__dict__:
+                return super(DeletingMock, self).__delattr__(attr)
+            obj = self._mock_children.get(attr, missing)
+            if obj is deleted:
+                raise AttributeError(attr)
+            if obj is not missing:
+                del self._mock_children[attr]
+            self._mock_children[attr] = deleted
+
+        def __getattr__(self, attr):
+            result = super(DeletingMock, self).__getattr__(attr)
+            if result is deleted:
+                raise AttributeError(attr)
+            return result
+
+
+.. doctest::
+
+    >>> mock = DeletingMock()
+    >>> hasattr(mock, 'm')
+    True
+    >>> del mock.m
+    >>> hasattr(mock, 'm')
+    False
+    >>> del mock.f
+    >>> mock.f
+    Traceback (most recent call last):
+        ...
+    AttributeError: f
+
+
 Mocking a Generator Method
 ==========================
 
@@ -282,26 +379,15 @@ To configure the values returned from the iteration (implicit in the call to
 .. doctest::
 
     >>> mock_foo = MagicMock()
-    >>> generator = mock_foo.iter.return_value
-    >>> iterator = iter([1, 2, 3])
-    >>> generator.__iter__.return_value = iterator
-    >>> list(mock_foo.iter())
-    [1, 2, 3]
-
-The above example is done step-by-step. The shorter version is:
-
-.. doctest::
-
-    >>> mock_foo = MagicMock()
-    >>> mock_foo.iter.return_value.__iter__.return_value = iter([1, 2, 3])
+    >>> mock_foo.iter.return_value = iter([1, 2, 3])
     >>> list(mock_foo.iter())
     [1, 2, 3]
 
 .. [#] There are also generator expressions and more `advanced uses
-   <http://www.dabeaz.com/coroutines/index.html>`_ of generators, but we aren't
-   concerned about them here. A very good introduction to generators and how
-   powerful they are is: `Generator Tricks for Systems Programmers
-   <http://www.dabeaz.com/generators/>`_.
+    <http://www.dabeaz.com/coroutines/index.html>`_ of generators, but we aren't
+    concerned about them here. A very good introduction to generators and how
+    powerful they are is: `Generator Tricks for Systems Programmers
+    <http://www.dabeaz.com/generators/>`_.
 
 
 Applying the same patch to every test method
@@ -479,6 +565,7 @@ that delegates back to the mock:
 As you're patching on the class these techniques affect *all* instances of
 `Foo`.
 
+
 Checking multiple calls with mock
 =================================
 
@@ -506,11 +593,8 @@ If your mock is only being called once you can use the
 
 Both `assert_called_with` and `assert_called_once_with` make assertions about
 the *most recent* call. If your mock is going to be called several times, and
-you want to make assertions about *all* those calls, the API is not quite so
-nice.
-
-All of the calls, in order, are stored in `call_args_list` as tuples of
-(positional args, keyword args).
+you want to make assertions about *all* those calls you can use
+:attr:`Mock.call_args_list`:
 
 .. doctest::
 
@@ -521,55 +605,15 @@ All of the calls, in order, are stored in `call_args_list` as tuples of
     >>> mock.call_args_list
     [call(1, 2, 3), call(4, 5, 6), call()]
 
-
-Because it stores positional args *and* keyword args, even if they are empty,
-the list is overly verbose which makes for ugly tests. It turns out that I do
-this rarely enough that I've never got around to improving it. One of the new
-features in 0.7.0 helps with this. The tuples of (positional, keyword)
-arguments are now custom objects that allow for 'soft comparisons'
-(implemented by Konrad Delong). This allows you to omit empty positional or
-keyword arguments from tuples you compare against.
+The :data:`call` helper makes it easy to make assertions about these calls. You
+can build up a list of expected calls and compare it to `call_args_list`. This
+looks remarkably similar to the repr of the `call_args_list`:
 
 .. doctest::
 
-    >>> mock.call_args_list
-    [call(1, 2, 3), call(4, 5, 6), call()]
-    >>> expected = [((1, 2, 3),), ((4, 5, 6),), ()]
+    >>> expected = [call(1, 2, 3), call(4, 5, 6), call()]
     >>> mock.call_args_list == expected
     True
-
-This is an improvement, but still not as nice as `assert_called_with`. Here's
-a helper function that pops the last argument of the call args list and
-decrements the call count. This allows you to make asserts as a series of
-calls to `assert_called_with` followed by a `pop_last_call`.
-
-.. doctest::
-
-    >>> def pop_last_call(mock):
-    ...     if not mock.call_count:
-    ...         raise AssertionError("Cannot pop last call: call_count is 0")
-    ...     mock.call_args_list.pop()
-    ...     try:
-    ...         mock.call_args = mock.call_args_list[-1]
-    ...     except IndexError:
-    ...         mock.call_args = None
-    ...         mock.called = False
-    ...     mock.call_count -=1
-    ...
-    >>> mock = Mock(return_value=None)
-    >>> mock(1, foo='bar')
-    >>> mock(2, foo='baz')
-    >>> mock(3, foo='spam')
-    >>> mock.assert_called_with(3, foo='spam')
-    >>> pop_last_call(mock)
-    >>> mock.assert_called_with(2, foo='baz')
-    >>> pop_last_call(mock)
-    >>> mock.assert_called_once_with(1, foo='bar')
-
-The calls to `assert_called_with` are made in reverse order to the actual
-calls. Your final call can be a call to `assert_called_once_with`, that
-ensures there were no extra calls you weren't expecting. You could, if you
-wanted, extend the function to take args and kwargs and do the assert for you.
 
 
 Coping with mutable arguments
@@ -662,7 +706,7 @@ the args and calls our `new_mock` with the copy.
         >>> mock(set([6]))
         >>> mock(set())
         Traceback (most recent call last):
-         ...
+            ...
         AssertionError
 
 An alternative approach is to create a subclass of `Mock` or `MagicMock` that
@@ -686,7 +730,7 @@ Here's an example implementation:
     >>> c.assert_called_with(set())
     >>> c.assert_called_with(arg)
     Traceback (most recent call last):
-      ...
+        ...
     AssertionError: Expected call: mock(set([1]))
     Actual call: mock(set([]))
     >>> c.foo
@@ -720,7 +764,7 @@ be used for the second call. It then raises an exception:
     >>> mock = Mock(side_effect=side_effect)
     >>> mock('first')
     Traceback (most recent call last):
-      ...
+        ...
     Exception: boom
     >>> mock('second')
     'response'
@@ -741,7 +785,7 @@ return value is an exception, raise it instead of returning it:
     >>> mock = Mock(side_effect=side_effect)
     >>> mock('first')
     Traceback (most recent call last):
-      ...
+        ...
     Exception: boom
     >>> mock('second')
     'response'
@@ -801,7 +845,6 @@ for us:
     >>> original = mymodule.Foo
     >>> MyTest('test_foo').run()
     >>> assert mymodule.Foo is original
-
 
 
 Mocking a dictionary with MagicMock
@@ -867,7 +910,7 @@ to access a key that doesn't exist.
     3
     >>> mock['d']
     Traceback (most recent call last):
-      ...
+        ...
     KeyError: 'd'
     >>> mock['b'] = 'fish'
     >>> mock['d'] = 'eggs'
@@ -954,91 +997,8 @@ onto the mock constructor:
     >>> assert not isinstance(mymock(), Subclass)
 
 .. [#] An exception to this rule are the non-callable mocks. Attributes use the
-   callable variant because otherwise non-callable mocks couldn't have callable
-   methods.
-
-
-Less verbose configuration of mock objects
-==========================================
-
-If you have a mock object, particularly one created for you by :func:`patch`
-decorators, setting up attributes and return values for methods takes one
-line for every aspect of configuration.
-
-A feature I'm considering for mock 0.8.0 is an api for `making configuring
-mocks less verbose <https://code.google.com/p/mock/issues/detail?id=80>`_. As
-is the way of these things, it is easy to prototype this first with a function
-that you can use right now.
-
-`configure_mock` is a function that takes a `Mock()
-<http://www.voidspace.org.uk/python/mock/getting-started.html#using-mock>`_
-instance along with keyword arguments for attributes of the mock you want to
-set. For example, to set `mock.foo` to 3 and `mock.bar` to None, you call:
-
-.. doctest::
-
-    >>> mock = Mock()
-    >>> configure_mock(mock, foo=3, bar=None)
-    <Mock id='...'>
-    >>> mock.foo
-    3
-    >>> print mock.bar
-    None
-
-`return_value` and `side_effect` can be used to set them directly on the main
-mock *anyway* as they are just attributes.
-
-.. doctest::
-
-    >>> mock = Mock()
-    >>> configure_mock(mock, side_effect=KeyError)
-    <Mock id='...'>
-    >>> mock()
-    Traceback (most recent call last):
-      ...
-    KeyError
-
-This is fine for directly setting attributes, but what if you want to
-configure the return values or side effects of child mocks? How about using
-standard dotted notation to specify these. Instead of normal keyword arguments
-you'll need to build a dictionary of arguments and pass them in with `**`. The
-function could also create a mock for us if we pass in `None`:
-
-.. doctest::
-
-    >>> args = {'foo.baz.return_value': 'fish', 'foo.side_effect':
-    ... RuntimeError, 'side_effect': KeyError, 'foo.bar': 3}
-    ...
-    >>> mock = configure_mock(None, **args)
-    >>> mock.foo.bar
-    3
-    >>> mock()
-    Traceback (most recent call last):
-      ...
-    KeyError
-    >>> mock.foo.baz()
-    'fish'
-    >>> mock.foo()
-    Traceback (most recent call last):
-      ...
-    RuntimeError
-
-If you have any opinions on this then please comment on the issue.
-
-A minimal implementation of `configure_mock` that you can start using now is::
-
-    def configure_mock(mock, **kwargs):
-        if mock is None:
-            mock = Mock()
-        for arg, val in sorted(kwargs.items(),
-                               key=lambda entry: len(entry[0].split('.'))):
-            args = arg.split('.')
-            final = args.pop()
-            obj = mock
-            for entry in args:
-                obj = getattr(obj, entry)
-            setattr(obj, final, val)
-        return mock
+    callable variant because otherwise non-callable mocks couldn't have callable
+    methods.
 
 
 Mocking imports with patch.dict
@@ -1127,17 +1087,16 @@ Tracking order of calls and less verbose call assertions
 The :class:`Mock` class allows you to track the *order* of method calls on
 your mock objects through the :attr:`Mock.method_calls` attribute. This
 doesn't allow you to track the order of calls between separate mock objects,
-however we can use `method_calls` to achieve the same effect.
+however we can use :attr:`Mock.mock_calls` to achieve the same effect.
 
-Because mocks track calls to child mocks in `method_calls`, and accessing an
+Because mocks track calls to child mocks in `mock_calls`, and accessing an
 arbitrary attribute of a mock creates a child mock, we can create our separate
 mocks from a parent one. Calls to those child mock will then all be recorded,
-in order, in the `method_calls` of the parent:
+in order, in the `mock_calls` of the parent:
 
 .. doctest::
 
     >>> manager = Mock()
-
     >>> mock_foo = manager.foo
     >>> mock_bar = manager.bar
 
@@ -1149,112 +1108,43 @@ in order, in the `method_calls` of the parent:
     >>> manager.mock_calls
     [call.foo.something(), call.bar.other.thing()]
 
-Using the "soft comparisons" feature of mock 0.7.0 we can make the final
-assertion about the expected calls less verbose:
+We can then assert about the calls, including the order, by comparing with
+the `mock_calls` attribute on the manager mock:
 
 .. doctest::
 
-    >>> expected_calls = [('foo.something',), ('bar.other.thing',)]
-    >>> manager.method_calls == expected_calls
+    >>> expected_calls = [call.foo.something(), call.bar.other.thing()]
+    >>> manager.mock_calls == expected_calls
     True
 
-To make them even less verbose I would like to add a new `call` object to mock
-0.8.0. You can see the issues I expect to work on for 0.8.0 in the `issues
-list <https://code.google.com/p/mock/issues/list>`_.
-
-`call` would look something like this::
-
-    class Call(object):
-        def __init__(self, name=None):
-            self.name = name
-
-        def __call__(self, *args, **kwargs):
-            if self.name is None:
-                return (args, kwargs)
-            return (self.name, args, kwargs)
-
-        def __getattr__(self, attr):
-            if self.name is None:
-                return Call(attr)
-            name = '%s.%s' % (self.name, attr)
-            return Call(name)
-
-    call = Call()
-
-You can then use it like this:
+If `patch` is creating, and putting in place, your mocks then you can attach
+them to a manager mock using the :meth:`Mock.attach_mock` method. After
+attaching calls will be recorded in `mock_calls` of the manager.
 
 .. doctest::
 
-    >>> mock = Mock(return_value=None)
-    >>> mock(1, 2, 3)
-    >>> mock(a=3, b=6)
-    >>> mock.call_args_list == [call(1, 2, 3), call(a=3, b=6)]
-    True
-
-    >>> mock = Mock()
-    >>> mock.foo(1, 2 ,3)
-    <Mock name='mock.foo()' id='...'>
-    >>> mock.bar.baz(a=3, b=6)
-    <Mock name='mock.bar.baz()' id='...'>
-    >>> mock.method_calls == [call.foo(1, 2, 3), call.bar.baz(a=3, b=6)]
-    True
-
-And for good measure, the first example (tracking order of calls between
-mocks) using the new `call` object for assertions:
-
-.. doctest::
-
-    >>> manager = Mock()
-
-    >>> mock_foo = manager.foo
-    >>> mock_bar = manager.bar
-
-    >>> mock_foo.something()
-    <Mock name='mock.foo.something()' id='...'>
-    >>> mock_bar.other.thing()
-    <Mock name='mock.bar.other.thing()' id='...'>
-
-    >>> manager.method_calls == [call.foo.something(), call.bar.other.thing()]
-    True
-
-
-Matching any argument in assertions
-===================================
-
-Sometimes you may need to make assertions about *some* of the arguments in a
-call to mock, but either not care about some of the arguments or want to pull
-them individually out of :attr:`Mock.call_args` and make more complex
-assertions on them.
-
-To ignore certain arguments you can pass in objects that compare equal to
-*everything*. Calls to :meth:`Mock.assert_called_with` and
-:meth:`Mock.assert_called_once_with` will then succeed no matter what was
-passed in.
-
-Here's an example implementation:
-
-.. doctest::
-
-    >>> class _ANY(object):
-    ...     def __eq__(self, other):
-    ...         return True
+    >>> manager = MagicMock()
+    >>> with patch('mymodule.Class1') as MockClass1:
+    ...     with patch('mymodule.Class2') as MockClass2:
+    ...         manager.attach_mock(MockClass1, 'MockClass1')
+    ...         manager.attach_mock(MockClass2, 'MockClass2')
+    ...         MockClass1().foo()
+    ...         MockClass2().bar()
     ...
-    >>> ANY = _ANY()
-
-And an example of using it:
-
-.. doctest::
-
-    >>> mock = Mock(return_value=None)
-    >>> mock('foo', bar=object())
-    >>> mock.assert_called_once_with('foo', bar=ANY)
+    <MagicMock name='mock.MockClass1().foo()' id='...'>
+    <MagicMock name='mock.MockClass2().bar()' id='...'>
+    >>> manager.mock_calls
+    [call.MockClass1(),
+     call.MockClass1().foo(),
+     call.MockClass2(),
+     call.MockClass2().bar()]
 
 
 More complex argument matching
 ==============================
 
-Using the same basic concept as the `ANY` pattern above we can implement
-matchers to do more complex assertions on objects used as arguments to mocks.
+Using the same basic concept as `ANY` we can implement matchers to do more
+complex assertions on objects used as arguments to mocks.
 
 Suppose we expect some object to be passed to a mock that by default
 compares equal based on object identity (which is the Python default for user
@@ -1276,7 +1166,7 @@ sufficient:
     >>> mock(Foo(1, 2))
     >>> mock.assert_called_with(Foo(1, 2))
     Traceback (most recent call last):
-     ...
+        ...
     AssertionError: Expected: ((<__main__.Foo object at 0x...>,), {})
     Called with: ((<__main__.Foo object at 0x...>,), {})
 
@@ -1325,7 +1215,7 @@ against the one we created our matcher with. If they match then
     >>> match_wrong = Matcher(compare, Foo(3, 4))
     >>> mock.assert_called_with(match_wrong)
     Traceback (most recent call last):
-     ...
+        ...
     AssertionError: Expected: ((<Matcher object at 0x...>,), {})
     Called with: ((<Foo object at 0x...>,), {})
 
@@ -1337,3 +1227,17 @@ As of version 1.5, the Python testing library `PyHamcrest
 that may be useful here, in the form of its equality matcher
 (`hamcrest.library.integration.match_equality
 <http://packages.python.org/PyHamcrest/integration.html#hamcrest.library.integration.match_equality>`_).
+
+
+Less verbose configuration of mock objects
+==========================================
+
+This recipe, for easier configuration of mock objects, is now part of `Mock`.
+See the :meth:`Mock.configure_mock` method.
+
+
+
+Matching any argument in assertions
+===================================
+
+This example is now built in to mock. See :data:`ANY`.

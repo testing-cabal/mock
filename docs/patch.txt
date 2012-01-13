@@ -105,30 +105,42 @@ patch
     `patch.dict(...)`, `patch.multiple(...)` and `patch.object(...)` are
     available for alternate use-cases.
 
-.. note::
 
-    Patching a class replaces the class with a Mock *instance*. If the class
-    is instantiated in the code under test then it will be the `return_value`
-    of the mock that will be used.
+Patching a class replaces the class with a `MagicMock`` *instance*. If the
+class is instantiated in the code under test then it will be the
+`return_value` of the mock that will be used.
 
-    If the class is instantiated multiple times you could use
-    :attr:`Mock.side_effect` to return a new mock each time. Alternatively you
-    can set the `return_value` to be anything you want.
+If the class is instantiated multiple times you could use
+:attr:`Mock.side_effect` to return a new mock each time. Alternatively you
+can set the `return_value` to be anything you want.
 
-    To configure return values on methods of *instances* on the patched class
-    you must do this on the `return_value`. For example:
+To configure return values on methods of *instances* on the patched class
+you must do this on the `return_value`. For example:
 
-    .. doctest::
+.. doctest::
 
-        >>> @patch('package.module.Class')
-        ... def test(MockClass):
-        ...     instance = MockClass.return_value
-        ...     instance.method.return_value = 'foo'
-        ...     from package.module import Class
-        ...     assert Class() is instance
-        ...     assert Class().method() == 'foo'
-        ...
-        >>> test()
+    >>> @patch('package.module.Class')
+    ... def test(MockClass):
+    ...     instance = MockClass.return_value
+    ...     instance.method.return_value = 'foo'
+    ...     from package.module import Class
+    ...     assert Class() is instance
+    ...     assert Class().method() == 'foo'
+    ...
+    >>> test()
+
+If you use `spec` or `spec_set` and `patch` is replacing a *class*, then the
+return value of the created mock will have the same spec.
+
+.. doctest::
+
+    >>> Original = SomeClass
+    >>> patcher = patch('__main__.SomeClass', spec=True)
+    >>> MockClass = patcher.start()
+    >>> instance = MockClass()
+    >>> assert isinstance(instance, Original)
+    >>> patcher.stop()
+
 
 
 patch.object
