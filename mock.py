@@ -385,7 +385,7 @@ class _SentinelObject(object):
         self.name = name
 
     def __repr__(self):
-        return '<SentinelObject "%s">' % self.name
+        return 'sentinel.%s' % self.name
 
 
 class _Sentinel(object):

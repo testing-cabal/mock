@@ -87,6 +87,10 @@ CHANGELOG
 2012/XX/XX Version 0.8.0
 ------------------------
 
+The only change since 0.8rc2 is:
+
+* Improved repr of `sentinel` objects
+
 Full List of changes since 0.7:
 
 mock 0.8.0 is the last version that will support Python 2.4.
@@ -124,6 +128,7 @@ mock 0.8.0 is the last version that will support Python 2.4.
 * Improved repr for mocks
 * Improved repr for `Mock.call_args` and entries in `Mock.call_args_list`,
   `Mock.method_calls` and `Mock.mock_calls`
+* Improved repr for `sentinel` objects
 * `patch` lookup is done at use time not at decoration time
 * In Python 2.6 or more recent, `dir` on a mock will report all the dynamically
   created attributes (or the full list of attributes if there is a spec) as
