@@ -1198,8 +1198,8 @@ sufficient:
     >>> mock.assert_called_with(Foo(1, 2))
     Traceback (most recent call last):
         ...
-    AssertionError: Expected: ((<__main__.Foo object at 0x...>,), {})
-    Called with: ((<__main__.Foo object at 0x...>,), {})
+    AssertionError: Expected: call(<__main__.Foo object at 0x...>)
+    Actual call: call(<__main__.Foo object at 0x...>)
 
 A comparison function for our `Foo` class might look something like this:
 
