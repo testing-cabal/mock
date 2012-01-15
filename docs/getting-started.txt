@@ -390,7 +390,7 @@ Sentinel
     >>> real.method = Mock()
     >>> real.method.return_value = sentinel.return_value
     >>> real.method()
-    <SentinelObject "return_value">
+    sentinel.return_value
 
 
 Patch Decorators

@@ -17,7 +17,7 @@ class SentinelTest(unittest2.TestCase):
 
 
     def testSentinelName(self):
-        self.assertEqual(str(sentinel.whatever), '<SentinelObject "whatever">',
+        self.assertEqual(str(sentinel.whatever), 'sentinel.whatever',
                          'sentinel name incorrect')
 
 

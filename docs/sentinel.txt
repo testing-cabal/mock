@@ -53,6 +53,6 @@ In this example we monkey patch `method` to return
     >>> result = real.method()
     >>> assert result is sentinel.some_object
     >>> sentinel.some_object
-    <SentinelObject "some_object">
+    sentinel.some_object
 
 
