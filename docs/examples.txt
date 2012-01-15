@@ -1139,6 +1139,37 @@ attaching calls will be recorded in `mock_calls` of the manager.
      call.MockClass2(),
      call.MockClass2().bar()]
 
+If many calls have been made, but you're only interested in a particular
+sequence of them then an alternative is to use the
+:meth:`Mock.assert_has_calls` method. This takes a list of calls (constructed
+with the :data:`call` object). If that sequence of calls are in
+:attr:`Mock.mock_calls` then the assert succeeds.
+
+.. doctest::
+
+    >>> m = MagicMock()
+    >>> m().foo().bar().baz()
+    <MagicMock name='mock().foo().bar().baz()' id='...'>
+    >>> m.one().two().three()
+    <MagicMock name='mock.one().two().three()' id='...'>
+    >>> calls = call.one().two().three().call_list()
+    >>> m.assert_has_calls(calls)
+
+Even though the chained call `m.one().two().three()` aren't the only calls that
+have been made to the mock, the assert still succeeds.
+
+Sometimes a mock may have several calls made to it, and you are only interested
+in asserting about *some* of those calls. You may not even care about the
+order. In this case you can pass `any_order=True` to `assert_has_calls`:
+
+.. doctest::
+
+    >>> m = MagicMock()
+    >>> m(1), m.two(2, 3), m.seven(7), m.fifty('50')
+    (...)
+    >>> calls = [call.fifty('50'), call(1), call.seven(7)]
+    >>> m.assert_has_calls(calls, any_order=True)
+
 
 More complex argument matching
 ==============================
