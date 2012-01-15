@@ -1397,13 +1397,16 @@ def _patch_object(
     ):
     """
     patch.object(target, attribute, new=DEFAULT, spec=None, create=False,
-                 mocksignature=False, spec_set=None)
+                 mocksignature=False, spec_set=None, autospec=False,
+                 new_callable=None, **kwargs)
 
     patch the named member (`attribute`) on an object (`target`) with a mock
     object.
 
-    Arguments new, spec, create, mocksignature and spec_set have the same
-    meaning as for patch.
+    Arguments new, spec, create, mocksignature, spec_set, autospec and
+    new_callable have the same meaning as for patch. Like patch, patch.object
+    takes arbitrary keyword arguments for configuring the mock object it
+    creates.
     """
     getter = lambda: target
     return _patch(
@@ -1470,7 +1473,8 @@ def patch(
 
     The `target` is imported and the specified attribute patched with the new
     object, so it must be importable from the environment you are calling the
-    decorator from.
+    decorator from. The target is imported when the decorated function is
+    executed, not at decoration time.
 
     If `new` is omitted, then a new `MagicMock` is created and passed in as an
     extra argument to the decorated function.
@@ -1511,18 +1515,17 @@ def patch(
     default because it can be dangerous. With it switched on you can write
     passing tests against APIs that don't actually exist!
 
-    Patch can be used as a TestCase class decorator. It works by
+    Patch can be used as a T`TestCase` class decorator. It works by
     decorating each test method in the class. This reduces the boilerplate
     code when your test methods share a common patchings set. `patch` finds
     tests by looking for method names that start with `patch.TEST_PREFIX`.
     By default this is `test`, which matches the way `unittest` finds tests.
     You can specify an alternative prefix by setting `patch.TEST_PREFIX`.
 
-    Patch can be used with the with statement, if this is available in your
-    version of Python. Here the patching applies to the indented block after
-    the with statement. If you use "as" then the patched object will be bound
-    to the name after the "as"; very useful if `patch` is creating a mock
-    object for you.
+    Patch can be used as a context manager, with the with statement. Here the
+    patching applies to the indented block after the with statement. If you
+    use "as" then the patched object will be bound to the name after the
+    "as"; very useful if `patch` is creating a mock object for you.
 
     `patch` also takes arbitrary keyword arguments. These will be passed to
     the `Mock` (or `new_callable`) on construction.
