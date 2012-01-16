@@ -537,6 +537,35 @@ The `Mock` classes have support for mocking magic methods. See :ref:`magic
 methods <magic-methods>` for the full details.
 
 
+The mock classes and the :func:`patch` decorators all take arbitrary keyword
+arguments for configuration. For the `patch` decorators the keywords are
+passed to the constructor of the mock being created. The keyword arguments
+are for configuring attributes of the mock:
+
+.. doctest::
+
+        >>> m = MagicMock(attribute=3, other='fish')
+        >>> m.attribute
+        3
+        >>> m.other
+        'fish'
+
+The return value and side effect of child mocks can be set in the same way,
+using dotted notation. As you can't use dotted names directly in a call you
+have to create a dictionary and unpack it using `**`:
+
+.. doctest::
+
+    >>> attrs = {'method.return_value': 3, 'other.side_effect': KeyError}
+    >>> mock = Mock(some_attribute='eggs', **attrs)
+    >>> mock.some_attribute
+    'eggs'
+    >>> mock.method()
+    3
+    >>> mock.other()
+    Traceback (most recent call last):
+      ...
+    KeyError
 
 
 
