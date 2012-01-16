@@ -267,10 +267,8 @@ patch.dict
     values are set.
 
     `patch.dict` can also be called with arbitrary keyword arguments to set
-    values in the dictionary::
+    values in the dictionary.
 
-        with patch.dict('sys.modules', mymodule=Mock(), other_module=Mock()):
-            ...
 
 Like :func:`patch` and :func:`patch.object` `patch.dict` can be used as a
 decorator or a context manager. It can be used to add members to a dictionary,
@@ -293,6 +291,18 @@ when the test ends.
     newvalue
     >>> assert 'newkey' not in os.environ
 
+Keywords can be used in the `patch.dict` call to set values in the dictionary:
+
+.. doctest::
+
+    >>> mymodule = MagicMock()
+    >>> mymodule.function.return_value = 'fish'
+    >>> with patch.dict('sys.modules', mymodule=mymodule):
+    ...     import mymodule
+    ...     mymodule.function('some', 'args')
+    ...
+    'fish'
+
 
 patch.multiple
 ==============
@@ -306,13 +316,56 @@ patch.multiple
         with patch.multiple(settings, FIRST_PATCH='one', SECOND_PATCH='two'):
             ...
 
-    Like `patch` it can be used as a decorator, class decorator or a context
+    Use :data:`DEFAULT` as the value if you want `patch.multiple` to create
+    mocks for you. In this case the created mocks are passed into a decorated
+    function by keyword, and a dictionary is returned when `patch.multiple` is
+    used as a context manager.
+
+    `patch.multiple` can be used as a decorator, class decorator or a context
     manager. The arguments `spec`, `spec_set`, `create`, `mocksignature`,
     `autospec` and `new_callable` have the same meaning as for `patch`. These
-    arguments will be applied to *all* the patches being done by
-    `patch.multiple`.
+    arguments will be applied to *all* patches done by `patch.multiple`.
 
-    XXXX note about KEYWORD=DEFAULT
+If you want `patch.multiple` to create mocks for you, then you can use
+:data:`DEFAULT` as the value. If you use `patch.multiple` as a decorator
+then the created mocks are passed into the decorated function by keyword.
+
+.. doctest::
+
+    >>> thing = object()
+    >>> other = object()
+    >>>
+    >>> @patch.multiple('__main__', thing=DEFAULT, other=DEFAULT)
+    ... def test_function(thing, other):
+    ...     assert isinstance(thing, MagicMock)
+    ...     assert isinstance(other, MagicMock)
+    ...
+    >>> test_function()
+
+`patch.multiple` can be nested with other `patch` decorators, but put arguments
+passed by keyword *after* any of the standard arguments created by `patch`:
+
+.. doctest::
+
+    >>> @patch('sys.exit')
+    ... @patch.multiple('__main__', thing=DEFAULT, other=DEFAULT)
+    ... def test_function(mock_exit, other, thing):
+    ...     assert 'other' in repr(other)
+    ...     assert 'thing' in repr(thing)
+    ...     assert 'exit' in repr(mock_exit)
+    ...
+    >>> test_function()
+
+
+If `patch.multiple` is used as a context manager, the value returned by the
+context manger is a dictionary where the mocks are keyed by name:
+
+.. doctest::
+
+    >>> with patch.multiple('__main__', thing=DEFAULT, other=DEFAULT) as values:
+    ...     assert values['thing'] is thing
+    ...     assert values['other'] is other
+    ...
 
 
 .. _start-and-stop:
