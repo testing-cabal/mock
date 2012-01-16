@@ -381,7 +381,7 @@ sequence from repeated calls:
 Sentinel
 ========
 
-``sentinel`` is a useful object for providing unique objects in your tests:
+`sentinel` is a useful object for providing unique objects in your tests:
 
 .. doctest::
 
@@ -436,8 +436,8 @@ with.
     ...
     >>> test()
 
-If you are patching a module (including ``__builtin__``) then use ``patch``
-instead of ``patch.object``:
+If you are patching a module (including `__builtin__`) then use `patch`
+instead of `patch.object`:
 
 .. doctest::
 
