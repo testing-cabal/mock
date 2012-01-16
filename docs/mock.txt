@@ -210,23 +210,41 @@ the `new_callable` argument to `patch`.
 
     .. method:: configure_mock(**kwargs)
 
-            Set attributes on the mock through keyword arguments.
+        Set attributes on the mock through keyword arguments.
 
-            Attributes plus return values and side effects can be set on child
-            mocks using standard dot notation and unpacking a dictionary in the
-            method call:
+        Attributes plus return values and side effects can be set on child
+        mocks using standard dot notation and unpacking a dictionary in the
+        method call:
 
-            .. doctest::
+        .. doctest::
 
-                >>> mock = Mock()
-                >>> attrs = {'method.return_value': 3, 'other.side_effect': KeyError}
-                >>> mock.configure_mock(**attrs)
-                >>> mock.method()
-                3
-                >>> mock.other()
-                Traceback (most recent call last):
-                  ...
-                KeyError
+            >>> mock = Mock()
+            >>> attrs = {'method.return_value': 3, 'other.side_effect': KeyError}
+            >>> mock.configure_mock(**attrs)
+            >>> mock.method()
+            3
+            >>> mock.other()
+            Traceback (most recent call last):
+              ...
+            KeyError
+
+        The same thing can be achieved in the constructor call to mocks:
+
+        .. doctest::
+
+            >>> attrs = {'method.return_value': 3, 'other.side_effect': KeyError}
+            >>> mock = Mock(some_attribute='eggs', **attrs)
+            >>> mock.some_attribute
+            'eggs'
+            >>> mock.method()
+            3
+            >>> mock.other()
+            Traceback (most recent call last):
+              ...
+            KeyError
+
+        `configure_mock` exists to make it easier to do configuration
+        after the mock has been created.
 
 
     .. method:: __dir__()
@@ -517,6 +535,8 @@ to pass `isintance` tests:
 
 The `Mock` classes have support for mocking magic methods. See :ref:`magic
 methods <magic-methods>` for the full details.
+
+
 
 
 
