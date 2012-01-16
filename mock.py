@@ -1426,11 +1426,15 @@ def _patch_multiple(target, spec=None, create=False,
         with patch.multiple(settings, FIRST_PATCH='one', SECOND_PATCH='two'):
             ...
 
-    Like `patch` it can be used as a decorator, class decorator or a context
+    Use `DEFAULT` as the value if you want `patch.multiple` to create
+    mocks for you. In this case the created mocks are passed into a decorated
+    function by keyword, and a dictionary is returned when `patch.multiple` is
+    used as a context manager.
+
+    `patch.multiple` can be used as a decorator, class decorator or a context
     manager. The arguments `spec`, `spec_set`, `create`, `mocksignature`,
     `autospec` and `new_callable` have the same meaning as for `patch`. These
-    arguments will be applied to *all* the patches being done by
-    `patch.multiple`.
+    arguments will be applied to *all* patches done by `patch.multiple`.
     """
     if type(target) in (unicode, str):
         getter = lambda: _importer(target)
