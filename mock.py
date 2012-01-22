@@ -1978,6 +1978,8 @@ class _Call(tuple):
 
 
     def __eq__(self, other):
+        if other is ANY:
+            return True
         try:
             len(other)
         except TypeError:

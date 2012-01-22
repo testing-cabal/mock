@@ -293,6 +293,15 @@ class CallTest(unittest2.TestCase):
         self.assertEqual(kall.call_list(), mock.mock_calls)
 
 
+    def test_call_any(self):
+        self.assertEqual(call, ANY)
+
+        m = MagicMock()
+        int(m)
+        self.assertEqual(m.mock_calls, [ANY])
+        self.assertEqual([ANY], m.mock_calls)
+
+
     def test_two_args_call(self):
         args = _Call(((1, 2), {'a': 3}), two=True)
         self.assertEqual(len(args), 2)
