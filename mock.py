@@ -1981,7 +1981,7 @@ class _Call(tuple):
         if other is ANY:
             return True
         try:
-            len(other)
+            len_other = len(other)
         except TypeError:
             return False
 
@@ -1992,11 +1992,11 @@ class _Call(tuple):
             self_name, self_args, self_kwargs = self
 
         other_name = ''
-        if len(other) == 0:
+        if len_other == 0:
             other_args, other_kwargs = (), {}
-        elif len(other) == 3:
+        elif len_other == 3:
             other_name, other_args, other_kwargs = other
-        elif len(other) == 1:
+        elif len_other == 1:
             value, = other
             if isinstance(value, tuple):
                 other_args = value
