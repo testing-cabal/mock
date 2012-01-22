@@ -28,11 +28,17 @@ call
 .. function:: call(*args, **kwargs)
 
     `call` is a helper object for making simpler assertions, for comparing
-    with :attr:`Mock.call_args_list`, :attr:`Mock.mock_calls` and
-    `Mock.method_calls`.
+    with :attr:`~Mock.call_args`, :attr:`~Mock.call_args_list`,
+    :attr:`~Mock.mock_calls` and:attr: `~Mock.method_calls`. `call` can also be
+    used with :meth:`~Mock.assert_has_calls`.
 
-    XXXX
+    .. doctest::
 
+        >>> m = MagicMock(return_value=None)
+        >>> m(1, 2, a='foo', b='bar')
+        >>> m()
+        >>> m.call_args_list == [call(1, 2, a='foo', b='bar'), call()]
+        True
 
 .. method:: call.call_list()
 
@@ -40,7 +46,27 @@ call
     returns a list of all the intermediate calls as well as the
     final call.
 
-`call_list` is particularly useful for making assertions on "chained calls". XXXX
+`call_list` is particularly useful for making assertions on "chained calls". A
+chained call is multiple calls on a single line of code. This results in
+multiple entries in :attr:`~Mock.mock_calls` on a mock. Manually constructing
+the sequence of calls can be tedious.
+
+:meth:`~call.call_list` can construct the sequence of calls from the same
+chained call:
+
+.. doctest::
+
+    >>> m = MagicMock()
+    >>> m(1).method(arg='foo').other('bar')(2.0)
+    <MagicMock name='mock().method().other()()' id='...'>
+    >>> kall = call(1).method(arg='foo').other('bar')(2.0)
+    >>> kall.call_list()
+    [call(1),
+     call().method(arg='foo'),
+     call().method().other('bar'),
+     call().method().other()(2.0)]
+    >>> m.mock_calls == kall.call_list()
+    True
 
 
 
