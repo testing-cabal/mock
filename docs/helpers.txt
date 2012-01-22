@@ -117,6 +117,17 @@ passed in.
     >>> mock('foo', bar=object())
     >>> mock.assert_called_once_with('foo', bar=ANY)
 
+`ANY` can also be used in comparisons with call lists like
+:attr:`~Mock.mock_calls`:
+
+.. doctest::
+
+    >>> m = MagicMock(return_value=None)
+    >>> m(1)
+    >>> m(1, 2)
+    >>> m(object())
+    >>> m.mock_calls == [call(1), call(1, 2), ANY]
+    True
 
 
 
