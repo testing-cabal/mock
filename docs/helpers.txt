@@ -134,7 +134,7 @@ passed in.
 FILTER_DIR
 ==========
 
-.. attribute:: FILTER_DIR
+.. data:: FILTER_DIR
 
 `FILTER_DIR` is a module level variable that controls the way mock objects
 respond to `dir` (only for Python 2.6 or more recent). The default is `True`,
