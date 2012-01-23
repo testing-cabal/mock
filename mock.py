@@ -1538,7 +1538,7 @@ def patch(
     use "as" then the patched object will be bound to the name after the
     "as"; very useful if `patch` is creating a mock object for you.
 
-    `patch` also takes arbitrary keyword arguments. These will be passed to
+    `patch` takes arbitrary keyword arguments. These will be passed to
     the `Mock` (or `new_callable`) on construction.
 
     `patch.dict(...)`, `patch.multiple(...)` and `patch.object(...)` are
