@@ -68,7 +68,8 @@ patch
     will have their arguments checked and will raise a `TypeError` if they are
     called with the wrong signature (similar to `mocksignature`). For mocks
     replacing a class, their return value (the 'instance') will have the same
-    spec as the class.
+    spec as the class. See the :func:`create_autospec function and
+    `:ref:`auto-speccing`.
 
     Instead of `autospec=True` you can pass `autospec=some_object` to use an
     arbitrary object as the spec instead of the one being replaced.
@@ -80,7 +81,7 @@ patch
     be copied.
 
     By default `patch` will fail to replace attributes that don't exist. If
-    you pass in 'create=True' and the attribute doesn't exist, patch will
+    you pass in `create=True`, and the attribute doesn't exist, patch will
     create the attribute for you when the patched function is called, and
     delete it again afterwards. This is useful for writing tests against
     attributes that your production code creates at runtime. It is off by by
@@ -108,7 +109,7 @@ patch
 
 Patching a class replaces the class with a `MagicMock` *instance*. If the
 class is instantiated in the code under test then it will be the
-`return_value` of the mock that will be used.
+:attr:`~Mock.return_value` of the mock that will be used.
 
 If the class is instantiated multiple times you could use
 :attr:`~Mock.side_effect` to return a new mock each time. Alternatively you
@@ -157,8 +158,7 @@ you wanted a :class:`NonCallableMock` to be used:
       ...
     TypeError: 'NonCallableMock' object is not callable
 
-Another use case might be to replace an object with a `StringIO` object, but
-still have `patch` pass in the created `StringIO` object to the method:
+Another use case might be to replace an object with a `StringIO` instance:
 
 .. doctest::
 
@@ -172,7 +172,6 @@ still have `patch` pass in the created `StringIO` object to the method:
     ...     assert mock_stdout.getvalue() == 'Something\n'
     ...
     >>> test()
-
 
 When `patch` is creating a mock for you, it is common that the first thing
 you need to do is to configure the mock. Some of that configuration can be done
@@ -215,10 +214,14 @@ patch.object
     patch the named member (`attribute`) on an object (`target`) with a mock
     object.
 
-    Arguments new, spec, create, mocksignature, spec_set, autospec and
-    new_callable have the same meaning as for patch. Like patch, patch.object
-    takes arbitrary keyword arguments for configuring the mock object it
-    creates.
+    `patch.object` can be used as a decorator, class decorator or a context
+    manager. Arguments `new`, `spec`, `create`, `mocksignature`, `spec_set`,
+    `autospec` and `new_callable` have the same meaning as for `patch`. Like
+    `patch`, `patch.object` takes arbitrary keyword arguments for configuring
+    the mock object it creates.
+
+    When used as a class decorator `patch.object` honours `patch.TEST_PREFIX`
+    for choosing which methods to wrap.
 
 You can either call `patch.object` with three arguments or two arguments. The
 three argument form takes the object to be patched, the attribute name and the
@@ -240,7 +243,7 @@ function:
 `spec`, `create` and the other arguments to `patch.object` have the same
 meaning as they do for `patch`.
 
-`patch.object` is also a context manager and can be used with ``with``
+`patch.object` is also a context manager and can be used with `with`
 statements in the same way as `patch`. It can also be used as a class
 decorator in the same way as `patch`.
 
@@ -261,7 +264,7 @@ patch.dict
     will then be fetched by importing it.
 
     `values` can be a dictionary of values to set in the dictionary. `values`
-    can also be an iterable of ``(key, value)`` pairs.
+    can also be an iterable of `(key, value)` pairs.
 
     If `clear` is True then the dictionary will be cleared before the new
     values are set.
@@ -269,11 +272,13 @@ patch.dict
     `patch.dict` can also be called with arbitrary keyword arguments to set
     values in the dictionary.
 
+    `patch.dict` can be used as a context manager, decorator or class
+    decorator. When used as a class decorator `patch.dict` honours
+    `patch.TEST_PREFIX` for choosing which methods to wrap.
 
-Like :func:`patch` and :func:`patch.object` `patch.dict` can be used as a
-decorator or a context manager. It can be used to add members to a dictionary,
-or simply let a test change a dictionary, and ensure the dictionary is restored
-when the test ends.
+`patch.dict` can be used to add members to a dictionary, or simply let a test
+change a dictionary, and ensure the dictionary is restored when the test
+ends.
 
 .. doctest::
 
@@ -325,6 +330,9 @@ patch.multiple
     manager. The arguments `spec`, `spec_set`, `create`, `mocksignature`,
     `autospec` and `new_callable` have the same meaning as for `patch`. These
     arguments will be applied to *all* patches done by `patch.multiple`.
+
+    When used as a class decorator `patch.multiple` honours `patch.TEST_PREFIX`
+    for choosing which methods to wrap.
 
 If you want `patch.multiple` to create mocks for you, then you can use
 :data:`DEFAULT` as the value. If you use `patch.multiple` as a decorator
@@ -524,14 +532,14 @@ The key is to patch out `SomeClass` where it is used (or where it is looked up
 ). In this case `some_function` will actually look up `SomeClass` in module b,
 where we have imported it. The patching should look like:
 
-    ``@patch('b.SomeClass')``
+    `@patch('b.SomeClass')`
 
 However, consider the alternative scenario where instead of `from a import
 SomeClass` module b does `import a` and `some_function` uses `a.SomeClass`. Both
 of these import forms are common. In this case the class we want to patch is
 being looked up on the a module and so we have to patch `a.SomeClass` instead:
 
-    ``@patch('a.SomeClass')``
+    `@patch('a.SomeClass')`
 
 
 Patching Descriptors and Proxy Objects

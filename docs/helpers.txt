@@ -195,7 +195,6 @@ Alternatively you can just use `vars(my_mock)` (instance members) and
 Autospeccing
 ============
 
-
 Autospeccing is based on the existing `spec` feature of mock. It limits the
 api of mocks to the api of an original object (the spec), but it is recursive
 (implemented lazily) so that attributes of mocks only have the same api as
@@ -334,7 +333,6 @@ As well as using `autospec` through `patch` there is a
 
 .. doctest::
 
-    >>> from mock import create_autospec
     >>> import urllib2
     >>> mock_urllib2 = create_autospec(urllib2)
     >>> mock_urllib2.Request('foo', 'bar')
@@ -458,7 +456,6 @@ alternative object as the `autospec` argument:
         ...     pass
         ...
         >>> Foo.foo(Foo())
-        >>> from mock import create_autospec
         >>> MockFoo = create_autospec(Foo)
         >>> MockFoo.foo(MockFoo())
         Traceback (most recent call last):
