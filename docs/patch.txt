@@ -243,18 +243,14 @@ function:
 `spec`, `create` and the other arguments to `patch.object` have the same
 meaning as they do for `patch`.
 
-`patch.object` is also a context manager and can be used with `with`
-statements in the same way as `patch`. It can also be used as a class
-decorator in the same way as `patch`.
-
 
 patch.dict
 ==========
 
 .. function:: patch.dict(in_dict, values=(), clear=False, **kwargs)
 
-    Patch a dictionary and restore the dictionary to its original state after
-    the test.
+    Patch a dictionary, or dictionary like object, and restore the dictionary
+    to its original state after the test.
 
     `in_dict` can be a dictionary or a mapping like container. If it is a
     mapping then it must at least support getting, setting and deleting items
@@ -307,6 +303,35 @@ Keywords can be used in the `patch.dict` call to set values in the dictionary:
     ...     mymodule.function('some', 'args')
     ...
     'fish'
+
+`patch.dict` can be used with dictionary like objects that aren't actually
+dictionaries. At the very minimum they must support item getting, setting,
+deleting and either iteration or membership test. This corresponds to the
+magic methods `__getitem__`, `__setitem__`, `__delitem__` and either
+`__iter__` or `__contains__`.
+
+.. doctest::
+
+    >>> class Container(object):
+    ...     def __init__(self):
+    ...         self.values = {}
+    ...     def __getitem__(self, name):
+    ...         return self.values[name]
+    ...     def __setitem__(self, name, value):
+    ...         self.values[name] = value
+    ...     def __delitem__(self, name):
+    ...         del self.values[name]
+    ...     def __iter__(self):
+    ...         return iter(self.values)
+    ...
+    >>> thing = Container()
+    >>> thing['one'] = 1
+    >>> with patch.dict(thing, one=2, two=3):
+    ...     assert thing['one'] == 2
+    ...     assert thing['two'] == 3
+    ...
+    >>> assert thing['one'] == 1
+    >>> assert list(thing) == ['one']
 
 
 patch.multiple

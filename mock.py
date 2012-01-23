@@ -1526,7 +1526,7 @@ def patch(
     default because it can be dangerous. With it switched on you can write
     passing tests against APIs that don't actually exist!
 
-    Patch can be used as a T`TestCase` class decorator. It works by
+    Patch can be used as a `TestCase` class decorator. It works by
     decorating each test method in the class. This reduces the boilerplate
     code when your test methods share a common patchings set. `patch` finds
     tests by looking for method names that start with `patch.TEST_PREFIX`.
@@ -1553,8 +1553,8 @@ def patch(
 
 class _patch_dict(object):
     """
-    Patch a dictionary and restore the dictionary to its original state after
-    the test.
+    Patch a dictionary, or dictionary like object, and restore the dictionary
+    to its original state after the test.
 
     `in_dict` can be a dictionary or a mapping like container. If it is a
     mapping then it must at least support getting, setting and deleting items
