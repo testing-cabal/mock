@@ -10,8 +10,8 @@ CHANGELOG
 
 The only change since 0.8rc2 is:
 
-* Improved repr of `sentinel` objects
-* `ANY` can be used for comparisons against `call` objects
+* Improved repr of :data:`sentinel` objects
+* :data:`ANY` can be used for comparisons against :data:`call` objects
 
 Full List of changes since 0.7:
 
@@ -27,8 +27,9 @@ mock 0.8.0 is the last version that will support Python 2.4.
   return values / side effects on the mock and its attributes
 * New mock assert methods :meth:`~Mock.assert_any_call` and
   :meth:`~Mock.assert_has_calls`
-* Implemented auto-speccing (recursive, lazy speccing of mocks with mocked
-  signatures for functions/methods), as the `autospec` argument to `patch`
+* Implemented :ref:`auto-speccing` (recursive, lazy speccing of mocks with
+  mocked signatures for functions/methods), as the `autospec` argument to
+  `patch`
 * Added the :func:`create_autospec` function for manually creating
   'auto-specced' mocks
 * :func:`patch.multiple` for doing multiple patches in a single call, using
@@ -46,7 +47,7 @@ mock 0.8.0 is the last version that will support Python 2.4.
   first lookup. This means the result of calling a protocol method is a
   `MagicMock` instead of a `Mock` as it was previously
 * Addition of :meth:`~Mock.attach_mock` method
-* Added :data:`ANY` for ignoring arguments in -meth:`~Mock.assert_called_with`
+* Added :data:`ANY` for ignoring arguments in :meth:`~Mock.assert_called_with`
   calls
 * Addition of :data:`call` helper object
 * Improved repr for mocks

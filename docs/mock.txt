@@ -268,7 +268,7 @@ the `new_callable` argument to `patch`.
         any custom subclass).
 
 
-    .. attribute:: Mock.called
+    .. attribute:: called
 
         A boolean representing whether or not the mock object has been called:
 
@@ -281,7 +281,7 @@ the `new_callable` argument to `patch`.
             >>> mock.called
             True
 
-    .. attribute:: Mock.call_count
+    .. attribute:: call_count
 
         An integer telling you how many times the mock object has been called:
 
@@ -296,7 +296,7 @@ the `new_callable` argument to `patch`.
             2
 
 
-    .. attribute:: Mock.return_value
+    .. attribute:: return_value
 
         Set this to configure the value returned by calling the mock:
 
@@ -307,8 +307,8 @@ the `new_callable` argument to `patch`.
             >>> mock()
             'fish'
 
-        The default return value is a mock object and you can configure it in the
-        normal way:
+        The default return value is a mock object and you can configure it in
+        the normal way:
 
         .. doctest::
 
@@ -329,11 +329,10 @@ the `new_callable` argument to `patch`.
             3
 
 
-    .. attribute:: Mock.side_effect
+    .. attribute:: side_effect
 
-
-        This can either be a function to be called when the mock is called, or an
-        exception (class or instance) to be raised.
+        This can either be a function to be called when the mock is called,
+        or an exception (class or instance) to be raised.
 
         If you pass in a function it will be called with same arguments as the
         mock and unless the function returns the :data:`DEFAULT` singleton the
@@ -341,8 +340,8 @@ the `new_callable` argument to `patch`.
         function returns :data:`DEFAULT` then the mock will return its normal
         value (from the :attr:`return_value`.
 
-        An example of a mock that raises an exception (to test exception handling of
-        an API):
+        An example of a mock that raises an exception (to test exception
+        handling of an API):
 
         .. doctest::
 
@@ -353,24 +352,20 @@ the `new_callable` argument to `patch`.
               ...
             Exception: Boom!
 
-        Using ``side_effect`` to return a sequence of values:
+        Using `side_effect` to return a sequence of values:
 
         .. doctest::
 
             >>> mock = Mock()
-            >>> results = [1, 2, 3]
-            >>> def side_effect(*args, **kwargs):
-            ...     return results.pop()
-            ...
-            >>> mock.side_effect = side_effect
+            >>> mock.side_effect = [3, 2, 1]
             >>> mock(), mock(), mock()
             (3, 2, 1)
 
-        The `side_effect` function is called with the same arguments as the mock (so
-        it is wise for it to take arbitrary args and keyword arguments) and
-        whatever it returns is used as the return value for the call. The
-        exception is if `side_effect` returns :data:`DEFAULT`, in which case the
-        normal :attr:`return_value` is used.
+        The `side_effect` function is called with the same arguments as the
+        mock (so it is wise for it to take arbitrary args and keyword
+        arguments) and whatever it returns is used as the return value for
+        the call. The exception is if `side_effect` returns :data:`DEFAULT`,
+        in which case the normal :attr:`return_value` is used.
 
         .. doctest::
 
@@ -382,8 +377,8 @@ the `new_callable` argument to `patch`.
             >>> mock()
             3
 
-        `side_effect` can be set in the constructor. Here's an example that adds one
-        to the value the mock is called with and returns it:
+        `side_effect` can be set in the constructor. Here's an example that
+        adds one to the value the mock is called with and returns it:
 
         .. doctest::
 
@@ -394,13 +389,13 @@ the `new_callable` argument to `patch`.
             >>> mock(-8)
             -7
 
-    .. attribute:: Mock.call_args
+    .. attribute:: call_args
 
-        This is either ``None`` (if the mock hasn't been called), or the arguments
-        that the mock was last called with. This will be in the form of a tuple:
-        the first member is any ordered arguments the mock was called with (or an
-        empty tuple) and the second member is any keyword arguments (or an empty
-        dictionary).
+        This is either ``None`` (if the mock hasn't been called), or the
+        arguments that the mock was last called with. This will be in the
+        form of a tuple: the first member is any ordered arguments the mock
+        was called with (or an empty tuple) and the second member is any
+        keyword arguments (or an empty dictionary).
 
         .. doctest::
 
@@ -431,12 +426,13 @@ the `new_callable` argument to `patch`.
             >>> mock.call_args == ()
             True
 
-    .. attribute:: Mock.call_args_list
+    .. attribute:: call_args_list
 
-        This is a list of all the calls made to the mock object in sequence (so
-        the length of the list is the number of times it has been called). Before
-        any calls have been made it is an empty list. Its elements compare
-        "softly" when positional arguments or keyword arguments are skipped:
+        This is a list of all the calls made to the mock object in sequence
+        (so the length of the list is the number of times it has been
+        called). Before any calls have been made it is an empty list. The
+        :data:`call` object can be used for conveniently constructing lists of
+        calls to compare with `call_args_list`.
 
         .. doctest::
 
@@ -451,10 +447,10 @@ the `new_callable` argument to `patch`.
             True
 
 
-    .. attribute:: Mock.method_calls
+    .. attribute:: method_calls
 
-        As well as tracking calls to themselves, mocks also track calls to methods
-        and attributes, and *their* methods and attributes:
+        As well as tracking calls to themselves, mocks also track calls to
+        methods and attributes, and *their* methods and attributes:
 
         .. doctest::
 
@@ -482,7 +478,7 @@ the `new_callable` argument to `patch`.
             ... ('method', {"a": "b"})]
             True
 
-    .. attribute:: Mock.mock_calls
+    .. attribute:: mock_calls
 
         `mock_calls` records *all* calls to the mock object, its methods, magic
         methods *and* return value mocks.
@@ -505,12 +501,12 @@ the `new_callable` argument to `patch`.
             True
 
 
-    .. attribute:: Mock.__class__
+    .. attribute:: __class__
 
-        Normally the `__class__` attribute of an object will return its type. For
-        a mock object with a `spec` `__class__` returns the spec class instead.
-        This allows mock objects to pass `isinstance` tests for the object they
-        are replacing / masquerading as:
+        Normally the `__class__` attribute of an object will return its type.
+        For a mock object with a `spec` `__class__` returns the spec class
+        instead. This allows mock objects to pass `isinstance` tests for the
+        object they are replacing / masquerading as:
 
         .. doctest::
 
@@ -524,7 +520,6 @@ the `new_callable` argument to `patch`.
     A non-callable version of `Mock`. The constructor parameters have the same
     meaning of `Mock`, with the exception of `return_value` and `side_effect`
     which have no meaning on a non-callable mock.
-
 
 Mock objects that use a class or an instance as a `spec` or `spec_set` are able
 to pass `isintance` tests:
@@ -540,7 +535,6 @@ to pass `isintance` tests:
 
 The `Mock` classes have support for mocking magic methods. See :ref:`magic
 methods <magic-methods>` for the full details.
-
 
 The mock classes and the :func:`patch` decorators all take arbitrary keyword
 arguments for configuration. For the `patch` decorators the keywords are
@@ -571,7 +565,6 @@ have to create a dictionary and unpack it using `**`:
     Traceback (most recent call last):
       ...
     KeyError
-
 
 
 .. index:: __call__
