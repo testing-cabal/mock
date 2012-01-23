@@ -1403,10 +1403,14 @@ def _patch_object(
     patch the named member (`attribute`) on an object (`target`) with a mock
     object.
 
-    Arguments new, spec, create, mocksignature, spec_set, autospec and
-    new_callable have the same meaning as for patch. Like patch, patch.object
-    takes arbitrary keyword arguments for configuring the mock object it
-    creates.
+    `patch.object` can be used as a decorator, class decorator or a context
+    manager. Arguments `new`, `spec`, `create`, `mocksignature`, `spec_set`,
+    `autospec` and `new_callable` have the same meaning as for `patch`. Like
+    `patch`, `patch.object` takes arbitrary keyword arguments for configuring
+    the mock object it creates.
+
+    When used as a class decorator `patch.object` honours `patch.TEST_PREFIX`
+    for choosing which methods to wrap.
     """
     getter = lambda: target
     return _patch(
@@ -1435,6 +1439,9 @@ def _patch_multiple(target, spec=None, create=False,
     manager. The arguments `spec`, `spec_set`, `create`, `mocksignature`,
     `autospec` and `new_callable` have the same meaning as for `patch`. These
     arguments will be applied to *all* patches done by `patch.multiple`.
+
+    When used as a class decorator `patch.multiple` honours `patch.TEST_PREFIX`
+    for choosing which methods to wrap.
     """
     if type(target) in (unicode, str):
         getter = lambda: _importer(target)
@@ -1512,7 +1519,7 @@ def patch(
     be copied.
 
     By default `patch` will fail to replace attributes that don't exist. If
-    you pass in 'create=True' and the attribute doesn't exist, patch will
+    you pass in `create=True`, and the attribute doesn't exist, patch will
     create the attribute for you when the patched function is called, and
     delete it again afterwards. This is useful for writing tests against
     attributes that your production code creates at runtime. It is off by by
@@ -1567,6 +1574,10 @@ class _patch_dict(object):
 
         with patch.dict('sys.modules', mymodule=Mock(), other_module=Mock()):
             ...
+
+    `patch.dict` can be used as a context manager, decorator or class
+    decorator. When used as a class decorator `patch.dict` honours
+    `patch.TEST_PREFIX` for choosing which methods to wrap.
     """
 
     def __init__(self, in_dict, values=(), clear=False, **kwargs):
