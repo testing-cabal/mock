@@ -111,7 +111,7 @@ class is instantiated in the code under test then it will be the
 `return_value` of the mock that will be used.
 
 If the class is instantiated multiple times you could use
-:attr:`Mock.side_effect` to return a new mock each time. Alternatively you
+:attr:`~Mock.side_effect` to return a new mock each time. Alternatively you
 can set the `return_value` to be anything you want.
 
 To configure return values on methods of *instances* on the patched class
@@ -189,7 +189,7 @@ used to set attributes on the created mock:
     'two'
 
 As well as attributes on the created mock attributes, like the
-:attr:`Mock.return_value` and :attr:`Mock.side_effect`, of child mocks can
+:attr:`~Mock.return_value` and :attr:`~Mock.side_effect`, of child mocks can
 also be configured. These aren't syntactically valid to pass in directly as
 keyword arguments, but a dictionary with these as keys can still be expanded
 into a `patch` call using `**`:

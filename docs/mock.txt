@@ -20,7 +20,7 @@ pre-created and ready to use. There are also non-callable variants, useful
 when you are mocking out objects that aren't callable:
 :class:`NonCallableMock` and :class:`NonCallableMagicMock`
 
-The :func:`mock.patch` decorators makes it easy to temporarily replace classes
+The :func:`patch` decorators makes it easy to temporarily replace classes
 in a particular module with a `Mock` object. By default `patch` will create
 a `MagicMock` for you. You can specify an alternative class of `Mock` using
 the `new_callable` argument to `patch`.
@@ -52,7 +52,7 @@ the `new_callable` argument to `patch`.
       `spec_set` will raise an `AttributeError`.
 
     * `side_effect`: A function to be called whenever the Mock is called. See
-      the :attr:`Mock.side_effect` attribute. Useful for raising exceptions or
+      the :attr:`~Mock.side_effect` attribute. Useful for raising exceptions or
       dynamically changing return values. The function is called with the same
       arguments as the mock, and unless it returns :data:`DEFAULT`, the return
       value of this function is used as the return value.
@@ -581,15 +581,15 @@ Calling
 =======
 
 Mock objects are callable. The call will return the value set as the
-:attr:`Mock.return_value` attribute. The default return value is a new Mock
+:attr:`~Mock.return_value` attribute. The default return value is a new Mock
 object; it is created the first time the return value is accessed (either
 explicitly or by calling the Mock) - but it is stored and the same one
 returned each time.
 
 Calls made to the object will be recorded in the attributes
-like :attr:`Mock.call_args` and :attr:`Mock.call_args_list`.
+like :attr:`~Mock.call_args` and :attr:`~Mock.call_args_list`.
 
-If :attr:`Mock.side_effect` is set then it will be called after the call has
+If :attr:`~Mock.side_effect` is set then it will be called after the call has
 been recorded but before any value is returned.
 
 

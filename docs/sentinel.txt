@@ -30,7 +30,7 @@
 .. data:: DEFAULT
 
     The `DEFAULT` object is a pre-created sentinel (actually
-    `sentinel.DEFAULT`). It can be used by :attr:`Mock.side_effect`
+    `sentinel.DEFAULT`). It can be used by :attr:`~Mock.side_effect`
     functions to indicate that the normal return value should be used.
 
 
