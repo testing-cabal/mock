@@ -399,7 +399,7 @@ Changes since beta 4:
   returns the type of the spec)
 * Default numeric value for MagicMock is 1 rather than zero (because the
   MagicMock bool defaults to True and 0 is False)
-* Improved failure message for :meth:`Mock.assert_called_with` when the mock
+* Improved failure message for :meth:`~Mock.assert_called_with` when the mock
   has not been called at all
 * Adding the following to the set of supported magic methods:
 

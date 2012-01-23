@@ -94,7 +94,7 @@ less verbose:
     >>> assert real.something.call_args_list == [()]
 
 If the mock has only been called once then you can use
-:meth:`Mock.assert_called_once_with`:
+:meth:`~Mock.assert_called_once_with`:
 
 .. doctest::
 
@@ -105,7 +105,7 @@ If the mock has only been called once then you can use
 
 If you don't care how many times an object has been called, but are just
 interested in the most recent call, then you can use
-:meth:`Mock.assert_called_with`:
+:meth:`~Mock.assert_called_with`:
 
 .. doctest::
 
@@ -131,7 +131,7 @@ Mock for Method Calls on an Object
 
 We don't have to do any work to provide the 'close' method on our mock.
 Accessing close creates it. So, if 'close' hasn't already been called then
-accessing it in the test will create it, but :meth:`Mock.assert_called_with`
+accessing it in the test will create it, but :meth:`~Mock.assert_called_with`
 will raise a failure exception.
 
 As ``close`` is a mock object is has all the attributes from the previous

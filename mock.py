@@ -1069,9 +1069,9 @@ class Mock(CallableMixin, NonCallableMock):
       `spec_set` will raise an `AttributeError`.
 
     * `side_effect`: A function to be called whenever the Mock is called. See
-      the :attr:`Mock.side_effect` attribute. Useful for raising exceptions or
+      the `side_effect` attribute. Useful for raising exceptions or
       dynamically changing return values. The function is called with the same
-      arguments as the mock, and unless it returns :data:`DEFAULT`, the return
+      arguments as the mock, and unless it returns `DEFAULT`, the return
       value of this function is used as the return value.
 
       Alternatively `side_effect` can be an exception class or instance. In
@@ -1082,7 +1082,7 @@ class Mock(CallableMixin, NonCallableMock):
 
     * `return_value`: The value returned when the mock is called. By default
       this is a new Mock (created on first access). See the
-      :attr:`Mock.return_value` attribute.
+      `return_value` attribute.
 
     * `wraps`: Item for the mock object to wrap. If `wraps` is not None
       then calling the Mock will pass the call through to the wrapped object

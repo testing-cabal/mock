@@ -58,12 +58,12 @@ One use case for this is for mocking objects used as context managers in a
    >>> mock.__enter__.assert_called_with()
    >>> mock.__exit__.assert_called_with(None, None, None)
 
-Calls to magic methods do not (yet) appear in :attr:`Mock.method_calls`.
-This may change in a future release.
+Calls to magic methods do not appear in :attr:`~Mock.method_calls`, but they
+are recorded in :attr:`~Mock.mock_calls`.
 
 .. note::
 
-   If you use the ``spec`` keyword argument to create a mock then attempting to
+   If you use the `spec` keyword argument to create a mock then attempting to
    set a magic method that isn't in the spec will raise an `AttributeError`.
 
 The full list of supported magic methods is:
