@@ -40,8 +40,8 @@ the `new_callable` argument to `patch`.
     * `spec`: This can be either a list of strings or an existing object (a
       class or instance) that acts as the specification for the mock object. If
       you pass in an object then a list of strings is formed by calling dir on
-      the object (excluding unsupported magic attributes and methods). Accessing
-      any attribute not in this list will raise an `AttributeError`.
+      the object (excluding unsupported magic attributes and methods).
+      Accessing any attribute not in this list will raise an `AttributeError`.
 
       If `spec` is an object (rather than a list of strings) then
       :attr:`__class__` returns the class of the spec object. This allows mocks
@@ -81,12 +81,12 @@ the `new_callable` argument to `patch`.
       this is a new Mock (created on first access). See the
       :attr:`return_value` attribute.
 
-    * `wraps`: Item for the mock object to wrap. If `wraps` is not None
-      then calling the Mock will pass the call through to the wrapped object
-      (returning the real result and ignoring `return_value`). Attribute
-      access on the mock will return a Mock object that wraps the corresponding
-      attribute of the wrapped object (so attempting to access an attribute that
-      doesn't exist will raise an `AttributeError`).
+    * `wraps`: Item for the mock object to wrap. If `wraps` is not None then
+      calling the Mock will pass the call through to the wrapped object
+      (returning the real result and ignoring `return_value`). Attribute access
+      on the mock will return a Mock object that wraps the corresponding
+      attribute of the wrapped object (so attempting to access an attribute
+      that doesn't exist will raise an `AttributeError`).
 
       If the mock has an explicit `return_value` set then calls are not passed
       to the wrapped object and the `return_value` is returned instead.
@@ -186,10 +186,10 @@ the `new_callable` argument to `patch`.
             False
 
         This can be useful where you want to make a series of assertions that
-        reuse the same object. Note that `reset_mock` *doesn't* clear the return
-        value, :attr:`side_effect` or any child attributes you have set
-        using normal assignment. Child mocks and the return
-        value mock (if any) are reset as well.
+        reuse the same object. Note that `reset_mock` *doesn't* clear the
+        return value, :attr:`side_effect` or any child attributes you have
+        set using normal assignment. Child mocks and the return value mock
+        (if any) are reset as well.
 
 
     .. method:: mock_add_spec(spec, spec_set=False)
@@ -462,21 +462,6 @@ the `new_callable` argument to `patch`.
             >>> mock.method_calls
             [call.method(), call.property.method.attribute()]
 
-        The tuples in method_calls compare equal even if empty positional and
-        keyword arguments are skipped.
-
-        .. doctest::
-
-            >>> mock = Mock()
-            >>> mock.method()
-            <Mock name='mock.method()' id='...'>
-            >>> mock.method(1, 2)
-            <Mock name='mock.method()' id='...'>
-            >>> mock.method(a="b")
-            <Mock name='mock.method()' id='...'>
-            >>> mock.method_calls == [('method',), ('method', (1, 2)),
-            ... ('method', {"a": "b"})]
-            True
 
     .. attribute:: mock_calls
 
