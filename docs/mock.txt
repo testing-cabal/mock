@@ -249,7 +249,12 @@ the `new_callable` argument to `patch`.
 
     .. method:: __dir__()
 
-        XXXX
+        `Mock` objects limit the results of `dir(some_mock)` to useful results.
+        For mocks with a `spec` this includes all the permitted attributes
+        for the mock.
+
+        See :data:`FILTER_RESULTS` for what this filtering does, and how to
+        switch it off.
 
 
     .. method:: _get_child_mock(**kw)
