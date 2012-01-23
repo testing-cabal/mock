@@ -367,7 +367,7 @@ then the created mocks are passed into the decorated function by keyword.
 
     >>> thing = object()
     >>> other = object()
-    >>>
+
     >>> @patch.multiple('__main__', thing=DEFAULT, other=DEFAULT)
     ... def test_function(thing, other):
     ...     assert isinstance(thing, MagicMock)

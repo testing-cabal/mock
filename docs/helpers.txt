@@ -69,7 +69,6 @@ chained call:
     True
 
 
-
 create_autospec
 ===============
 
@@ -94,6 +93,8 @@ create_autospec
     `create_autospec` also takes arbitrary keyword arguments that are passed to
     the constructor of the created mock.
 
+See :ref:`auto-speccing` for examples of how to use auto-speccing with
+`create_autospec` and the `autospec` argument to :func:`patch`.
 
 
 ANY
