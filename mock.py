@@ -157,7 +157,8 @@ def _getsignature(func, skipfirst):
     if getattr(func, self, None) is not None:
         regargs = regargs[1:]
 
-    _msg = "_mock_ is a reserved argument name, can't mock signatures using _mock_"
+    _msg = ("_mock_ is a reserved argument name, can't mock signatures using "
+            "_mock_")
     assert '_mock_' not in regargs, _msg
     if varargs is not None:
         assert '_mock_' not in varargs, _msg

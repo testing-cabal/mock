@@ -63,19 +63,7 @@ the `new_callable` argument to `patch`.
       If `side_effect` is an iterable then each call to the mock will return
       the next value from the iterable.
 
-      A `side_effect` can be cleared by setting it to `None`:
-
-      .. doctest::
-
-        >>> from mock import Mock
-        >>> m = Mock(side_effect=KeyError, return_value=3)
-        >>> m()
-        Traceback (most recent call last):
-         ...
-        KeyError
-        >>> m.side_effect = None
-        >>> m()
-        3
+      A `side_effect` can be cleared by setting it to `None`.
 
     * `return_value`: The value returned when the mock is called. By default
       this is a new Mock (created on first access). See the
@@ -388,6 +376,20 @@ the `new_callable` argument to `patch`.
             4
             >>> mock(-8)
             -7
+
+        Setting `side_effect` to `None` clears it:
+
+        .. doctest::
+
+            >>> from mock import Mock
+            >>> m = Mock(side_effect=KeyError, return_value=3)
+            >>> m()
+            Traceback (most recent call last):
+             ...
+            KeyError
+            >>> m.side_effect = None
+            >>> m()
+            3
 
     .. attribute:: call_args
 
