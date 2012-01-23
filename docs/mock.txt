@@ -135,8 +135,8 @@ the `new_callable` argument to `patch`.
         assert the mock has been called with the specified arguments.
 
         The assert passes if the mock has *ever* been called, unlike
-        `assert_called_with` and `assert_called_once_with` that only pass if
-        the call is the most recent one.
+        :meth:`assert_called_with` and :meth:`assert_called_once_with` that
+        only pass if the call is the most recent one.
 
         .. doctest::
 
@@ -152,11 +152,11 @@ the `new_callable` argument to `patch`.
         The `mock_calls` list is checked for the calls.
 
         If `any_order` is False (the default) then the calls must be
-        sequentially. There can be extra calls before or after the
+        sequential. There can be extra calls before or after the
         specified calls.
 
         If `any_order` is True then the calls can be in any order, but
-        they must all appear in `mock_calls`.
+        they must all appear in :attr:`mock_calls`.
 
         .. doctest::
 
@@ -187,7 +187,7 @@ the `new_callable` argument to `patch`.
 
         This can be useful where you want to make a series of assertions that
         reuse the same object. Note that `reset_mock` *doesn't* clear the return
-        value, `side_effect` or any child attributes you have set
+        value, :attr:`side_effect` or any child attributes you have set
         using normal assignment. Child mocks and the return
         value mock (if any) are reset as well.
 
@@ -205,7 +205,7 @@ the `new_callable` argument to `patch`.
 
         Attach a mock as an attribute of this one, replacing its name and
         parent. Calls to the attached mock will be recorded in the
-        `method_calls` and `mock_calls` attributes of this one.
+        :attr:`method_calls` and :attr:`mock_calls` attributes of this one.
 
 
     .. method:: configure_mock(**kwargs)

@@ -17,51 +17,52 @@ Full List of changes since 0.7:
 
 mock 0.8.0 is the last version that will support Python 2.4.
 
-* Addition of `mock_calls` list for *all* calls (including magic methods and
-  chained calls)
-* `patch` and `patch.object` now create a `MagicMock` instead of a `Mock` by
-  default
+* Addition of :attr:`~Mock.mock_calls` list for *all* calls (including magic
+  methods and chained calls)
+* :func:`patch` and :func:`patch.object` now create a :class:`MagicMock`
+  instead of a :class:`Mock` by default
 * The patchers (`patch`, `patch.object` and `patch.dict`), plus `Mock` and
   `MagicMock`, take arbitrary keyword arguments for configuration
-* New mock method `configure_mock` for setting attributes and return values /
-  side effects on the mock and its attributes
-* New mock assert methods `assert_any_call` and `assert_has_calls`
+* New mock method :meth:`~Mock.configure_mock` for setting attributes and
+  return values / side effects on the mock and its attributes
+* New mock assert methods :meth:`~Mock.assert_any_call` and
+  :meth:`~Mock.assert_has_calls`
 * Implemented auto-speccing (recursive, lazy speccing of mocks with mocked
   signatures for functions/methods), as the `autospec` argument to `patch`
-* Added the `create_autospec` function for manually creating 'auto-specced'
-  mocks
-* `patch.multiple` for doing multiple patches in a single call, using keyword
-  arguments
-* Setting `side_effect` to an iterable will cause calls to the mock to return
-  the next value from the iterable
+* Added the :func:`create_autospec` function for manually creating
+  'auto-specced' mocks
+* :func:`patch.multiple` for doing multiple patches in a single call, using
+  keyword arguments
+* Setting :attr:`~Mock.side_effect` to an iterable will cause calls to the mock
+  to return the next value from the iterable
 * New `new_callable` argument to `patch` and `patch.object` allowing you to
   pass in a class or callable object (instead of `MagicMock`) that will be
   called to replace the object being patched
-* Addition of `NonCallableMock` and `NonCallableMagicMock`, mocks without a
-  `__call__` method
-* Addition of `mock_add_spec` method for adding (or changing) a spec on an
-  existing mock
+* Addition of :class:`NonCallableMock` and :class:`NonCallableMagicMock`, mocks
+  without a `__call__` method
+* Addition of :meth:`~Mock.mock_add_spec` method for adding (or changing) a
+  spec on an existing mock
 * Protocol methods on `MagicMock` are magic mocks, and are created lazily on
   first lookup. This means the result of calling a protocol method is a
-  MagicMock instead of a Mock as it was previously
-* Addition of `attach_mock` method
-* Added `ANY` for ignoring arguments in `assert_called_with` calls
-* Addition of `call` helper object
+  `MagicMock` instead of a `Mock` as it was previously
+* Addition of :meth:`~Mock.attach_mock` method
+* Added :data:`ANY` for ignoring arguments in -meth:`~Mock.assert_called_with`
+  calls
+* Addition of :data:`call` helper object
 * Improved repr for mocks
-* Improved repr for `Mock.call_args` and entries in `Mock.call_args_list`,
-  `Mock.method_calls` and `Mock.mock_calls`
-* Improved repr for `sentinel` objects
+* Improved repr for :attr:`Mock.call_args` and entries in
+  :attr:`Mock.call_args_list`, :attr:`Mock.method_calls` and
+  :attr:`Mock.mock_calls`
+* Improved repr for :data:`sentinel` objects
 * `patch` lookup is done at use time not at decoration time
 * In Python 2.6 or more recent, `dir` on a mock will report all the dynamically
   created attributes (or the full list of attributes if there is a spec) as
   well as all the mock methods and attributes.
-* Module level `FILTER_DIR` added to control whether `dir(mock)` filters
-  private attributes. `True` by default. Note that `vars(Mock())` can still be
-  used to get all instance attributes and `dir(type(Mock())` will still return
-  all the other attributes (irrespective of `FILTER_DIR`)
+* Module level :data:`FILTER_DIR` added to control whether `dir(mock)` filters
+  private attributes. `True` by default.
 * `patch.TEST_PREFIX` for controlling how patchers recognise test methods when
   used to decorate a class
-* Support for using Java exceptions as a `side_effect` on Jython
+* Support for using Java exceptions as a :attr:`~Mock.side_effect` on Jython
 * `Mock` call lists (`call_args_list`, `method_calls` & `mock_calls`) are now
   custom list objects that allow membership tests for "sub lists" and have
   a nicer representation if you `str` or `print` them
@@ -71,7 +72,7 @@ mock 0.8.0 is the last version that will support Python 2.4.
 * Improved failure messages for `assert_called_with` and
   `assert_called_once_with`
 * Added the Mock API (`assert_called_with` etc) to functions created by
-  `mocksignature`
+  :func:`mocksignature`
 * Tuples as well as lists can be used to specify allowed methods for `spec` &
   `spec_set` arguments
 * Calling `stop` on an unstarted patcher fails with  a more meaningful error
