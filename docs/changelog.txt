@@ -8,7 +8,7 @@ CHANGELOG
 2012/XX/XX Version 0.8.0
 ------------------------
 
-The only change since 0.8rc2 is:
+The only changes since 0.8rc2 are:
 
 * Improved repr of :data:`sentinel` objects
 * :data:`ANY` can be used for comparisons against :data:`call` objects
@@ -43,9 +43,9 @@ mock 0.8.0 is the last version that will support Python 2.4.
   without a `__call__` method
 * Addition of :meth:`~Mock.mock_add_spec` method for adding (or changing) a
   spec on an existing mock
-* Protocol methods on `MagicMock` are magic mocks, and are created lazily on
-  first lookup. This means the result of calling a protocol method is a
-  `MagicMock` instead of a `Mock` as it was previously
+* Protocol methods on :class:`MagicMock` are magic mocks, and are created
+  lazily on first lookup. This means the result of calling a protocol method is
+  a `MagicMock` instead of a `Mock` as it was previously
 * Addition of :meth:`~Mock.attach_mock` method
 * Added :data:`ANY` for ignoring arguments in :meth:`~Mock.assert_called_with`
   calls
