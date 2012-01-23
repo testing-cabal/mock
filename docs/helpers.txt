@@ -68,6 +68,19 @@ chained call:
     >>> m.mock_calls == kall.call_list()
     True
 
+A `call` object is either a tuple of (positional args, keyword args) or
+(name, positional args, keyword args) depending on how it was constructed. When
+you construct them yourself this isn't particularly interesting, but the `call`
+objects that are in the :attr:`Mock.call_args`, :attr:`Mock.call_args_list` and
+:attr:`Mock.mock_calls` attributes can be introspected to get at the individual
+arguments they contain.
+
+The `call` objects in :attr:`Mock.call_args` and :attr:`Mock.call_args_list`
+are two-tuples of (positional args, keyword args) whereas the `call` objects
+in :attr:`Mock.mock_calls`, along with ones you construct yourself, are
+three-tuples of (name, positional args, keyword args).
+
+    XXXX example
 
 create_autospec
 ===============
