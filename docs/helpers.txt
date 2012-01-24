@@ -97,6 +97,10 @@ arguments are a dictionary:
     (1, 2, 3)
     >>> kwargs
     {'arg2': 'two', 'arg': 'one'}
+    >>> args is kall[0]
+    True
+    >>> kwargs is kall[1]
+    True
 
     >>> m = MagicMock()
     >>> m.foo(4, 5, 6, arg='two', arg2='three')
@@ -109,6 +113,8 @@ arguments are a dictionary:
     (4, 5, 6)
     >>> kwargs
     {'arg2': 'three', 'arg': 'two'}
+    >>> name is m.mock_calls[0][0]
+    True
 
 
 create_autospec

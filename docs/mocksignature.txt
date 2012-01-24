@@ -3,6 +3,11 @@ mocksignature
 
 .. currentmodule:: mock
 
+.. note::
+
+    :ref:`auto-speccing`, added in mock 0.8, is a more advanced version of
+    `mocksignature` and can be used for many of the same use cases.
+
 A problem with using mock objects to replace real objects in your tests is that
 :class:`Mock` can be *too* flexible. Your code can treat the mock objects in
 any way and you have to manually check that they were called correctly. If your
