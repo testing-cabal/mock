@@ -418,7 +418,11 @@ the `new_callable` argument to `patch`.
             >>> mock.call_args
             call(3, 4, 5, key='fish', next='w00t!')
 
-        If you want to pull individual arguments out, to see XXXX example
+        `call_args`, along with members of the lists :attr:`call_args_list`,
+        :attr:`method_calls` and :attr:`mock_calls` are :data:`call` objecsts.
+        These are tuples, so they can be unpacked to get at the individual
+        arguments and make more complex assertions. See
+        :ref:`calls as tuples <calls-as-tuples>`.
 
 
     .. attribute:: call_args_list

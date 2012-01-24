@@ -68,6 +68,8 @@ chained call:
     >>> m.mock_calls == kall.call_list()
     True
 
+.. _calls-as-tuples:
+
 A `call` object is either a tuple of (positional args, keyword args) or
 (name, positional args, keyword args) depending on how it was constructed. When
 you construct them yourself this isn't particularly interesting, but the `call`
@@ -80,7 +82,34 @@ are two-tuples of (positional args, keyword args) whereas the `call` objects
 in :attr:`Mock.mock_calls`, along with ones you construct yourself, are
 three-tuples of (name, positional args, keyword args).
 
-    XXXX example
+You can use their "tupleness" to pull out the individual arguments for more
+complex introspection and assertions. The positional arguments are a tuple
+(an empty tuple if there are no positional arguments) and the keyword
+arguments are a dictionary:
+
+.. doctest::
+
+    >>> m = MagicMock(return_value=None)
+    >>> m(1, 2, 3, arg='one', arg2='two')
+    >>> kall = m.call_args
+    >>> args, kwargs = kall
+    >>> args
+    (1, 2, 3)
+    >>> kwargs
+    {'arg2': 'two', 'arg': 'one'}
+
+    >>> m = MagicMock()
+    >>> m.foo(4, 5, 6, arg='two', arg2='three')
+    <MagicMock name='mock.foo()' id='...'>
+    >>> kall = m.mock_calls[0]
+    >>> name, args, kwargs = kall
+    >>> name
+    'foo'
+    >>> args
+    (4, 5, 6)
+    >>> kwargs
+    {'arg2': 'three', 'arg': 'two'}
+
 
 create_autospec
 ===============
