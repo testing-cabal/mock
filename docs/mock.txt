@@ -182,11 +182,11 @@ the `new_callable` argument to `patch`.
 
     .. method:: mock_add_spec(spec, spec_set=False)
 
-        Mock.Add a spec to a mock. `spec` can either be an object or a
+        Add a spec to a mock. `spec` can either be an object or a
         list of strings. Only attributes on the `spec` can be fetched as
         attributes from the mock.
 
-        If `spec_set` is True then only attributes on the spec can be set.
+        If `spec_set` is `True` then only attributes on the spec can be set.
 
 
     .. method:: attach_mock(mock, attribute)
