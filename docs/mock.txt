@@ -391,6 +391,7 @@ the `new_callable` argument to `patch`.
             >>> m()
             3
 
+
     .. attribute:: call_args
 
         This is either `None` (if the mock hasn't been called), or the
@@ -419,7 +420,7 @@ the `new_callable` argument to `patch`.
             call(3, 4, 5, key='fish', next='w00t!')
 
         `call_args`, along with members of the lists :attr:`call_args_list`,
-        :attr:`method_calls` and :attr:`mock_calls` are :data:`call` objecsts.
+        :attr:`method_calls` and :attr:`mock_calls` are :data:`call` objects.
         These are tuples, so they can be unpacked to get at the individual
         arguments and make more complex assertions. See
         :ref:`calls as tuples <calls-as-tuples>`.
@@ -445,6 +446,10 @@ the `new_callable` argument to `patch`.
             >>> mock.call_args_list == expected
             True
 
+        Members of `call_args_list` are :data:`call` objects. These can be
+        unpacked as tuples to get at the individual arguments. See
+        :ref:`calls as tuples <calls-as-tuples>`.
+
 
     .. attribute:: method_calls
 
@@ -460,6 +465,10 @@ the `new_callable` argument to `patch`.
             <Mock name='mock.property.method.attribute()' id='...'>
             >>> mock.method_calls
             [call.method(), call.property.method.attribute()]
+
+        Members of `method_calls` are :data:`call` objects. These can be
+        unpacked as tuples to get at the individual arguments. See
+        :ref:`calls as tuples <calls-as-tuples>`.
 
 
     .. attribute:: mock_calls
@@ -483,6 +492,10 @@ the `new_callable` argument to `patch`.
             ... call.__int__(), call()(1)]
             >>> mock.mock_calls == expected
             True
+
+        Members of `mock_calls` are :data:`call` objects. These can be
+        unpacked as tuples to get at the individual arguments. See
+        :ref:`calls as tuples <calls-as-tuples>`.
 
 
     .. attribute:: __class__
