@@ -623,7 +623,7 @@ Mocks created for you by :func:`patch` are automatically given names. To
 attach mocks that have names to a parent you use the :meth:`~Mock.attach_mock`
 method:
 
-.. doctest:
+.. doctest::
 
     >>> thing1 = object()
     >>> thing2 = object()
