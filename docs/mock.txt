@@ -583,6 +583,61 @@ If :attr:`~Mock.side_effect` is set then it will be called after the call has
 been recorded but before any value is returned.
 
 
+Attaching Mocks as Attributes of Mocks
+======================================
+
+When you attach a mock as an attribute of another mock it becomes a "child" of
+that mock. Calls to the child are recorded in the :attr:`~Mock.method_calls`
+and :attr:`~Mock.mock_calls` attributes of the parent. This is useful for
+configuring child mocks and then attaching them to the parent, or for
+attaching mocks to a parent that records all calls to the children and allows
+you to make assertions about the order of calls between mocks:
+
+..doctest::
+
+    >>> parent = MagicMock()
+    >>> child1 = MagicMock(return_value=None)
+    >>> child2 = MagicMock(return_value=None)
+    >>> parent.child1 = child1
+    >>> parent.child2 = child2
+    >>> child1(1)
+    >>> child2(2)
+    >>> parent.mock_calls
+    [call.child1(1), call.child2(2)]
+
+The exception to this is if the mock has a name. This allows you to prevent
+the "parenting" if for some reason you don't want it to happen.
+
+.. doctest::
+
+    >>> mock = MagicMock()
+    >>> not_a_child = MagicMock(name='not-a-child')
+    >>> mock.attribute = not_a_child
+    >>> mock.attribute()
+    <MagicMock name='not-a-child()' id='...'>
+    >>> mock.mock_calls
+    []
+
+Mocks created for you by :func:`patch` are automatically given names. To
+attach mocks that have names to a parent you use the :meth:`~Mock.attach_mock`
+method:
+
+.. doctest:
+
+    >>> thing1 = object()
+    >>> thing2 = object()
+    >>> parent = MagicMock()
+    >>> with patch('__main__.thing1', return_value=None) as child1:
+    ...     with patch('__main__.thing2', return_value=None) as child2:
+    ...         parent.attach_mock(child1, 'child1')
+    ...         parent.attach_mock(child2, 'child2')
+    ...         child1('one')
+    ...         child2('two')
+    ...
+    >>> parent.mock_calls
+    [call.child1('one'), call.child2('two')]
+
+
 -----
 
 .. [#] The only exceptions are magic methods and attributes (those that have

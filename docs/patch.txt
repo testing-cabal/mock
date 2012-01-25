@@ -514,6 +514,8 @@ inform the patchers of the different prefix by setting `patch.TEST_PREFIX`:
     not three
     >>> Thing().foo_two()
     not three
+    >>> value
+    3
 
 
 Nesting Patch Decorators
