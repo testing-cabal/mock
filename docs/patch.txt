@@ -21,6 +21,11 @@
             super(unittest2.TestCase, self).run(result)
             assert result.wasSuccessful()
 
+.. testcleanup::
+
+    patch.TEST_PREFIX = 'test'
+
+
 The patch decorators are used for patching objects only within the scope of
 the function they decorate. They automatically handle the unpatching for you,
 even if exceptions are raised. All of these functions can also be used in with
@@ -479,6 +484,36 @@ method of a `TestCase`:
 
 In fact `start` and `stop` are just aliases for the context manager
 `__enter__` and `__exit__` methods.
+
+
+TEST_PREFIX
+===========
+
+All of the patchers can be used as class decorators. When used in this way
+they wrap every test method on the class. The patchers recognise methods that
+start with `test` as being test methods. This is the same way that the
+`unittest.TestLoader` finds test methods by default.
+
+It is possible that you want to use a different prefix for your tests. You can
+inform the patchers of the different prefix by setting `patch.TEST_PREFIX`:
+
+.. doctest::
+
+    >>> patch.TEST_PREFIX = 'foo'
+    >>> value = 3
+    >>>
+    >>> @patch('__main__.value', 'not three')
+    ... class Thing(object):
+    ...     def foo_one(self):
+    ...         print value
+    ...     def foo_two(self):
+    ...         print value
+    ...
+    >>>
+    >>> Thing().foo_one()
+    not three
+    >>> Thing().foo_two()
+    not three
 
 
 Nesting Patch Decorators
