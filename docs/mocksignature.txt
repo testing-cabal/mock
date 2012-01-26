@@ -100,8 +100,8 @@ The methods and attributes available on functions returned by `mocksignature`
 are:
 
     :meth:`~Mock.assert_any_call`, :meth:`~Mock.assert_called_once_with`,
-    :meth:`~Mock.assert_called_with`', :meth:`~Mock.assert_has_calls`,
-    :attr:`~Mock.call_args', :attr:`call_args_list`,
+    :meth:`~Mock.assert_called_with`, :meth:`~Mock.assert_has_calls`,
+    :attr:`~Mock.call_args`, :attr:`call_args_list`,
     :attr:`call_count`, :attr:`called`, :attr:`method_calls`, 'mock',
     :attr:`mock_calls`, :meth:`~Mock.reset_mock`, :attr:`return_value`, and
     :attr:`side_effect`.
