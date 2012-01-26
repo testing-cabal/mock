@@ -314,6 +314,9 @@ def mocksignature(func, mock=None, skipfirst=False):
     The mock is set as the `mock` attribute of the returned function for easy
     access.
 
+    Functions returned by `mocksignature` have many of the same attributes
+    and assert methods as a mock object.
+
     `mocksignature` can also be used with classes. It copies the signature of
     the `__init__` method.
 
