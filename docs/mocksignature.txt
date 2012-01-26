@@ -101,10 +101,11 @@ are:
 
     :meth:`~Mock.assert_any_call`, :meth:`~Mock.assert_called_once_with`,
     :meth:`~Mock.assert_called_with`, :meth:`~Mock.assert_has_calls`,
-    :attr:`~Mock.call_args`, :attr:`call_args_list`,
-    :attr:`call_count`, :attr:`called`, :attr:`method_calls`, 'mock',
-    :attr:`mock_calls`, :meth:`~Mock.reset_mock`, :attr:`return_value`, and
-    :attr:`side_effect`.
+    :attr:`~Mock.call_args`, :attr:`~Mock.call_args_list`,
+    :attr:`~Mock.call_count`, :attr:`~Mock.called`,
+    ::attr:`~Mock.method_calls`, 'mock', attr:`~Mock.mock_calls`,
+    ::meth:`~Mock.reset_mock`, :attr:`~Mock.return_value`, and
+    :attr:`~Mock.side_effect`.
 
 
 Example use
