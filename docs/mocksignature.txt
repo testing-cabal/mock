@@ -103,8 +103,8 @@ are:
     :meth:`~Mock.assert_called_with`, :meth:`~Mock.assert_has_calls`,
     :attr:`~Mock.call_args`, :attr:`~Mock.call_args_list`,
     :attr:`~Mock.call_count`, :attr:`~Mock.called`,
-    ::attr:`~Mock.method_calls`, 'mock', attr:`~Mock.mock_calls`,
-    ::meth:`~Mock.reset_mock`, :attr:`~Mock.return_value`, and
+    :attr:`~Mock.method_calls`, 'mock', attr:`~Mock.mock_calls`,
+    :meth:`~Mock.reset_mock`, :attr:`~Mock.return_value`, and
     :attr:`~Mock.side_effect`.
 
 
