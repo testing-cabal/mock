@@ -580,11 +580,105 @@ Calls made to the object will be recorded in the attributes
 like :attr:`~Mock.call_args` and :attr:`~Mock.call_args_list`.
 
 If :attr:`~Mock.side_effect` is set then it will be called after the call has
-been recorded but before any value is returned.
+been recorded, so if `side_effect` raises an exception the call is still
+recorded.
+
+The simplest way to make a mock raise an exception when called is to make
+:attr:`~Mock.side_effect` an exception class or instance:
+
+.. doctest::
+
+        >>> m = MagicMock(side_effect=IndexError)
+        >>> m(1, 2, 3)
+        Traceback (most recent call last):
+          ...
+        IndexError
+        >>> m.mock_calls
+        [call(1, 2, 3)]
+        >>> m.side_effect = KeyError('Bang!')
+        >>> m('two', 'three', 'four')
+        Traceback (most recent call last):
+          ...
+        KeyError: 'Bang!'
+        >>> m.mock_calls
+        [call(1, 2, 3), call('two', 'three', 'four')]
+
+If `side_effect` is a function then whatever that function returns is what
+calls to the mock return. The `side_effect` function is called with the
+same arguments as the mock. This allows you to vary the return value of the
+call dynamically, based on the input:
+
+.. doctest::
+
+        >>> def side_effect(value):
+        ...     return value + 1
+        ...
+        >>> m = MagicMock(side_effect=side_effect)
+        >>> m(1)
+        2
+        >>> m(2)
+        3
+        >>> m.mock_calls
+        [call(1), call(2)]
+
+If you want the mock to still return the default return value (a new mock), or
+any set return value, then there are two ways of doing this. Either return
+`mock.return_value` from inside `side_effect`, or return :data:`DEFAULT`:
+
+.. doctest::
+
+        >>> m = MagicMock()
+        >>> def side_effect(*args, **kwargs):
+        ...     return m.return_value
+        ...
+        >>> m.side_effect = side_effect
+        >>> m.return_value = 3
+        >>> m()
+        3
+        >>> def side_effect(*args, **kwargs):
+        ...     return DEFAULT
+        ...
+        >>> m.side_effect = side_effect
+        >>> m()
+        3
+
+To remove a `side_effect`, and return to the default behaviour, set the
+`side_effect` to `None`:
+
+.. doctest::
+
+        >>> m = MagicMock(return_value=6)
+        >>> def side_effect(*args, **kwargs):
+        ...     return 3
+        ...
+        >>> m.side_effect = side_effect
+        >>> m()
+        3
+        >>> m.side_effect = None
+        >>> m()
+        6
+
+The `side_effect` can also be any iterable object. Repeated calls to the mock
+will return values from the iterable (until the iterable is exhausted and
+a `StopIteration` is raised):
+
+.. doctest::
+
+        >>> m = MagicMock(side_effect=[1, 2, 3])
+        >>> m()
+        1
+        >>> m()
+        2
+        >>> m()
+        3
+        >>> m()
+        Traceback (most recent call last):
+          ...
+        StopIteration
 
 
-Attaching Mocks as Attributes of Mocks
-======================================
+Attaching Mocks as Attributes
+=============================
 
 When you attach a mock as an attribute of another mock (or as the return
 value) it becomes a "child" of that mock. Calls to the child are recorded in
