@@ -28,14 +28,16 @@ Using Mock
 Mock Patching Methods
 ---------------------
 
-``Mock`` objects can be used for:
+:class:`Mock` objects can be used for:
 
 * Patching methods
 * Recording method calls on objects
 
+For example, you might want to replace a method on an object to check that
+it is called with the correct arguments by another part of the system:
+
 .. doctest::
 
-    >>> from mock import Mock
     >>> real = SomeClass()
     >>> real.method = Mock(name='method')
     >>> real.method(3, 4, 5, key='value')
