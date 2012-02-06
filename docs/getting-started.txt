@@ -28,34 +28,41 @@ Using Mock
 Mock Patching Methods
 ---------------------
 
-:class:`Mock` objects can be used for:
+Common uses for :class:`Mock` objects include:
 
 * Patching methods
 * Recording method calls on objects
 
-For example, you might want to replace a method on an object to check that
+You might want to replace a method on an object to check that
 it is called with the correct arguments by another part of the system:
 
 .. doctest::
 
     >>> real = SomeClass()
-    >>> real.method = Mock(name='method')
+    >>> real.method = MagicMock(name='method')
     >>> real.method(3, 4, 5, key='value')
     <Mock name='method()' id='...'>
 
-Once the mock has been used it has methods and attributes that allow you to
-make assertions about how it has been used.
+Once our mock has been used (`real.method` in this example) it has methods
+and attributes that allow you to make assertions about how it has been used.
 
-`Mock` objects are callable. If they are called then the :attr:`~Mock.called`
-attribute is set to `True`. More importantly we can use the
-:meth:`~Mock.assert_called_with` or :meth`~Mock.assert_called_once_with`
-method to check that it was called with the correct arguments.
+.. note::
 
-This example tests that calling `method` results in a call to `something`:
+    In most of these examples the :class:`Mock` and :class:`MagicMock` classes
+    are interchangeable. As the `MagicMock` is the more capable class it makes
+    a sensible one to use by default.
+
+Once the mock has been called its :attr:`~Mock.called` attribute is set to
+`True`. More importantly we can use the :meth:`~Mock.assert_called_with` or
+:meth`~Mock.assert_called_once_with` method to check that it was called with
+the correct arguments.
+
+This example tests that calling `ProductionClass().method` results in a call to
+the `something` method:
 
 .. doctest::
 
-    >>> from mock import Mock
+    >>> from mock import MagicMock
     >>> class ProductionClass(object):
     ...     def method(self):
     ...         self.something(1, 2, 3)
@@ -63,7 +70,7 @@ This example tests that calling `method` results in a call to `something`:
     ...         pass
     ...
     >>> real = ProductionClass()
-    >>> real.something = Mock()
+    >>> real.something = MagicMock()
     >>> real.method()
     >>> real.something.assert_called_once_with(1, 2, 3)
 
@@ -72,7 +79,13 @@ This example tests that calling `method` results in a call to `something`:
 Mock for Method Calls on an Object
 ----------------------------------
 
-In the last example we XXXX
+In the last example we patched a method directly on an object to check that it
+was called correctly. Another common use case is to pass an object into a
+method (or some part of the system under test) and then check that it is used
+in the correct way.
+
+The simple `ProductionClass` below has a `closer` method. If it is called with
+an object then it calls `close` on it.
 
 .. doctest::
 
@@ -80,10 +93,18 @@ In the last example we XXXX
     ...     def closer(self, something):
     ...         something.close()
     ...
+
+So to test it we need to pass in an object with a `close` method and check
+that it was called correctly.
+
+.. doctest::
+
     >>> real = ProductionClass()
     >>> mock = Mock()
     >>> real.closer(mock)
     >>> mock.close.assert_called_with()
+
+XXX
 
 
 We don't have to do any work to provide the 'close' method on our mock.
