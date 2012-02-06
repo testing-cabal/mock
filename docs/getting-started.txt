@@ -41,7 +41,7 @@ it is called with the correct arguments by another part of the system:
     >>> real = SomeClass()
     >>> real.method = MagicMock(name='method')
     >>> real.method(3, 4, 5, key='value')
-    <Mock name='method()' id='...'>
+    <MagicMock name='method()' id='...'>
 
 Once our mock has been used (`real.method` in this example) it has methods
 and attributes that allow you to make assertions about how it has been used.
