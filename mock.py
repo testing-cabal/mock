@@ -913,7 +913,7 @@ class NonCallableMock(Base):
         `assert_called_with` and `assert_called_once_with` that only pass if
         the call is the most recent one."""
         kall = call(*args, **kwargs)
-        if not kall in self.call_args_list:
+        if kall not in self.call_args_list:
             expected_string = self._format_mock_call_signature(args, kwargs)
             raise AssertionError(
                 '%s call not found' % expected_string
