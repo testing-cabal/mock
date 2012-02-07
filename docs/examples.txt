@@ -30,6 +30,9 @@
 
 
 
+For comprehensive examples, see the unit tests included in the full source
+distribution.
+
 Here are some more examples for some slightly more advanced scenarios than in
 the :ref:`getting started <getting-started>` guide.
 
