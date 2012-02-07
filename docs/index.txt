@@ -296,6 +296,8 @@ References
 
 Articles and blog entries on testing with Mock:
 
+* `mock-django: tools for mocking the Django ORM and models
+  <https://github.com/dcramer/mock-django>`_
 * `PyCon 2011 Video: Testing with mock <https://blip.tv/file/4881513>`_
 * `Python: Injecting Mock Objects for Powerful Testing
   <http://blueprintforge.com/blog/2012/01/08/python-injecting-mock-objects-for-powerful-testing/>`_

@@ -18,10 +18,6 @@
     sys.modules['module'] = package.module
 
 
-For comprehensive examples, see the unit tests included in the full source
-distribution.
-
-
 Using Mock
 ==========
 
