@@ -100,16 +100,10 @@ that it was called correctly.
     >>> real.closer(mock)
     >>> mock.close.assert_called_with()
 
-XXX
-
-
 We don't have to do any work to provide the 'close' method on our mock.
 Accessing close creates it. So, if 'close' hasn't already been called then
 accessing it in the test will create it, but :meth:`~Mock.assert_called_with`
 will raise a failure exception.
-
-As `close` is a mock object is has all the attributes from the previous
-example.
 
 
 Mocking Classes
@@ -121,8 +115,9 @@ are created by *calling the class*. This means you access the "mock instance"
 by looking at the return value of the mocked class.
 
 In the example below we have a function `some_function` that instantiates `Foo`
-and calls a method on it. We can mock out the class `Foo`, and configure the
-behaviour of the `Foo` instance by configuring the `mock.return_value`.
+and calls a method on it. The call to `patch` replaces the class `Foo` with a
+mock. The `Foo` instance is the result of calling the mock, so it is configured
+by modify the mock :attr:`~Mock.return_value`.
 
 .. doctest::
 
@@ -146,11 +141,11 @@ name is also propagated to attributes or methods of the mock:
 
 .. doctest::
 
-    >>> mock = Mock(name='foo')
+    >>> mock = MagicMock(name='foo')
     >>> mock
-    <Mock name='foo' id='...'>
+    <MagicMock name='foo' id='...'>
     >>> mock.method
-    <Mock name='foo.method' id='...'>
+    <MagicMock name='foo.method' id='...'>
 
 
 Limiting Available Methods
