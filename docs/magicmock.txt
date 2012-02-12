@@ -186,9 +186,9 @@ For example:
    >>> object() in mock
    False
 
-The two equality method, `__eq__` and `__ne__`, are special (changed in 0.7.2).
-They do the default equality comparison on identity, using a side effect, unless
-you change their return value to return something else:
+The two equality method, `__eq__` and `__ne__`, are special (changed in
+0.7.2). They do the default equality comparison on identity, using a side
+effect, unless you change their return value to return something else:
 
 .. doctest::
 
@@ -200,6 +200,30 @@ you change their return value to return something else:
    >>> mock.__eq__.return_value = True
    >>> mock == 3
    True
+
+In `0.8` the `__iter__` also gained special handling implemented with a
+side effect. The return value of `MagicMock.__iter__` can be any iterable
+object and isn't required to be an iterator:
+
+.. doctest::
+
+   >>> mock = MagicMock()
+   >>> mock.__iter__.return_value = ['a', 'b', 'c']
+   >>> list(mock)
+   ['a', 'b', 'c']
+   >>> list(mock)
+   ['a', 'b', 'c']
+
+If the return value *is* an iterator, then iterating over it once will consume
+it and subsequent iterations will result in an empty list:
+
+.. doctest::
+
+   >>> mock.__iter__.return_value = iter(['a', 'b', 'c'])
+   >>> list(mock)
+   ['a', 'b', 'c']
+   >>> list(mock)
+   []
 
 ``MagicMock`` has all of the supported magic methods configured except for some
 of the obscure and obsolete ones. You can still set these up if you want.
