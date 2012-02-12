@@ -12,6 +12,8 @@ The only changes since 0.8rc2 are:
 
 * Improved repr of :data:`sentinel` objects
 * :data:`ANY` can be used for comparisons against :data:`call` objects
+* The return value of the :class:`MagicMock` `__iter__` method can be set to
+  any iterable and isn't required to be an iterator
 
 Full List of changes since 0.7:
 
@@ -72,6 +74,8 @@ mock 0.8.0 is the last version that will support Python 2.4.
   already set on the child)
 * Improved failure messages for `assert_called_with` and
   `assert_called_once_with`
+* The return value of the :class:`MagicMock` `__iter__` method can be set to
+  any iterable and isn't required to be an iterator
 * Added the Mock API (`assert_called_with` etc) to functions created by
   :func:`mocksignature`
 * Tuples as well as lists can be used to specify allowed methods for `spec` &

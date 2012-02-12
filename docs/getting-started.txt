@@ -148,56 +148,6 @@ name is also propagated to attributes or methods of the mock:
     <MagicMock name='foo.method' id='...'>
 
 
-Limiting Available Methods
---------------------------
-
-The disadvantage of the approach above is that *all* method access creates a
-new mock. This means that you can't tell if any methods were called that
-shouldn't have been. There are two ways round this. The first is by
-restricting the methods available on your mock.
-
-.. doctest::
-
-    >>> mock = Mock(spec=['close'])
-    >>> real.closer(mock)
-    >>> mock.close.assert_called_with()
-    >>> mock.foo
-    Traceback (most recent call last):
-      ...
-    AttributeError: Mock object has no attribute 'foo'
-
-If `closer` calls any methods on `mock` *other* than close, then an
-`AttributeError` will be raised.
-
-When you use `spec` it is still possible to set arbitrary attributes on the
-mock object. For a stronger form that only allows you to *set* attributes
-that are in the spec you can use `spec_set` instead:
-
-.. doctest::
-
-    >>> mock = Mock(spec=['close'])
-    >>> mock.foo = 3
-    >>> mock.foo
-    3
-    >>> mock = Mock(spec_set=['close'])
-    >>> mock.foo = 3
-    Traceback (most recent call last):
-      ...
-    AttributeError: Mock object has no attribute 'foo'
-
-Mock objects that use a class or an instance as a `spec` or `spec_set` are able
-to pass `isintance` tests:
-
-.. doctest::
-
-    >>> mock = Mock(spec=SomeClass)
-    >>> isinstance(mock, SomeClass)
-    True
-    >>> mock = Mock(spec_set=SomeClass())
-    >>> isinstance(mock, SomeClass)
-    True
-
-
 Tracking all Calls
 ------------------
 
@@ -269,19 +219,63 @@ If you need an attribute setting on your mock, just do it:
     3
 
 Sometimes you want to mock up a more complex situation, like for example
-`mock.connection.cursor().execute("SELECT 1")`:
+`mock.connection.cursor().execute("SELECT 1")`. If we wanted this call to
+return a list, then we have to configure the result of the nested call.
+
+We can use :data:`call` to construct the set of calls in a "chained call" like
+this for easy assertion afterwards:
 
 
 .. doctest::
 
     >>> mock = Mock()
     >>> cursor = mock.connection.cursor.return_value
-    >>> cursor.execute.return_value = None
+    >>> cursor.execute.return_value = ['foo']
     >>> mock.connection.cursor().execute("SELECT 1")
-    >>> mock.method_calls
-    [call.connection.cursor()]
-    >>> cursor.method_calls
-    [call.execute('SELECT 1')]
+    ['foo']
+    >>> expected = call.connection.cursor().execute("SELECT 1").call_list()
+    >>> mock.mock_calls
+    [call.connection.cursor(), call.connection.cursor().execute('SELECT 1')]
+    >>> mock.mock_calls == expected
+    True
+
+It is the call to `.call_list()` that turns our call object into a list of
+calls representing the chained calls.
+
+
+
+Raising exceptions with mocks
+-----------------------------
+
+A useful attribute is :attr:`~Mock.side_effect`. If you set this to an
+exception class or instance then the exception will be raised when the mock
+is called.
+
+.. doctest::
+
+    >>> mock = Mock(side_effect=Exception('Boom!'))
+    >>> mock()
+    Traceback (most recent call last):
+      ...
+    Exception: Boom!
+
+`side_effect` can also be set to a function or an iterable. If your mock is
+going to be called several times, and you want each call to return a different
+value, then
+
+XXXX
+
+
+    >>> results = [1, 2, 3]
+    >>> def side_effect(*args, **kwargs):
+    ...     return results.pop()
+    ...
+    >>> mock.side_effect = side_effect
+    >>> mock(), mock(), mock()
+    (3, 2, 1)
+
+
+
 
 
 Creating a Mock from an Existing Object
@@ -309,52 +303,10 @@ instantiate the class in those tests.
        ...
     AttributeError: object has no attribute 'old_method'
 
-Again, if you want a stronger form of specification that prevents the setting
+If you want a stronger form of specification that prevents the setting
 of arbitrary attributes as well as the getting of them then you can use
 `spec_set` instead of `spec`.
 
-
-Raising exceptions with mocks
------------------------------
-
-A useful attribute is `side_effect`. If you set
-this to an exception class or instance then the exception will be raised when
-the mock is called. If you set it to a callable then it will be called whenever
-the mock is called. This allows you to do things like return members of a
-sequence from repeated calls:
-
-
-.. doctest::
-
-    >>> mock = Mock()
-    >>> mock.side_effect = Exception('Boom!')
-    >>> mock()
-    Traceback (most recent call last):
-      ...
-    Exception: Boom!
-
-    >>> results = [1, 2, 3]
-    >>> def side_effect(*args, **kwargs):
-    ...     return results.pop()
-    ...
-    >>> mock.side_effect = side_effect
-    >>> mock(), mock(), mock()
-    (3, 2, 1)
-
-
-Sentinel
-========
-
-`sentinel` is a useful object for providing unique objects in your tests:
-
-.. doctest::
-
-    >>> from mock import sentinel
-    >>> real = SomeClass()
-    >>> real.method = Mock()
-    >>> real.method.return_value = sentinel.return_value
-    >>> real.method()
-    sentinel.return_value
 
 
 Patch Decorators

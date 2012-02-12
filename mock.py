@@ -1749,16 +1749,10 @@ _calculate_return_value = {
     '__unicode__': lambda self: unicode(object.__str__(self)),
 }
 
-_side_effect_methods = {
-    '__eq__': lambda self: lambda other: self is other,
-    '__ne__': lambda self: lambda other: self is not other,
-}
-
 _return_values = {
     '__int__': 1,
     '__contains__': False,
     '__len__': 0,
-    '__iter__': iter([]),
     '__exit__': False,
     '__complex__': 1j,
     '__float__': 1.0,
@@ -1786,29 +1780,44 @@ def _get_ne(self):
         return self is not other
     return __ne__
 
+def _get_iter(self):
+    def __iter__():
+        ret_val = self.__iter__._mock_return_value
+        if ret_val is DEFAULT:
+            return iter([])
+        # if ret_val was already an iterator, then calling iter on it should
+        # return the iterator unchanged
+        return iter(ret_val)
+    return __iter__
+
 _side_effect_methods = {
     '__eq__': _get_eq,
     '__ne__': _get_ne,
+    '__iter__': _get_iter,
 }
 
 
 
 def _set_return_value(mock, method, name):
-    return_value = DEFAULT
-    if name in _return_values:
-        return_value = _return_values[name]
-    elif name in _calculate_return_value:
+    fixed = _return_values.get(name, DEFAULT)
+    if fixed is not DEFAULT:
+        method.return_value = fixed
+        return
+
+    return_calulator = _calculate_return_value.get(name)
+    if return_calulator is not None:
         try:
-            return_value = _calculate_return_value[name](mock)
+            return_value = return_calulator(mock)
         except AttributeError:
             # XXXX why do we return AttributeError here?
             #      set it as a side_effect instead?
             return_value = AttributeError(name)
-    elif name in _side_effect_methods:
-        side_effect = _side_effect_methods[name](mock)
-        method.side_effect = side_effect
-    if return_value is not DEFAULT:
         method.return_value = return_value
+        return
+
+    side_effector = _side_effect_methods.get(name)
+    if side_effector is not None:
+        method.side_effect = side_effector(mock)
 
 
 
