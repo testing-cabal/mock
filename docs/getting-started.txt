@@ -169,9 +169,9 @@ restricting the methods available on your mock.
 If `closer` calls any methods on `mock` *other* than close, then an
 `AttributeError` will be raised.
 
-When you use `spec` it is still possible to set arbitrary attributes on the mock
-object. For a stronger form that only allows you to *set* attributes that are in
-the spec you can use `spec_set` instead:
+When you use `spec` it is still possible to set arbitrary attributes on the
+mock object. For a stronger form that only allows you to *set* attributes
+that are in the spec you can use `spec_set` instead:
 
 .. doctest::
 
@@ -198,41 +198,36 @@ to pass `isintance` tests:
     True
 
 
-Tracking all Method Calls
--------------------------
+Tracking all Calls
+------------------
 
-An alternative way to verify that only the expected methods have been accessed
-is to use the `method_calls` attribute of the mock. This records all calls
+Often you want to track more than a single call to a method. The
+:attr:`~Mock.mock_calls` attribute records all calls
 to child attributes of the mock - and also to their children.
 
-This is useful if you have a mock where you expect an attribute method to be
-called. You could access the attribute directly, but `method_calls` provides
-a convenient way of looking at all method calls:
-
 .. doctest::
 
-    >>> mock = Mock()
+    >>> mock = MagicMock()
     >>> mock.method()
-    <Mock name='mock.method()' id='...'>
-    >>> mock.Property.method(10, x=53)
-    <Mock name='mock.Property.method()' id='...'>
-    >>> mock.method_calls
-    [call.method(), call.Property.method(10, x=53)]
+    <MagicMock name='mock.method()' id='...'>
+    >>> mock.attribute.method(10, x=53)
+    <MagicMock name='mock.attribute.method()' id='...'>
+    >>> mock.mock_calls
+    [call.method(), call.attribute.method(10, x=53)]
 
-If you make an assertion about `method_calls` and any unexpected methods
-have been called, then the assertion will fail.
+If you make an assertion about `mock_calls` and any unexpected methods
+have been called, then the assertion will fail. This is useful because as well
+as asserting that the calls you expected have been made, you are also checking
+that they were made in the right order and with no additional calls:
 
-Again, from 0.7.0, empty arguments and keyword arguments can be omitted for
-less verbose comparisons:
+You use the :data:`call` object to construct lists for comparing with
+`mock_calls`:
 
 .. doctest::
 
-    >>> mock = Mock()
-    >>> mock.method1()
-    <Mock name='mock.method1()' id='...'>
-    >>> mock.method2()
-    <Mock name='mock.method2()' id='...'>
-    >>> assert mock.method_calls == [('method1',), ('method2',)]
+    >>> expected = [call.method(), call.attribute.method(10, x=53)]
+    >>> mock.mock_calls == expected
+    True
 
 
 Setting Return Values and Attributes
