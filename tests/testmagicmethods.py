@@ -455,6 +455,16 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertEqual(str(m), 'foo')
 
 
+    def test_iterable_as_iter_return_value(self):
+        m = MagicMock()
+        m.__iter__.return_value = [1, 2, 3]
+        self.assertEqual(list(m), [1, 2, 3])
+        self.assertEqual(list(m), [1, 2, 3])
+
+        m.__iter__.return_value = iter([4, 5, 6])
+        self.assertEqual(list(m), [4, 5, 6])
+        self.assertEqual(list(m), [])
+
 
 if __name__ == '__main__':
     unittest2.main()
