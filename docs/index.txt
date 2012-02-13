@@ -294,7 +294,7 @@ the `__call__` method.
 References
 ==========
 
-Articles and blog entries on testing with Mock:
+Articles, blog entries and other stuff related to testing with Mock:
 
 * `mock-django: tools for mocking the Django ORM and models
   <https://github.com/dcramer/mock-django>`_
