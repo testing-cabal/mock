@@ -1,3 +1,5 @@
+.. _further-examples:
+
 ==================
  Further Examples
 ==================

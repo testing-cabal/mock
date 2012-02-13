@@ -259,23 +259,43 @@ is called.
       ...
     Exception: Boom!
 
-`side_effect` can also be set to a function or an iterable. If your mock is
-going to be called several times, and you want each call to return a different
-value, then
 
-XXXX
+Side effect functions and iterables
+-----------------------------------
+
+`side_effect` can also be set to a function or an iterable. The use case for
+`side_effect` as an iterable is where your mock is going to be called several
+times, and you want each call to return a different value. When you set
+`side_effect` to an iterable every call to the mock returns the next value
+from the iterable:
+
+.. doctest::
+
+    >>> mock = MagicMock(side_effect=[4, 5, 6])
+    >>> mock()
+    4
+    >>> mock()
+    5
+    >>> mock()
+    6
 
 
-    >>> results = [1, 2, 3]
-    >>> def side_effect(*args, **kwargs):
-    ...     return results.pop()
+For more advanced use cases, like dynamically varying the return values
+depending on what the mock is called with, `side_effect` can be a function.
+The function will be called with the same arguments as the mock. Whatever the
+function returns is what the call returns:
+
+.. doctest::
+
+    >>> vals = {(1, 2): 1, (2, 3): 2}
+    >>> def side_effect(*args):
+    ...     return vals[args]
     ...
-    >>> mock.side_effect = side_effect
-    >>> mock(), mock(), mock()
-    (3, 2, 1)
-
-
-
+    >>> mock = MagicMock(side_effect=side_effect)
+    >>> mock(1, 2)
+    1
+    >>> mock(2, 3)
+    2
 
 
 Creating a Mock from an Existing Object
@@ -357,13 +377,10 @@ instead of `patch.object`:
 
 .. doctest::
 
-    >>> mock = Mock()
-    >>> mock.return_value = sentinel.file_handle
-    >>> @patch('__builtin__.open', mock)
-    ... def test():
-    ...     return open('filename', 'r')
+    >>> mock = MagicMock(return_value = sentinel.file_handle)
+    >>> with patch('__builtin__.open', mock):
+    ...     handle = open('filename', 'r')
     ...
-    >>> handle = test()
     >>> mock.assert_called_with('filename', 'r')
     >>> assert handle == sentinel.file_handle, "incorrect file handle returned"
 
@@ -377,9 +394,6 @@ The module name can be 'dotted', in the form `package.module` if needed:
     ...     assert ClassName.attribute == sentinel.attribute
     ...
     >>> test()
-
-If you don't want to call the decorated test function yourself, you can add
-`apply` as a decorator on top, this calls it immediately.
 
 A nice pattern is to actually decorate test methods themselves:
 
@@ -459,5 +473,7 @@ mock using the "as" form of the with statement:
 
 
 As an alternative `patch`, `patch.object` and `patch.dict` can be used as
-class decorators. When used in this way it is the same as applying the decorator
-indvidually to every method whose name starts with "test".
+class decorators. When used in this way it is the same as applying the
+decorator indvidually to every method whose name starts with "test".
+
+For some more advanced examples, see the :ref:`further-examples` page.
