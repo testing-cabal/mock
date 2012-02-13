@@ -5,7 +5,7 @@ CHANGELOG
 =========
 
 
-2012/XX/XX Version 0.8.0
+2012/02/13 Version 0.8.0
 ------------------------
 
 The only changes since 0.8rc2 are:
