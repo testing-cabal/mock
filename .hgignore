@@ -1,0 +1,10 @@
+.*\.pyc
+html/
+mock\.egg-info/
+mock\.wpu
+\.tox/
+build
+dist
+latex
+.*\$py\.class
+runtox
