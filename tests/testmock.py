@@ -420,6 +420,19 @@ class MockTest(unittest2.TestCase):
         test_attributes(Mock(spec=Something()))
 
 
+    def test_spec_return_value(self):
+        class A(object):
+            pass
+        for Klass in Mock, MagicMock:
+            for arg in ('spec', 'spec_set'):
+                kwargs = {arg: A}
+                m = Klass(**kwargs)
+                self.assertTrue(isinstance(m, A))
+
+                instance = m()
+                self.assertTrue(isinstance(instance, A))
+
+
     def test_wraps_calls(self):
         real = Mock()
 

@@ -4,6 +4,11 @@
 CHANGELOG
 =========
 
+2012/XX/XX Version 0.8.1
+------------------------
+
+* `return_value` of a `Mock` with a class as a `spec` also has the `spec`
+
 
 2012/02/13 Version 0.8.0
 ------------------------
