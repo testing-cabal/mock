@@ -89,18 +89,16 @@ response object for it. To set the response as the return value for that final
 
     `mock_backend.get_endpoint.return_value.create_call.return_value.start_call.return_value = mock_response`.
 
-Here's how we might do it in a slightly nicer way. We start by creating our
-initial mocks:
+We can do that in a slightly nicer way using the :meth:`~Mock.configure_mock`
+method to directly set the return value for us:
 
 .. doctest::
 
     >>> something = Something()
     >>> mock_response = Mock(spec=file)
     >>> mock_backend = Mock()
-    >>> get_endpoint = mock_backend.get_endpoint
-    >>> create_call = get_endpoint.return_value.create_call
-    >>> start_call = create_call.return_value.start_call
-    >>> start_call.return_value = mock_response
+    >>> config = {'get_endpoint.return_value.create_call.return_value.start_call.return_value': mock_response}
+    >>> mock_backend.configure_mock(**config)
 
 With these we monkey patch the "mock backend" in place and can make the real
 call:
