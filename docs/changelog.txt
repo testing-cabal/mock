@@ -18,7 +18,7 @@ The only changes since 0.8rc2 are:
 
 * Improved repr of :data:`sentinel` objects
 * :data:`ANY` can be used for comparisons against :data:`call` objects
-* The return value of the :class:`MagicMock` `__iter__` method can be set to
+* The return value of `MagicMock.__iter__` method can be set to
   any iterable and isn't required to be an iterator
 
 Full List of changes since 0.7:

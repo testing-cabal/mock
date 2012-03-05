@@ -299,8 +299,12 @@ Articles and blog entries on testing with Mock:
 * `mock-django: tools for mocking the Django ORM and models
   <https://github.com/dcramer/mock-django>`_
 * `PyCon 2011 Video: Testing with mock <https://blip.tv/file/4881513>`_
+* `Mock objects in Python
+  <http://noopenblockers.com/2012/01/06/mock-objects-in-python/>`_
 * `Python: Injecting Mock Objects for Powerful Testing
   <http://blueprintforge.com/blog/2012/01/08/python-injecting-mock-objects-for-powerful-testing/>`_
+* `Python Mock: How to assert a substring of logger output
+  <http://www.michaelpollmeier.com/python-mock-how-to-assert-a-substring-of-logger-output/>`_
 * `Mocking Django <http://www.mattjmorrison.com/2011/09/mocking-django.html>`_
 * `Mocking dates and other classes that can't be modified
   <http://williamjohnbert.com/2011/07/how-to-unit-testing-in-django-with-mocking-and-patching/>`_
@@ -312,6 +316,8 @@ Articles and blog entries on testing with Mock:
 * `Python Unit Testing with Mock <http://www.insomnihack.com/?p=194>`_
 * `Getting started with Python Mock
   <http://myadventuresincoding.wordpress.com/2011/02/26/python-python-mock-cheat-sheet/>`_
+* `Smart Parameter Checks with mock
+  <http://tobyho.com/2011/03/24/smart-parameter-checks-in/>`_
 * `Python mock testing techniques and tools
   <http://agiletesting.blogspot.com/2009/07/python-mock-testing-techniques-and.html>`_
 * `How To Test Django Template Tags
