@@ -7,7 +7,6 @@ CHANGELOG
 2012/XX/XX Version 0.8.1
 ------------------------
 
-* BUGFIX: `return_value` of a `Mock` with a class as `spec` inherits the `spec`
 * BUGFIX: `create_autospec` works correctly for calling mocked unbound methods
 
 
