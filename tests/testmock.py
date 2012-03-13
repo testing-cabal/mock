@@ -1291,5 +1291,17 @@ class MockTest(unittest2.TestCase):
                 self.assertEqual(m.mock_calls, call().foo().call_list())
 
 
+    def test_attribute_deletion(self):
+        for mock in Mock(), MagicMock():
+            self.assertTrue(hasattr(mock, 'm'))
+
+            del mock.m
+            self.assertFalse(hasattr(mock, 'm'))
+
+            del mock.f
+            self.assertFalse(hasattr(mock, 'f'))
+            self.assertRaises(AttributeError, getattr, mock, 'f')
+
+
 if __name__ == '__main__':
     unittest2.main()

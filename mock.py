@@ -25,6 +25,7 @@ __all__ = (
     'FILTER_DIR',
     'NonCallableMock',
     'NonCallableMagicMock',
+    'mock_open',
 )
 
 
@@ -335,6 +336,8 @@ class _Sentinel(object):
 sentinel = _Sentinel()
 
 DEFAULT = sentinel.DEFAULT
+_missing = sentinel.MISSING
+_deleted = sentinel.DELETED
 
 
 class OldStyleClass:
@@ -630,7 +633,9 @@ class NonCallableMock(Base):
             raise AttributeError(name)
 
         result = self._mock_children.get(name)
-        if result is None:
+        if result is _deleted:
+            raise AttributeError(name)
+        elif result is None:
             wraps = None
             if self._mock_wraps is not None:
                 # XXXX should we get the attribute without triggering code
@@ -757,7 +762,16 @@ class NonCallableMock(Base):
                 # not set on the instance itself
                 return
 
-        return object.__delattr__(self, name)
+        if name in self.__dict__:
+            object.__delattr__(self, name)
+
+        obj = self._mock_children.get(name, _missing)
+        if obj is _deleted:
+            raise AttributeError(name)
+        if obj is not _missing:
+            del self._mock_children[name]
+        self._mock_children[name] = _deleted
+
 
 
     def _format_mock_call_signature(self, args, kwargs):
@@ -2201,3 +2215,24 @@ FunctionAttributes = set([
     'func_globals',
     'func_name',
 ])
+
+if inPy3k:
+    import _io
+    file_spec = list(set(dir(_io.TextIOWrapper)).union(set(dir(_io.BytesIO))))
+else:
+    file_spec = file
+
+
+def mock_open(mock=None, read_data=None):
+    if mock is None:
+        mock = MagicMock(spec=file_spec)
+
+    handle = MagicMock(spec=file_spec)
+    handle.write.return_value = None
+    handle.__enter__.return_value = handle
+
+    if read_data is not None:
+        handle.read.return_value = read_data
+
+    mock.return_value = handle
+    return mock

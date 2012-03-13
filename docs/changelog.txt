@@ -10,6 +10,9 @@ CHANGELOG
 The standard library version!
 
 * `mocksignature`, along with the `mocksignature` argument to `patch`, removed
+* Support for deleting attributes (accessing deleted attributes will raise an
+  `AttributeError`)
+* Added the `mock_open` helper function for mocking open as a context manager
 
 
 2012/02/13 Version 0.8.0
