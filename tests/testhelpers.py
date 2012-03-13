@@ -360,7 +360,6 @@ class SpecSignatureTest(unittest2.TestCase):
         self.assertEqual(mock(), 'foo')
 
 
-    @unittest2.expectedFailure
     def test_create_autospec_unbound_methods(self):
         # see issue 128
         class Foo(object):
@@ -369,8 +368,12 @@ class SpecSignatureTest(unittest2.TestCase):
 
         klass = create_autospec(Foo)
         instance = klass()
-        self.assertRaises(TypeError, instance.foo(1))
-        self.assertRaises(TypeError, klass.foo())
+        self.assertRaises(TypeError, instance.foo, 1)
+
+        # Note: no type checking on the "self" parameter
+        klass.foo(1)
+        klass.foo.assert_called_with(1)
+        self.assertRaises(TypeError, klass.foo)
 
 
     def test_create_autospec_keyword_arguments(self):
