@@ -3,7 +3,7 @@
 # Copyright (C) 2007-2012 Michael Foord & the mock team
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 
-# mock 0.9.0
+# mock 1.0
 # http://www.voidspace.org.uk/python/mock/
 
 # Released subject to the BSD License
@@ -16,7 +16,6 @@
 __all__ = (
     'Mock',
     'MagicMock',
-    'mocksignature',
     'patch',
     'sentinel',
     'DEFAULT',
@@ -29,7 +28,7 @@ __all__ = (
 )
 
 
-__version__ = '0.9.0alpha1'
+__version__ = '1.0alpha1'
 
 
 import pprint
@@ -136,43 +135,7 @@ DescriptorTypes = (
 )
 
 
-# getsignature and mocksignature heavily "inspired" by
-# the decorator module: http://pypi.python.org/pypi/decorator/
-# by Michele Simionato
-
-def _getsignature(func, skipfirst):
-    if inspect is None:
-        raise ImportError('inspect module not available')
-
-    if inspect.isclass(func):
-        func = func.__init__
-        # will have a self arg
-        skipfirst = True
-    elif not (inspect.ismethod(func) or inspect.isfunction(func)):
-        func = func.__call__
-
-    regargs, varargs, varkwargs, defaults = inspect.getargspec(func)
-
-    # instance methods need to lose the self argument
-    if getattr(func, self, None) is not None:
-        regargs = regargs[1:]
-
-    _msg = ("_mock_ is a reserved argument name, can't mock signatures using "
-            "_mock_")
-    assert '_mock_' not in regargs, _msg
-    if varargs is not None:
-        assert '_mock_' not in varargs, _msg
-    if varkwargs is not None:
-        assert '_mock_' not in varkwargs, _msg
-    if skipfirst:
-        regargs = regargs[1:]
-
-    signature = inspect.formatargspec(regargs, varargs, varkwargs, defaults,
-                                      formatvalue=lambda value: "")
-    return signature[1:-1], func
-
-
-def _getsignature2(func, skipfirst, instance=False):
+def _getsignature(func, skipfirst, instance=False):
     if inspect is None:
         raise ImportError('inspect module not available')
 
@@ -211,7 +174,7 @@ def _check_signature(func, mock, skipfirst, instance=False):
     if not _callable(func):
         return
 
-    result = _getsignature2(func, skipfirst, instance)
+    result = _getsignature(func, skipfirst, instance)
     if result is None:
         return
     signature, func = result
@@ -271,12 +234,12 @@ def _instance_callable(obj):
 def _set_signature(mock, original, instance=False):
     # creates a function with signature (*args, **kwargs) that delegates to a
     # mock. It still does signature checking by calling a lambda with the same
-    # signature as the original. This is effectively mocksignature2.
+    # signature as the original.
     if not _callable(original):
         return
 
     skipfirst = isinstance(original, ClassTypes)
-    result = _getsignature2(original, skipfirst, instance)
+    result = _getsignature(original, skipfirst, instance)
     if result is None:
         # was a C function (e.g. object().__init__ ) that can't be mocked
         return
@@ -297,41 +260,6 @@ def _set_signature(mock, original, instance=False):
     return mock(*args, **kwargs)""" % name
     exec (src, context)
     funcopy = context[name]
-    _setup_func(funcopy, mock)
-    return funcopy
-
-
-def mocksignature(func, mock=None, skipfirst=False):
-    """
-    mocksignature(func, mock=None, skipfirst=False)
-
-    Create a new function with the same signature as `func` that delegates
-    to `mock`. If `skipfirst` is True the first argument is skipped, useful
-    for methods where `self` needs to be omitted from the new function.
-
-    If you don't pass in a `mock` then one will be created for you.
-
-    The mock is set as the `mock` attribute of the returned function for easy
-    access.
-
-    Functions returned by `mocksignature` have many of the same attributes
-    and assert methods as a mock object.
-
-    `mocksignature` can also be used with classes. It copies the signature of
-    the `__init__` method.
-
-    When used with callable objects (instances) it copies the signature of the
-    `__call__` method.
-    """
-    if mock is None:
-        mock = Mock()
-    signature, func = _getsignature(func, skipfirst)
-    src = "lambda %(signature)s: _mock_(%(signature)s)" % {
-        'signature': signature
-    }
-
-    funcopy = eval(src, dict(_mock_=mock))
-    _copy_func_details(func, funcopy)
     _setup_func(funcopy, mock)
     return funcopy
 
@@ -809,8 +737,7 @@ class NonCallableMock(Base):
             if not _is_instance_mock(value):
                 setattr(type(self), name, _get_method(name, value))
                 original = value
-                real = lambda *args, **kw: original(self, *args, **kw)
-                value = mocksignature(value, real, skipfirst=True)
+                value = lambda *args, **kw: original(self, *args, **kw)
             else:
                 # only set _new_name and not name so that mock_calls is tracked
                 # but not method calls
@@ -1138,7 +1065,7 @@ class _patch(object):
 
     def __init__(
             self, getter, attribute, new, spec, create,
-            mocksignature, spec_set, autospec, new_callable, kwargs
+            spec_set, autospec, new_callable, kwargs
         ):
         if new_callable is not None:
             if new is not DEFAULT:
@@ -1157,7 +1084,6 @@ class _patch(object):
         self.spec = spec
         self.create = create
         self.has_local = False
-        self.mocksignature = mocksignature
         self.spec_set = spec_set
         self.autospec = autospec
         self.kwargs = kwargs
@@ -1167,7 +1093,7 @@ class _patch(object):
     def copy(self):
         patcher = _patch(
             self.getter, self.attribute, self.new, self.spec,
-            self.create, self.mocksignature, self.spec_set,
+            self.create, self.spec_set,
             self.autospec, self.new_callable, self.kwargs
         )
         patcher.attribute_name = self.attribute_name
@@ -1321,8 +1247,7 @@ class _patch(object):
         elif autospec is not False:
             # spec is ignored, new *must* be default, spec_set is treated
             # as a boolean. Should we check spec is not None and that spec_set
-            # is a bool? mocksignature should also not be used. Should we
-            # check this?
+            # is a bool?
             if new is not DEFAULT:
                 raise TypeError(
                     "autospec creates the mock for you. Can't specify "
@@ -1340,8 +1265,6 @@ class _patch(object):
             raise TypeError("Can't pass kwargs to a mock we aren't creating")
 
         new_attr = new
-        if self.mocksignature:
-            new_attr = mocksignature(original, new)
 
         self.temp_original = original
         self.is_local = local
@@ -1396,19 +1319,19 @@ def _get_target(target):
 
 def _patch_object(
         target, attribute, new=DEFAULT, spec=None,
-        create=False, mocksignature=False, spec_set=None, autospec=False,
+        create=False, spec_set=None, autospec=False,
         new_callable=None, **kwargs
     ):
     """
     patch.object(target, attribute, new=DEFAULT, spec=None, create=False,
-                 mocksignature=False, spec_set=None, autospec=False,
+                 spec_set=None, autospec=False,
                  new_callable=None, **kwargs)
 
     patch the named member (`attribute`) on an object (`target`) with a mock
     object.
 
     `patch.object` can be used as a decorator, class decorator or a context
-    manager. Arguments `new`, `spec`, `create`, `mocksignature`, `spec_set`,
+    manager. Arguments `new`, `spec`, `create`, `spec_set`,
     `autospec` and `new_callable` have the same meaning as for `patch`. Like
     `patch`, `patch.object` takes arbitrary keyword arguments for configuring
     the mock object it creates.
@@ -1418,13 +1341,13 @@ def _patch_object(
     """
     getter = lambda: target
     return _patch(
-        getter, attribute, new, spec, create, mocksignature,
+        getter, attribute, new, spec, create,
         spec_set, autospec, new_callable, kwargs
     )
 
 
 def _patch_multiple(target, spec=None, create=False,
-        mocksignature=False, spec_set=None, autospec=False,
+        spec_set=None, autospec=False,
         new_callable=None, **kwargs
     ):
     """Perform multiple patches in a single call. It takes the object to be
@@ -1440,7 +1363,7 @@ def _patch_multiple(target, spec=None, create=False,
     used as a context manager.
 
     `patch.multiple` can be used as a decorator, class decorator or a context
-    manager. The arguments `spec`, `spec_set`, `create`, `mocksignature`,
+    manager. The arguments `spec`, `spec_set`, `create`,
     `autospec` and `new_callable` have the same meaning as for `patch`. These
     arguments will be applied to *all* patches done by `patch.multiple`.
 
@@ -1460,13 +1383,13 @@ def _patch_multiple(target, spec=None, create=False,
     items = list(kwargs.items())
     attribute, new = items[0]
     patcher = _patch(
-        getter, attribute, new, spec, create, mocksignature, spec_set,
+        getter, attribute, new, spec, create, spec_set,
         autospec, new_callable, {}
     )
     patcher.attribute_name = attribute
     for attribute, new in items[1:]:
         this_patcher = _patch(
-            getter, attribute, new, spec, create, mocksignature, spec_set,
+            getter, attribute, new, spec, create, spec_set,
             autospec, new_callable, {}
         )
         this_patcher.attribute_name = attribute
@@ -1476,7 +1399,7 @@ def _patch_multiple(target, spec=None, create=False,
 
 def patch(
         target, new=DEFAULT, spec=None, create=False,
-        mocksignature=False, spec_set=None, autospec=False,
+        spec_set=None, autospec=False,
         new_callable=None, **kwargs
     ):
     """
@@ -1507,20 +1430,13 @@ def patch(
     A more powerful form of `spec` is `autospec`. If you set `autospec=True`
     then the mock with be created with a spec from the object being replaced.
     All attributes of the mock will also have the spec of the corresponding
-    attribute of the object being replaced. Methods and functions being mocked
-    will have their arguments checked and will raise a `TypeError` if they are
-    called with the wrong signature (similar to `mocksignature`). For mocks
-    replacing a class, their return value (the 'instance') will have the same
-    spec as the class.
+    attribute of the object being replaced. Methods and functions being
+    mocked will have their arguments checked and will raise a `TypeError` if
+    they are called with the wrong signature. For mocks replacing a class,
+    their return value (the 'instance') will have the same spec as the class.
 
     Instead of `autospec=True` you can pass `autospec=some_object` to use an
     arbitrary object as the spec instead of the one being replaced.
-
-    If `mocksignature` is True then the patch will be done with a function
-    created by mocking the one being replaced. If the object being replaced is
-    a class then the signature of `__init__` will be copied. If the object
-    being replaced is a callable object then the signature of `__call__` will
-    be copied.
 
     By default `patch` will fail to replace attributes that don't exist. If
     you pass in `create=True`, and the attribute doesn't exist, patch will
@@ -1550,7 +1466,7 @@ def patch(
     """
     getter, attribute = _get_target(target)
     return _patch(
-        getter, attribute, new, spec, create, mocksignature,
+        getter, attribute, new, spec, create,
         spec_set, autospec, new_callable, kwargs
     )
 
@@ -2114,9 +2030,8 @@ def create_autospec(spec, spec_set=False, instance=False, _parent=None,
     mock will use the corresponding attribute on the `spec` object as their
     spec.
 
-    Functions or methods being mocked will have their arguments checked in a
-    similar way to `mocksignature` to check that they are called with the
-    correct signature.
+    Functions or methods being mocked will have their arguments checked
+    to check that they are called with the correct signature.
 
     If `spec_set` is True then attempting to set attributes that don't exist
     on the spec object will raise an `AttributeError`.
@@ -2183,7 +2098,7 @@ def create_autospec(spec, spec_set=False, instance=False, _parent=None,
             continue
 
         if isinstance(spec, FunctionTypes) and entry in FunctionAttributes:
-            # allow a mock to actually be a function from mocksignature
+            # allow a mock to actually be a function
             continue
 
         # XXXX do we need a better way of getting attributes without
@@ -2214,7 +2129,7 @@ def create_autospec(spec, spec_set=False, instance=False, _parent=None,
             skipfirst = _must_skip(spec, entry, is_type)
             _check_signature(original, new, skipfirst=skipfirst)
 
-        # so functions created with mocksignature become instance attributes,
+        # so functions created with _set_signature become instance attributes,
         # *plus* their underlying mock exists in _mock_children of the parent
         # mock. Adding to _mock_children may be unnecessary where we are also
         # setting as an instance attribute?

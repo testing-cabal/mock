@@ -4,10 +4,12 @@
 CHANGELOG
 =========
 
-2012/XX/XX Version 0.8.1
+2012/XX/XX Version 1.0.0
 ------------------------
 
-* BUGFIX: `create_autospec` works correctly for calling mocked unbound methods
+The standard library version!
+
+* `mocksignature`, along with the `mocksignature` argument to `patch`, removed
 
 
 2012/02/13 Version 0.8.0

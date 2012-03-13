@@ -51,13 +51,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
         mock.__getitem__ = f
         self.assertFalse(mock.__getitem__ is f)
         self.assertEqual(mock['foo'], (mock, 'fish'))
-
-        # When you pull the function back of the *instance*
-        # the first argument (self) is removed
-        def instance_f(name):
-            pass
-        self.assertEqual(inspect.getargspec(mock.__getitem__),
-                         inspect.getargspec(instance_f))
+        self.assertEqual(mock.__getitem__('foo'), (mock, 'fish'))
 
         mock.__getitem__ = mock
         self.assertTrue(mock.__getitem__ is mock)
@@ -438,7 +432,8 @@ class TestMockingMagicMethods(unittest2.TestCase):
 
         # this seems like it should work, but is hard to do without introducing
         # other api inconsistencies. Failure message could be better though.
-        self.assertRaises(TypeError, setattr, m, '__iter__', [3].__iter__)
+        m.__iter__ = [3].__iter__
+        self.assertRaises(TypeError, iter, m)
 
 
     def test_magic_method_type(self):

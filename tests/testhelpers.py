@@ -6,8 +6,7 @@ from tests.support import unittest2, inPy3k
 
 from mock import (
     call, _Call, create_autospec,
-    MagicMock, Mock, ANY, _CallList,
-    mocksignature
+    MagicMock, Mock, ANY, _CallList
 )
 
 from datetime import datetime
@@ -424,7 +423,7 @@ class SpecSignatureTest(unittest2.TestCase):
 
 
     def test_builtin_functions_types(self):
-        # we could replace builtin functions / methods with a mocksignature
+        # we could replace builtin functions / methods with a function
         # with *args / **kwargs signature. Using the builtin method type
         # as a spec seems to work fairly well though.
         class BuiltinSubclass(list):
@@ -814,28 +813,28 @@ class SpecSignatureTest(unittest2.TestCase):
 class TestCallList(unittest2.TestCase):
 
     def test_args_list_contains_call_list(self):
-        for mock in Mock(), mocksignature(lambda *args, **kwargs: None):
-            self.assertIsInstance(mock.call_args_list, _CallList)
+        mock = Mock()
+        self.assertIsInstance(mock.call_args_list, _CallList)
 
-            mock(1, 2)
-            mock(a=3)
-            mock(3, 4)
-            mock(b=6)
+        mock(1, 2)
+        mock(a=3)
+        mock(3, 4)
+        mock(b=6)
 
-            for kall in call(1, 2), call(a=3), call(3, 4), call(b=6):
-                self.assertTrue(kall in mock.call_args_list)
+        for kall in call(1, 2), call(a=3), call(3, 4), call(b=6):
+            self.assertTrue(kall in mock.call_args_list)
 
-            calls = [call(a=3), call(3, 4)]
-            self.assertTrue(calls in mock.call_args_list)
-            calls = [call(1, 2), call(a=3)]
-            self.assertTrue(calls in mock.call_args_list)
-            calls = [call(3, 4), call(b=6)]
-            self.assertTrue(calls in mock.call_args_list)
-            calls = [call(3, 4)]
-            self.assertTrue(calls in mock.call_args_list)
+        calls = [call(a=3), call(3, 4)]
+        self.assertTrue(calls in mock.call_args_list)
+        calls = [call(1, 2), call(a=3)]
+        self.assertTrue(calls in mock.call_args_list)
+        calls = [call(3, 4), call(b=6)]
+        self.assertTrue(calls in mock.call_args_list)
+        calls = [call(3, 4)]
+        self.assertTrue(calls in mock.call_args_list)
 
-            self.assertFalse(call('fish') in mock.call_args_list)
-            self.assertFalse([call('fish')] in mock.call_args_list)
+        self.assertFalse(call('fish') in mock.call_args_list)
+        self.assertFalse([call('fish')] in mock.call_args_list)
 
 
     def test_call_list_str(self):
