@@ -610,7 +610,7 @@ class PatchTest(unittest2.TestCase):
         foo = {}
 
         @patch('%s.SomeClass' % __name__, object())
-        @patch('%s.SomeClass' % __name__, object(), mocksignature=True)
+        @patch('%s.SomeClass' % __name__, object(), autospec=True)
         @patch.object(SomeClass, object())
         @patch.dict(foo)
         def some_name():

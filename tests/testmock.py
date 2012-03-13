@@ -14,7 +14,7 @@ from mock import (
     call, DEFAULT, patch, sentinel,
     MagicMock, Mock, NonCallableMock,
     NonCallableMagicMock, _CallList,
-    mocksignature, create_autospec
+    create_autospec
 )
 
 
@@ -854,7 +854,6 @@ class MockTest(unittest2.TestCase):
     def test_arg_lists(self):
         mocks = [
             Mock(),
-            mocksignature(lambda *args, **kwargs: None),
             MagicMock(),
             NonCallableMock(),
             NonCallableMagicMock()
@@ -878,10 +877,6 @@ class MockTest(unittest2.TestCase):
 
                 mock.reset_mock()
                 assert_attrs(mock)
-
-            if not isinstance(mock, Mock):
-                # the mocksignature
-                continue
 
             mock.foo()
             mock.foo.bar(1, a=3)
@@ -955,48 +950,48 @@ class MockTest(unittest2.TestCase):
 
 
     def test_assert_has_calls_any_order(self):
-        for mock in Mock(), mocksignature(lambda *args, **kwargs: None):
-            mock(1, 2)
-            mock(a=3)
-            mock(3, 4)
-            mock(b=6)
-            mock(b=6)
+        mock = Mock()
+        mock(1, 2)
+        mock(a=3)
+        mock(3, 4)
+        mock(b=6)
+        mock(b=6)
 
-            kalls = [
-                call(1, 2), ({'a': 3},),
-                ((3, 4),), ((), {'a': 3}),
-                ('', (1, 2)), ('', {'a': 3}),
-                ('', (1, 2), {}), ('', (), {'a': 3})
-            ]
-            for kall in kalls:
-                mock.assert_has_calls([kall], any_order=True)
+        kalls = [
+            call(1, 2), ({'a': 3},),
+            ((3, 4),), ((), {'a': 3}),
+            ('', (1, 2)), ('', {'a': 3}),
+            ('', (1, 2), {}), ('', (), {'a': 3})
+        ]
+        for kall in kalls:
+            mock.assert_has_calls([kall], any_order=True)
 
-            for kall in call(1, '2'), call(b=3), call(), 3, None, 'foo':
-                self.assertRaises(
-                    AssertionError, mock.assert_has_calls,
-                    [kall], any_order=True
-                )
+        for kall in call(1, '2'), call(b=3), call(), 3, None, 'foo':
+            self.assertRaises(
+                AssertionError, mock.assert_has_calls,
+                [kall], any_order=True
+            )
 
-            kall_lists = [
-                [call(1, 2), call(b=6)],
-                [call(3, 4), call(1, 2)],
-                [call(b=6), call(b=6)],
-            ]
+        kall_lists = [
+            [call(1, 2), call(b=6)],
+            [call(3, 4), call(1, 2)],
+            [call(b=6), call(b=6)],
+        ]
 
-            for kall_list in kall_lists:
-                mock.assert_has_calls(kall_list, any_order=True)
+        for kall_list in kall_lists:
+            mock.assert_has_calls(kall_list, any_order=True)
 
-            kall_lists = [
-                [call(b=6), call(b=6), call(b=6)],
-                [call(1, 2), call(1, 2)],
-                [call(3, 4), call(1, 2), call(5, 7)],
-                [call(b=6), call(3, 4), call(b=6), call(1, 2), call(b=6)],
-            ]
-            for kall_list in kall_lists:
-                self.assertRaises(
-                    AssertionError, mock.assert_has_calls,
-                    kall_list, any_order=True
-                )
+        kall_lists = [
+            [call(b=6), call(b=6), call(b=6)],
+            [call(1, 2), call(1, 2)],
+            [call(3, 4), call(1, 2), call(5, 7)],
+            [call(b=6), call(3, 4), call(b=6), call(1, 2), call(b=6)],
+        ]
+        for kall_list in kall_lists:
+            self.assertRaises(
+                AssertionError, mock.assert_has_calls,
+                kall_list, any_order=True
+            )
 
     def test_assert_has_calls(self):
         kalls1 = [
@@ -1009,7 +1004,7 @@ class MockTest(unittest2.TestCase):
         kalls2.extend(call.bam(set(), foo={}).fish([1]).call_list())
 
         mocks = []
-        for mock in Mock(), mocksignature(lambda *args, **kwargs: None):
+        for mock in Mock(), MagicMock():
             mock(1, 2)
             mock(a=3)
             mock(3, 4)
@@ -1039,39 +1034,39 @@ class MockTest(unittest2.TestCase):
 
 
     def test_assert_any_call(self):
-        for mock in Mock(), mocksignature(lambda *args, **kwargs: None):
-            mock(1, 2)
-            mock(a=3)
-            mock(1, b=6)
+        mock = Mock()
+        mock(1, 2)
+        mock(a=3)
+        mock(1, b=6)
 
-            mock.assert_any_call(1, 2)
-            mock.assert_any_call(a=3)
-            mock.assert_any_call(1, b=6)
+        mock.assert_any_call(1, 2)
+        mock.assert_any_call(a=3)
+        mock.assert_any_call(1, b=6)
 
-            self.assertRaises(
-                AssertionError,
-                mock.assert_any_call
-            )
-            self.assertRaises(
-                AssertionError,
-                mock.assert_any_call,
-                1, 3
-            )
-            self.assertRaises(
-                AssertionError,
-                mock.assert_any_call,
-                a=4
-            )
+        self.assertRaises(
+            AssertionError,
+            mock.assert_any_call
+        )
+        self.assertRaises(
+            AssertionError,
+            mock.assert_any_call,
+            1, 3
+        )
+        self.assertRaises(
+            AssertionError,
+            mock.assert_any_call,
+            a=4
+        )
 
 
-    def test_mock_calls_mocksignature(self):
+    def test_mock_calls_create_autospec(self):
         def f(a, b):
             pass
         obj = Iter()
         obj.f = f
 
         funcs = [
-            mocksignature(f), create_autospec(f),
+            create_autospec(f),
             create_autospec(obj).f
         ]
         for func in funcs:
