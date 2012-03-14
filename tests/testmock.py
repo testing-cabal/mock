@@ -1303,6 +1303,13 @@ class MockTest(unittest2.TestCase):
             self.assertRaises(AttributeError, getattr, mock, 'f')
 
 
+    def test_class_assignable(self):
+        for mock in Mock(), MagicMock():
+            self.assertNotIsInstance(mock, int)
+
+            mock.__class__ = int
+            self.assertIsInstance(mock, int)
+
 
 if __name__ == '__main__':
     unittest2.main()
