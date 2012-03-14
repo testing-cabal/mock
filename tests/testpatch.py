@@ -5,8 +5,10 @@
 import os
 import sys
 
+import unittest2 as unittest
+
 from tests import support
-from tests.support import unittest2, inPy3k, SomeClass, is_instance, callable
+from tests.support import inPy3k, SomeClass, is_instance, callable
 
 from mock import (
     NonCallableMock, CallableMixin, patch, sentinel,
@@ -80,7 +82,7 @@ class Container(object):
 
 
 
-class PatchTest(unittest2.TestCase):
+class PatchTest(unittest.TestCase):
 
     def assertNotCallable(self, obj, magic=True):
         MockClass = NonCallableMagicMock
@@ -644,7 +646,7 @@ class PatchTest(unittest2.TestCase):
         test()
 
 
-    @unittest2.expectedFailure
+    @unittest.expectedFailure
     def test_patch_descriptor(self):
         # would be some effort to fix this - we could special case the
         # builtin descriptors: classmethod, property, staticmethod
@@ -1027,7 +1029,7 @@ class PatchTest(unittest2.TestCase):
         except:
             err = sys.exc_info()
 
-        result = unittest2.TextTestResult(None, None, 0)
+        result = unittest.TextTestResult(None, None, 0)
         traceback = result._exc_info_to_string(err, self)
         self.assertIn('raise AssertionError', traceback)
 
@@ -1812,4 +1814,4 @@ class PatchTest(unittest2.TestCase):
 
 
 if __name__ == '__main__':
-    unittest2.main()
+    unittest.main()

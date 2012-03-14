@@ -2,7 +2,8 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
-from tests.support import unittest2, inPy3k
+import unittest2 as unittest
+from tests.support import inPy3k
 
 from mock import (
     call, _Call, create_autospec, MagicMock,
@@ -21,7 +22,7 @@ class SomeClass(object):
 
 
 
-class AnyTest(unittest2.TestCase):
+class AnyTest(unittest.TestCase):
 
     def test_any(self):
         self.assertEqual(ANY, object())
@@ -72,7 +73,7 @@ class AnyTest(unittest2.TestCase):
 
 
 
-class CallTest(unittest2.TestCase):
+class CallTest(unittest.TestCase):
 
     def test_call_with_call(self):
         kall = _Call()
@@ -311,7 +312,7 @@ class CallTest(unittest2.TestCase):
         self.assertEqual(args, other_args)
 
 
-class SpecSignatureTest(unittest2.TestCase):
+class SpecSignatureTest(unittest.TestCase):
 
     def _check_someclass_mock(self, mock):
         self.assertRaises(AttributeError, getattr, mock, 'foo')
@@ -377,7 +378,7 @@ class SpecSignatureTest(unittest2.TestCase):
         mock_foo.assert_called_with(1)
 
 
-    @unittest2.expectedFailure
+    @unittest.expectedFailure
     def test_create_autospec_unbound_methods(self):
         # see issue 128
         class Foo(object):
@@ -400,7 +401,7 @@ class SpecSignatureTest(unittest2.TestCase):
         m = create_autospec(Foo, a='3')
         self.assertEqual(m.a, '3')
 
-    @unittest2.skipUnless(inPy3k, "Keyword only arguments Python 3 specific")
+    @unittest.skipUnless(inPy3k, "Keyword only arguments Python 3 specific")
     def test_create_autospec_keyword_only_arguments(self):
         func_def = "def foo(a, *, b=None):\n    pass\n"
         namespace = {}
@@ -555,7 +556,7 @@ class SpecSignatureTest(unittest2.TestCase):
             mock.g.assert_called_once_with(3, 4)
 
 
-    @unittest2.skipIf(inPy3k, "No old style classes in Python 3")
+    @unittest.skipIf(inPy3k, "No old style classes in Python 3")
     def test_old_style_classes(self):
         class Foo:
             def f(self, a, b):
@@ -735,7 +736,7 @@ class SpecSignatureTest(unittest2.TestCase):
         mock.assert_called_with(4, 5)
 
 
-    @unittest2.skipIf(inPy3k, 'no old style classes in Python 3')
+    @unittest.skipIf(inPy3k, 'no old style classes in Python 3')
     def test_signature_old_style_class(self):
         class Foo:
             def __init__(self, a, b=3):
@@ -759,7 +760,7 @@ class SpecSignatureTest(unittest2.TestCase):
         create_autospec(Foo)
 
 
-    @unittest2.skipIf(inPy3k, 'no old style classes in Python 3')
+    @unittest.skipIf(inPy3k, 'no old style classes in Python 3')
     def test_old_style_class_with_no_init(self):
         # this used to raise an exception
         # due to Foo.__init__ raising an AttributeError
@@ -865,7 +866,7 @@ class SpecSignatureTest(unittest2.TestCase):
         mock_slot.abc.assert_called_once_with(4, 5, 6)
 
 
-class TestCallList(unittest2.TestCase):
+class TestCallList(unittest.TestCase):
 
     def test_args_list_contains_call_list(self):
         mock = Mock()
@@ -937,4 +938,4 @@ class TestCallList(unittest2.TestCase):
 
 
 if __name__ == '__main__':
-    unittest2.main()
+    unittest.main()

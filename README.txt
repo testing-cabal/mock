@@ -186,3 +186,12 @@ Releasing
 1. update mock.__version__
 2. commit, tag, push --tags origin master
 3. setup.py sdist bdist_wheel upload -s
+
+Backporting rules
+-----------------
+
+type -> ClassTypes
+__self__ -> self
+name.isidentifier() -> _isidentifier(name)
+super -> _super
+

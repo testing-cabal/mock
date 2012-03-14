@@ -2,7 +2,9 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
-from tests.support import unittest2, inPy3k
+import unittest2 as unittest
+
+from tests.support import inPy3k
 
 try:
     unicode
@@ -17,7 +19,7 @@ from mock import Mock, MagicMock, _magics
 
 
 
-class TestMockingMagicMethods(unittest2.TestCase):
+class TestMockingMagicMethods(unittest.TestCase):
 
     def test_deleting_magic_methods(self):
         mock = Mock()
@@ -80,7 +82,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertEqual(str(mock), 'foo')
 
 
-    @unittest2.skipIf(inPy3k, "no unicode in Python 3")
+    @unittest.skipIf(inPy3k, "no unicode in Python 3")
     def test_unicode(self):
         mock = Mock()
         self.assertEqual(unicode(mock), unicode(str(mock)))
@@ -148,7 +150,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertEqual(mock.value, 16)
 
 
-    @unittest2.skipIf(inPy3k, 'no truediv in Python 3')
+    @unittest.skipIf(inPy3k, 'no truediv in Python 3')
     def test_truediv(self):
         mock = MagicMock()
         mock.__truediv__.return_value = 6
@@ -164,7 +166,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertEqual(context['result'], 3)
 
 
-    @unittest2.skipIf(not inPy3k, 'truediv is available in Python 2')
+    @unittest.skipIf(not inPy3k, 'truediv is available in Python 2')
     def test_no_truediv(self):
         self.assertRaises(
             AttributeError, getattr, MagicMock(), '__truediv__'
@@ -203,10 +205,10 @@ class TestMockingMagicMethods(unittest2.TestCase):
         #       it is fixed in jython 2.5.2
         if not inPy3k:
             # incomparable in Python 3
-            self. assertEqual(Mock() < 3, object() < 3)
-            self. assertEqual(Mock() > 3, object() > 3)
-            self. assertEqual(Mock() <= 3, object() <= 3)
-            self. assertEqual(Mock() >= 3, object() >= 3)
+            self.assertEqual(Mock() < 3, object() < 3)
+            self.assertEqual(Mock() > 3, object() > 3)
+            self.assertEqual(Mock() <= 3, object() <= 3)
+            self.assertEqual(Mock() >= 3, object() >= 3)
         else:
             self.assertRaises(TypeError, lambda: MagicMock() < object())
             self.assertRaises(TypeError, lambda: object() < MagicMock())
@@ -334,7 +336,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
         # how to test __sizeof__ ?
 
 
-    @unittest2.skipIf(inPy3k, "no __cmp__ in Python 3")
+    @unittest.skipIf(inPy3k, "no __cmp__ in Python 3")
     def test_non_default_magic_methods(self):
         mock = MagicMock()
         self.assertRaises(AttributeError, lambda: mock.__cmp__)
@@ -399,7 +401,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
         mock = MagicMock()
         def set_setattr():
             mock.__setattr__ = lambda self, name: None
-        self.assertRaisesRegexp(AttributeError,
+        self.assertRaisesRegex(AttributeError,
             "Attempting to set unsupported magic method '__setattr__'.",
             set_setattr
         )
@@ -433,9 +435,6 @@ class TestMockingMagicMethods(unittest2.TestCase):
         mock.reset_mock()
         self.assertFalse(mock.__str__.called)
 
-
-    @unittest2.skipUnless(sys.version_info[:2] >= (2, 6),
-                          "__dir__ not available until Python 2.6 or later")
     def test_dir(self):
         # overriding the default implementation
         for mock in Mock(), MagicMock():
@@ -445,7 +444,7 @@ class TestMockingMagicMethods(unittest2.TestCase):
             self.assertEqual(dir(mock), ['foo'])
 
 
-    @unittest2.skipIf('PyPy' in sys.version, "This fails differently on pypy")
+    @unittest.skipIf('PyPy' in sys.version, "This fails differently on pypy")
     def test_bound_methods(self):
         m = Mock()
 
@@ -483,4 +482,4 @@ class TestMockingMagicMethods(unittest2.TestCase):
 
 
 if __name__ == '__main__':
-    unittest2.main()
+    unittest.main()

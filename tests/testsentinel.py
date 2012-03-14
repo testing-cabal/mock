@@ -2,12 +2,12 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
-from tests.support import unittest2
+import unittest2 as unittest
 
 from mock import sentinel, DEFAULT
 
 
-class SentinelTest(unittest2.TestCase):
+class SentinelTest(unittest.TestCase):
 
     def testSentinels(self):
         self.assertEqual(sentinel.whatever, sentinel.whatever,
@@ -30,4 +30,4 @@ class SentinelTest(unittest2.TestCase):
 
 
 if __name__ == '__main__':
-    unittest2.main()
+    unittest.main()

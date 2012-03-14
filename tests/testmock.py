@@ -2,8 +2,9 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
+import unittest2 as unittest
 from tests.support import (
-    callable, unittest2, inPy3k, is_instance, next
+    callable, inPy3k, is_instance, next
 )
 
 import copy
@@ -48,7 +49,7 @@ class Thing(object):
 
 
 
-class MockTest(unittest2.TestCase):
+class MockTest(unittest.TestCase):
 
     def test_all(self):
         # if __all__ is badly defined then import * will raise an error
@@ -83,11 +84,6 @@ class MockTest(unittest2.TestCase):
                           "methods not initialised correctly")
         self.assertEqual(mock._mock_children, {},
                          "children not initialised incorrectly")
-
-
-    def test_unicode_not_broken(self):
-        # This used to raise an exception with Python 2.5 and Mock 0.4
-        unicode(Mock())
 
 
     def test_return_value_in_constructor(self):
@@ -170,7 +166,7 @@ class MockTest(unittest2.TestCase):
         self.assertEqual(mock(), sentinel.RETURN)
 
 
-    @unittest2.skipUnless('java' in sys.platform,
+    @unittest.skipUnless('java' in sys.platform,
                           'This test only applies to Jython')
     def test_java_exception_side_effect(self):
         import java
@@ -396,7 +392,7 @@ class MockTest(unittest2.TestCase):
 
                 # this should be allowed
                 mock.something
-                self.assertRaisesRegexp(
+                self.assertRaisesRegex(
                     AttributeError,
                     "Mock object has no attribute 'something_else'",
                     getattr, mock, 'something_else'
@@ -415,12 +411,12 @@ class MockTest(unittest2.TestCase):
             mock.x
             mock.y
             mock.__something__
-            self.assertRaisesRegexp(
+            self.assertRaisesRegex(
                 AttributeError,
                 "Mock object has no attribute 'z'",
                 getattr, mock, 'z'
             )
-            self.assertRaisesRegexp(
+            self.assertRaisesRegex(
                 AttributeError,
                 "Mock object has no attribute '__foobar__'",
                 getattr, mock, '__foobar__'
@@ -486,7 +482,7 @@ class MockTest(unittest2.TestCase):
 
     def test_assert_called_with_message(self):
         mock = Mock()
-        self.assertRaisesRegexp(AssertionError, 'Not called',
+        self.assertRaisesRegex(AssertionError, 'Not called',
                                 mock.assert_called_with)
 
 
@@ -553,7 +549,7 @@ class MockTest(unittest2.TestCase):
         copy.copy(Mock())
 
 
-    @unittest2.skipIf(inPy3k, "no old style classes in Python 3")
+    @unittest.skipIf(inPy3k, "no old style classes in Python 3")
     def test_spec_old_style_classes(self):
         class Foo:
             bar = 7
@@ -567,7 +563,7 @@ class MockTest(unittest2.TestCase):
         self.assertRaises(AttributeError, lambda: mock.foo)
 
 
-    @unittest2.skipIf(inPy3k, "no old style classes in Python 3")
+    @unittest.skipIf(inPy3k, "no old style classes in Python 3")
     def test_spec_set_old_style_classes(self):
         class Foo:
             bar = 7
@@ -621,8 +617,6 @@ class MockTest(unittest2.TestCase):
         self.assertRaises(TypeError, mock, 'one', 'two')
 
 
-    @unittest2.skipUnless(sys.version_info[:2] >= (2, 6),
-                          "__dir__ not available until Python 2.6 or later")
     def test_dir(self):
         mock = Mock()
         attrs = set(dir(mock))
@@ -646,11 +640,9 @@ class MockTest(unittest2.TestCase):
         self.assertIn('__iter__', dir(mock))
 
 
-    @unittest2.skipUnless(sys.version_info[:2] >= (2, 6),
-                          "__dir__ not available until Python 2.6 or later")
     def test_dir_from_spec(self):
-        mock = Mock(spec=unittest2.TestCase)
-        testcase_attrs = set(dir(unittest2.TestCase))
+        mock = Mock(spec=unittest.TestCase)
+        testcase_attrs = set(dir(unittest.TestCase))
         attrs = set(dir(mock))
 
         # all attributes from the spec are included
@@ -661,8 +653,6 @@ class MockTest(unittest2.TestCase):
         self.assertEqual(dir(mock).count('version'), 1)
 
 
-    @unittest2.skipUnless(sys.version_info[:2] >= (2, 6),
-                          "__dir__ not available until Python 2.6 or later")
     def test_filter_dir(self):
         patcher = patch.object(mock, 'FILTER_DIR', False)
         patcher.start()
@@ -1329,9 +1319,10 @@ class MockTest(unittest2.TestCase):
 
             mock.__class__ = int
             self.assertIsInstance(mock, int)
+            mock.foo
 
 
-    @unittest2.expectedFailure
+    @unittest.expectedFailure
     def test_pickle(self):
         for Klass in (MagicMock, Mock, Subclass, NonCallableMagicMock):
             mock = Klass(name='foo', attribute=3)
@@ -1348,4 +1339,4 @@ class MockTest(unittest2.TestCase):
 
 
 if __name__ == '__main__':
-    unittest2.main()
+    unittest.main()

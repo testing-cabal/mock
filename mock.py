@@ -52,41 +52,24 @@ __all__ = (
 __version__ = '1.0.1'
 
 
+import inspect
 import pprint
 import sys
 
-try:
-    import inspect
-except ImportError:
-    # for alternative platforms that
-    # may not have inspect
-    inspect = None
-
-try:
-    from functools import wraps as original_wraps
-except ImportError:
-    # Python 2.4 compatibility
-    def wraps(original):
+from functools import wraps as original_wraps
+if sys.version_info[:2] >= (3, 2):
+    wraps = original_wraps
+else:
+    # Emulate 3.2+ functools.
+    def wraps(func):
         def inner(f):
-            f.__name__ = original.__name__
-            f.__doc__ = original.__doc__
-            f.__module__ = original.__module__
-            wrapped = getattr(original, '__wrapped__', original)
+            f = original_wraps(func)(f)
+            wrapped = getattr(func, '__wrapped__', func)
             f.__wrapped__ = wrapped
             return f
         return inner
-else:
-    if sys.version_info[:2] >= (3, 2):
-        wraps = original_wraps
-    else:
-        def wraps(func):
-            def inner(f):
-                f = original_wraps(func)(f)
-                wrapped = getattr(func, '__wrapped__', func)
-                f.__wrapped__ = wrapped
-                return f
-            return inner
 
+# TODO: use six.
 try:
     unicode
 except NameError:
@@ -170,9 +153,6 @@ DescriptorTypes = (
 
 
 def _getsignature(func, skipfirst, instance=False):
-    if inspect is None:
-        raise ImportError('inspect module not available')
-
     if isinstance(func, ClassTypes) and not instance:
         try:
             func = func.__init__
@@ -388,7 +368,7 @@ class _Sentinel(object):
 
     def __getattr__(self, name):
         if name == '__bases__':
-            # Without this help(mock) raises an exception
+            # Without this help(unittest.mock) raises an exception
             raise AttributeError
         return self._sentinels.setdefault(name, _SentinelObject(name))
 
@@ -628,18 +608,18 @@ class NonCallableMock(Base):
 
 
     def __get_side_effect(self):
-        sig = self._mock_delegate
-        if sig is None:
+        delegated = self._mock_delegate
+        if delegated is None:
             return self._mock_side_effect
-        return sig.side_effect
+        return delegated.side_effect
 
     def __set_side_effect(self, value):
         value = _try_iter(value)
-        sig = self._mock_delegate
-        if sig is None:
+        delegated = self._mock_delegate
+        if delegated is None:
             self._mock_side_effect = value
         else:
-            sig.side_effect = value
+            delegated.side_effect = value
 
     side_effect = property(__get_side_effect, __set_side_effect)
 
@@ -1213,12 +1193,11 @@ class _patch(object):
 
         @wraps(func)
         def patched(*args, **keywargs):
-            # don't use a with here (backwards compatability with Python 2.4)
+            # could use with statement here
             extra_args = []
             entered_patchers = []
 
-            # can't use try...except...finally because of Python 2.4
-            # compatibility
+            # could use try..except...finally here
             exc_info = tuple()
             try:
                 try:

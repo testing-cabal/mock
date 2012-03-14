@@ -2,7 +2,8 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
-from tests.support import is_instance, unittest2, X, SomeClass
+import unittest2 as unittest
+from tests.support import is_instance, X, SomeClass
 
 from mock import (
     Mock, MagicMock, NonCallableMagicMock,
@@ -12,7 +13,7 @@ from mock import (
 
 
 
-class TestCallable(unittest2.TestCase):
+class TestCallable(unittest.TestCase):
 
     def assertNotCallable(self, mock):
         self.assertTrue(is_instance(mock, NonCallableMagicMock))
