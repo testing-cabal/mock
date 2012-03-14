@@ -26,6 +26,7 @@ __all__ = (
     'NonCallableMock',
     'NonCallableMagicMock',
     'mock_open',
+    'PropertyMock',
 )
 
 
@@ -2239,3 +2240,10 @@ def mock_open(mock=None, read_data=None):
 
     mock.return_value = handle
     return mock
+
+class PropertyMock(Mock):
+    """A Mock variant with __get__ and __set__ methods to act as a property"""
+    def __get__(self, obj, obj_type):
+        return self()
+    def __set__(self, obj, val):
+        self(val)
