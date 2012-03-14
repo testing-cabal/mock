@@ -126,9 +126,8 @@ create_autospec
     mock will use the corresponding attribute on the `spec` object as their
     spec.
 
-    Functions or methods being mocked will have their arguments checked in a
-    similar way to :func:`mocksignature` to check that they are called with the
-    correct signature.
+    Functions or methods being mocked will have their arguments checked to
+    ensure that they are called with the correct signature.
 
     If `spec_set` is `True` then attempting to set attributes that don't exist
     on the spec object will raise an `AttributeError`.
@@ -249,8 +248,7 @@ api of mocks to the api of an original object (the spec), but it is recursive
 (implemented lazily) so that attributes of mocks only have the same api as
 the attributes of the spec. In addition mocked functions / methods have the
 same call signature as the original so they raise a `TypeError` if they are
-called incorrectly. This feature is a better version of both the `spec` and
-`mocksignature` features in the current mock.
+called incorrectly.
 
 Before I explain how auto-speccing works, here's why it is needed.
 
@@ -318,14 +316,14 @@ with any methods on the mock:
     <mock.Mock object at 0x...>
     >>> mock.has_data.assret_called_with()
 
-Auto-speccing solves this problem, and combines the features of
-`mocksignature`. You can either pass `autospec=True` to `patch` /
-`patch.object` or use the `create_autospec` function to create a mock with a
-spec. If you use the `autospec=True` argument to `patch` then the object that
-is being replaced will be used as the spec object. Because the speccing is
-done "lazily" (the spec is created as attributes on the mock are accessed)
-you can use it with very complex or deeply nested objects (like modules that
-import modules that import modules) without a big performance hit.
+Auto-speccing solves this problem. You can either pass `autospec=True` to
+`patch` / `patch.object` or use the `create_autospec` function to create a
+mock with a spec. If you use the `autospec=True` argument to `patch` then the
+object that is being replaced will be used as the spec object. Because the
+speccing is done "lazily" (the spec is created as attributes on the mock are
+accessed) you can use it with very complex or deeply nested objects (like
+modules that import modules that import modules) without a big performance
+hit.
 
 Here's an example of it in use:
 

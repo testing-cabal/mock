@@ -77,7 +77,6 @@ API Documentation
    helpers
    sentinel
    magicmock
-   mocksignature
 
 
 User Guide
