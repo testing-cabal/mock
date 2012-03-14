@@ -6,7 +6,7 @@ from tests.support import unittest2, inPy3k
 
 from mock import (
     call, _Call, create_autospec, MagicMock,
-    Mock, ANY, _CallList, patch
+    Mock, ANY, _CallList, patch, PropertyMock
 )
 
 from datetime import datetime
@@ -862,6 +862,23 @@ class TestCallList(unittest2.TestCase):
         )
         self.assertEqual(str(mock.mock_calls), expected)
 
+
+    def test_propertymock(self):
+        p = patch('%s.SomeClass.one' % __name__, new_callable=PropertyMock)
+        mock = p.start()
+        try:
+            SomeClass.one
+            mock.assert_called_once_with()
+
+            s = SomeClass()
+            s.one
+            mock.assert_called_with()
+            self.assertEqual(mock.mock_calls, [call(), call()])
+
+            s.one = 3
+            self.assertEqual(mock.mock_calls, [call(), call(), call(3)])
+        finally:
+            p.stop()
 
 
 if __name__ == '__main__':

@@ -15,6 +15,7 @@ The standard library version!
 * Added the `mock_open` helper function for mocking open as a context manager
 * `__class__` is assignable, so a mock can pass an `isinstance` check without
   requiring a spec
+* Addition of `PropertyMock`
 
 
 2012/02/13 Version 0.8.0
