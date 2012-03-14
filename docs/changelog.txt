@@ -13,6 +13,8 @@ The standard library version!
 * Support for deleting attributes (accessing deleted attributes will raise an
   `AttributeError`)
 * Added the `mock_open` helper function for mocking open as a context manager
+* `__class__` is assignable, so a mock can pass an `isinstance` check without
+  requiring a spec
 
 
 2012/02/13 Version 0.8.0

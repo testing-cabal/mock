@@ -748,6 +748,9 @@ class NonCallableMock(Base):
                 # but not method calls
                 _check_and_set_parent(self, value, None, name)
                 setattr(type(self), name, value)
+        elif name == '__class__':
+            self._spec_class = value
+            return
         else:
             if _check_and_set_parent(self, value, name, name):
                 self._mock_children[name] = value
