@@ -6,7 +6,7 @@ from __future__ import with_statement
 
 from tests.support import unittest2, is_instance
 
-from mock import MagicMock, Mock, patch, sentinel
+from mock import MagicMock, Mock, patch, sentinel, mock_open, call
 
 from tests.support_with import catch_warnings, nested
 
@@ -131,6 +131,50 @@ class WithTest(unittest2.TestCase):
 
         self.assertEqual(foo, {})
 
+
+
+class TestMockOpen(unittest2.TestCase):
+
+    def test_mock_open(self):
+        mock = mock_open()
+        with patch('%s.open' % __name__, mock, create=True) as patched:
+            self.assertIs(patched, mock)
+            open('foo')
+
+        mock.assert_called_once_with('foo')
+
+
+    def test_mock_open_context_manager(self):
+        mock = mock_open()
+        handle = mock.return_value
+        with patch('%s.open' % __name__, mock, create=True):
+            with open('foo') as f:
+                f.read()
+
+        expected_calls = [call('foo'), call().__enter__(), call().read(),
+                          call().__exit__(None, None, None)]
+        self.assertEqual(mock.mock_calls, expected_calls)
+        self.assertIs(f, handle)
+
+
+    def test_explicit_mock(self):
+        mock = MagicMock()
+        mock_open(mock)
+
+        with patch('%s.open' % __name__, mock, create=True) as patched:
+            self.assertIs(patched, mock)
+            open('foo')
+
+        mock.assert_called_once_with('foo')
+
+
+    def test_read_data(self):
+        mock = mock_open(read_data='foo')
+        with patch('%s.open' % __name__, mock, create=True):
+            h = open('bar')
+            result = h.read()
+
+        self.assertEqual(result, 'foo')
 
 
 if __name__ == '__main__':

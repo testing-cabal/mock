@@ -474,7 +474,7 @@ function instead. The :func:`patch` decorator makes it so simple to
 patch out methods with a mock that having to create a real function becomes a
 nuisance.
 
-If you pass `mocksignature=True` to patch then it does the patching with a
+If you pass `autospec=True` to patch then it does the patching with a
 *real* function object. This function object has the same signature as the one
 it is replacing, but delegates to a mock under the hood. You still get your
 mock auto-created in exactly the same way as before. What it means though, is
@@ -489,7 +489,7 @@ wanted:
     ...   def foo(self):
     ...     pass
     ...
-    >>> with patch.object(Foo, 'foo', mocksignature=True) as mock_foo:
+    >>> with patch.object(Foo, 'foo', autospec=True) as mock_foo:
     ...   mock_foo.return_value = 'foo'
     ...   foo = Foo()
     ...   foo.foo()
@@ -497,7 +497,7 @@ wanted:
     'foo'
     >>> mock_foo.assert_called_once_with(foo)
 
-If we don't use `mocksignature=True` then the unbound method is patched out
+If we don't use `autospec=True` then the unbound method is patched out
 with a Mock instance instead, and isn't called with `self`.
 
 

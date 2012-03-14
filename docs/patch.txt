@@ -40,7 +40,7 @@ patch
     `patch` is straightforward to use. The key is to do the patching in the
     right namespace. See the section `where to patch`_.
 
-.. function:: patch(target, new=DEFAULT, spec=None, create=False, mocksignature=False, spec_set=None, autospec=False, new_callable=None, **kwargs)
+.. function:: patch(target, new=DEFAULT, spec=None, create=False, spec_set=None, autospec=False, new_callable=None, **kwargs)
 
     `patch` acts as a function decorator, class decorator or a context
     manager. Inside the body of the function or with statement, the `target`
@@ -71,19 +71,13 @@ patch
     All attributes of the mock will also have the spec of the corresponding
     attribute of the object being replaced. Methods and functions being mocked
     will have their arguments checked and will raise a `TypeError` if they are
-    called with the wrong signature (similar to `mocksignature`). For mocks
+    called with the wrong signature. For mocks
     replacing a class, their return value (the 'instance') will have the same
     spec as the class. See the :func:`create_autospec` function and
     :ref:`auto-speccing`.
 
     Instead of `autospec=True` you can pass `autospec=some_object` to use an
     arbitrary object as the spec instead of the one being replaced.
-
-    If `mocksignature` is True then the patch will be done with a function
-    created by mocking the one being replaced. If the object being replaced is
-    a class then the signature of `__init__` will be copied. If the object
-    being replaced is a callable object then the signature of `__call__` will
-    be copied.
 
     By default `patch` will fail to replace attributes that don't exist. If
     you pass in `create=True`, and the attribute doesn't exist, patch will
@@ -214,16 +208,16 @@ into a `patch` call using `**`:
 patch.object
 ============
 
-.. function:: patch.object(target, attribute, new=DEFAULT, spec=None, create=False, mocksignature=False, spec_set=None, autospec=False, new_callable=None, **kwargs)
+.. function:: patch.object(target, attribute, new=DEFAULT, spec=None, create=False, spec_set=None, autospec=False, new_callable=None, **kwargs)
 
     patch the named member (`attribute`) on an object (`target`) with a mock
     object.
 
     `patch.object` can be used as a decorator, class decorator or a context
-    manager. Arguments `new`, `spec`, `create`, `mocksignature`, `spec_set`,
-    `autospec` and `new_callable` have the same meaning as for `patch`. Like
-    `patch`, `patch.object` takes arbitrary keyword arguments for configuring
-    the mock object it creates.
+    manager. Arguments `new`, `spec`, `create`, `spec_set`, `autospec` and
+    `new_callable` have the same meaning as for `patch`. Like `patch`,
+    `patch.object` takes arbitrary keyword arguments for configuring the mock
+    object it creates.
 
     When used as a class decorator `patch.object` honours `patch.TEST_PREFIX`
     for choosing which methods to wrap.
@@ -342,7 +336,7 @@ magic methods `__getitem__`, `__setitem__`, `__delitem__` and either
 patch.multiple
 ==============
 
-.. function:: patch.multiple(target, spec=None, create=False, mocksignature=False, spec_set=None, autospec=False, new_callable=None, **kwargs)
+.. function:: patch.multiple(target, spec=None, create=False, spec_set=None, autospec=False, new_callable=None, **kwargs)
 
     Perform multiple patches in a single call. It takes the object to be
     patched (either as an object or a string to fetch the object by importing)
@@ -357,9 +351,9 @@ patch.multiple
     used as a context manager.
 
     `patch.multiple` can be used as a decorator, class decorator or a context
-    manager. The arguments `spec`, `spec_set`, `create`, `mocksignature`,
-    `autospec` and `new_callable` have the same meaning as for `patch`. These
-    arguments will be applied to *all* patches done by `patch.multiple`.
+    manager. The arguments `spec`, `spec_set`, `create`, `autospec` and
+    `new_callable` have the same meaning as for `patch`. These arguments will
+    be applied to *all* patches done by `patch.multiple`.
 
     When used as a class decorator `patch.multiple` honours `patch.TEST_PREFIX`
     for choosing which methods to wrap.

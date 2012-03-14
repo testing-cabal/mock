@@ -1303,5 +1303,6 @@ class MockTest(unittest2.TestCase):
             self.assertRaises(AttributeError, getattr, mock, 'f')
 
 
+
 if __name__ == '__main__':
     unittest2.main()
