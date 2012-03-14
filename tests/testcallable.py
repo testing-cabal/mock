@@ -116,10 +116,7 @@ class TestCallable(unittest.TestCase):
 
         for arg in 'spec', 'spec_set':
             for Klass in CallableX, Sub, Multi, OldStyle, OldStyleSub:
-                patcher = patch('%s.X' % __name__, **{arg: Klass})
-                mock = patcher.start()
-
-                try:
+                with patch('%s.X' % __name__, **{arg: Klass}) as mock:
                     instance = mock()
                     mock.assert_called_once_with()
 
@@ -136,8 +133,6 @@ class TestCallable(unittest.TestCase):
                     result.assert_called_once_with(3, 2, 1)
                     result.foo(3, 2, 1)
                     result.foo.assert_called_once_with(3, 2, 1)
-                finally:
-                    patcher.stop()
 
 
     def test_create_autospec(self):

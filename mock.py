@@ -262,14 +262,21 @@ def _instance_callable(obj):
         # already an instance
         return getattr(obj, '__call__', None) is not None
 
-    klass = obj
-    # uses __bases__ instead of __mro__ so that we work with old style classes
-    if klass.__dict__.get('__call__') is not None:
-        return True
-
-    for base in klass.__bases__:
-        if _instance_callable(base):
+    if inPy3k:
+        # *could* be broken by a class overriding __mro__ or __dict__ via
+        # a metaclass
+        for base in (obj,) + obj.__mro__:
+            if base.__dict__.get('__call__') is not None:
+                return True
+    else:
+        klass = obj
+        # uses __bases__ instead of __mro__ so that we work with old style classes
+        if klass.__dict__.get('__call__') is not None:
             return True
+
+        for base in klass.__bases__:
+            if _instance_callable(base):
+                return True
     return False
 
 
