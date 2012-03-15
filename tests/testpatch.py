@@ -10,8 +10,8 @@ from tests.support import unittest2, inPy3k, SomeClass, is_instance
 
 from mock import (
     NonCallableMock, CallableMixin, patch, sentinel,
-    MagicMock, Mock, NonCallableMagicMock, patch,
-    DEFAULT, call
+    MagicMock, Mock, NonCallableMagicMock, patch, _patch,
+    DEFAULT, call, _get_target
 )
 
 builtin_string = '__builtin__'
@@ -1650,6 +1650,37 @@ class PatchTest(unittest2.TestCase):
         p1.start()
         p1.stop()
         self.assertEqual(squizz.squozz, 3)
+
+
+    def test_patch_propogrates_exc_on_exit(self):
+
+        class holder:
+            exc_info = None, None, None
+
+        class custom_patch(_patch):
+            def __exit__(self, etype=None, val=None, tb=None):
+                _patch.__exit__(self, etype, val, tb)
+                holder.exc_info = etype, val, tb
+            stop = __exit__
+
+        def with_custom_patch(target):
+            getter, attribute = _get_target(target)
+            return custom_patch(
+                getter, attribute, DEFAULT, None, False, False,
+                None, False, None, {}
+            )
+
+        # @with_custom_patch('squizz.squozz')
+        def test(mock):
+            raise RuntimeError
+        test = with_custom_patch('squizz.squozz')(test)
+
+        self.assertRaises(RuntimeError, test)
+        self.assertEqual(holder.exc_info[0], RuntimeError)
+        assert holder.exc_info[1] is not None, (
+                            'exception value not propgated')
+        assert holder.exc_info[2] is not None, (
+                            'exception traceback not propgated')
 
 
 
