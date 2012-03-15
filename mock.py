@@ -1210,6 +1210,7 @@ class _patch(object):
 
             # can't use try...except...finally because of Python 2.4
             # compatibility
+            exc_info = tuple()
             try:
                 try:
                     for patching in patched.patchings:
@@ -1228,11 +1229,13 @@ class _patch(object):
                         # the patcher may have been started, but an exception
                         # raised whilst entering one of its additional_patchers
                         entered_patchers.append(patching)
+                    # Pass the excetion to __exit__
+                    exc_info = sys.exc_info()
                     # re-raise the exception
                     raise
             finally:
                 for patching in reversed(entered_patchers):
-                    patching.__exit__()
+                    patching.__exit__(*exc_info)
 
         patched.patchings = [self]
         if hasattr(func, 'func_code'):
@@ -1377,7 +1380,7 @@ class _patch(object):
         del self.target
         for patcher in reversed(self.additional_patchers):
             if _is_started(patcher):
-                patcher.__exit__()
+                patcher.__exit__(*_)
 
     start = __enter__
     stop = __exit__
