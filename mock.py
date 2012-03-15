@@ -1229,7 +1229,7 @@ class _patch(object):
                         # the patcher may have been started, but an exception
                         # raised whilst entering one of its additional_patchers
                         entered_patchers.append(patching)
-                    # Pass the excetion to __exit__
+                    # Pass the exception to __exit__
                     exc_info = sys.exc_info()
                     # re-raise the exception
                     raise
