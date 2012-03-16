@@ -249,16 +249,15 @@ def _set_signature(mock, original, instance=False):
     signature, func = result
 
     src = "lambda %s: None" % signature
-    context = {'_mock_': mock}
-    checksig = eval(src, context)
+    checksig = eval(src, {})
     _copy_func_details(func, checksig)
 
     name = original.__name__
     if not _isidentifier(name):
         name = 'funcopy'
-    context = {'checksig': checksig, 'mock': mock}
+    context = {'_checksig_': checksig, 'mock': mock}
     src = """def %s(*args, **kwargs):
-    checksig(*args, **kwargs)
+    _checksig_(*args, **kwargs)
     return mock(*args, **kwargs)""" % name
     exec (src, context)
     funcopy = context[name]
@@ -306,7 +305,7 @@ def _setup_func(funcopy, mock):
     funcopy.assert_any_call = assert_any_call
     funcopy.reset_mock = reset_mock
 
-    mock._mock_signature = funcopy
+    mock._mock_delegate = funcopy
 
 
 def _is_magic(name):
@@ -365,16 +364,16 @@ _allowed_names = set(
 )
 
 
-def _mock_signature_property(name):
+def _delegating_property(name):
     _allowed_names.add(name)
     _the_name = '_mock_' + name
     def _get(self, name=name, _the_name=_the_name):
-        sig = self._mock_signature
+        sig = self._mock_delegate
         if sig is None:
             return getattr(self, _the_name)
         return getattr(sig, name)
     def _set(self, value, name=name, _the_name=_the_name):
-        sig = self._mock_signature
+        sig = self._mock_delegate
         if sig is None:
             self.__dict__[_the_name] = value
         else:
@@ -472,7 +471,7 @@ class NonCallableMock(Base):
 
         __dict__['_mock_children'] = {}
         __dict__['_mock_wraps'] = wraps
-        __dict__['_mock_signature'] = None
+        __dict__['_mock_delegate'] = None
 
         __dict__['_mock_called'] = False
         __dict__['_mock_call_args'] = None
@@ -532,8 +531,8 @@ class NonCallableMock(Base):
 
     def __get_return_value(self):
         ret = self._mock_return_value
-        if self._mock_signature is not None:
-            ret = self._mock_signature.return_value
+        if self._mock_delegate is not None:
+            ret = self._mock_delegate.return_value
 
         if ret is DEFAULT:
             ret = self._get_child_mock(
@@ -544,8 +543,8 @@ class NonCallableMock(Base):
 
 
     def __set_return_value(self, value):
-        if self._mock_signature is not None:
-            self._mock_signature.return_value = value
+        if self._mock_delegate is not None:
+            self._mock_delegate.return_value = value
         else:
             self._mock_return_value = value
             _check_and_set_parent(self, value, None, '()')
@@ -561,22 +560,22 @@ class NonCallableMock(Base):
             return type(self)
         return self._spec_class
 
-    called = _mock_signature_property('called')
-    call_count = _mock_signature_property('call_count')
-    call_args = _mock_signature_property('call_args')
-    call_args_list = _mock_signature_property('call_args_list')
-    mock_calls = _mock_signature_property('mock_calls')
+    called = _delegating_property('called')
+    call_count = _delegating_property('call_count')
+    call_args = _delegating_property('call_args')
+    call_args_list = _delegating_property('call_args_list')
+    mock_calls = _delegating_property('mock_calls')
 
 
     def __get_side_effect(self):
-        sig = self._mock_signature
+        sig = self._mock_delegate
         if sig is None:
             return self._mock_side_effect
         return sig.side_effect
 
     def __set_side_effect(self, value):
         value = _try_iter(value)
-        sig = self._mock_signature
+        sig = self._mock_delegate
         if sig is None:
             self._mock_side_effect = value
         else:
@@ -2240,6 +2239,7 @@ def mock_open(mock=None, read_data=None):
 
     mock.return_value = handle
     return mock
+
 
 class PropertyMock(Mock):
     """A Mock variant with __get__ and __set__ methods to act as a property"""
