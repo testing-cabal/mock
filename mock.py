@@ -2257,7 +2257,14 @@ def mock_open(mock=None, read_data=''):
 
 
 class PropertyMock(Mock):
-    """A Mock variant with __get__ and __set__ methods to act as a property"""
+    """
+    A mock intended to be used as a property, or other descriptor, on a class.
+    `PropertyMock` provides `__get__` and `__set__` methods so you can specify
+    a return value when it is fetched.
+
+    Fetching a `PropertyMock` instance from an object calls the mock, with
+    no args. Setting it calls the mock with the value being set.
+    """
     def __get__(self, obj, obj_type):
         return self()
     def __set__(self, obj, val):
