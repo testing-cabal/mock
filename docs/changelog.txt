@@ -12,10 +12,10 @@ The standard library version!
 * `mocksignature`, along with the `mocksignature` argument to `patch`, removed
 * Support for deleting attributes (accessing deleted attributes will raise an
   `AttributeError`)
-* Added the `mock_open` helper function for mocking open as a context manager
+* Added the `mock_open` helper function for mocking the builtin `open`
 * `__class__` is assignable, so a mock can pass an `isinstance` check without
   requiring a spec
-* Addition of `PropertyMock`
+* Addition of `PropertyMock`, for mocking properties
 * `MagicMocks` are unorderable by default (in Python 3). The comparison methods
   (other than equality and inequality) return `NotImplemented`
 
