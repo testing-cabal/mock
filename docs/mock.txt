@@ -564,6 +564,30 @@ have to create a dictionary and unpack it using `**`:
     KeyError
 
 
+.. class:: PropertyMock(*args, **kwargs)
+
+   A mock intended to be used as a property, or other descriptor, on a class.
+   `PropertyMock` provides `__get__` and `__set__` methods so you can specify
+   a return value when it is fetched.
+
+   Fetching a `PropertyMock` instance from an object calls the mock, with
+   no args. Setting it calls the mock with the value being set.
+
+   .. doctest::
+
+        >>> class Foo(object):
+        ...     @property
+        ...     def foo(self):
+        ...         return 3
+        ...
+        >>> with patch('__main__.Foo.foo', new_callable=PropertyMock) as mock_foo:
+        ...     mock_foo.return_value = 3
+        ...     print Foo().foo
+        ...
+        3
+        >>> mock_foo.mock_calls
+        [call()]
+
 .. index:: __call__
 .. index:: calling
 

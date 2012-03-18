@@ -1683,6 +1683,10 @@ _calculate_return_value = {
 }
 
 _return_values = {
+    '__lt__': NotImplemented,
+    '__gt__': NotImplemented,
+    '__le__': NotImplemented,
+    '__ge__': NotImplemented,
     '__int__': 1,
     '__contains__': False,
     '__len__': 0,
