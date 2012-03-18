@@ -587,7 +587,7 @@ have to create a dictionary and unpack it using `**`:
         >>> class Foo(object):
         ...     @property
         ...     def foo(self):
-        ...         return 3
+        ...         return 'something'
         ...     @foo.setter
         ...     def foo(self, value):
         ...         pass

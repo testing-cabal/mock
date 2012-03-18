@@ -4,8 +4,8 @@
 CHANGELOG
 =========
 
-2012/XX/XX Version 1.0.0
-------------------------
+2012/XX/XX Version 1.0.0 alpha 1
+--------------------------------
 
 The standard library version!
 
@@ -16,8 +16,8 @@ The standard library version!
 * `__class__` is assignable, so a mock can pass an `isinstance` check without
   requiring a spec
 * Addition of `PropertyMock`, for mocking properties
-* `MagicMocks` are unorderable by default (in Python 3). The comparison methods
-  (other than equality and inequality) return `NotImplemented`
+* `MagicMocks` made unorderable by default (in Python 3). The comparison
+  methods (other than equality and inequality) now return `NotImplemented`
 
 
 2012/02/13 Version 0.8.0

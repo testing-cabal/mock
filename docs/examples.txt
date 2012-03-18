@@ -1021,7 +1021,6 @@ This recipe, for easier configuration of mock objects, is now part of `Mock`.
 See the :meth:`~Mock.configure_mock` method.
 
 
-
 Matching any argument in assertions
 ===================================
 
