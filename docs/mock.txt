@@ -511,6 +511,15 @@ the `new_callable` argument to `patch`.
             >>> isinstance(mock, int)
             True
 
+        `__class__` is assignable to, this allows a mock to pass an
+        `isinstance` check without forcing you to use a spec:
+
+        .. doctest::
+
+            >>> mock = Mock()
+            >>> mock.__class__ = dict
+            >>> isinstance(mock, dict)
+            True
 
 .. class:: NonCallableMock(spec=None, wraps=None, name=None, spec_set=None, **kwargs)
 
