@@ -721,9 +721,6 @@ a `StopIteration` is raised):
 Deleting Attributes
 ===================
 
-XXXX
-
-
 Mock objects create attributes on demand. This allows them to pretend to be
 objects of any type.
 
@@ -733,7 +730,6 @@ an object as a `spec` for a mock, but that isn't always convenient.
 
 You "block" attributes by deleting them. Once deleted, accessing an attribute
 will raise an `AttributeError`.
-
 
 .. doctest::
 
@@ -748,8 +744,6 @@ will raise an `AttributeError`.
     Traceback (most recent call last):
         ...
     AttributeError: f
-
-
 
 
 Attaching Mocks as Attributes
