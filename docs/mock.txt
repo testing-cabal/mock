@@ -579,14 +579,20 @@ have to create a dictionary and unpack it using `**`:
         ...     @property
         ...     def foo(self):
         ...         return 3
+        ...     @foo.setter
+        ...     def foo(self, value):
+        ...         pass
         ...
         >>> with patch('__main__.Foo.foo', new_callable=PropertyMock) as mock_foo:
-        ...     mock_foo.return_value = 3
-        ...     print Foo().foo
+        ...     mock_foo.return_value = 'mockity-mock'
+        ...     this_foo = Foo()
+        ...     print this_foo.foo
+        ...     this_foo.foo = 6
         ...
-        3
+        mockity-mock
         >>> mock_foo.mock_calls
-        [call()]
+        [call(), call(6)]
+
 
 .. index:: __call__
 .. index:: calling
@@ -699,6 +705,42 @@ a `StopIteration` is raised):
         Traceback (most recent call last):
           ...
         StopIteration
+
+
+.. _deleting-attributes:
+
+Deleting Attributes
+===================
+
+XXXX
+
+
+Mock objects create attributes on demand. This allows them to pretend to be
+objects of any type.
+
+You may want a mock object to return `False` to a `hasattr` call, or raise an
+`AttributeError` when an attribute is fetched. You can do this by providing
+an object as a `spec` for a mock, but that isn't always convenient.
+
+You "block" attributes by deleting them. Once deleted, accessing an attribute
+will raise an `AttributeError`.
+
+
+.. doctest::
+
+    >>> mock = MagicMock()
+    >>> hasattr(mock, 'm')
+    True
+    >>> del mock.m
+    >>> hasattr(mock, 'm')
+    False
+    >>> del mock.f
+    >>> mock.f
+    Traceback (most recent call last):
+        ...
+    AttributeError: f
+
+
 
 
 Attaching Mocks as Attributes
