@@ -2221,11 +2221,8 @@ FunctionAttributes = set([
     'func_name',
 ])
 
-if inPy3k:
-    import _io
-    file_spec = list(set(dir(_io.TextIOWrapper)).union(set(dir(_io.BytesIO))))
-else:
-    file_spec = file
+
+file_spec = None
 
 
 def mock_open(mock=None, read_data=''):
@@ -2240,6 +2237,15 @@ def mock_open(mock=None, read_data=''):
     `read_data` is a string for the `read` method of the file handle to return.
     This is an empty string by default.
     """
+    global file_spec
+    if file_spec is None:
+        # set on first use
+        if inPy3k:
+            import _io
+            file_spec = list(set(dir(_io.TextIOWrapper)).union(set(dir(_io.BytesIO))))
+        else:
+            file_spec = file
+
     if mock is None:
         mock = MagicMock(name='open', spec=open)
 
