@@ -2109,7 +2109,6 @@ def create_autospec(spec, spec_set=False, instance=False, _parent=None,
         _parent._mock_children[_name] = mock
 
     if is_type and not instance and 'return_value' not in kwargs:
-        # XXXX could give a name to the return_value mock?
         mock.return_value = create_autospec(spec, spec_set, instance=True,
                                             _name='()', _parent=mock)
 
@@ -2165,7 +2164,6 @@ def _must_skip(spec, entry, is_type):
         if entry in getattr(spec, '__dict__', {}):
             # instance attribute - shouldn't skip
             return False
-        # can't use type because of old style classes
         spec = spec.__class__
     if not hasattr(spec, '__mro__'):
         # old style class: can't have descriptors anyway
