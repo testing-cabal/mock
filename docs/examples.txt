@@ -166,187 +166,6 @@ is discussed in `this blog entry
 <http://williamjohnbert.com/2011/07/how-to-unit-testing-in-django-with-mocking-and-patching/>`_.
 
 
-Mocking open
-============
-
-Using `open` as a context manager is a great way to ensure your file handles
-are closed properly and is becoming common::
-
-    with open('/some/path', 'w') as f:
-        f.write('something')
-
-The issue is that even if you mock out the call to `open` it is the
-*returned object* that is used as a context manager (and has `__enter__` and
-`__exit__` called).
-
-Mocking context managers with a :class:`MagicMock` is common enough and fiddly
-enough that a helper function is useful. Here `mock_open` creates and
-configures a `MagicMock` that behaves as a file context manager. You can
-optionally supply a `StringIO` object as the `data` argument for the actual
-file handle:
-
-.. testcode::
-
-    from mock import inPy3k, MagicMock
-    if inPy3k:
-        file_spec = ['_CHUNK_SIZE', '__enter__', '__eq__', '__exit__',
-            '__format__', '__ge__', '__gt__', '__hash__', '__iter__', '__le__',
-            '__lt__', '__ne__', '__next__', '__repr__', '__str__',
-            '_checkClosed', '_checkReadable', '_checkSeekable',
-            '_checkWritable', 'buffer', 'close', 'closed', 'detach',
-            'encoding', 'errors', 'fileno', 'flush', 'isatty',
-            'line_buffering', 'mode', 'name',
-            'newlines', 'peek', 'raw', 'read', 'read1', 'readable',
-            'readinto', 'readline', 'readlines', 'seek', 'seekable', 'tell',
-            'truncate', 'writable', 'write', 'writelines']
-    else:
-        file_spec = file
-
-    def mock_open(mock=None, data=None):
-        if mock is None:
-            mock = MagicMock(spec=file_spec)
-
-        handle = MagicMock(spec=file_spec)
-        handle.write.return_value = None
-        if data is None:
-            handle.__enter__.return_value = handle
-        else:
-            handle.__enter__.return_value = data
-        mock.return_value = handle
-        return mock
-
-
-.. doctest::
-
-    >>> m = mock_open()
-    >>> with patch('__main__.open', m, create=True):
-    ...     with open('foo', 'w') as h:
-    ...         h.write('some stuff')
-    ...
-    >>> m.mock_calls
-    [call('foo', 'w'),
-     call().__enter__(),
-     call().write('some stuff'),
-     call().__exit__(None, None, None)]
-    >>> m.assert_called_once_with('foo', 'w')
-    >>> handle = m()
-    >>> handle.write.assert_called_once_with('some stuff')
-
-And for reading files, using a `StringIO` to represent the actual file
-handle:
-
-.. doctest::
-
-    >>> from StringIO import StringIO
-    >>> m = mock_open(data=StringIO('foo bar baz'))
-    >>> with patch('__main__.open', m, create=True):
-    ...     with open('foo') as h:
-    ...         result = h.read()
-    ...
-    >>> m.assert_called_once_with('foo')
-    >>> assert result == 'foo bar baz'
-
-Let's step through what's happening here in more detail.
-
-To mock `open` we need a mock object that can be called, with the return
-value able to act as a context manager. The easiest way of doing this is to
-use :class:`MagicMock`, which is preconfigured to be able to act as a context
-manger. As an added bonus we'll use the spec argument to ensure that the
-mocked object can only be used in the same ways a real file could be used
-(attempting to access a method or attribute not on the `file` will raise an
-`AttributeError`):
-
-.. doctest::
-
-    >>> mock_open = Mock()
-    >>> mock_open.return_value = MagicMock(spec=file)
-
-In terms of configuring our mock this is all that needs to be done. In fact it
-could be constructed with a one liner: `mock_open =
-Mock(return_value=MagicMock(spec=file))`.
-
-So what is the best way of patching the builtin `open` function? One way
-would be to globally patch `__builtin__.open`. So long as you are sure that
-none of the other code being called also accesses `open` this is perfectly
-reasonable. It does make some people nervous however. By default we can't
-patch the `open` name in the module where it is used, because `open`
-doesn't exist as an attribute in that namespace. `patch` refuses to patch
-attributes that don't exist because that is a great way of having tests that
-pass but code that is horribly broken (your code can access attributes that
-only exist during your tests!). `patch` *will* however create (and then
-remove again) non-existent attributes if you tell it that you are really sure
-you know what you're doing.
-
-By passing `create=True` into `patch` we can just patch the `open`
-function in the module under test instead of patching it globally:
-
-.. doctest::
-
-    >>> open_name = '%s.open' % __name__
-    >>> with patch(open_name, create=True) as mock_open:
-    ...     mock_open.return_value = MagicMock(spec=file)
-    ...
-    ...     with open('/some/path', 'w') as f:
-    ...         f.write('something')
-    ...
-    <MagicMock name='open().__enter__().write()' id='...'>
-    >>> file_handle = mock_open.return_value.__enter__.return_value
-    >>> file_handle.write.assert_called_with('something')
-
-
-Mocks without some attributes
-=============================
-
-Mock objects create attributes on demand. This allows them to pretend to be
-objects of any type.
-
-What mocks aren't so good at is pretending *not* to have attributes. You may
-want a mock object to return `False` to a `hasattr` call, or raise an
-`AttributeError` when an attribute is fetched. You can do this by providing
-an object as a `spec` for a mock, but that isn't always convenient.
-
-Below is a subclass of `Mock` that allows you to "block" attributes by
-deleting them. Once deleted, accessing an attribute will raise an
-`AttributeError`.
-
-.. testcode::
-
-    deleted = object()
-    missing = object()
-
-    class DeletingMock(Mock):
-        def __delattr__(self, attr):
-            if attr in self.__dict__:
-                return super(DeletingMock, self).__delattr__(attr)
-            obj = self._mock_children.get(attr, missing)
-            if obj is deleted:
-                raise AttributeError(attr)
-            if obj is not missing:
-                del self._mock_children[attr]
-            self._mock_children[attr] = deleted
-
-        def __getattr__(self, attr):
-            result = super(DeletingMock, self).__getattr__(attr)
-            if result is deleted:
-                raise AttributeError(attr)
-            return result
-
-
-.. doctest::
-
-    >>> mock = DeletingMock()
-    >>> hasattr(mock, 'm')
-    True
-    >>> del mock.m
-    >>> hasattr(mock, 'm')
-    False
-    >>> del mock.f
-    >>> mock.f
-    Traceback (most recent call last):
-        ...
-    AttributeError: f
-
-
 Mocking a Generator Method
 ==========================
 
@@ -499,74 +318,6 @@ wanted:
 
 If we don't use `autospec=True` then the unbound method is patched out
 with a Mock instance instead, and isn't called with `self`.
-
-
-Mocking Properties
-==================
-
-A few people have asked about `mocking properties
-<https://code.google.com/p/mock/issues/detail?id=38&can=1>`_, specifically
-tracking when properties are fetched from objects or even having side effects
-when properties are fetched.
-
-You can already do this by subclassing :class:`Mock` and providing your own
-property. Delegating to another mock is one way to record the property being
-accessed whilst still able to control things like return values:
-
-.. doctest::
-
-    >>> mock_foo = Mock(return_value='fish')
-    >>> class MyMock(Mock):
-    ...     @property
-    ...     def foo(self):
-    ...         return mock_foo()
-    ...
-    >>> mock = MyMock()
-    >>> mock.foo
-    'fish'
-    >>> mock_foo.assert_called_once_with()
-
-This approach works fine if you can replace the whole object you're mocking. If
-you *just* want to mock the property on another object here's an alternative
-approach using the support for magic methods introduced in 0.7:
-
-.. doctest::
-
-    >>> class Foo(object):
-    ...    @property
-    ...    def fish(self):
-    ...      return 'fish'
-    ...
-    >>> with patch.object(Foo, 'fish') as mock_fish:
-    ...   mock_fish.__get__ = Mock(return_value='mocked fish')
-    ...   foo = Foo()
-    ...   print foo.fish
-    ...
-    mocked fish
-    >>> mock_fish.__get__.assert_called_with(mock_fish, foo, Foo)
-
-If you're using an earlier version of mock, a third approach is to subclass
-:class:`Mock` and provide a `__get__ method
-<http://docs.python.org/reference/datamodel.html#implementing-descriptors>`_
-that delegates back to the mock:
-
-.. doctest::
-
-    >>> class PropertyMock(Mock):
-    ...   def __get__(self, instance, owner):
-    ...     return self()
-    ...
-    >>> prop_mock = PropertyMock()
-    >>> with patch.object(Foo, 'fish', prop_mock):
-    ...   foo = Foo()
-    ...   prop_mock.return_value = 'mocked fish'
-    ...   print foo.fish
-    ...
-    mocked fish
-    >>> prop_mock.assert_called_with()
-
-As you're patching on the class these techniques affect *all* instances of
-`Foo`.
 
 
 Checking multiple calls with mock
@@ -1275,3 +1026,21 @@ Matching any argument in assertions
 ===================================
 
 This example is now built in to mock. See :data:`ANY`.
+
+
+Mocking Properties
+==================
+
+This example is now built in to mock. See :class:`PropertyMock`.
+
+
+Mocking open
+============
+
+This example is now built in to mock. See :func:`mock_open`.
+
+
+Mocks without some attributes
+=============================
+
+This example is now built in to mock. See :ref:`deleting-attributes`.

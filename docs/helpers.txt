@@ -238,6 +238,62 @@ Alternatively you can just use `vars(my_mock)` (instance members) and
 `mock.FILTER_DIR`.
 
 
+mock_open
+=========
+
+.. function:: mock_open(mock=None, read_data=None)
+
+    A helper function to create a mock to replace the use of `open`. It works
+    for `open` called directly or used as a context manager.
+
+    The `mock` argument is the mock object to configure. If `None` (the
+    default) then a `MagicMock` will be created for you, with the API limited
+    to methods or attributes available on standard file handles.
+
+    `read_data` is a string for the `read` method of the file handle to return.
+    This is an empty string by default.
+
+Using `open` as a context manager is a great way to ensure your file handles
+are closed properly and is becoming common::
+
+    with open('/some/path', 'w') as f:
+        f.write('something')
+
+The issue is that even if you mock out the call to `open` it is the
+*returned object* that is used as a context manager (and has `__enter__` and
+`__exit__` called).
+
+Mocking context managers with a :class:`MagicMock` is common enough and fiddly
+enough that a helper function is useful.
+
+.. doctest::
+
+    >>> m = mock_open()
+    >>> with patch('__main__.open', m, create=True):
+    ...     with open('foo', 'w') as h:
+    ...         h.write('some stuff')
+    ...
+    >>> m.mock_calls
+    [call('foo', 'w'),
+     call().__enter__(),
+     call().write('some stuff'),
+     call().__exit__(None, None, None)]
+    >>> m.assert_called_once_with('foo', 'w')
+    >>> handle = m()
+    >>> handle.write.assert_called_once_with('some stuff')
+
+And for reading files:
+
+.. doctest::
+
+    >>> with patch('__main__.open', mock_open(read_data='bibble'), create=True) as m:
+    ...     with open('foo') as h:
+    ...         result = h.read()
+    ...
+    >>> m.assert_called_once_with('foo')
+    >>> assert result == 'bibble'
+
+
 .. _auto-speccing:
 
 Autospeccing
