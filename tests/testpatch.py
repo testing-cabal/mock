@@ -10,8 +10,8 @@ from tests.support import unittest2, inPy3k, SomeClass, is_instance
 
 from mock import (
     NonCallableMock, CallableMixin, patch, sentinel,
-    MagicMock, Mock, NonCallableMagicMock, patch,
-    DEFAULT, call
+    MagicMock, Mock, NonCallableMagicMock, patch, _patch,
+    DEFAULT, call, _get_target
 )
 
 builtin_string = '__builtin__'
@@ -1650,6 +1650,36 @@ class PatchTest(unittest2.TestCase):
         p1.start()
         p1.stop()
         self.assertEqual(squizz.squozz, 3)
+
+
+    def test_patch_propogrates_exc_on_exit(self):
+
+        class holder:
+            exc_info = None, None, None
+
+        class custom_patch(_patch):
+            def __exit__(self, etype=None, val=None, tb=None):
+                _patch.__exit__(self, etype, val, tb)
+                holder.exc_info = etype, val, tb
+            stop = __exit__
+
+        def with_custom_patch(target):
+            getter, attribute = _get_target(target)
+            return custom_patch(
+                getter, attribute, DEFAULT, None, False, False,
+                False, None, {}
+            )
+
+        @with_custom_patch('squizz.squozz')
+        def test(mock):
+            raise RuntimeError
+
+        self.assertRaises(RuntimeError, test)
+        self.assertIs(holder.exc_info[0], RuntimeError)
+        self.assertIsNotNone(holder.exc_info[1],
+                            'exception value not propgated')
+        self.assertIsNotNone(holder.exc_info[2],
+                            'exception traceback not propgated')
 
 
 
