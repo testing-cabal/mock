@@ -18,6 +18,8 @@ The standard library version!
 * Addition of `PropertyMock`, for mocking properties
 * `MagicMocks` made unorderable by default (in Python 3). The comparison
   methods (other than equality and inequality) now return `NotImplemented`
+* Propagate traceback info to support subclassing of `_patch` by other
+  libraries
 
 
 2012/02/13 Version 0.8.0
