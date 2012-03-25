@@ -27,6 +27,8 @@ The standard library version!
 * BUGFIX: using `spec` or `autospec` arguments to patchers, along with
   `spec_set=True` did not work correctly
 * BUGFIX: using an object that evaluates to False as a spec could be ignored
+* BUGFIX: a list as the `spec` argument to a patcher would always result in a
+  non-callable mock. Now if `__call__` is in the spec the mock is callable
 
 
 2012/02/13 Version 0.8.0
