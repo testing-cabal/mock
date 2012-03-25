@@ -1442,9 +1442,6 @@ def _patch_object(
         new_callable=None, **kwargs
     ):
     """
-    patch.object(target, attribute, new=DEFAULT, spec=None, create=False,
-                 spec_set=None, autospec=None, new_callable=None, **kwargs)
-
     patch the named member (`attribute`) on an object (`target`) with a mock
     object.
 
@@ -2298,7 +2295,7 @@ def _get_class(obj):
     try:
         return obj.__class__
     except AttributeError:
-        # in Python 2, _sre.SRE_Pattern objects have no __class__
+        # it is possible for objects to have no __class__
         return type(obj)
 
 
