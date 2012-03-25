@@ -6,7 +6,7 @@ import os
 import sys
 
 from tests import support
-from tests.support import unittest2, inPy3k, SomeClass, is_instance
+from tests.support import unittest2, inPy3k, SomeClass, is_instance, callable
 
 from mock import (
     NonCallableMock, CallableMixin, patch, sentinel,
@@ -1745,6 +1745,26 @@ class PatchTest(unittest2.TestCase):
                 self.assertRaises(AttributeError, getattr, m, 'doesnotexist')
             finally:
                 p.stop()
+
+
+    def test_callable_spec_as_list(self):
+        spec = ('__call__',)
+        p = patch(MODNAME, spec=spec)
+        m = p.start()
+        try:
+            self.assertTrue(callable(m))
+        finally:
+            p.stop()
+
+
+    def test_not_callable_spec_as_list(self):
+        spec = ('foo', 'bar')
+        p = patch(MODNAME, spec=spec)
+        m = p.start()
+        try:
+            self.assertFalse(callable(m))
+        finally:
+            p.stop()
 
 
 if __name__ == '__main__':
