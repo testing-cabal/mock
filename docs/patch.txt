@@ -40,7 +40,7 @@ patch
     `patch` is straightforward to use. The key is to do the patching in the
     right namespace. See the section `where to patch`_.
 
-.. function:: patch(target, new=DEFAULT, spec=None, create=False, spec_set=None, autospec=False, new_callable=None, **kwargs)
+.. function:: patch(target, new=DEFAULT, spec=None, create=False, spec_set=None, autospec=None, new_callable=None, **kwargs)
 
     `patch` acts as a function decorator, class decorator or a context
     manager. Inside the body of the function or with statement, the `target`
@@ -208,7 +208,7 @@ into a `patch` call using `**`:
 patch.object
 ============
 
-.. function:: patch.object(target, attribute, new=DEFAULT, spec=None, create=False, spec_set=None, autospec=False, new_callable=None, **kwargs)
+.. function:: patch.object(target, attribute, new=DEFAULT, spec=None, create=False, spec_set=None, autospec=None, new_callable=None, **kwargs)
 
     patch the named member (`attribute`) on an object (`target`) with a mock
     object.
@@ -336,7 +336,7 @@ magic methods `__getitem__`, `__setitem__`, `__delitem__` and either
 patch.multiple
 ==============
 
-.. function:: patch.multiple(target, spec=None, create=False, spec_set=None, autospec=False, new_callable=None, **kwargs)
+.. function:: patch.multiple(target, spec=None, create=False, spec_set=None, autospec=None, new_callable=None, **kwargs)
 
     Perform multiple patches in a single call. It takes the object to be
     patched (either as an object or a string to fetch the object by importing)

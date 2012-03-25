@@ -20,8 +20,12 @@ The standard library version!
   methods (other than equality and inequality) now return `NotImplemented`
 * Propagate traceback info to support subclassing of `_patch` by other
   libraries
+* BUGFIX: passing multiple spec arguments to patchers (`spec` , `spec_set` and
+  `autospec`) had unpredictable results, now it is an error
 * BUGFIX: using `spec=True` *and* `create=True` as arguments to patchers could
   result in using `DEFAULT` as the spec. Now it is an error instead
+* BUGFIX: using `spec` or `autospec` arguments to patchers, along with
+  `spec_set=True` did not work correctly
 
 
 2012/02/13 Version 0.8.0
