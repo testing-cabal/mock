@@ -201,8 +201,15 @@ class TestMockingMagicMethods(unittest.TestCase):
 
 
     def test_comparison(self):
-        # note: this test fails with Jython 2.5.1 due to a Jython bug
-        #       it is fixed in jython 2.5.2
+        mock = Mock()
+        def comp(s, o):
+            return True
+        mock.__lt__ = mock.__gt__ = mock.__le__ = mock.__ge__ = comp
+        self. assertTrue(mock < 3)
+        self. assertTrue(mock > 3)
+        self. assertTrue(mock <= 3)
+        self. assertTrue(mock >= 3)
+
         if not inPy3k:
             # incomparable in Python 3
             self.assertEqual(Mock() < 3, object() < 3)
@@ -222,15 +229,6 @@ class TestMockingMagicMethods(unittest.TestCase):
             self.assertRaises(TypeError, lambda: MagicMock() >= object())
             self.assertRaises(TypeError, lambda: object() >= MagicMock())
             self.assertRaises(TypeError, lambda: MagicMock() >= MagicMock())
-
-        mock = Mock()
-        def comp(s, o):
-            return True
-        mock.__lt__ = mock.__gt__ = mock.__le__ = mock.__ge__ = comp
-        self. assertTrue(mock < 3)
-        self. assertTrue(mock > 3)
-        self. assertTrue(mock <= 3)
-        self. assertTrue(mock >= 3)
 
 
     def test_equality(self):

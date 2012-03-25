@@ -759,11 +759,16 @@ class NonCallableMock(Base):
 
     def __dir__(self):
         """Filter the output of `dir(mock)` to only useful members."""
+        if not FILTER_DIR and getattr(object, '__dir__', None):
+            # object.__dir__ is not in 2.7
+            return object.__dir__(self)
+
         extras = self._mock_methods or []
         from_type = dir(type(self))
         from_dict = list(self.__dict__)
 
         if FILTER_DIR:
+            # object.__dir__ is not in 2.7
             from_type = [e for e in from_type if not e.startswith('_')]
             from_dict = [e for e in from_dict if not e.startswith('_') or
                          _is_magic(e)]
