@@ -1229,6 +1229,8 @@ class _patch(object):
                 spec = original
 
             if (spec or spec_set) is not None:
+                if original is DEFAULT:
+                    raise TypeError("Can't use 'spec' with create=True")
                 if isinstance(original, ClassTypes):
                     # If we're patching out a class and there is a spec
                     inherit = True
@@ -1273,6 +1275,8 @@ class _patch(object):
                     "autospec creates the mock for you. Can't specify "
                     "autospec and new."
                 )
+            if original is DEFAULT:
+                raise TypeError("Can't use 'spec' with create=True")
             spec_set = bool(spec_set)
             if autospec is True:
                 autospec = original
@@ -1302,7 +1306,7 @@ class _patch(object):
         return new
 
 
-    def __exit__(self, *_):
+    def __exit__(self, *exc_info):
         """Undo the patch."""
         if not _is_started(self):
             raise RuntimeError('stop called on unstarted patcher')
@@ -1320,7 +1324,7 @@ class _patch(object):
         del self.target
         for patcher in reversed(self.additional_patchers):
             if _is_started(patcher):
-                patcher.__exit__(*_)
+                patcher.__exit__(*exc_info)
 
     start = __enter__
     stop = __exit__
