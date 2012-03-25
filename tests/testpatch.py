@@ -1682,6 +1682,21 @@ class PatchTest(unittest2.TestCase):
                             'exception traceback not propgated')
 
 
+    def test_create_and_specs(self):
+        for kwarg in ('spec', 'spec_set', 'autospec'):
+            p = patch('%s.doesnotexist' % __name__, create=True,
+                      **{kwarg: True})
+            self.assertRaises(TypeError, p.start)
+            self.assertRaises(NameError, lambda: doesnotexist)
+
+            # check that spec with create is innocuous if the original exists
+            p = patch('%s.PTModule' % __name__, create=True,
+                      **{kwarg: True})
+            try:
+                p.start()
+            finally:
+                p.stop()
+
 
 if __name__ == '__main__':
     unittest2.main()
