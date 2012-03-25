@@ -1691,12 +1691,9 @@ class PatchTest(unittest2.TestCase):
             self.assertRaises(NameError, lambda: doesnotexist)
 
             # check that spec with create is innocuous if the original exists
-            p = patch(MODNAME, create=True,
-                      **{kwarg: True})
-            try:
-                p.start()
-            finally:
-                p.stop()
+            p = patch(MODNAME, create=True, **{kwarg: True})
+            p.start()
+            p.stop()
 
 
     def test_multiple_specs(self):
