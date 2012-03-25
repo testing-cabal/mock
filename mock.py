@@ -1260,7 +1260,7 @@ class _patch(object):
             _kwargs = {}
             if new_callable is not None:
                 Klass = new_callable
-            elif (spec or spec_set) is not None:
+            elif spec is not None or spec_set is not None:
                 if not _callable(spec or spec_set):
                     Klass = NonCallableMagicMock
 
@@ -1300,7 +1300,7 @@ class _patch(object):
                     "autospec and new."
                 )
             if original is DEFAULT:
-                raise TypeError("Can't use 'spec' with create=True")
+                raise TypeError("Can't use 'autospec' with create=True")
             spec_set = bool(spec_set)
             if autospec is True:
                 autospec = original
@@ -1394,8 +1394,7 @@ def _patch_object(
 
 
 def _patch_multiple(target, spec=None, create=False, spec_set=None,
-                    autospec=None, new_callable=None, **kwargs
-    ):
+                    autospec=None, new_callable=None, **kwargs):
     """Perform multiple patches in a single call. It takes the object to be
     patched (either as an object or a string to fetch the object by importing)
     and keyword arguments for the patches::
@@ -2280,9 +2279,7 @@ def mock_open(mock=None, read_data=''):
     handle = MagicMock(spec=file_spec)
     handle.write.return_value = None
     handle.__enter__.return_value = handle
-
-    if read_data is not None:
-        handle.read.return_value = read_data
+    handle.read.return_value = read_data
 
     mock.return_value = handle
     return mock
