@@ -20,6 +20,7 @@ if inPy3k:
     unicode = str
 
 PTModule = sys.modules[__name__]
+MODNAME = '%s.PTModule' % __name__
 
 
 def _get_proxy(obj, get_only=True):
@@ -687,13 +688,13 @@ class PatchTest(unittest2.TestCase):
 
 
     def test_patch_spec_set(self):
-        @patch('%s.SomeClass' % __name__, spec=SomeClass, spec_set=True)
+        @patch('%s.SomeClass' % __name__, spec_set=SomeClass)
         def test(MockClass):
             MockClass.z = 'foo'
 
         self.assertRaises(AttributeError, test)
 
-        @patch.object(support, 'SomeClass', spec=SomeClass, spec_set=True)
+        @patch.object(support, 'SomeClass', spec_set=SomeClass)
         def test(MockClass):
             MockClass.z = 'foo'
 
@@ -1653,7 +1654,6 @@ class PatchTest(unittest2.TestCase):
 
 
     def test_patch_propogrates_exc_on_exit(self):
-
         class holder:
             exc_info = None, None, None
 
@@ -1666,8 +1666,8 @@ class PatchTest(unittest2.TestCase):
         def with_custom_patch(target):
             getter, attribute = _get_target(target)
             return custom_patch(
-                getter, attribute, DEFAULT, None, False, False,
-                False, None, {}
+                getter, attribute, DEFAULT, None, False, None,
+                None, None, {}
             )
 
         @with_custom_patch('squizz.squozz')
@@ -1690,10 +1690,61 @@ class PatchTest(unittest2.TestCase):
             self.assertRaises(NameError, lambda: doesnotexist)
 
             # check that spec with create is innocuous if the original exists
-            p = patch('%s.PTModule' % __name__, create=True,
+            p = patch(MODNAME, create=True,
                       **{kwarg: True})
             try:
                 p.start()
+            finally:
+                p.stop()
+
+
+    def test_multiple_specs(self):
+        original = PTModule
+        for kwarg in ('spec', 'spec_set'):
+            p = patch(MODNAME, autospec=0, **{kwarg: 0})
+            self.assertRaises(TypeError, p.start)
+            self.assertIs(PTModule, original)
+
+        for kwarg in ('spec', 'autospec'):
+            p = patch(MODNAME, spec_set=0, **{kwarg: 0})
+            self.assertRaises(TypeError, p.start)
+            self.assertIs(PTModule, original)
+
+        for kwarg in ('spec_set', 'autospec'):
+            p = patch(MODNAME, spec=0, **{kwarg: 0})
+            self.assertRaises(TypeError, p.start)
+            self.assertIs(PTModule, original)
+
+
+    def test_specs_false_instead_of_none(self):
+        p = patch(MODNAME, spec=False, spec_set=False, autospec=False)
+        mock = p.start()
+        try:
+            # no spec should have been set, so attribute access should not fail
+            mock.does_not_exist
+            mock.does_not_exist = 3
+        finally:
+            p.stop()
+
+
+    def test_falsey_spec(self):
+        for kwarg in ('spec', 'autospec', 'spec_set'):
+            p = patch(MODNAME, **{kwarg: 0})
+            m = p.start()
+            try:
+                self.assertRaises(AttributeError, getattr, m, 'doesnotexit')
+            finally:
+                p.stop()
+
+
+    def test_spec_set_true(self):
+        for kwarg in ('spec', 'autospec'):
+            p = patch(MODNAME, spec_set=True, **{kwarg: True})
+            m = p.start()
+            try:
+                self.assertRaises(AttributeError, setattr, m,
+                                  'doesnotexist', 'something')
+                self.assertRaises(AttributeError, getattr, m, 'doesnotexist')
             finally:
                 p.stop()
 
