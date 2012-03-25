@@ -726,8 +726,8 @@ class PatchTest(unittest2.TestCase):
         patcher = patch('%s.something' % __name__)
         self.assertIs(something, original)
         mock = patcher.start()
-        self.assertIsNot(mock, original)
         try:
+            self.assertIsNot(mock, original)
             self.assertIs(something, mock)
         finally:
             patcher.stop()
@@ -746,8 +746,8 @@ class PatchTest(unittest2.TestCase):
         patcher = patch.object(PTModule, 'something', 'foo')
         self.assertIs(something, original)
         replaced = patcher.start()
-        self.assertEqual(replaced, 'foo')
         try:
+            self.assertEqual(replaced, 'foo')
             self.assertIs(something, replaced)
         finally:
             patcher.stop()
@@ -761,9 +761,10 @@ class PatchTest(unittest2.TestCase):
         self.assertEqual(d, original)
 
         patcher.start()
-        self.assertEqual(d, {'spam': 'eggs'})
-
-        patcher.stop()
+        try:
+            self.assertEqual(d, {'spam': 'eggs'})
+        finally:
+            patcher.stop()
         self.assertEqual(d, original)
 
 
