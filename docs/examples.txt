@@ -823,17 +823,6 @@ With slightly more work you can also mock package imports:
     <Mock name='mock.module.fooble()' id='...'>
     >>> mock.module.fooble.assert_called_once_with()
 
-Unfortunately it seems that using `patch.dict` as a test *decorator* on
-`sys.modules` interferes with the way `nosetests
-<http://somethingaboutorange.com/mrl/projects/nose/>`_ collects tests.
-`nosetests` does some manipulation of `sys.modules` (along with `sys.path`
-manipulation) and using `patch.dict` with `sys.modules` can cause it to not
-find tests. Using `patch.dict` as a context manager, or using the
-:ref:`start-and-stop`, work around this by taking a reference to `sys.modules`
-inside the test rather than at import time. (Using `patch.dict` as a decorator
-takes a *reference* to `sys.modules` at import time, it doesn't do the
-patching until the test is executed though.)
-
 
 Tracking order of calls and less verbose call assertions
 ========================================================
