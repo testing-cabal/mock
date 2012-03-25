@@ -20,6 +20,8 @@ The standard library version!
   methods (other than equality and inequality) now return `NotImplemented`
 * Propagate traceback info to support subclassing of `_patch` by other
   libraries
+* BUGFIX: using `spec=True` *and* `create=True` as arguments to patchers could
+  result in using `DEFAULT` as the spec. Now it is an error instead
 
 
 2012/02/13 Version 0.8.0
