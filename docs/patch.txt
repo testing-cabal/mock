@@ -108,7 +108,8 @@ patch
     `patch.dict(...)`, `patch.multiple(...)` and `patch.object(...)` are
     available for alternate use-cases.
 
-`patch` as function decorator:
+`patch` as function decorator, creating the mock for you and passing it into
+the decorated function:
 
 .. doctest::
 
