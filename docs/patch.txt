@@ -114,10 +114,10 @@ the decorated function:
 .. doctest::
 
     >>> @patch('__main__.SomeClass')
-    ... def function(mock_class):
+    ... def function(normal_argument, mock_class):
     ...     print mock_class is SomeClass
     ...
-    >>> function()
+    >>> function(None)
     True
 
 
