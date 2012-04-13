@@ -8,6 +8,10 @@ CHANGELOG
 2012/XX/XX Version 1.0.0 alpha 2
 --------------------------------
 
+* `PropertyMock` attributes are now standard `MagicMocks`
+* `create_autospec` works with attributes present in results of `dir` that
+  can't be fetched from the object's class
+
 
 2012/03/25 Version 1.0.0 alpha 1
 --------------------------------

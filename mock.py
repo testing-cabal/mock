@@ -2166,7 +2166,10 @@ def create_autospec(spec, spec_set=False, instance=False, _parent=None,
         # XXXX what about attributes that raise exceptions on being fetched
         # we could be resilient against it, or catch and propagate the
         # exception when the attribute is fetched from the mock
-        original = getattr(spec, entry)
+        try:
+            original = getattr(spec, entry)
+        except AttributeError:
+            continue
 
         kwargs = {'spec': original}
         if spec_set:
