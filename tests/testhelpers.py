@@ -691,6 +691,29 @@ class SpecSignatureTest(unittest2.TestCase):
         mock.assert_called_with(4, 5)
 
 
+    def test_skip_attributeerrors(self):
+        class Raiser(object):
+            def __get__(self, obj, type=None):
+                if obj is None:
+                    raise AttributeError('Can only be accessed via an instance')
+
+        class RaiserClass(object):
+            raiser = Raiser()
+
+            @staticmethod
+            def existing(a, b):
+                return a + b
+
+        s = create_autospec(RaiserClass)
+        self.assertRaises(TypeError, lambda x: s.existing(1, 2, 3))
+        s.existing(1, 2)
+        self.assertRaises(AttributeError, lambda: s.nonexisting)
+
+        # check we can fetch the raiser attribute and it has no spec
+        obj = s.raiser
+        obj.foo, obj.bar
+
+
     @unittest2.skipIf(inPy3k, 'no old style classes in Python 3')
     def test_signature_old_style_class(self):
         class Foo:
