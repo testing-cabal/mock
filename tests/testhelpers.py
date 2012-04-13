@@ -676,21 +676,6 @@ class SpecSignatureTest(unittest2.TestCase):
         mock.f.assert_called_with(3, 4)
 
 
-    def test_signature_class(self):
-        class Foo(object):
-            def __init__(self, a, b=3):
-                pass
-
-        mock = create_autospec(Foo)
-
-        self.assertRaises(TypeError, mock)
-        mock(1)
-        mock.assert_called_once_with(1)
-
-        mock(4, 5)
-        mock.assert_called_with(4, 5)
-
-
     def test_skip_attributeerrors(self):
         class Raiser(object):
             def __get__(self, obj, type=None):
@@ -712,6 +697,21 @@ class SpecSignatureTest(unittest2.TestCase):
         # check we can fetch the raiser attribute and it has no spec
         obj = s.raiser
         obj.foo, obj.bar
+
+
+    def test_signature_class(self):
+        class Foo(object):
+            def __init__(self, a, b=3):
+                pass
+
+        mock = create_autospec(Foo)
+
+        self.assertRaises(TypeError, mock)
+        mock(1)
+        mock.assert_called_once_with(1)
+
+        mock(4, 5)
+        mock.assert_called_with(4, 5)
 
 
     @unittest2.skipIf(inPy3k, 'no old style classes in Python 3')
