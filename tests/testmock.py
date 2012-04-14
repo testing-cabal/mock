@@ -7,6 +7,7 @@ from tests.support import (
 )
 
 import copy
+import pickle
 import sys
 
 import mock
@@ -35,6 +36,15 @@ class Iter(object):
         return next(self.thing)
 
     __next__ = next
+
+
+class Subclass(MagicMock):
+    pass
+
+
+class Thing(object):
+    attribute = 6
+    foo = 'bar'
 
 
 
@@ -1309,6 +1319,22 @@ class MockTest(unittest2.TestCase):
 
             mock.__class__ = int
             self.assertIsInstance(mock, int)
+
+
+    @unittest2.expectedFailure
+    def test_pickle(self):
+        for Klass in (MagicMock, Mock, Subclass, NonCallableMagicMock):
+            mock = Klass(name='foo', attribute=3)
+            mock.foo(1, 2, 3)
+            data = pickle.dumps(mock)
+            new = pickle.loads(data)
+
+            new.foo.assert_called_once_with(1, 2, 3)
+            self.assertFalse(new.called)
+            self.assertTrue(is_instance(new, Klass))
+            self.assertIsInstance(new, Thing)
+            self.assertIn('name="foo"', repr(new))
+            self.assertEqual(new.attribute, 3)
 
 
 if __name__ == '__main__':
