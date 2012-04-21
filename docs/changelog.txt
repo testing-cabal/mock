@@ -13,6 +13,7 @@ CHANGELOG
   can't be fetched from the object's class. Contributed by Konstantine Rybnikov
 * Any exceptions in an iterable `side_effect` will be raised instead of
   returned
+* In Python 3, `create_autospec` now supports keyword only arguments
 
 
 2012/03/25 Version 1.0.0 alpha 1

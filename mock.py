@@ -154,11 +154,19 @@ def _getsignature(func, skipfirst, instance=False):
         except AttributeError:
             return
 
-    try:
-        regargs, varargs, varkwargs, defaults = inspect.getargspec(func)
-    except TypeError:
-        # C function / method, possibly inherited object().__init__
-        return
+    if inPy3k:
+        try:
+            argspec = inspect.getfullargspec(func)
+        except TypeError:
+            # C function / method, possibly inherited object().__init__
+            return
+        regargs, varargs, varkw, defaults, kwonly, kwonlydef, ann = argspec
+    else:
+        try:
+            regargs, varargs, varkwargs, defaults = inspect.getargspec(func)
+        except TypeError:
+            # C function / method, possibly inherited object().__init__
+            return
 
     # instance methods and classmethods need to lose the self argument
     if getattr(func, self, None) is not None:
@@ -167,8 +175,14 @@ def _getsignature(func, skipfirst, instance=False):
         # this condition and the above one are never both True - why?
         regargs = regargs[1:]
 
-    signature = inspect.formatargspec(regargs, varargs, varkwargs, defaults,
-                                      formatvalue=lambda value: "")
+    if inPy3k:
+        signature = inspect.formatargspec(
+            regargs, varargs, varkw, defaults,
+            kwonly, kwonlydef, ann, formatvalue=lambda value: "")
+    else:
+        signature = inspect.formatargspec(
+            regargs, varargs, varkwargs, defaults,
+            formatvalue=lambda value: "")
     return signature[1:-1], func
 
 
@@ -981,7 +995,6 @@ class CallableMixin(Base):
             if _is_exception(effect):
                 raise effect
 
-            ret_val = DEFAULT
             if not _callable(effect):
                 result = next(effect)
                 if _is_exception(result):
