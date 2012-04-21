@@ -380,7 +380,7 @@ class SpecSignatureTest(unittest.TestCase):
 
     @unittest.expectedFailure
     def test_create_autospec_unbound_methods(self):
-        # see issue 128
+        # see mock issue 128
         class Foo(object):
             def foo(self):
                 pass
