@@ -959,6 +959,16 @@ class MockTest(unittest2.TestCase):
         self.assertIs(mock.side_effect, this_iter)
 
 
+    def test_side_effect_iterator_exceptions(self):
+        for Klass in Mock, MagicMock:
+            iterable = (ValueError, 3, KeyError, 6)
+            m = Klass(side_effect=iterable)
+            self.assertRaises(ValueError, m)
+            self.assertEqual(m(), 3)
+            self.assertRaises(KeyError, m)
+            self.assertEqual(m(), 6)
+
+
     def test_assert_has_calls_any_order(self):
         mock = Mock()
         mock(1, 2)

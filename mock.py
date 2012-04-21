@@ -981,8 +981,12 @@ class CallableMixin(Base):
             if _is_exception(effect):
                 raise effect
 
+            ret_val = DEFAULT
             if not _callable(effect):
-                return next(effect)
+                result = next(effect)
+                if _is_exception(result):
+                    raise result
+                return result
 
             ret_val = effect(*args, **kwargs)
             if ret_val is DEFAULT:
@@ -1026,7 +1030,8 @@ class Mock(CallableMixin, NonCallableMock):
       this case the exception will be raised when the mock is called.
 
       If `side_effect` is an iterable then each call to the mock will return
-      the next value from the iterable.
+      the next value from the iterable. If any of the members of the iterable
+      are exceptions they will be raised instead of returned.
 
     * `return_value`: The value returned when the mock is called. By default
       this is a new Mock (created on first access). See the

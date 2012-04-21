@@ -498,6 +498,11 @@ children of a `CopyingMock` will also have the type `CopyingMock`.
 Multiple calls with different effects
 =====================================
 
+.. note::
+
+    In mock 1.0 the handling of iterable `side_effect` was changed. Any
+    exceptions in the iterable will be raised instead of returned.
+
 Handling code that needs to behave differently on subsequent calls during the
 test can be tricky. For example you may have a function that needs to raise
 an exception the first time it is called but returns a response on the second
