@@ -495,6 +495,30 @@ and the `return_value` will use your subclass automatically. That means all
 children of a `CopyingMock` will also have the type `CopyingMock`.
 
 
+Raising exceptions on attribute access
+======================================
+
+You can use :class:`PropertyMock` to mimic the behaviour of properties. This
+includes raising exceptions when an attribute is accessed.
+
+Here's an example raising a `ValueError` when the 'foo' attribute is accessed:
+
+.. doctest::
+
+    >>> m = MagicMock()
+    >>> p = PropertyMock(side_effect=ValueError)
+    >>> type(m).foo = p
+    >>> m.foo
+    Traceback (most recent call last):
+    ....
+    ValueError
+
+Because every mock object has its own type, a new subclass of whichever mock
+class you're using, all mock objects are isolated from each other. You can
+safely attach properties (or other descriptors or whatever you want in fact)
+to `type(mock)` without affecting other mock objects.
+
+
 Multiple calls with different effects
 =====================================
 
