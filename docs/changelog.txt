@@ -5,7 +5,7 @@ CHANGELOG
 =========
 
 
-2012/XX/XX Version 1.0.0 alpha 2
+2012/05/04 Version 1.0.0 alpha 2
 --------------------------------
 
 * `PropertyMock` attributes are now standard `MagicMocks`

@@ -11,7 +11,7 @@
 :Homepage: `Mock Homepage`_
 :Download: `Mock on PyPI`_
 :Documentation: `PDF Documentation
- <http://www.voidspace.org.uk/downloads/mock-1.0.0a1.pdf>`_
+ <http://www.voidspace.org.uk/downloads/mock-1.0a2.pdf>`_
 :License: `BSD License`_
 :Support: `Mailing list (testing-in-python@lists.idyll.org)
  <http://lists.idyll.org/listinfo/testing-in-python>`_
@@ -102,7 +102,7 @@ then please contact us.
 
 * `mock on PyPI <http://pypi.python.org/pypi/mock>`_
 * `mock documentation as PDF
-  <http://www.voidspace.org.uk/downloads/mock-0.8.0.pdf>`_
+  <http://www.voidspace.org.uk/downloads/mock-1.0a2.pdf>`_
 * `Google Code Home & Mercurial Repository <http://code.google.com/p/mock/>`_
 
 .. index:: repository
@@ -364,6 +364,7 @@ Older Versions
 
 Documentation for older versions of mock:
 
+* `mock 0.8 <http://www.voidspace.org.uk/python/mock/0.8/>`_
 * `mock 0.7 <http://www.voidspace.org.uk/python/mock/0.7/>`_
 * `mock 0.6 <http://www.voidspace.org.uk/python/mock/0.6.0/>`_
 
