@@ -1,1 +1,4 @@
+- Issue #14857: fix regression in references to PEP 3135 implicit __class__
+  closure variable (Reopens issue #12370)
+
 - Issue #14295: Add unittest.mock

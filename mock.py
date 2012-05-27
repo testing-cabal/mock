@@ -116,10 +116,6 @@ except AttributeError:
 
 inPy3k = sys.version_info[0] == 3
 
-# Needed to work around Python 3 bug where use of "super" interferes with
-# defining __class__ as a descriptor
-_super = super
-
 self = 'im_self'
 builtin = '__builtin__'
 if inPy3k:
@@ -128,6 +124,9 @@ if inPy3k:
 
 FILTER_DIR = True
 
+# Workaround for Python issue #12370
+# Without this, the __class__ properties wouldn't be set correctly
+_safe_super = super
 
 def _is_instance_mock(obj):
     # can't use isinstance on Mock objects because they override __class__
@@ -531,7 +530,7 @@ class NonCallableMock(Base):
         if kwargs:
             self.configure_mock(**kwargs)
 
-        _super(NonCallableMock, self).__init__(
+        _safe_super(NonCallableMock, self).__init__(
             spec, wraps, name, spec_set, parent,
             _spec_state
         )
@@ -960,7 +959,7 @@ class CallableMixin(Base):
                  _spec_state=None, _new_name='', _new_parent=None, **kwargs):
         self.__dict__['_mock_return_value'] = return_value
 
-        _super(CallableMixin, self).__init__(
+        _safe_super(CallableMixin, self).__init__(
             spec, wraps, name, spec_set, parent,
             _spec_state, _new_name, _new_parent, **kwargs
         )
@@ -1858,7 +1857,7 @@ def _set_return_value(mock, method, name):
 
 class MagicMixin(object):
     def __init__(self, *args, **kw):
-        _super(MagicMixin, self).__init__(*args, **kw)
+        _safe_super(MagicMixin, self).__init__(*args, **kw)
         self._mock_set_magics()
 
 
