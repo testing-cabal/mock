@@ -426,6 +426,14 @@ class TestMockingMagicMethods(unittest2.TestCase):
         self.assertEqual(mock[1][2][3], 3)
 
 
+    def test_magic_method_reset_mock(self):
+        mock = MagicMock()
+        str(mock)
+        self.assertTrue(mock.__str__.called)
+        mock.reset_mock()
+        self.assertFalse(mock.__str__.called)
+
+
     @unittest2.skipUnless(sys.version_info[:2] >= (2, 6),
                           "__dir__ not available until Python 2.6 or later")
     def test_dir(self):
