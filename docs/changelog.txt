@@ -7,6 +7,11 @@ CHANGELOG
 2012/XX/XX Version 1.0.0 alpha 3
 --------------------------------
 
+* BUGFIX: calling `MagicMock.reset_mock` wouldn't reset magic method mocks
+* BUGFIX: calling `reset_mock` on a `MagicMock` created with autospec could
+  raise an exception
+
+
 2012/05/04 Version 1.0.0 alpha 2
 --------------------------------
 
