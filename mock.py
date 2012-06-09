@@ -30,7 +30,7 @@ __all__ = (
 )
 
 
-__version__ = '1.0a2'
+__version__ = '1.0a3'
 
 
 import pprint
@@ -608,6 +608,8 @@ class NonCallableMock(Base):
         self.method_calls = _CallList()
 
         for child in self._mock_children.values():
+            if isinstance(child, _SpecState):
+                continue
             child.reset_mock()
 
         ret = self._mock_return_value
