@@ -7,7 +7,7 @@
 :Author: `Michael Foord
  <http://www.voidspace.org.uk/python/weblog/index.shtml>`_
 :Version: |release|
-:Date: 2012/03/25
+:Date: 2012/07/13
 :Homepage: `Mock Homepage`_
 :Download: `Mock on PyPI`_
 :Documentation: `PDF Documentation
