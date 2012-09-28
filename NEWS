@@ -1,3 +1,5 @@
+- Issue #15323: improve failure message of Mock.assert_called_once_with
+
 - Issue #14857: fix regression in references to PEP 3135 implicit __class__
   closure variable (Reopens issue #12370)
 
