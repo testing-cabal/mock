@@ -2,8 +2,8 @@ mock is a library for testing in Python. It allows you to replace parts of
 your system under test with mock objects and make assertions about how they
 have been used.
 
-mock is now part of the Python standard library, available as `unittest.mock <
-http://docs.python.org/py3k/library/unittest.mock.html#module-unittest.mock>`_
+mock is now part of the Python standard library, available as `unittest.mock
+<http://docs.python.org/py3k/library/unittest.mock.html#module-unittest.mock>`_
 in Python 3.3 onwards.
 
 mock provides a core `MagicMock` class removing the need to create a host of
@@ -18,7 +18,7 @@ with the latest versions of Jython and pypy.
 The mock module also provides utility functions / objects to assist with
 testing, particularly monkey patching.
 
-* `PDF documentation for 1.0 beta 1
+* `PDF documentation for 1.0
   <http://www.voidspace.org.uk/downloads/mock-1.0.0.pdf>`_
 * `mock on google code (repository and issue tracker)
   <http://code.google.com/p/mock/>`_
