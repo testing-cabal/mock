@@ -15,7 +15,7 @@ The mock module also provides utility functions / objects to assist with
 testing, particularly monkey patching.
 
 * `PDF documentation for 1.0 beta 1
-  <http://www.voidspace.org.uk/downloads/mock-1.0b1.pdf>`_
+  <http://www.voidspace.org.uk/downloads/mock-1.0.0.pdf>`_
 * `mock on google code (repository and issue tracker)
   <http://code.google.com/p/mock/>`_
 * `mock documentation

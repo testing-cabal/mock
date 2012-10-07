@@ -4,6 +4,47 @@
 CHANGELOG
 =========
 
+2012/10/07 Version 1.0.0
+------------------------
+
+No changes since 1.0.0 beta 1. This version has feature parity with
+`unittest.mock <
+http://docs.python.org/py3k/library/unittest.mock.html#module-unittest.mock>`_
+in Python 3.3.
+
+Full list of changes since 0.8:
+
+* `mocksignature`, along with the `mocksignature` argument to `patch`, removed
+* Support for deleting attributes (accessing deleted attributes will raise an
+  `AttributeError`)
+* Added the `mock_open` helper function for mocking the builtin `open`
+* `__class__` is assignable, so a mock can pass an `isinstance` check without
+  requiring a spec
+* Addition of `PropertyMock`, for mocking properties
+* `MagicMocks` made unorderable by default (in Python 3). The comparison
+  methods (other than equality and inequality) now return `NotImplemented`
+* Propagate traceback info to support subclassing of `_patch` by other
+  libraries
+* `create_autospec` works with attributes present in results of `dir` that
+  can't be fetched from the object's class. Contributed by Konstantine Rybnikov
+* Any exceptions in an iterable `side_effect` will be raised instead of
+  returned
+* In Python 3, `create_autospec` now supports keyword only arguments
+* Added `patch.stopall` method to stop all active patches created by `start`
+* BUGFIX: calling `MagicMock.reset_mock` wouldn't reset magic method mocks
+* BUGFIX: calling `reset_mock` on a `MagicMock` created with autospec could
+  raise an exception
+* BUGFIX: passing multiple spec arguments to patchers (`spec` , `spec_set` and
+  `autospec`) had unpredictable results, now it is an error
+* BUGFIX: using `spec=True` *and* `create=True` as arguments to patchers could
+  result in using `DEFAULT` as the spec. Now it is an error instead
+* BUGFIX: using `spec` or `autospec` arguments to patchers, along with
+  `spec_set=True` did not work correctly
+* BUGFIX: using an object that evaluates to False as a spec could be ignored
+* BUGFIX: a list as the `spec` argument to a patcher would always result in a
+  non-callable mock. Now if `__call__` is in the spec the mock is callable
+
+
 2012/07/13 Version 1.0.0 beta 1
 --------------------------------
 

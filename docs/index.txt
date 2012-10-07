@@ -7,11 +7,11 @@
 :Author: `Michael Foord
  <http://www.voidspace.org.uk/python/weblog/index.shtml>`_
 :Version: |release|
-:Date: 2012/07/13
+:Date: 2012/10/07
 :Homepage: `Mock Homepage`_
 :Download: `Mock on PyPI`_
 :Documentation: `PDF Documentation
- <http://www.voidspace.org.uk/downloads/mock-1.0b1.pdf>`_
+ <http://www.voidspace.org.uk/downloads/mock-1.0.0.pdf>`_
 :License: `BSD License`_
 :Support: `Mailing list (testing-in-python@lists.idyll.org)
  <http://lists.idyll.org/listinfo/testing-in-python>`_
@@ -102,7 +102,7 @@ then please contact us.
 
 * `mock on PyPI <http://pypi.python.org/pypi/mock>`_
 * `mock documentation as PDF
-  <http://www.voidspace.org.uk/downloads/mock-1.0b1.pdf>`_
+  <http://www.voidspace.org.uk/downloads/mock-1.0.0.pdf>`_
 * `Google Code Home & Mercurial Repository <http://code.google.com/p/mock/>`_
 
 .. index:: repository
