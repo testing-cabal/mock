@@ -8,8 +8,8 @@ CHANGELOG
 ------------------------
 
 No changes since 1.0.0 beta 1. This version has feature parity with
-`unittest.mock <
-http://docs.python.org/py3k/library/unittest.mock.html#module-unittest.mock>`_
+`unittest.mock
+<http://docs.python.org/py3k/library/unittest.mock.html#module-unittest.mock>`_
 in Python 3.3.
 
 Full list of changes since 0.8:

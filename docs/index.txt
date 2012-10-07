@@ -33,6 +33,10 @@ mock is a library for testing in Python. It allows you to replace parts of
 your system under test with mock objects and make assertions about how they
 have been used.
 
+mock is now part of the Python standard library, available as `unittest.mock
+<http://docs.python.org/py3k/library/unittest.mock.html#module-unittest.mock>`_
+in Python 3.3 onwards.
+
 mock provides a core :class:`Mock` class removing the need to create a host
 of stubs throughout your test suite. After performing an action, you can make
 assertions about which methods / attributes were used and arguments they were
