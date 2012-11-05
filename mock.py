@@ -56,7 +56,7 @@ except ImportError:
             return f
         return inner
 else:
-    if sys.version_info[:2] >= (3, 3):
+    if sys.version_info[:2] >= (3, 2):
         wraps = original_wraps
     else:
         def wraps(func):
