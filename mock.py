@@ -30,7 +30,7 @@ __all__ = (
 )
 
 
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 
 
 import pprint
@@ -44,7 +44,7 @@ except ImportError:
     inspect = None
 
 try:
-    from functools import wraps
+    from functools import wraps as original_wraps
 except ImportError:
     # Python 2.4 compatibility
     def wraps(original):
@@ -52,8 +52,19 @@ except ImportError:
             f.__name__ = original.__name__
             f.__doc__ = original.__doc__
             f.__module__ = original.__module__
+            f.__wrapped__ = original
             return f
         return inner
+else:
+    if sys.version_info[:2] >= (3, 3):
+        wraps = original_wraps
+    else:
+        def wraps(func):
+            def inner(f):
+                f = original_wraps(func)(f)
+                f.__wrapped__ = func
+                return f
+            return inner
 
 try:
     unicode

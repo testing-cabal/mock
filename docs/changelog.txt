@@ -4,6 +4,18 @@
 CHANGELOG
 =========
 
+2012/11/5 Version 1.0.1
+-----------------------
+
+* Functions decorated with `patch` variants have a `__wrapped__` attribute
+  pointing to the original function. This brings compatibility with the
+  default behaviour in Python 3.3 (due to a new feature in `functools.wraps`).
+
+Note that due to changes in `tox`, `mock` is no longer tested with Python 2.4.
+The compatibility code has not been removed so it probably still works, but
+tests are no longer run.
+
+
 2012/10/07 Version 1.0.0
 ------------------------
 
