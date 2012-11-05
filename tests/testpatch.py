@@ -1785,6 +1785,25 @@ class PatchTest(unittest2.TestCase):
         self.assertIs(os.path, path)
 
 
+    def test_wrapped_patch(self):
+        decorated = patch('sys.modules')(function)
+        self.assertIs(decorated.__wrapped__, function)
+
+
+    def test_wrapped_patch_object(self):
+        decorated = patch.object(sys, 'modules')(function)
+        self.assertIs(decorated.__wrapped__, function)
+
+
+    def test_wrapped_patch_dict(self):
+        decorated = patch.dict('sys.modules')(function)
+        self.assertIs(decorated.__wrapped__, function)
+
+
+    def test_wrapped_patch_multiple(self):
+        decorated = patch.multiple('sys', modules={})(function)
+        self.assertIs(decorated.__wrapped__, function)
+
 
 if __name__ == '__main__':
     unittest2.main()
