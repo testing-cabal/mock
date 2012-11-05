@@ -3,7 +3,7 @@
 # Copyright (C) 2007-2012 Michael Foord & the mock team
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 
-# mock 1.0
+# mock 1.0.1
 # http://www.voidspace.org.uk/python/mock/
 
 # Released subject to the BSD License

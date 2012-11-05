@@ -4,7 +4,7 @@
 CHANGELOG
 =========
 
-2012/11/5 Version 1.0.1
+2012/11/05 Version 1.0.1
 -----------------------
 
 * Functions decorated with `patch` variants have a `__wrapped__` attribute
