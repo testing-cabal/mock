@@ -171,7 +171,9 @@ the `__init__` method, and on callable objects where it copies the signature of
 the `__call__` method.
 
 The distribution contains tests and documentation. The tests require
-`unittest2 <http://pypi.python.org/pypi/unittest2>`_ to run.
+`unittest2 <http://pypi.python.org/pypi/unittest2>`_ to run on Python 2.5, 2.6
+or 3.1. For Python 2.7 and 3.2 they can be run with
+`python -m unittest discover`.
 
 Docs from the in-development version of `mock` can be found at
 `mock.readthedocs.org <http://mock.readthedocs.org>`_.
