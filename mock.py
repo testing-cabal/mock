@@ -9,10 +9,6 @@
 # Released subject to the BSD License
 # Please see http://www.voidspace.org.uk/python/license.shtml
 
-# Scripts maintained at http://www.voidspace.org.uk/python/index.shtml
-# Comments, suggestions and bug reports welcome.
-
-
 __all__ = (
     'Mock',
     'MagicMock',
@@ -52,7 +48,8 @@ except ImportError:
             f.__name__ = original.__name__
             f.__doc__ = original.__doc__
             f.__module__ = original.__module__
-            f.__wrapped__ = original
+            wrapped = getattr(original, '__wrapped__', original)
+            f.__wrapped__ = wrapped
             return f
         return inner
 else:
@@ -62,7 +59,8 @@ else:
         def wraps(func):
             def inner(f):
                 f = original_wraps(func)(f)
-                f.__wrapped__ = func
+                wrapped = getattr(func, '__wrapped__', func)
+                f.__wrapped__ = wrapped
                 return f
             return inner
 

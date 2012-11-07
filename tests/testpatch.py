@@ -1790,6 +1790,12 @@ class PatchTest(unittest2.TestCase):
         self.assertIs(decorated.__wrapped__, function)
 
 
+    def test_wrapped_several_times_patch(self):
+        decorated = patch('sys.modules')(function)
+        decorated = patch('sys.modules')(decorated)
+        self.assertIs(decorated.__wrapped__, function)
+
+
     def test_wrapped_patch_object(self):
         decorated = patch.object(sys, 'modules')(function)
         self.assertIs(decorated.__wrapped__, function)
