@@ -183,7 +183,7 @@ Docs from the in-development version of `mock` can be found at
 Releasing
 ---------
 
-1. update mock.__version__
+1. update mock.__version__ and __version__.__version__
 2. commit, tag, push --tags origin master
 3. setup.py sdist bdist_wheel upload -s
 

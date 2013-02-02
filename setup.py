@@ -4,7 +4,7 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
-from mock import __version__
+from __version__ import __version__
 
 import os
 
@@ -61,8 +61,10 @@ params = dict(
     url=URL,
     classifiers=CLASSIFIERS,
     extras_require={
+        ':python_version<"3.3"': ['funcsigs'],
         'test': ['unittest2'],
         },
+    install_requires=['six'],
     tests_require=['unittest2'],
     test_suite='unittest2.collector',
 )

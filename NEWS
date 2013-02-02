@@ -1,3 +1,7 @@
+- Issue #17015: When it has a spec, a Mock object now inspects its signature
+  when matching calls, so that arguments can be matched positionally or
+  by name.
+
 - Issue #15323: improve failure message of Mock.assert_called_once_with
 
 - Issue #14857: fix regression in references to PEP 3135 implicit __class__
