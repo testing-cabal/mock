@@ -59,7 +59,7 @@ raise an exception when a mock is called::
    ...
    >>> mock.side_effect = side_effect
    >>> mock('a'), mock('b'), mock('c')
-   (3, 2, 1)
+   (1, 2, 3)
    >>> mock.side_effect = [5, 4, 3, 2, 1]
    >>> mock(), mock(), mock()
    (5, 4, 3)
