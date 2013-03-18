@@ -734,9 +734,7 @@ class NonCallableMock(Base):
 
 
     def __dir__(self):
-        """Filter the output of `dir(mock)` to only useful members.
-        XXXX
-        """
+        """Filter the output of `dir(mock)` to only useful members."""
         extras = self._mock_methods or []
         from_type = dir(type(self))
         from_dict = list(self.__dict__)
