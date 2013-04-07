@@ -50,7 +50,7 @@ class Something(object):
     @staticmethod
     def smeth(a, b, c, d=None):
         pass
- 
+
 
 class Subclass(MagicMock):
     pass
@@ -1040,6 +1040,11 @@ class MockTest(unittest.TestCase):
             self.assertRaises(KeyError, m)
             self.assertEqual(m(), 6)
 
+
+    def test_side_effect_iterator_default(self):
+        mock = Mock(return_value=2)
+        mock.side_effect = iter([1, DEFAULT])
+        self.assertEqual([mock(), mock()], [1, 2])
 
     def test_assert_has_calls_any_order(self):
         mock = Mock()
