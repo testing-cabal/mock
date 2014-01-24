@@ -1,3 +1,7 @@
+- Issue #20189: unittest.mock now no longer assumes that any object for
+  which it could get an inspect.Signature is a callable written in Python.
+  Fix courtesy of Michael Foord.
+
 - Issue #17467: add readline and readlines support to mock_open in
   unittest.mock.
 
