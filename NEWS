@@ -1,6 +1,9 @@
 - Issue #17826: setting an iterable side_effect on a mock function created by
   create_autospec now works. Patch by Kushal Das.
 
+- Issue #17826: setting an iterable side_effect on a mock function created by
+  create_autospec now works. Patch by Kushal Das.
+
 - Issue #20968: unittest.mock.MagicMock now supports division.
   Patch by Johannes Baiter.
 

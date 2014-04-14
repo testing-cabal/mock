@@ -56,6 +56,11 @@ from functools import partial
 import inspect
 import pprint
 import sys
+try:
+    import builtins
+except ImportError:
+    import __builtin__ as builtins
+from types import ModuleType
 
 import six
 from six import wraps
@@ -115,6 +120,8 @@ if not inPy3k:
 
     del _next
 
+
+_builtins = {name for name in dir(builtins) if not name.startswith('_')}
 
 BaseExceptions = (BaseException,)
 if 'java' in sys.platform:
@@ -1301,6 +1308,9 @@ class _patch(object):
             original = getattr(target, name, DEFAULT)
         else:
             local = True
+
+        if name in _builtins and isinstance(target, ModuleType):
+            self.create = True
 
         if not self.create and original is DEFAULT:
             raise AttributeError(
