@@ -61,6 +61,9 @@ import six
 from six import wraps
 
 
+inPy3k = sys.version_info[0] == 3
+
+
 try:
     inspectsignature = inspect.signature
 except AttributeError:
@@ -102,11 +105,15 @@ except NameError:
     # Python 2.4 compatibility
     BaseException = Exception
 
-try:
-    next
-except NameError:
-    def next(obj):
-        return obj.next()
+if not inPy3k:
+    # Python 2's next() can't handle a non-iterator with a __next__ method.
+    _next = next
+    def next(obj, _next=_next):
+        if getattr(obj, '__next__', None):
+            return obj.__next__()
+        return _next(obj)
+
+    del _next
 
 
 BaseExceptions = (BaseException,)
@@ -126,9 +133,6 @@ except AttributeError:
         if string in keyword.kwlist:
             return False
         return regex.match(string)
-
-
-inPy3k = sys.version_info[0] == 3
 
 self = 'im_self'
 builtin = '__builtin__'
@@ -465,7 +469,14 @@ def _check_and_set_parent(parent, value, name, new_name):
         value._mock_name = name
     return True
 
-
+# Internal class to identify if we wrapped an iterator object or not.
+class _MockIter(object):
+    def __init__(self, obj):
+        self.obj = iter(obj)
+    def __iter__(self):
+        return self
+    def __next__(self):
+        return next(self.obj)
 
 class Base(object):
     _mock_return_value = DEFAULT
@@ -617,7 +628,11 @@ class NonCallableMock(Base):
         delegated = self._mock_delegate
         if delegated is None:
             return self._mock_side_effect
-        return delegated.side_effect
+        sf = delegated.side_effect
+        if sf is not None and not callable(sf) and not isinstance(sf, _MockIter):
+            sf = _MockIter(sf)
+            delegated.side_effect = sf
+        return sf
 
     def __set_side_effect(self, value):
         value = _try_iter(value)
