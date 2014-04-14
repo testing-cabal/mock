@@ -1765,7 +1765,11 @@ magic_methods = (
     "trunc floor ceil "
 )
 
-numerics = "add sub mul div floordiv mod lshift rshift and xor or pow "
+numerics = (
+    "add sub mul div floordiv mod lshift rshift and xor or pow"
+)
+if inPy3k:
+    numerics += ' truediv'
 inplace = ' '.join('i%s' % n for n in numerics.split())
 right = ' '.join('r%s' % n for n in numerics.split())
 extra = ''

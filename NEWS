@@ -1,3 +1,6 @@
+- Issue #20968: unittest.mock.MagicMock now supports division.
+  Patch by Johannes Baiter.
+
 - Issue #20189: unittest.mock now no longer assumes that any object for
   which it could get an inspect.Signature is a callable written in Python.
   Fix courtesy of Michael Foord.

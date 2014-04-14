@@ -2,6 +2,8 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
+from __future__ import division
+
 import unittest2 as unittest
 
 from tests.support import inPy3k
@@ -149,32 +151,34 @@ class TestMockingMagicMethods(unittest.TestCase):
         self.assertEqual(7 + mock, mock)
         self.assertEqual(mock.value, 16)
 
+    def test_division(self):
+        original = mock = Mock()
+        mock.value = 32
+        self.assertRaises(TypeError, lambda: mock / 2)
 
-    @unittest.skipIf(inPy3k, 'no truediv in Python 3')
-    def test_truediv(self):
-        mock = MagicMock()
-        mock.__truediv__.return_value = 6
+        def truediv(self, other):
+            mock.value /= other
+            return self
+        mock.__truediv__ = truediv
+        self.assertEqual(mock / 2, mock)
+        self.assertEqual(mock.value, 16)
 
-        context = {'mock': mock}
-        code = 'from __future__ import division\nresult = mock / 7\n'
-        exec(code, context)
-        self.assertEqual(context['result'], 6)
+        del mock.__truediv__
+        if inPy3k:
+            def itruediv(mock):
+                mock /= 4
+            self.assertRaises(TypeError, itruediv, mock)
+            mock.__itruediv__ = truediv
+            mock /= 8
+            self.assertEqual(mock, original)
+            self.assertEqual(mock.value, 2)
+        else:
+            mock.value = 2
 
-        mock.__rtruediv__.return_value = 3
-        code = 'from __future__ import division\nresult = 2 / mock\n'
-        exec(code, context)
-        self.assertEqual(context['result'], 3)
-
-
-    @unittest.skipIf(not inPy3k, 'truediv is available in Python 2')
-    def test_no_truediv(self):
-        self.assertRaises(
-            AttributeError, getattr, MagicMock(), '__truediv__'
-        )
-        self.assertRaises(
-            AttributeError, getattr, MagicMock(), '__rtruediv__'
-        )
-
+        self.assertRaises(TypeError, lambda: 8 / mock)
+        mock.__rtruediv__ = truediv
+        self.assertEqual(0.5 / mock, mock)
+        self.assertEqual(mock.value, 4)
 
     def test_hash(self):
         mock = Mock()
