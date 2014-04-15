@@ -1,3 +1,6 @@
+- Issue #21222: Passing name keyword argument to mock.create_autospec now
+  works.
+
 - Issue #17826: setting an iterable side_effect on a mock function created by
   create_autospec now works. Patch by Kushal Das.
 
