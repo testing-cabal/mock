@@ -1,3 +1,6 @@
+- Issue #21238: New keyword argument `unsafe` to Mock. It raises
+  `AttributeError` incase of an attribute startswith assert or assret.
+
 - Issue #21239: patch.stopall() didn't work deterministically when the same
   name was patched more than once.
 
