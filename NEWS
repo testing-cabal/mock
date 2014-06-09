@@ -1,3 +1,6 @@
+- Issue #21256: Printout of keyword args should be in deterministic order in
+  a mock function call. This will help to write better doctests.
+
 - Issue #21262: New method assert_not_called for Mock.
   It raises AssertionError if the mock has been called.
 
