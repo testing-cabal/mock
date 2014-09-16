@@ -1,3 +1,6 @@
+- Issue #21270: We now override tuple methods in mock.call objects so that
+  they can be used as normal call attributes.
+
 - Issue #21256: Printout of keyword args should be in deterministic order in
   a mock function call. This will help to write better doctests.
 
