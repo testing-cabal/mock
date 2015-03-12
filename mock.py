@@ -1806,7 +1806,7 @@ magic_methods = (
 )
 
 numerics = (
-    "add sub mul div floordiv mod lshift rshift and xor or pow"
+    "add sub mul matmul div floordiv mod lshift rshift and xor or pow"
 )
 if inPy3k:
     numerics += ' truediv'

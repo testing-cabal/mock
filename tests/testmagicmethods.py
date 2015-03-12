@@ -17,6 +17,7 @@ except NameError:
 
 import inspect
 import sys
+import textwrap
 from mock import Mock, MagicMock, _magics
 
 
@@ -482,6 +483,20 @@ class TestMockingMagicMethods(unittest.TestCase):
         self.assertEqual(list(m), [4, 5, 6])
         self.assertEqual(list(m), [])
 
+    @unittest.skipIf(sys.version_info < (3, 5), "@ added in Python 3.5")
+    def test_matmul(self):
+        src = textwrap.dedent("""\
+            m = MagicMock()
+            self.assertIsInstance(m @ 1, MagicMock)
+            m.__matmul__.return_value = 42
+            m.__rmatmul__.return_value = 666
+            m.__imatmul__.return_value = 24
+            self.assertEqual(m @ 1, 42)
+            self.assertEqual(1 @ m, 666)
+            m @= 24
+            self.assertEqual(m, 24)
+        """)
+        exec(src)
 
 if __name__ == '__main__':
     unittest.main()
