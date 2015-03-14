@@ -1,3 +1,6 @@
+- Issue #23568: Add rdivmod support to MagicMock() objects.
+  Patch by Håkan Lövdahl.
+
 - Issue #23581: Add matmul support to MagicMock. Patch by Håkan Lövdahl.
 
 - Issue #23326: Removed __ne__ implementations.  Since fixing default __ne__
