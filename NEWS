@@ -1,3 +1,6 @@
+- Issue #23310: Fix MagicMock's initializer to work with __methods__, just
+  like configure_mock().  Patch by Kasia Jachim.
+
 - Issue #23568: Add rdivmod support to MagicMock() objects.
   Patch by Håkan Lövdahl.
 
