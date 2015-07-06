@@ -12,8 +12,10 @@ assertions about which methods / attributes were used and arguments they were
 called with. You can also specify return values and set needed attributes in
 the normal way.
 
-mock is tested on Python versions 2.5-2.7 and Python 3. mock is also tested
-with the latest versions of Jython and pypy.
+mock is CI tested using Travis-CI on Python versions 2.6, 2.7, 3.2, 3.3, 3.4,
+3.5, nightly Python 3 builds, pypy, pypy3. Jython support is desired, if
+someone could contribute a patch to .travis.jml to support it that would be
+excellent.
 
 The mock module also provides utility functions / objects to assist with
 testing, particularly monkey patching.
