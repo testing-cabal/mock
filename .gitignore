@@ -8,3 +8,5 @@ dist
 latex
 .*\$py\.class
 runtox
+*~
+*.pyc
