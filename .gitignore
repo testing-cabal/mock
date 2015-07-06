@@ -10,3 +10,4 @@ latex
 runtox
 *~
 *.pyc
+.testrepository
