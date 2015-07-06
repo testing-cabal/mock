@@ -139,7 +139,7 @@ class TestCallable(unittest2.TestCase):
                     patcher.stop()
 
 
-    def test_create_autopsec(self):
+    def test_create_autospec(self):
         mock = create_autospec(X)
         instance = mock()
         self.assertRaises(TypeError, instance)
