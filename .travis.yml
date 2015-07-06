@@ -7,6 +7,9 @@ python:
   - "3.4"
   - "nightly"
 # command to install dependencies
-install: pip install .[test]
+install:
+ - pip install -U pip
+ - pip install -U wheel setuptools
+ - pip install .[test]
 # command to run tests
 script: unit2
