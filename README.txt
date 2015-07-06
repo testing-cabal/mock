@@ -179,3 +179,10 @@ or 3.1. For Python 2.7 and 3.2 they can be run with
 
 Docs from the in-development version of `mock` can be found at
 `mock.readthedocs.org <http://mock.readthedocs.org>`_.
+
+Releasing
+---------
+
+1. update mock.__version__
+2. commit, tag, push --tags origin master
+3. setup.py sdist bdist_wheel upload -s
