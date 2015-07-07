@@ -7,6 +7,8 @@ python:
   - "3.3"
   - "3.4"
   - "nightly"
+  - pypy
+  - pypy3
 # command to install dependencies
 install:
  - pip install -U pip
