@@ -13,3 +13,5 @@ runtox
 *.pyc
 .testrepository
 .*.swp
+AUTHORS
+ChangeLog
