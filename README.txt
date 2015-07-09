@@ -12,10 +12,13 @@ assertions about which methods / attributes were used and arguments they were
 called with. You can also specify return values and set needed attributes in
 the normal way.
 
-mock is CI tested using Travis-CI on Python versions 2.6, 2.7, 3.2, 3.3, 3.4,
-3.5, nightly Python 3 builds, pypy, pypy3. Jython support is desired, if
+mock is CI tested using Travis-CI on Python versions 2.7, 3.2, 3.3, 3.4, 3.5,
+nightly Python 3 builds, pypy, pypy3. Jython support is desired, if
 someone could contribute a patch to .travis.jml to support it that would be
 excellent.
+
+The last release of mock to support 2.6 was 1.0.1. mock 1.1.0 and above require
+Pythno 2.7 or higher.
 
 The mock module also provides utility functions / objects to assist with
 testing, particularly monkey patching.
@@ -173,9 +176,7 @@ the `__init__` method, and on callable objects where it copies the signature of
 the `__call__` method.
 
 The distribution contains tests and documentation. The tests require
-`unittest2 <http://pypi.python.org/pypi/unittest2>`_ to run on Python 2.5, 2.6
-or 3.1. For Python 2.7 and 3.2 they can be run with
-`python -m unittest discover`.
+`unittest2 <http://pypi.python.org/pypi/unittest2>`_. Run them with `unit2`.
 
 Docs from the in-development version of `mock` can be found at
 `mock.readthedocs.org <http://mock.readthedocs.org>`_.
