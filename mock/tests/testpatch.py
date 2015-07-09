@@ -7,14 +7,15 @@ import sys
 
 import unittest2 as unittest
 
-from tests import support
-from tests.support import inPy3k, SomeClass, is_instance, callable
+from mock.tests import support
+from mock.tests.support import inPy3k, SomeClass, is_instance, callable
 
 from mock import (
     NonCallableMock, CallableMixin, patch, sentinel,
-    MagicMock, Mock, NonCallableMagicMock, patch, _patch,
-    DEFAULT, call, _get_target
+    MagicMock, Mock, NonCallableMagicMock, patch,
+    DEFAULT, call
 )
+from mock.mock import _patch, _get_target
 
 builtin_string = '__builtin__'
 if inPy3k:
@@ -1622,7 +1623,7 @@ class PatchTest(unittest.TestCase):
 
 
     def test_patch_nested_autospec_repr(self):
-        p = patch('tests.support', autospec=True)
+        p = patch('mock.tests.support', autospec=True)
         m = p.start()
         try:
             self.assertIn(" name='support.SomeClass.wibble()'",

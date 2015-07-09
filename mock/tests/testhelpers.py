@@ -3,12 +3,13 @@
 # http://www.voidspace.org.uk/python/mock/
 
 import unittest2 as unittest
-from tests.support import inPy3k
+from mock.tests.support import inPy3k
 
 from mock import (
-    call, _Call, create_autospec, MagicMock,
-    Mock, ANY, _CallList, patch, PropertyMock
+    call, create_autospec, MagicMock,
+    Mock, ANY, patch, PropertyMock
 )
+from mock.mock import _Call, _CallList
 
 from datetime import datetime
 

@@ -32,6 +32,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from __future__ import absolute_import
+
 __all__ = (
     'Mock',
     'MagicMock',
@@ -42,6 +44,7 @@ __all__ = (
     'call',
     'create_autospec',
     'FILTER_DIR',
+    'CallableMixin',
     'NonCallableMock',
     'NonCallableMagicMock',
     'mock_open',
@@ -65,6 +68,7 @@ from types import ModuleType
 import six
 from six import wraps
 
+import mock
 
 inPy3k = sys.version_info[0] == 3
 
@@ -147,6 +151,7 @@ if inPy3k:
     self = '__self__'
     builtin = 'builtins'
 
+# NOTE: This FILTER_DIR is not used. The binding in mock.FILTER_DIR is.
 FILTER_DIR = True
 
 # Workaround for Python issue #12370
@@ -782,7 +787,7 @@ class NonCallableMock(Base):
 
     def __dir__(self):
         """Filter the output of `dir(mock)` to only useful members."""
-        if not FILTER_DIR and getattr(object, '__dir__', None):
+        if not mock.FILTER_DIR and getattr(object, '__dir__', None):
             # object.__dir__ is not in 2.7
             return object.__dir__(self)
 
@@ -790,7 +795,7 @@ class NonCallableMock(Base):
         from_type = dir(type(self))
         from_dict = list(self.__dict__)
 
-        if FILTER_DIR:
+        if mock.FILTER_DIR:
             # object.__dir__ is not in 2.7
             from_type = [e for e in from_type if not e.startswith('_')]
             from_dict = [e for e in from_dict if not e.startswith('_') or

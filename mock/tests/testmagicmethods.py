@@ -6,7 +6,7 @@ from __future__ import division
 
 import unittest2 as unittest
 
-from tests.support import inPy3k
+from mock.tests.support import inPy3k
 
 try:
     unicode
@@ -18,7 +18,8 @@ except NameError:
 import inspect
 import sys
 import textwrap
-from mock import Mock, MagicMock, _magics
+from mock import Mock, MagicMock
+from mock.mock import _magics
 
 
 

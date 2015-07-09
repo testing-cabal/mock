@@ -3,7 +3,7 @@
 # http://www.voidspace.org.uk/python/mock/
 
 import unittest2 as unittest
-from tests.support import (
+from mock.tests.support import (
     callable, inPy3k, is_instance, next
 )
 
@@ -15,9 +15,10 @@ import mock
 from mock import (
     call, DEFAULT, patch, sentinel,
     MagicMock, Mock, NonCallableMock,
-    NonCallableMagicMock, _CallList,
+    NonCallableMagicMock,
     create_autospec
 )
+from mock.mock import _CallList
 
 
 try:
