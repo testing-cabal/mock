@@ -7,7 +7,7 @@ mock is now part of the Python standard library, available as `unittest.mock
 onwards.
 
 This package contains a rolling backport of the standard library mock code
-compatible with Python 2.7 and up, and 3.2 and up.
+compatible with Python 2.6 and up, and 3.2 and up.
 
 Please see the standard library documentation for more details.
 

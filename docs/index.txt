@@ -45,7 +45,7 @@ the newest features from the latest release of Python available for all
 Pythons.
 
 The ``mock`` package contains a rolling backport of the standard library mock
-code compatible with Python 2.7 and up, and 3.2 and up.
+code compatible with Python 2.6 and up, and 3.2 and up.
 
 Please see the standard library documentation for usage details.
 
@@ -121,13 +121,10 @@ Checkout from git (see :ref:`installing`) and submit pull requests.
 Committers can just push as desired: since all semantic development takes
 place in cPython, the backport process is as lightweight as we can make it.
 
-mock is CI tested using Travis-CI on Python versions 2.7, 3.2, 3.3, 3.4, 3.5,
-nightly Python 3 builds, pypy, pypy3. Jython support is desired, if
+mock is CI tested using Travis-CI on Python versions 2.6, 2.7, 3.2, 3.3, 3.4,
+3.5, nightly Python 3 builds, pypy, pypy3. Jython support is desired, if
 someone could contribute a patch to .travis.jml to support it that would be
 excellent.
-
-The last release of mock to support 2.6 was 1.0.1. mock 1.1.0 and above require
-Python 2.7 or higher.
 
 Releasing
 =========
