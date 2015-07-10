@@ -129,7 +129,7 @@ if not inPy3k:
     del _next
 
 
-_builtins = {name for name in dir(builtins) if not name.startswith('_')}
+_builtins = set([name for name in dir(builtins) if not name.startswith('_')])
 
 BaseExceptions = (BaseException,)
 if 'java' in sys.platform:
