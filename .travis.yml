@@ -5,13 +5,19 @@ python:
   - "3.2"
   - "3.3"
   - "3.4"
-  - "nightly"
   - pypy
   - pypy3
-# command to install dependencies
+matrix:
+  include:
+# Travis nightly look to be 3.5.0a4, b3 is out and the syntax error we see
+# doesn't happen in trunk.
+    - python: "nightly"
+      env: SKIP_DOCS=1
 install:
  - pip install -U pip
  - pip install -U wheel setuptools
- - pip install .[test]
-# command to run tests
-script: unit2
+ - pip install -U .[docs,test]
+script:
+ - unit2
+ - if [ -z "$SKIP_DOCS" ]; then python setup.py build_sphinx; fi
+ - rst2html.py README.txt README.html

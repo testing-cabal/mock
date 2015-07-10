@@ -11,32 +11,19 @@ compatible with Python 2.7 and up, and 3.2 and up.
 
 Please see the standard library documentation for more details.
 
-mock is CI tested using Travis-CI on Python versions 2.7, 3.2, 3.3, 3.4, 3.5,
-nightly Python 3 builds, pypy, pypy3. Jython support is desired, if
-someone could contribute a patch to .travis.jml to support it that would be
-excellent.
+:Homepage: `Mock Homepage`_
+:Download: `Mock on PyPI`_
+:Documentation: `Python Docs`_
+:License: `BSD License`_
+:Support: `Mailing list (testing-in-python@lists.idyll.org)
+ <http://lists.idyll.org/listinfo/testing-in-python>`_
+:Issue tracker: `Github Issues
+ <https://github.com/testing-cabal/mock/issues>`_
+:Build status:
+  .. image:: https://travis-ci.org/testing-cabal/mock.svg?branch=master
+      :target: https://travis-ci.org/testing-cabal/mock
 
-The last release of mock to support 2.6 was 1.0.1. mock 1.1.0 and above require
-Python 2.7 or higher.
-
-NEWS entries from cPython:
-
-.. include:: NEWS
-
-Notes for maintainers
----------------------
-
-Releasing
-=========
-
-2. tag -s, push --tags origin master
-3. setup.py sdist bdist_wheel upload -s
-
-Backporting rules
-=================
-
-type -> ClassTypes
-__self__ -> self
-name.isidentifier() -> _isidentifier(name)
-super -> _super
-
+.. _Mock Homepage: https://github.com/testing-cabal/mock
+.. _BSD License: http://github.com/testing-cabal/mock/blob/master/LICENSE.txt
+.. _Python Docs: https://docs.python.org/dev/library/unittest.mock.html
+.. _mock on PyPI: http://pypi.python.org/pypi/mock

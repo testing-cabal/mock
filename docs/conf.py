@@ -13,7 +13,6 @@
 
 import sys, os
 sys.path.insert(0, os.path.abspath('..'))
-from mock import __version__
 
 # If your extensions are in another directory, add it here. If the directory
 # is relative to the documentation root, use os.path.abspath to make it
@@ -66,21 +65,21 @@ master_doc = 'index'
 
 # General substitutions.
 project = u'Mock'
-copyright = u'2007-2012, Michael Foord & the mock team'
+copyright = u'2007-2015, Michael Foord & the mock team'
 
 # The default replacements for |version| and |release|, also used in various
-# other places throughout the built documents.
+# other places throughout the built documents. Supplied by pbr.
 #
 # The short X.Y version.
-version = __version__[:3]
+version = None
 # The full version, including alpha/beta/rc tags.
-release = __version__
+release = None
 
 # There are two options for replacing |today|: either, you set today to some
-# non-false value, then it is used:
-#today = ''
+# non-false value, then it is used: (Set from pbr)
+today = ''
 # Else, today_fmt is used as the format for a strftime call.
-today_fmt = '%B %d, %Y'
+# today_fmt = '%B %d, %Y'
 
 # List of documents that shouldn't be included in the build.
 #unused_docs = []

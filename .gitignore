@@ -15,3 +15,6 @@ runtox
 .*.swp
 AUTHORS
 ChangeLog
+.eggs
+README.saved
+README.html
