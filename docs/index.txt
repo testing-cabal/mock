@@ -132,6 +132,9 @@ Python 2.7 or higher.
 Releasing
 =========
 
+NB: please use semver. Bump the major component on API breaks, minor on all
+non-bugfix changes, patch on bugfix only changes.
+
 1. tag -s, push --tags origin master
 2. setup.py sdist bdist_wheel upload -s
 

@@ -35,6 +35,8 @@
 from __future__ import absolute_import
 
 __all__ = (
+    '__version__',
+    'version_info',
     'Mock',
     'MagicMock',
     'patch',
@@ -52,9 +54,6 @@ __all__ = (
 )
 
 
-__version__ = '1.1.0dev1'
-
-
 from functools import partial
 import inspect
 import pprint
@@ -67,6 +66,11 @@ from types import ModuleType
 
 import six
 from six import wraps
+from pbr.version import VersionInfo
+
+_v = VersionInfo('mock').semantic_version()
+__version__ = _v.release_string()
+version_info = _v.version_tuple()
 
 import mock
 
