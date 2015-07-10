@@ -3,4 +3,4 @@ funcsigs;python_version<"3.3"
 # but setuptools can't cope with conflicts in setup_requires, so thats
 # unversioned.
 pbr>=0.11
-six
+six>=1.7
