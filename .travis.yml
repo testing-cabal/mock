@@ -22,4 +22,4 @@ install:
 script:
  - unit2
  - if [ -z "$SKIP_DOCS" ]; then python setup.py build_sphinx; fi
- - rst2html.py README.txt README.html
+ - rst2html.py README.rst README.html
