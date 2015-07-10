@@ -129,7 +129,7 @@ if not inPy3k:
     del _next
 
 
-_builtins = {name for name in dir(builtins) if not name.startswith('_')}
+_builtins = set(name for name in dir(builtins) if not name.startswith('_'))
 
 BaseExceptions = (BaseException,)
 if 'java' in sys.platform:
@@ -413,11 +413,11 @@ ClassTypes = (type,)
 if not inPy3k:
     ClassTypes = (type, ClassType)
 
-_allowed_names = {
+_allowed_names = set((
     'return_value', '_mock_return_value', 'side_effect',
     '_mock_side_effect', '_mock_parent', '_mock_new_parent',
     '_mock_name', '_mock_new_name'
-}
+))
 
 
 def _delegating_property(name):
@@ -702,7 +702,7 @@ class NonCallableMock(Base):
 
 
     def __getattr__(self, name):
-        if name in {'_mock_methods', '_mock_unsafe'}:
+        if name in ('_mock_methods', '_mock_unsafe'):
             raise AttributeError(name)
         elif self._mock_methods is not None:
             if name not in self._mock_methods or name in _all_magics:
@@ -1833,13 +1833,13 @@ else:
 # (as they are metaclass methods)
 # __del__ is not supported at all as it causes problems if it exists
 
-_non_defaults = {
+_non_defaults = set((
     '__cmp__', '__getslice__', '__setslice__', '__coerce__', # <3.x
     '__get__', '__set__', '__delete__', '__reversed__', '__missing__',
     '__reduce__', '__reduce_ex__', '__getinitargs__', '__getnewargs__',
     '__getstate__', '__setstate__', '__getformat__', '__setformat__',
     '__repr__', '__dir__', '__subclasses__', '__format__',
-}
+))
 
 
 def _get_method(name, func):
@@ -1850,19 +1850,19 @@ def _get_method(name, func):
     return method
 
 
-_magics = {
+_magics = set(
     '__%s__' % method for method in
     ' '.join([magic_methods, numerics, inplace, right, extra]).split()
-}
+)
 
 _all_magics = _magics | _non_defaults
 
-_unsupported_magics = {
+_unsupported_magics = set((
     '__getattr__', '__setattr__',
     '__init__', '__new__', '__prepare__'
     '__instancecheck__', '__subclasscheck__',
     '__del__'
-}
+))
 
 _calculate_return_value = {
     '__hash__': lambda self: object.__hash__(self),
@@ -2431,7 +2431,7 @@ def _iterate_read_data(read_data):
     # Helper for mock_open:
     # Retrieve lines from read_data via a generator so that separate calls to
     # readline, read, and readlines are properly interleaved
-    data_as_list = ['{}\n'.format(l) for l in read_data.split('\n')]
+    data_as_list = ['{0}\n'.format(l) for l in read_data.split('\n')]
 
     if data_as_list[-1] == '\n':
         # If the last line ended in a newline, the list comprehension will have an
