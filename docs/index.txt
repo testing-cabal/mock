@@ -12,7 +12,7 @@
  <http://lists.idyll.org/listinfo/testing-in-python>`_
 :Issue tracker: `Github Issues
  <https://github.com/testing-cabal/mock/issues>`_
-:Last sync: 95211209f6c499f2f92b01a3372f9961d480abad
+:Last sync: f2badf6d47bfbb39c04efe9a9551577a8073fb16
 
 .. _Mock Homepage: https://github.com/testing-cabal/mock
 .. _BSD License: http://github.com/testing-cabal/mock/blob/master/LICENSE.txt
@@ -159,7 +159,7 @@ Backporting process
 
      revs=${lastsync}..
      rm migrate-export
-     git log --pretty="format:%H " $revs -- Lib/unittest/mock.py \
+     git log --pretty="format:%H " $revs.. -- Lib/unittest/mock.py \
        Lib/unittest/test/testmock/ > migrate-revs
      tac migrate-revs > migrate-sorted-revs
      for rev in $(< migrate-sorted-revs); do
