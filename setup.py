@@ -7,7 +7,7 @@ import sys
 # Setuptools 17.1 is required, and setup_requires cannot upgrade setuptools
 # in-place, nor trigger the use of a newer version. Abort cleanly up-front.
 setuptools_required = StrictVersion("17.1")
-setuptools_installed = StrictVersion(setuptools.version.__version__)
+setuptools_installed = StrictVersion(setuptools.__version__)
 if setuptools_installed < setuptools_required:
     sys.stderr.write(
         "mock requires setuptools>=17.1. Aborting installation\n")
