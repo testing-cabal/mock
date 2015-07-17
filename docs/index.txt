@@ -12,7 +12,7 @@
  <http://lists.idyll.org/listinfo/testing-in-python>`_
 :Issue tracker: `Github Issues
  <https://github.com/testing-cabal/mock/issues>`_
-:Last sync: f2badf6d47bfbb39c04efe9a9551577a8073fb16
+:Last sync: 081c1c41c256bc0e401a5fbf7ca3b0f20b025ea3
 
 .. _Mock Homepage: https://github.com/testing-cabal/mock
 .. _BSD License: http://github.com/testing-cabal/mock/blob/master/LICENSE.txt
