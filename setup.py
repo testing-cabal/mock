@@ -1,18 +1,27 @@
 #!/usr/bin/env python
-from distutils.version import StrictVersion
 import setuptools
-import sys
 
 
-# Setuptools 17.1 is required, and setup_requires cannot upgrade setuptools
-# in-place, nor trigger the use of a newer version. Abort cleanly up-front.
-setuptools_required = StrictVersion("17.1")
-setuptools_installed = StrictVersion(setuptools.__version__)
-if setuptools_installed < setuptools_required:
-    sys.stderr.write(
-        "mock requires setuptools>=17.1. Aborting installation\n")
-    sys.exit(1)
+def _parse_requirements(fname):
+    ''' Return the content of the specified file except for the lines starting
+    with a ``#``.
+    It will also split the line having a `;` on this character and keep only the
+    first part.
+    '''
+    ret = []
+    with open(fname) as stream:
+        for line in stream.readlines():
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            if ';' in line:
+                line = line.split(';', 1)[0].strip()
+            if line:
+                ret.append(line)
+    return ret
+
 
 setuptools.setup(
     setup_requires=['pbr>=1.3'],
+    install_requires=_parse_requirements('requirements.txt'),
     pbr=True)
