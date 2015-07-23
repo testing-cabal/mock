@@ -2468,18 +2468,18 @@ def mock_open(mock=None, read_data=''):
     def _readlines_side_effect(*args, **kwargs):
         if handle.readlines.return_value is not None:
             return handle.readlines.return_value
-        return list(_data)
+        return list(_state[0])
 
     def _read_side_effect(*args, **kwargs):
         if handle.read.return_value is not None:
             return handle.read.return_value
-        return ''.join(_data)
+        return ''.join(_state[0])
 
     def _readline_side_effect():
         if handle.readline.return_value is not None:
             while True:
                 yield handle.readline.return_value
-        for line in _data:
+        for line in _state[0]:
             yield line
 
 
@@ -2498,7 +2498,7 @@ def mock_open(mock=None, read_data=''):
     handle = MagicMock(spec=file_spec)
     handle.__enter__.return_value = handle
 
-    _data = _iterate_read_data(read_data)
+    _state = [_iterate_read_data(read_data), None]
 
     handle.write.return_value = None
     handle.read.return_value = None
@@ -2506,9 +2506,19 @@ def mock_open(mock=None, read_data=''):
     handle.readlines.return_value = None
 
     handle.read.side_effect = _read_side_effect
-    handle.readline.side_effect = _readline_side_effect()
+    _state[1] = _readline_side_effect()
+    handle.readline.side_effect = _state[1]
     handle.readlines.side_effect = _readlines_side_effect
 
+    def reset_data(*args, **kwargs):
+        _state[0] = _iterate_read_data(read_data)
+        if handle.readline.side_effect == _state[1]:
+            # Only reset the side effect if the user hasn't overridden it.
+            _state[1] = _readline_side_effect()
+            handle.readline.side_effect = _state[1]
+        return DEFAULT
+
+    mock.side_effect = reset_data
     mock.return_value = handle
     return mock
 

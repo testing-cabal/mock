@@ -10,6 +10,7 @@ from mock.tests.support import (
 import copy
 import pickle
 import sys
+import tempfile
 
 import mock
 from mock import (
@@ -1436,7 +1437,33 @@ class MockTest(unittest.TestCase):
             self.assertEqual(m.mock_calls, [call.__int__(), call.__float__()])
             self.assertEqual(m.method_calls, [])
 
+    def test_mock_open_reuse_issue_21750(self):
+        mocked_open = mock.mock_open(read_data='data')
+        f1 = mocked_open('a-name')
+        f1_data = f1.read()
+        f2 = mocked_open('another-name')
+        f2_data = f2.read()
+        self.assertEqual(f1_data, f2_data)
 
+    def test_mock_open_write(self):
+        # Test exception in file writing write()
+        mock_namedtemp = mock.mock_open(mock.MagicMock(name='JLV'))
+        with mock.patch('tempfile.NamedTemporaryFile', mock_namedtemp):
+            mock_filehandle = mock_namedtemp.return_value
+            mock_write = mock_filehandle.write
+            mock_write.side_effect = OSError('Test 2 Error')
+            def attempt():
+                tempfile.NamedTemporaryFile().write('asd')
+            self.assertRaises(OSError, attempt)
+
+    def test_mock_open_alter_readline(self):
+        mopen = mock.mock_open(read_data='foo\nbarn')
+        mopen.return_value.readline.side_effect = lambda *args:'abc'
+        first = mopen().readline()
+        second = mopen().readline()
+        self.assertEqual('abc', first)
+        self.assertEqual('abc', second)
+ 
     def test_mock_parents(self):
         for Klass in Mock, MagicMock:
             m = Klass()

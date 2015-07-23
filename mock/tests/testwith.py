@@ -156,6 +156,20 @@ class TestMockOpen(unittest.TestCase):
         self.assertEqual(mock.mock_calls, expected_calls)
         self.assertIs(f, handle)
 
+    def test_mock_open_context_manager_multiple_times(self):
+        mock = mock_open()
+        with patch('%s.open' % __name__, mock, create=True):
+            with open('foo') as f:
+                f.read()
+            with open('bar') as f:
+                f.read()
+
+        expected_calls = [
+            call('foo'), call().__enter__(), call().read(),
+            call().__exit__(None, None, None),
+            call('bar'), call().__enter__(), call().read(),
+            call().__exit__(None, None, None)]
+        self.assertEqual(mock.mock_calls, expected_calls)
 
     def test_explicit_mock(self):
         mock = MagicMock()
