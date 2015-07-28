@@ -4,8 +4,7 @@
 
 import os
 import sys
-
-import unittest2 as unittest
+import unittest
 
 from mock.tests import support
 from mock.tests.support import inPy3k, SomeClass, is_instance, callable

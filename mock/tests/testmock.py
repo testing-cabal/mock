@@ -2,7 +2,6 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
-import unittest2 as unittest
 from mock.tests.support import (
     callable, inPy3k, is_instance, next
 )
@@ -11,6 +10,7 @@ import copy
 import pickle
 import sys
 import tempfile
+import unittest
 
 import mock
 from mock import (

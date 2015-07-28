@@ -1,7 +1,7 @@
 import sys
+import unittest
 
 info = sys.version_info
-import unittest2
 
 
 try:

@@ -4,7 +4,6 @@
 
 from __future__ import division
 
-import unittest2 as unittest
 
 from mock.tests.support import inPy3k
 
@@ -18,6 +17,8 @@ except NameError:
 import inspect
 import sys
 import textwrap
+import unittest
+
 from mock import Mock, MagicMock
 from mock.mock import _magics
 
