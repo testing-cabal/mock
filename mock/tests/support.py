@@ -11,7 +11,6 @@ except NameError:
         return hasattr(obj, '__call__')
 
 
-inPy3k = sys.version_info[0] == 3
 with_available = sys.version_info[:2] >= (2, 5)
 
 

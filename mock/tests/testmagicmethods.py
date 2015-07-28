@@ -6,8 +6,6 @@ from __future__ import division
 
 import unittest2 as unittest
 
-from mock.tests.support import inPy3k
-
 try:
     unicode
 except NameError:
@@ -15,6 +13,7 @@ except NameError:
     unicode = str
     long = int
 
+import six
 import inspect
 import sys
 import textwrap
@@ -86,7 +85,7 @@ class TestMockingMagicMethods(unittest.TestCase):
         self.assertEqual(str(mock), 'foo')
 
 
-    @unittest.skipIf(inPy3k, "no unicode in Python 3")
+    @unittest.skipIf(six.PY3, "no unicode in Python 3")
     def test_unicode(self):
         mock = Mock()
         self.assertEqual(unicode(mock), unicode(str(mock)))
@@ -166,7 +165,7 @@ class TestMockingMagicMethods(unittest.TestCase):
         self.assertEqual(mock.value, 16)
 
         del mock.__truediv__
-        if inPy3k:
+        if six.PY3:
             def itruediv(mock):
                 mock /= 4
             self.assertRaises(TypeError, itruediv, mock)
@@ -198,7 +197,7 @@ class TestMockingMagicMethods(unittest.TestCase):
         self.assertTrue(bool(m))
 
         nonzero = lambda s: False
-        if not inPy3k:
+        if six.PY2:
             m.__nonzero__ = nonzero
         else:
             m.__bool__ = nonzero
@@ -216,7 +215,7 @@ class TestMockingMagicMethods(unittest.TestCase):
         self. assertTrue(mock <= 3)
         self. assertTrue(mock >= 3)
 
-        if not inPy3k:
+        if six.PY2:
             # incomparable in Python 3
             self.assertEqual(Mock() < 3, object() < 3)
             self.assertEqual(Mock() > 3, object() > 3)
@@ -294,7 +293,7 @@ class TestMockingMagicMethods(unittest.TestCase):
 
         name = '__nonzero__'
         other = '__bool__'
-        if inPy3k:
+        if six.PY3:
             name, other = other, name
         getattr(mock, name).return_value = False
         self.assertFalse(hasattr(mock, other))
@@ -330,7 +329,7 @@ class TestMockingMagicMethods(unittest.TestCase):
         self.assertEqual(unicode(mock), object.__str__(mock))
         self.assertIsInstance(unicode(mock), unicode)
         self.assertTrue(bool(mock))
-        if not inPy3k:
+        if six.PY2:
             self.assertEqual(oct(mock), '1')
         else:
             # in Python 3 oct and hex use __index__
@@ -340,7 +339,7 @@ class TestMockingMagicMethods(unittest.TestCase):
         # how to test __sizeof__ ?
 
 
-    @unittest.skipIf(inPy3k, "no __cmp__ in Python 3")
+    @unittest.skipIf(six.PY3, "no __cmp__ in Python 3")
     def test_non_default_magic_methods(self):
         mock = MagicMock()
         self.assertRaises(AttributeError, lambda: mock.__cmp__)
