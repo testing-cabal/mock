@@ -4,10 +4,11 @@
 
 import os
 import sys
+import six
 import unittest
 
 from mock.tests import support
-from mock.tests.support import inPy3k, SomeClass, is_instance, callable
+from mock.tests.support import SomeClass, is_instance, callable
 
 from mock import (
     NonCallableMock, CallableMixin, patch, sentinel,
@@ -17,7 +18,7 @@ from mock import (
 from mock.mock import _patch, _get_target
 
 builtin_string = '__builtin__'
-if inPy3k:
+if six.PY3:
     builtin_string = 'builtins'
     unicode = str
 

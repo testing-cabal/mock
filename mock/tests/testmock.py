@@ -3,9 +3,10 @@
 # http://www.voidspace.org.uk/python/mock/
 
 from mock.tests.support import (
-    callable, inPy3k, is_instance, next
+    callable, is_instance, next
 )
 
+import six
 import copy
 import pickle
 import sys
@@ -663,7 +664,7 @@ class MockTest(unittest.TestCase):
         copy.copy(Mock())
 
 
-    @unittest.skipIf(inPy3k, "no old style classes in Python 3")
+    @unittest.skipIf(six.PY3, "no old style classes in Python 3")
     def test_spec_old_style_classes(self):
         class Foo:
             bar = 7
@@ -677,7 +678,7 @@ class MockTest(unittest.TestCase):
         self.assertRaises(AttributeError, lambda: mock.foo)
 
 
-    @unittest.skipIf(inPy3k, "no old style classes in Python 3")
+    @unittest.skipIf(six.PY3, "no old style classes in Python 3")
     def test_spec_set_old_style_classes(self):
         class Foo:
             bar = 7
