@@ -2,15 +2,16 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
-import unittest2 as unittest
 from mock.tests.support import (
-    callable, inPy3k, is_instance, next
+    callable, is_instance, next
 )
 
+import six
 import copy
 import pickle
 import sys
 import tempfile
+import unittest
 
 import mock
 from mock import (
@@ -206,7 +207,7 @@ class MockTest(unittest.TestCase):
 
         mock = create_autospec(f)
         mock.side_effect = ValueError('Bazinga!')
-        self.assertRaisesRegex(ValueError, 'Bazinga!', mock)
+        six.assertRaisesRegex(self, ValueError, 'Bazinga!', mock)
 
     @unittest.skipUnless('java' in sys.platform,
                           'This test only applies to Jython')
@@ -499,7 +500,8 @@ class MockTest(unittest.TestCase):
 
                 # this should be allowed
                 mock.something
-                self.assertRaisesRegex(
+                six.assertRaisesRegex(
+                    self,
                     AttributeError,
                     "Mock object has no attribute 'something_else'",
                     getattr, mock, 'something_else'
@@ -518,12 +520,14 @@ class MockTest(unittest.TestCase):
             mock.x
             mock.y
             mock.__something__
-            self.assertRaisesRegex(
+            six.assertRaisesRegex(
+                self,
                 AttributeError,
                 "Mock object has no attribute 'z'",
                 getattr, mock, 'z'
             )
-            self.assertRaisesRegex(
+            six.assertRaisesRegex(
+                self,
                 AttributeError,
                 "Mock object has no attribute '__foobar__'",
                 getattr, mock, '__foobar__'
@@ -589,13 +593,13 @@ class MockTest(unittest.TestCase):
 
     def test_assert_called_with_message(self):
         mock = Mock()
-        self.assertRaisesRegex(AssertionError, 'Not called',
-                                mock.assert_called_with)
+        six.assertRaisesRegex(self, AssertionError, 'Not called',
+                               mock.assert_called_with)
 
 
     def test_assert_called_once_with_message(self):
         mock = Mock(name='geoffrey')
-        self.assertRaisesRegex(AssertionError,
+        six.assertRaisesRegex(self, AssertionError,
                      r"Expected 'geoffrey' to be called once\.",
                      mock.assert_called_once_with)
 
@@ -663,7 +667,7 @@ class MockTest(unittest.TestCase):
         copy.copy(Mock())
 
 
-    @unittest.skipIf(inPy3k, "no old style classes in Python 3")
+    @unittest.skipIf(six.PY3, "no old style classes in Python 3")
     def test_spec_old_style_classes(self):
         class Foo:
             bar = 7
@@ -677,7 +681,7 @@ class MockTest(unittest.TestCase):
         self.assertRaises(AttributeError, lambda: mock.foo)
 
 
-    @unittest.skipIf(inPy3k, "no old style classes in Python 3")
+    @unittest.skipIf(six.PY3, "no old style classes in Python 3")
     def test_spec_set_old_style_classes(self):
         class Foo:
             bar = 7

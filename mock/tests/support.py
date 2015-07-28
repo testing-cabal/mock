@@ -1,7 +1,7 @@
 import sys
+import unittest
 
 info = sys.version_info
-import unittest2
 
 
 try:
@@ -11,7 +11,6 @@ except NameError:
         return hasattr(obj, '__call__')
 
 
-inPy3k = sys.version_info[0] == 3
 with_available = sys.version_info[:2] >= (2, 5)
 
 
