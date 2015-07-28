@@ -74,9 +74,6 @@ version_info = _v.version_tuple()
 
 import mock
 
-inPy3k = sys.version_info[0] == 3
-
-
 try:
     inspectsignature = inspect.signature
 except AttributeError:
@@ -118,7 +115,7 @@ except NameError:
     # Python 2.4 compatibility
     BaseException = Exception
 
-if not inPy3k:
+if six.PY2:
     # Python 2's next() can't handle a non-iterator with a __next__ method.
     _next = next
     def next(obj, _next=_next):
@@ -151,7 +148,7 @@ except AttributeError:
 
 self = 'im_self'
 builtin = '__builtin__'
-if inPy3k:
+if six.PY3:
     self = '__self__'
     builtin = 'builtins'
 
@@ -250,7 +247,7 @@ def _copy_func_details(func, funcopy):
         funcopy.__kwdefaults__ = func.__kwdefaults__
     except AttributeError:
         pass
-    if not inPy3k:
+    if six.PY2:
         funcopy.func_defaults = func.func_defaults
         return
 
@@ -276,7 +273,7 @@ def _instance_callable(obj):
         # already an instance
         return getattr(obj, '__call__', None) is not None
 
-    if inPy3k:
+    if six.PY3:
         # *could* be broken by a class overriding __mro__ or __dict__ via
         # a metaclass
         for base in (obj,) + obj.__mro__:
@@ -410,7 +407,7 @@ def _copy(value):
 
 
 ClassTypes = (type,)
-if not inPy3k:
+if six.PY2:
     ClassTypes = (type, ClassType)
 
 _allowed_names = set((
@@ -926,7 +923,7 @@ class NonCallableMock(Base):
 
         def _error_message(cause):
             msg = self._format_mock_failure_message(args, kwargs)
-            if not inPy3k and cause is not None:
+            if six.PY2 and cause is not None:
                 # Tack on some diagnostics for Python without __cause__
                 msg = '%s\n%s' % (msg, str(cause))
             return msg
@@ -1826,12 +1823,12 @@ magic_methods = (
 numerics = (
     "add sub mul matmul div floordiv mod lshift rshift and xor or pow"
 )
-if inPy3k:
+if six.PY3:
     numerics += ' truediv'
 inplace = ' '.join('i%s' % n for n in numerics.split())
 right = ' '.join('r%s' % n for n in numerics.split())
 extra = ''
-if inPy3k:
+if six.PY3:
     extra = 'bool next '
 else:
     extra = 'unicode long nonzero oct hex truediv rtruediv '
@@ -2486,7 +2483,7 @@ def mock_open(mock=None, read_data=''):
     global file_spec
     if file_spec is None:
         # set on first use
-        if inPy3k:
+        if six.PY3:
             import _io
             file_spec = list(set(dir(_io.TextIOWrapper)).union(set(dir(_io.BytesIO))))
         else:
