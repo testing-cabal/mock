@@ -4,8 +4,8 @@
 
 import os
 import sys
-import six
 
+import six
 import unittest2 as unittest
 
 from mock.tests import support

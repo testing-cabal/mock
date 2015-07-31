@@ -4,8 +4,6 @@
 
 from __future__ import division
 
-import unittest2 as unittest
-
 try:
     unicode
 except NameError:
@@ -13,10 +11,13 @@ except NameError:
     unicode = str
     long = int
 
-import six
 import inspect
 import sys
 import textwrap
+
+import six
+import unittest2 as unittest
+
 from mock import Mock, MagicMock
 from mock.mock import _magics
 

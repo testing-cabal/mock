@@ -2,16 +2,13 @@
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
 
-import unittest2 as unittest
-from mock.tests.support import (
-    callable, is_instance, next
-)
-
-import six
 import copy
 import pickle
 import sys
 import tempfile
+
+import six
+import unittest2 as unittest
 
 import mock
 from mock import (
@@ -21,6 +18,9 @@ from mock import (
     create_autospec
 )
 from mock.mock import _CallList
+from mock.tests.support import (
+    callable, is_instance, next
+)
 
 
 try:
