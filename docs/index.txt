@@ -103,10 +103,10 @@ Python NEWS entries from cPython:
 
 .. index:: older versions
 
-Older Versions
-++++++++++++++
+Older Versions of Python
+++++++++++++++++++++++++
 
-Version 1.0.1 is the last version compatible with Python 2.6.
+Version 1.0.1 is the last version compatible with Python < 2.6.
 
 .. index:: maintainer notes
 
