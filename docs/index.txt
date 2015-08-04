@@ -101,13 +101,6 @@ Python NEWS entries from cPython:
 
 .. include:: ../NEWS
 
-.. index:: older versions
-
-Older Versions
-++++++++++++++
-
-Version 1.0.1 is the last version compatible with Python 2.6.
-
 .. index:: maintainer notes
 
 Maintainer Notes
