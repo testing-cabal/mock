@@ -1,6 +1,9 @@
 Library
 -------
 
+- Issue #24857: Comparing call_args to a long sequence now correctly returns a
+  boolean result instead of raising an exception.  Patch by A Kaptur.
+
 - Issue #23004: mock_open() now reads binary data correctly when the type of
   read_data is bytes.  Initial patch by Aaron Hill.
 
