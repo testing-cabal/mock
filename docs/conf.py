@@ -14,6 +14,8 @@
 import sys, os
 sys.path.insert(0, os.path.abspath('..'))
 
+import mock
+
 # If your extensions are in another directory, add it here. If the directory
 # is relative to the documentation root, use os.path.abspath to make it
 # absolute, like shown here.
@@ -71,9 +73,9 @@ copyright = u'2007-2015, Michael Foord & the mock team'
 # other places throughout the built documents. Supplied by pbr.
 #
 # The short X.Y version.
-version = None
+version = mock.mock._v.brief_string()
 # The full version, including alpha/beta/rc tags.
-release = None
+release = mock.__version__
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used: (Set from pbr)
