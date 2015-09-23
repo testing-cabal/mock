@@ -123,7 +123,7 @@ place in cPython, the backport process is as lightweight as we can make it.
 
 mock is CI tested using Travis-CI on Python versions 2.6, 2.7, 3.2, 3.3, 3.4,
 3.5, nightly Python 3 builds, pypy, pypy3. Jython support is desired, if
-someone could contribute a patch to .travis.jml to support it that would be
+someone could contribute a patch to .travis.yml to support it that would be
 excellent.
 
 Releasing
