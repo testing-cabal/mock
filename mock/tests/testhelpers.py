@@ -937,7 +937,7 @@ class TestCallList(unittest.TestCase):
             def __repr__(self):
                 return "\xe9"
 
-        mock(**{u"a": NonAsciiRepr()})
+        mock(**{unicode("a"): NonAsciiRepr()})
 
         expected = (
             "[call(a=\xe9)]"
