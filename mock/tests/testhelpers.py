@@ -928,6 +928,22 @@ class TestCallList(unittest.TestCase):
         self.assertEqual(str(mock.mock_calls), expected)
 
 
+    def test_call_list_unicode(self):
+        # See github issue #328
+        mock = Mock()
+
+        class NonAsciiRepr(object):
+            def __repr__(self):
+                return "\xe9"
+
+        mock(**{u"a": NonAsciiRepr()})
+
+        expected = (
+            "[call(a=\xe9)]"
+        )
+        self.assertEqual(str(mock.mock_calls), expected)
+
+
     def test_propertymock(self):
         p = patch('%s.SomeClass.one' % __name__, new_callable=PropertyMock)
         mock = p.start()
