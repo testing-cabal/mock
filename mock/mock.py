@@ -2059,9 +2059,15 @@ def _format_call_signature(name, args, kwargs):
     message = '%s(%%s)' % name
     formatted_args = ''
     args_string = ', '.join([repr(arg) for arg in args])
-    kwargs_string = ', '.join([
-        '%s=%r' % (key, value) for key, value in sorted(kwargs.items())
-    ])
+
+    kwargs_to_join = []
+    for key, value in sorted(kwargs.items()):
+        if isinstance(key, unicode):
+            key = key.encode("utf8")
+        kwargs_to_join.append('%s=%r' % (key, value))
+
+    kwargs_string = ', '.join(kwargs_to_join)
+
     if args_string:
         formatted_args = args_string
     if kwargs_string:
