@@ -2059,8 +2059,15 @@ def _format_call_signature(name, args, kwargs):
     message = '%s(%%s)' % name
     formatted_args = ''
     args_string = ', '.join([repr(arg) for arg in args])
+
+    def encode_item(item):
+        if six.PY2 and isinstance(item, unicode):
+            return item.encode("utf-8")
+        else:
+            return item
+
     kwargs_string = ', '.join([
-        '%s=%r' % (key, value) for key, value in sorted(kwargs.items())
+        '%s=%r' % (encode_item(key), value) for key, value in sorted(kwargs.items())
     ])
     if args_string:
         formatted_args = args_string
