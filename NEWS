@@ -1,6 +1,9 @@
 Library
 -------
 
+- Issue #22138: Fix mock.patch behavior when patching descriptors. Restore
+  original values after patching. Patch contributed by Sean McCully.
+
 - Issue #24857: Comparing call_args to a long sequence now correctly returns a
   boolean result instead of raising an exception.  Patch by A Kaptur.
 
