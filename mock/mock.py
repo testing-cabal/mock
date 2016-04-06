@@ -79,21 +79,6 @@ try:
 except AttributeError:
     import funcsigs
     inspectsignature = funcsigs.signature
-    # Has funcsigs been fixed?
-    try:
-        class F:
-            def f(a, self):
-                pass
-        inspectsignature(partial(F.f, None)).bind(self=10)
-    except TypeError:
-        def fixedbind(*args, **kwargs):
-            self = args[0]
-            args = args[1:]
-            return self._bind(args, kwargs)
-        funcsigs.Signature.bind = fixedbind
-        del fixedbind
-    finally:
-        del F
 
 
 # TODO: use six.
