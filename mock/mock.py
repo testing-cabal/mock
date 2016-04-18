@@ -962,7 +962,7 @@ class NonCallableMock(Base):
             if expected not in all_calls:
                 six.raise_from(AssertionError(
                     'Calls not found.\nExpected: %r\n'
-                    'Actual: %r' % (calls, self.mock_calls)
+                    'Actual: %r' % (_CallList(calls), self.mock_calls)
                 ), cause)
             return
 
