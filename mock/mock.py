@@ -659,7 +659,7 @@ class NonCallableMock(Base):
         self.method_calls = _CallList()
 
         for child in self._mock_children.values():
-            if isinstance(child, _SpecState):
+            if isinstance(child, (_SpecState, _SentinelObject)):
                 continue
             child.reset_mock(visited)
 
