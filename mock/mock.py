@@ -66,11 +66,14 @@ from types import ModuleType
 
 import six
 from six import wraps
-from pbr.version import VersionInfo
 
-_v = VersionInfo('mock').semantic_version()
-__version__ = _v.release_string()
-version_info = _v.version_tuple()
+# TODO(houglum): Adjust this section if we use a later version of mock.
+# Manually specify version so that we don't need to rely on pbr (which works
+# best when packages are installed via pip rather than direct download).
+# This allows us to include mock in other projects which can be installed
+# via methods other than pip (downloading a git repo, tarball, etc.).
+__version__ = '2.0.0'
+version_info = (2, 0, 0, 'final', 0)
 
 import mock
 
