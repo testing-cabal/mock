@@ -890,6 +890,56 @@ class SpecSignatureTest(unittest.TestCase):
         mock_slot.assert_called_once_with(1, 2, 3)
         mock_slot.abc.assert_called_once_with(4, 5, 6)
 
+
+    def test_autospec_data_descriptor(self):
+        class Descriptor(object):
+            def __init__(self, value):
+                self.value = value
+
+            def __get__(self, obj, cls=None):
+                if obj is None:
+                    return self
+                return self.value
+
+            def __set__(self, obj, value):
+                pass
+
+        class MyProperty(property):
+            pass
+
+        class Foo(object):
+            __slots__ = ['slot']
+
+            @property
+            def prop(self):
+                return 3
+
+            @MyProperty
+            def subprop(self):
+                return 4
+
+            desc = Descriptor(42)
+
+        foo = create_autospec(Foo)
+
+        def check_data_descriptor(mock_attr):
+            # Data descriptors don't have a spec.
+            self.assertIsInstance(mock_attr, MagicMock)
+            mock_attr(1, 2, 3)
+            mock_attr.abc(4, 5, 6)
+            mock_attr.assert_called_once_with(1, 2, 3)
+            mock_attr.abc.assert_called_once_with(4, 5, 6)
+
+        # property
+        check_data_descriptor(foo.prop)
+        # property subclass
+        check_data_descriptor(foo.subprop)
+        # class __slot__
+        check_data_descriptor(foo.slot)
+        # plain data descriptor
+        check_data_descriptor(foo.desc)
+
+
     def test_autospec_on_bound_builtin_function(self):
         meth = six.create_bound_method(time.ctime, time.time())
         self.assertIsInstance(meth(), str)
