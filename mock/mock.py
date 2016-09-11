@@ -2,7 +2,7 @@
 # Test tools for mocking and patching.
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 #
-# mock 1.0.1
+# mock 2.0.0
 # http://www.voidspace.org.uk/python/mock/
 #
 # Copyright (c) 2007-2013, Michael Foord & the mock team
