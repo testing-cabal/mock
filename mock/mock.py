@@ -2057,6 +2057,8 @@ class _ANY(object):
     def __repr__(self):
         return '<ANY>'
 
+    __hash__ = None
+
 ANY = _ANY()
 
 
@@ -2199,6 +2201,7 @@ class _Call(tuple):
     def __ne__(self, other):
         return not self.__eq__(other)
 
+    __hash__ = None
 
     def __call__(self, *args, **kwargs):
         if self.name is None:
