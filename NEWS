@@ -1,6 +1,9 @@
 Library
 -------
 
+- Issue #28380: unittest.mock Mock autospec functions now properly support
+  assert_called, assert_not_called, and assert_called_once.
+  
 - Issue #28735: Fixed the comparison of mock.MagickMock with mock.ANY.
 
 - Issue #20804: The unittest.mock.sentinel attributes now preserve their
