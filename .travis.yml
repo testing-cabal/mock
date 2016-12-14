@@ -5,6 +5,7 @@ python:
   - "2.7"
   - "3.3"
   - "3.4"
+  - "3.5"
   - pypy
   - pypy3
 matrix:
@@ -15,7 +16,7 @@ matrix:
       env: SKIP_DOCS=1
 install:
  - pip install -U pip
- - pip install -U wheel setuptools
+ - pip install -U wheel setuptools==27.3.0
  - pip install -U .[docs,test]
  - pip list
  - python --version
