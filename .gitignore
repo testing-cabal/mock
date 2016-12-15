@@ -14,7 +14,6 @@ runtox
 .testrepository
 .*.swp
 AUTHORS
-ChangeLog
 .eggs
 README.saved
 README.html
