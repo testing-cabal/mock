@@ -2497,6 +2497,11 @@ def mock_open(mock=None, read_data=''):
         for line in _state[0]:
             yield line
 
+    def _iter_side_effect():
+        if handle.__iter__.return_value is not None:
+            return iter(handle.__iter__.return_value)
+        return _state[0]
+
 
     global file_spec
     if file_spec is None:
@@ -2519,11 +2524,13 @@ def mock_open(mock=None, read_data=''):
     handle.read.return_value = None
     handle.readline.return_value = None
     handle.readlines.return_value = None
+    handle.__iter__.return_value = None
 
     handle.read.side_effect = _read_side_effect
     _state[1] = _readline_side_effect()
     handle.readline.side_effect = _state[1]
     handle.readlines.side_effect = _readlines_side_effect
+    handle.__iter__.side_effect = _iter_side_effect
 
     def reset_data(*args, **kwargs):
         _state[0] = _iterate_read_data(read_data)

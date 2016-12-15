@@ -228,6 +228,37 @@ class TestMockOpen(unittest.TestCase):
 
         self.assertEqual(result, ['foo\n', 'bar\n', 'baz'])
 
+    def test_iter_data(self):
+        # Test that emulating a file that ends in a newline character works
+        mock = mock_open(read_data='foo\nbar\nbaz\n')
+        expected = Mock(side_effect=['foo\n', 'bar\n', 'baz\n'])
+        with patch('%s.open' % __name__, mock, create=True):
+            h = open('bar')
+            for line in h:
+                self.assertEqual(line, expected())
+            self.assertEqual(expected.call_count, 3)
+
+        # Test that files without a final newline will also be correctly
+        # emulated
+        mock = mock_open(read_data='foo\nbar\nbaz')
+        expected = Mock(side_effect=['foo\n', 'bar\n', 'baz'])
+        with patch('%s.open' % __name__, mock, create=True):
+            h = open('bar')
+            for line in h:
+                self.assertEqual(line, expected())
+            self.assertEqual(expected.call_count, 3)
+
+        # Test that h.__iter__.return_value overrides default implementation
+        mock = mock_open(read_data='foo\nbar\nbaz\n')
+        override = ['FOO', 'BAR', 'BAZ']
+        expected = Mock(side_effect=override)
+        with patch('%s.open' % __name__, mock, create=True):
+            h = open('bar')
+            h.__iter__.return_value = override
+            for line in h:
+                self.assertEqual(line, expected())
+            self.assertEqual(expected.call_count, 3)
+
 
     def test_read_bytes(self):
         mock = mock_open(read_data=b'\xc6')
