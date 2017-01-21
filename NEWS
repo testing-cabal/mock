@@ -1,6 +1,8 @@
 Library
 -------
 
+- Issue #28735: Fixed the comparison of mock.MagickMock with mock.ANY.
+
 - Issue #20804: The unittest.mock.sentinel attributes now preserve their
   identity when they are copied or pickled.
 
