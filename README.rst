@@ -17,7 +17,7 @@ Please see the standard library documentation for more details.
 :License: `BSD License`_
 :Support: `Mailing list (testing-in-python@lists.idyll.org)
  <http://lists.idyll.org/listinfo/testing-in-python>`_
-:Issue tracker: `Github Issues
+:Issue tracker: `GitHub Issues
  <https://github.com/testing-cabal/mock/issues>`_
 :Build status:
   .. image:: https://travis-ci.org/testing-cabal/mock.svg?branch=master

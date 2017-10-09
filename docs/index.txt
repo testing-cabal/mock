@@ -10,7 +10,7 @@
 :License: `BSD License`_
 :Support: `Mailing list (testing-in-python@lists.idyll.org)
  <http://lists.idyll.org/listinfo/testing-in-python>`_
-:Issue tracker: `Github Issues
+:Issue tracker: `GitHub Issues
  <https://github.com/testing-cabal/mock/issues>`_
 :Last sync: cb6aab1248c4aec4dd578bea717854505a6fb55d
 
@@ -64,7 +64,7 @@ The current version is |release|. Mock is stable and widely used.
 .. index:: repository
 .. index:: git
 
-You can checkout the latest development version from Github
+You can checkout the latest development version from GitHub
 repository with the following command:
 
     ``git clone https://github.com/testing-cabal/mock``
