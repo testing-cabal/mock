@@ -30,6 +30,7 @@ test_version 2.7
 test_version 3.3
 test_version 3.4
 test_version 3.5
+test_version 3.6
 test_version cpython
 test_version pypy
 
