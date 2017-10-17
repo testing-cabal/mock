@@ -50,6 +50,7 @@ __all__ = (
     'NonCallableMagicMock',
     'mock_open',
     'PropertyMock',
+    'seal',
 )
 
 
@@ -513,6 +514,7 @@ class NonCallableMock(Base):
         __dict__['_mock_name'] = name
         __dict__['_mock_new_name'] = _new_name
         __dict__['_mock_new_parent'] = _new_parent
+        __dict__['_mock_sealed'] = False
 
         if spec_set is not None:
             spec = spec_set
@@ -739,7 +741,7 @@ class NonCallableMock(Base):
         return result
 
 
-    def __repr__(self):
+    def _extract_mock_name(self):
         _name_list = [self._mock_new_name]
         _parent = self._mock_new_parent
         last = self
@@ -769,7 +771,10 @@ class NonCallableMock(Base):
             if _name_list[1] not in ('()', '().'):
                 _first += '.'
         _name_list[0] = _first
-        name = ''.join(_name_list)
+        return ''.join(_name_list)
+
+    def __repr__(self):
+        name = self._extract_mock_name()
 
         name_string = ''
         if name not in ('mock', 'mock.'):
@@ -839,6 +844,11 @@ class NonCallableMock(Base):
         else:
             if _check_and_set_parent(self, value, name, name):
                 self._mock_children[name] = value
+
+        if self._mock_sealed and not hasattr(self, name):
+            mock_name = f'{self._extract_mock_name()}.{name}'
+            raise AttributeError(f'Cannot set {mock_name}')
+
         return object.__setattr__(self, name, value)
 
 
@@ -1026,6 +1036,12 @@ class NonCallableMock(Base):
                 klass = Mock
         else:
             klass = _type.__mro__[1]
+
+        if self._mock_sealed:
+            attribute = "." + kw["name"] if "name" in kw else "()"
+            mock_name = self._extract_mock_name() + attribute
+            raise AttributeError(mock_name)
+
         return klass(**kw)
 
 
@@ -2571,3 +2587,26 @@ class PropertyMock(Mock):
         return self()
     def __set__(self, obj, val):
         self(val)
+
+
+def seal(mock):
+    """Disable the automatic generation of "submocks"
+
+    Given an input Mock, seals it to ensure no further mocks will be generated
+    when accessing an attribute that was not already defined.
+
+    Submocks are defined as all mocks which were created DIRECTLY from the
+    parent. If a mock is assigned to an attribute of an existing mock,
+    it is not considered a submock.
+
+    """
+    mock._mock_sealed = True
+    for attr in dir(mock):
+        try:
+            m = getattr(mock, attr)
+        except AttributeError:
+            continue
+        if not isinstance(m, NonCallableMock):
+            continue
+        if m._mock_new_parent is mock:
+            seal(m)
