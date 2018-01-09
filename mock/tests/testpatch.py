@@ -9,7 +9,7 @@ import six
 import unittest2 as unittest
 
 from mock.tests import support
-from mock.tests.support import SomeClass, is_instance, callable
+from mock.tests.support import SomeClass, is_instance
 
 from mock import (
     NonCallableMock, CallableMixin, patch, sentinel,
@@ -1340,7 +1340,7 @@ class PatchTest(unittest.TestCase):
         try:
             f = result['f']
             foo = result['foo']
-            self.assertEqual(set(result), set(['f', 'foo']))
+            self.assertEqual(set(result), {'f', 'foo'})
 
             self.assertIs(Foo, original_foo)
             self.assertIs(Foo.f, f)

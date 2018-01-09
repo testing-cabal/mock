@@ -94,12 +94,6 @@ except NameError:
     # Python 3
     long = int
 
-try:
-    BaseException
-except NameError:
-    # Python 2.4 compatibility
-    BaseException = Exception
-
 if six.PY2:
     # Python 2's next() can't handle a non-iterator with a __next__ method.
     _next = next

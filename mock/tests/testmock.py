@@ -18,9 +18,7 @@ from mock import (
     create_autospec
 )
 from mock.mock import _CallList
-from mock.tests.support import (
-    callable, is_instance, next
-)
+from mock.tests.support import is_instance
 
 
 try:
@@ -738,7 +736,7 @@ class MockTest(unittest.TestCase):
     def test_dir(self):
         mock = Mock()
         attrs = set(dir(mock))
-        type_attrs = set([m for m in dir(Mock) if not m.startswith('_')])
+        type_attrs = {m for m in dir(Mock) if not m.startswith('_')}
 
         # all public attributes from the type are included
         self.assertEqual(set(), type_attrs - attrs)
