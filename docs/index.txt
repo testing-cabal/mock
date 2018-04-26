@@ -62,7 +62,7 @@ Installing
 
 The current version is |release|. Mock is stable and widely used.
 
-* `mock on PyPI <http://pypi.python.org/pypi/mock>`_
+* `mock on PyPI <https://pypi.org/project/mock/>`_
 
 .. index:: repository
 .. index:: git
@@ -90,7 +90,7 @@ unpacking run:
 Bug Reports
 +++++++++++
 
-Mock uses `unittest2 <http://pypi.python.org/pypi/unittest2>`_ for its own
+Mock uses `unittest2 <https://pypi.org/project/unittest2/>`_ for its own
 Issues with the backport process, such as compatibility with a particular
 Python, should be reported to the `bug tracker
 <https://github.com/testing-cabal/mock/issues>`_. Feature requests and issues
