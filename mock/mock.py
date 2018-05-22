@@ -1850,7 +1850,7 @@ magic_methods = (
     # because there is no idivmod
     "divmod rdivmod neg pos abs invert "
     "complex int float index "
-    "trunc floor ceil "
+    "round trunc floor ceil "
 )
 
 numerics = (

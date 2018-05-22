@@ -11,6 +11,7 @@ except NameError:
     unicode = str
     long = int
 
+import math
 import sys
 import textwrap
 import unittest
@@ -329,6 +330,10 @@ class TestMockingMagicMethods(unittest.TestCase):
         self.assertEqual(unicode(mock), object.__str__(mock))
         self.assertIsInstance(unicode(mock), unicode)
         self.assertTrue(bool(mock))
+        self.assertEqual(round(mock), mock.__round__())
+        self.assertEqual(math.trunc(mock), mock.__trunc__())
+        self.assertEqual(math.floor(mock), mock.__floor__())
+        self.assertEqual(math.ceil(mock), mock.__ceil__())
         if six.PY2:
             self.assertEqual(oct(mock), '1')
         else:
