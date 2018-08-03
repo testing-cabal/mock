@@ -16,7 +16,7 @@ import sys
 import textwrap
 
 import six
-import unittest2 as unittest
+import unittest
 
 from mock import Mock, MagicMock
 from mock.mock import _magics

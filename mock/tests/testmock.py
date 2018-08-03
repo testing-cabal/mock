@@ -8,7 +8,7 @@ import sys
 import tempfile
 
 import six
-import unittest2 as unittest
+import unittest
 
 import mock
 from mock import (

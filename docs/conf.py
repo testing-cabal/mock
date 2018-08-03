@@ -33,7 +33,7 @@ import os
 import sys
 import mock
 from mock import * # yeah, I know :-/
-import unittest2
+import unittest
 import __main__
 
 if os.getcwd() not in sys.path:
