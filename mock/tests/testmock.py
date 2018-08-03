@@ -8,7 +8,7 @@ import sys
 import tempfile
 
 import six
-import unittest2 as unittest
+import unittest
 
 import mock
 from mock import (
@@ -205,7 +205,7 @@ class MockTest(unittest.TestCase):
 
         mock = create_autospec(f)
         mock.side_effect = ValueError('Bazinga!')
-        self.assertRaisesRegex(ValueError, 'Bazinga!', mock)
+        six.assertRaisesRegex(self, ValueError, 'Bazinga!', mock)
 
     @unittest.skipUnless('java' in sys.platform,
                           'This test only applies to Jython')
@@ -501,7 +501,8 @@ class MockTest(unittest.TestCase):
 
                 # this should be allowed
                 mock.something
-                self.assertRaisesRegex(
+                six.assertRaisesRegex(
+                    self,
                     AttributeError,
                     "Mock object has no attribute 'something_else'",
                     getattr, mock, 'something_else'
@@ -520,12 +521,14 @@ class MockTest(unittest.TestCase):
             mock.x
             mock.y
             mock.__something__
-            self.assertRaisesRegex(
+            six.assertRaisesRegex(
+                self,
                 AttributeError,
                 "Mock object has no attribute 'z'",
                 getattr, mock, 'z'
             )
-            self.assertRaisesRegex(
+            six.assertRaisesRegex(
+                self,
                 AttributeError,
                 "Mock object has no attribute '__foobar__'",
                 getattr, mock, '__foobar__'
@@ -591,13 +594,13 @@ class MockTest(unittest.TestCase):
 
     def test_assert_called_with_message(self):
         mock = Mock()
-        self.assertRaisesRegex(AssertionError, 'Not called',
+        six.assertRaisesRegex(self, AssertionError, 'Not called',
                                 mock.assert_called_with)
 
 
     def test_assert_called_once_with_message(self):
         mock = Mock(name='geoffrey')
-        self.assertRaisesRegex(AssertionError,
+        six.assertRaisesRegex(self, AssertionError,
                      r"Expected 'geoffrey' to be called once\.",
                      mock.assert_called_once_with)
 
@@ -1486,7 +1489,7 @@ class MockTest(unittest.TestCase):
         second = mopen().readline()
         self.assertEqual('abc', first)
         self.assertEqual('abc', second)
- 
+
     def test_mock_parents(self):
         for Klass in Mock, MagicMock:
             m = Klass()
