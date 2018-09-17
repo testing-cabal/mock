@@ -6,7 +6,7 @@ import os
 import sys
 
 import six
-import unittest2 as unittest
+import unittest
 
 from mock.tests import support
 from mock.tests.support import SomeClass, is_instance

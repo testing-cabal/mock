@@ -3,7 +3,7 @@
 # http://www.voidspace.org.uk/python/mock/
 
 import six
-import unittest2 as unittest
+import unittest
 
 from mock import (
     call, create_autospec, MagicMock,

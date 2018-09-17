@@ -90,7 +90,7 @@ unpacking run:
 Bug Reports
 +++++++++++
 
-Mock uses `unittest2 <http://pypi.python.org/pypi/unittest2>`_ for its own
+Mock uses `unittest <https://docs.python.org/3/library/unittest.html>`_ for its own
 Issues with the backport process, such as compatibility with a particular
 Python, should be reported to the `bug tracker
 <https://github.com/testing-cabal/mock/issues>`_. Feature requests and issues
