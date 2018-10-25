@@ -1864,7 +1864,7 @@ inplace = ' '.join('i%s' % n for n in numerics.split())
 right = ' '.join('r%s' % n for n in numerics.split())
 extra = ''
 if six.PY3:
-    extra = 'bool next '
+    extra = 'bool next fspath '
 else:
     extra = 'unicode long nonzero oct hex truediv rtruediv '
 
@@ -1909,6 +1909,7 @@ _calculate_return_value = {
     '__str__': lambda self: object.__str__(self),
     '__sizeof__': lambda self: object.__sizeof__(self),
     '__unicode__': lambda self: unicode(object.__str__(self)),
+    '__fspath__': lambda self: type(self).__name__+'/'+self._extract_mock_name()+'/'+str(id(self)),
 }
 
 _return_values = {

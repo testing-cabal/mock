@@ -12,6 +12,7 @@ except NameError:
     long = int
 
 import math
+import os
 import sys
 import textwrap
 import unittest
@@ -359,6 +360,17 @@ class TestMockingMagicMethods(unittest.TestCase):
         mock.__cmp__ = lambda s, o: 0
 
         self.assertEqual(mock, object())
+
+
+    def test_magic_methods_fspath(self):
+        mock = MagicMock()
+        if six.PY2:
+            self.assertRaises(AttributeError, lambda: mock.__fspath__)
+        else:
+            expected_path = mock.__fspath__()
+            mock.reset_mock()
+            self.assertEqual(os.fspath(mock), expected_path)
+            mock.__fspath__.assert_called_once()
 
 
     def test_magic_methods_and_spec(self):
