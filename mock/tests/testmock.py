@@ -950,6 +950,32 @@ class MockTest(unittest.TestCase):
                              call().__int__().call_list())
 
 
+    def test_mock_call_not_equal_leaf(self):
+        m = Mock()
+        m.foo().bar()
+        self.assertNotEqual(m.mock_calls[1], call.foo().baz())
+        self.assertEqual(m.mock_calls[0], call.foo())
+
+
+    def test_mock_call_not_equal_non_leaf(self):
+        m = Mock()
+        m.foo().bar()
+        self.assertNotEqual(m.mock_calls[1], call.baz().bar())
+        self.assertNotEqual(m.mock_calls[0], call.baz())
+
+
+    def test_mock_call_not_equal_non_leaf_attr(self):
+        m = Mock()
+        m.foo.bar()
+        self.assertNotEqual(m.mock_calls[0], call.baz.bar())
+
+
+    def test_mock_call_not_equal_non_leaf_call_versus_attr(self):
+        m = Mock()
+        m.foo.bar()
+        self.assertNotEqual(m.mock_calls[0], call.foo().bar())
+
+
     def test_subclassing(self):
         class Subclass(Mock):
             pass

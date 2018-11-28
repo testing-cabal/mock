@@ -2155,6 +2155,10 @@ class _Call(tuple):
         else:
             self_name, self_args, self_kwargs = self
 
+        if (getattr(self, 'parent', None) and getattr(other, 'parent', None)
+            and self.parent != other.parent):
+            return False
+
         other_name = ''
         if len_other == 0:
             other_args, other_kwargs = (), {}
