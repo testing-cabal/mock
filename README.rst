@@ -7,7 +7,7 @@ mock is now part of the Python standard library, available as `unittest.mock
 onwards.
 
 This package contains a rolling backport of the standard library mock code
-compatible with Python 2.7 and 3.3 and up.
+compatible with Python 2.7 and 3.4 and up.
 
 Please see the standard library documentation for more details.
 
@@ -24,6 +24,6 @@ Please see the standard library documentation for more details.
       :target: https://travis-ci.org/testing-cabal/mock
 
 .. _Mock Homepage: https://github.com/testing-cabal/mock
-.. _BSD License: http://github.com/testing-cabal/mock/blob/master/LICENSE.txt
+.. _BSD License: https://github.com/testing-cabal/mock/blob/master/LICENSE.txt
 .. _Python Docs: https://docs.python.org/dev/library/unittest.mock.html
 .. _mock on PyPI: https://pypi.org/project/mock/

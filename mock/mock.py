@@ -105,7 +105,7 @@ if six.PY2:
     del _next
 
 
-_builtins = set(name for name in dir(builtins) if not name.startswith('_'))
+_builtins = {name for name in dir(builtins) if not name.startswith('_')}
 
 BaseExceptions = (BaseException,)
 if 'java' in sys.platform:
@@ -389,11 +389,11 @@ ClassTypes = (type,)
 if six.PY2:
     ClassTypes = (type, ClassType)
 
-_allowed_names = set((
+_allowed_names = {
     'return_value', '_mock_return_value', 'side_effect',
     '_mock_side_effect', '_mock_parent', '_mock_new_parent',
     '_mock_name', '_mock_new_name'
-))
+}
 
 
 def _delegating_property(name):
@@ -764,7 +764,7 @@ class NonCallableMock(Base):
             if self._spec_set:
                 spec_string = ' spec_set=%r'
             spec_string = spec_string % self._spec_class.__name__
-        return "<%s%s%s id='%s'>" % (
+        return "<{}{}{} id='{}'>".format(
             type(self).__name__,
             name_string,
             spec_string,
@@ -916,13 +916,13 @@ class NonCallableMock(Base):
         self = _mock_self
         if self.call_args is None:
             expected = self._format_mock_call_signature(args, kwargs)
-            raise AssertionError('Expected call: %s\nNot called' % (expected,))
+            raise AssertionError('Expected call: {}\nNot called'.format(expected))
 
         def _error_message(cause):
             msg = self._format_mock_failure_message(args, kwargs)
             if six.PY2 and cause is not None:
                 # Tack on some diagnostics for Python without __cause__
-                msg = '%s\n%s' % (msg, str(cause))
+                msg = '{}\n{}'.format(msg, str(cause))
             return msg
         expected = self._call_matcher((args, kwargs))
         actual = self._call_matcher(self.call_args)
@@ -973,7 +973,7 @@ class NonCallableMock(Base):
                 not_found.append(kall)
         if not_found:
             six.raise_from(AssertionError(
-                '%r not all found in call list' % (tuple(not_found),)
+                '{!r} not all found in call list'.format(tuple(not_found))
             ), cause)
 
 
@@ -1334,7 +1334,7 @@ class _patch(object):
 
         if not self.create and original is DEFAULT:
             raise AttributeError(
-                "%s does not have the attribute %r" % (target, name)
+                "{} does not have the attribute {!r}".format(target, name)
             )
         return original, local
 
@@ -1837,13 +1837,13 @@ else:
 # (as they are metaclass methods)
 # __del__ is not supported at all as it causes problems if it exists
 
-_non_defaults = set((
+_non_defaults = {
     '__cmp__', '__getslice__', '__setslice__', '__coerce__', # <3.x
     '__get__', '__set__', '__delete__', '__reversed__', '__missing__',
     '__reduce__', '__reduce_ex__', '__getinitargs__', '__getnewargs__',
     '__getstate__', '__setstate__', '__getformat__', '__setformat__',
     '__repr__', '__dir__', '__subclasses__', '__format__',
-))
+}
 
 
 def _get_method(name, func):
@@ -1854,19 +1854,19 @@ def _get_method(name, func):
     return method
 
 
-_magics = set(
+_magics = {
     '__%s__' % method for method in
     ' '.join([magic_methods, numerics, inplace, right, extra]).split()
-)
+}
 
 _all_magics = _magics | _non_defaults
 
-_unsupported_magics = set((
+_unsupported_magics = {
     '__getattr__', '__setattr__',
     '__init__', '__new__', '__prepare__'
     '__instancecheck__', '__subclasscheck__',
     '__del__'
-))
+}
 
 _calculate_return_value = {
     '__hash__': lambda self: object.__hash__(self),
@@ -2069,7 +2069,7 @@ def _format_call_signature(name, args, kwargs):
             return item
 
     kwargs_string = ', '.join([
-        '%s=%r' % (encode_item(key), value) for key, value in sorted(kwargs.items())
+        '{}={!r}'.format(encode_item(key), value) for key, value in sorted(kwargs.items())
     ])
     if args_string:
         formatted_args = args_string
@@ -2208,7 +2208,7 @@ class _Call(tuple):
     def __getattr__(self, attr):
         if self.name is None:
             return _Call(name=attr, from_kall=False)
-        name = '%s.%s' % (self.name, attr)
+        name = '{}.{}'.format(self.name, attr)
         return _Call(name=name, parent=self, from_kall=False)
 
 
