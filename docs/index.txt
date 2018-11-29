@@ -62,7 +62,7 @@ Installing
 
 The current version is |release|. Mock is stable and widely used.
 
-* `mock on PyPI <http://pypi.python.org/pypi/mock>`_
+* `mock on PyPI <https://pypi.org/project/mock/>`_
 
 .. index:: repository
 .. index:: git

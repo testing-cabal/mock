@@ -26,4 +26,4 @@ Please see the standard library documentation for more details.
 .. _Mock Homepage: https://github.com/testing-cabal/mock
 .. _BSD License: https://github.com/testing-cabal/mock/blob/master/LICENSE.txt
 .. _Python Docs: https://docs.python.org/dev/library/unittest.mock.html
-.. _mock on PyPI: http://pypi.python.org/pypi/mock
+.. _mock on PyPI: https://pypi.org/project/mock/
