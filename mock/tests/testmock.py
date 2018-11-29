@@ -811,7 +811,7 @@ class MockTest(unittest.TestCase):
             instance = sys.exc_info()[1]
             self.assertIsInstance(instance, exception)
         else:
-            self.fail('Exception %r not raised' % (exception,))
+            self.fail('Exception {!r} not raised'.format(exception))
 
         msg = str(instance)
         self.assertEqual(msg, message)
