@@ -13,7 +13,7 @@ from mock.tests.support import SomeClass, is_instance
 
 from mock import (
     NonCallableMock, CallableMixin, patch, sentinel,
-    MagicMock, Mock, NonCallableMagicMock, patch,
+    MagicMock, Mock, NonCallableMagicMock,
     DEFAULT, call
 )
 from mock.mock import _patch, _get_target

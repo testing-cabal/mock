@@ -11,7 +11,6 @@ except NameError:
     unicode = str
     long = int
 
-import inspect
 import sys
 import textwrap
 
