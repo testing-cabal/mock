@@ -15,7 +15,7 @@
 :Last sync: cb6aab1248c4aec4dd578bea717854505a6fb55d
 
 .. _Mock Homepage: https://github.com/testing-cabal/mock
-.. _BSD License: http://github.com/testing-cabal/mock/blob/master/LICENSE.txt
+.. _BSD License: https://github.com/testing-cabal/mock/blob/master/LICENSE.txt
 .. _Python Docs: https://docs.python.org/dev/library/unittest.mock.html
 
 .. module:: mock
