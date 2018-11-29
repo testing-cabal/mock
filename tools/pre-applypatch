@@ -27,7 +27,6 @@ function test_version {
 find . -name "*.pyc" -exec rm "{}" \;
 
 test_version 2.7
-test_version 3.3
 test_version 3.4
 test_version 3.5
 test_version 3.6

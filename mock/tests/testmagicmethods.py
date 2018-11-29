@@ -11,12 +11,11 @@ except NameError:
     unicode = str
     long = int
 
-import inspect
 import sys
 import textwrap
+import unittest
 
 import six
-import unittest2 as unittest
 
 from mock import Mock, MagicMock
 from mock.mock import _magics
@@ -405,7 +404,7 @@ class TestMockingMagicMethods(unittest.TestCase):
         mock = MagicMock()
         def set_setattr():
             mock.__setattr__ = lambda self, name: None
-        self.assertRaisesRegex(AttributeError,
+        self.assertRaisesRegexp(AttributeError,
             "Attempting to set unsupported magic method '__setattr__'.",
             set_setattr
         )

@@ -4,7 +4,7 @@
 
 from warnings import catch_warnings
 
-import unittest2 as unittest
+import unittest
 
 from mock.tests.support import is_instance
 from mock import MagicMock, Mock, patch, sentinel, mock_open, call

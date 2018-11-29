@@ -8,7 +8,7 @@ import sys
 import tempfile
 
 import six
-import unittest2 as unittest
+import unittest
 
 import mock
 from mock import (
@@ -205,7 +205,7 @@ class MockTest(unittest.TestCase):
 
         mock = create_autospec(f)
         mock.side_effect = ValueError('Bazinga!')
-        self.assertRaisesRegex(ValueError, 'Bazinga!', mock)
+        self.assertRaisesRegexp(ValueError, 'Bazinga!', mock)
 
     @unittest.skipUnless('java' in sys.platform,
                           'This test only applies to Jython')
@@ -501,7 +501,7 @@ class MockTest(unittest.TestCase):
 
                 # this should be allowed
                 mock.something
-                self.assertRaisesRegex(
+                self.assertRaisesRegexp(
                     AttributeError,
                     "Mock object has no attribute 'something_else'",
                     getattr, mock, 'something_else'
@@ -520,12 +520,12 @@ class MockTest(unittest.TestCase):
             mock.x
             mock.y
             mock.__something__
-            self.assertRaisesRegex(
+            self.assertRaisesRegexp(
                 AttributeError,
                 "Mock object has no attribute 'z'",
                 getattr, mock, 'z'
             )
-            self.assertRaisesRegex(
+            self.assertRaisesRegexp(
                 AttributeError,
                 "Mock object has no attribute '__foobar__'",
                 getattr, mock, '__foobar__'
@@ -591,13 +591,13 @@ class MockTest(unittest.TestCase):
 
     def test_assert_called_with_message(self):
         mock = Mock()
-        self.assertRaisesRegex(AssertionError, 'Not called',
+        self.assertRaisesRegexp(AssertionError, 'Not called',
                                 mock.assert_called_with)
 
 
     def test_assert_called_once_with_message(self):
         mock = Mock(name='geoffrey')
-        self.assertRaisesRegex(AssertionError,
+        self.assertRaisesRegexp(AssertionError,
                      r"Expected 'geoffrey' to be called once\.",
                      mock.assert_called_once_with)
 
@@ -811,7 +811,7 @@ class MockTest(unittest.TestCase):
             instance = sys.exc_info()[1]
             self.assertIsInstance(instance, exception)
         else:
-            self.fail('Exception %r not raised' % (exception,))
+            self.fail('Exception {!r} not raised'.format(exception))
 
         msg = str(instance)
         self.assertEqual(msg, message)
