@@ -13,6 +13,8 @@ matrix:
 # doesn't happen in trunk.
     - python: "nightly"
       env: SKIP_DOCS=1
+  allow_failures:
+  - python: pypy
 install:
  - pip install -U pip
  - pip install -U wheel setuptools
