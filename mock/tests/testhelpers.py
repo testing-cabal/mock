@@ -3,6 +3,7 @@
 # http://www.voidspace.org.uk/python/mock/
 
 import six
+import time
 import unittest
 
 from mock import (
@@ -884,6 +885,18 @@ class SpecSignatureTest(unittest.TestCase):
         mock_slot.abc(4, 5, 6)
         mock_slot.assert_called_once_with(1, 2, 3)
         mock_slot.abc.assert_called_once_with(4, 5, 6)
+
+    def test_autospec_on_bound_builtin_function(self):
+        meth = six.create_bound_method(time.ctime, time.time())
+        self.assertIsInstance(meth(), str)
+        mocked = create_autospec(meth)
+
+        # no signature, so no spec to check against
+        mocked()
+        mocked.assert_called_once_with()
+        mocked.reset_mock()
+        mocked(4, 5, 6)
+        mocked.assert_called_once_with(4, 5, 6)
 
 
 class TestCallList(unittest.TestCase):
