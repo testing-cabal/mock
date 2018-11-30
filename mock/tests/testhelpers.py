@@ -1,6 +1,7 @@
 # Copyright (C) 2007-2012 Michael Foord & the mock team
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 # http://www.voidspace.org.uk/python/mock/
+import socket
 
 import six
 import time
@@ -897,6 +898,10 @@ class SpecSignatureTest(unittest.TestCase):
         mocked.reset_mock()
         mocked(4, 5, 6)
         mocked.assert_called_once_with(4, 5, 6)
+
+    def test_autospec_socket(self):
+        sock_class = create_autospec(socket.socket)
+        self.assertRaises(TypeError, sock_class, foo=1)
 
 
 class TestCallList(unittest.TestCase):
