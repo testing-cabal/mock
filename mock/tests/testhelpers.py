@@ -15,6 +15,7 @@ from mock import (
 from mock.mock import _Call, _CallList
 
 from datetime import datetime
+from functools import partial
 
 class SomeClass(object):
     def one(self, a, b):
@@ -960,6 +961,17 @@ class SpecSignatureTest(unittest.TestCase):
     def test_autospec_socket(self):
         sock_class = create_autospec(socket.socket)
         self.assertRaises(TypeError, sock_class, foo=1)
+
+
+    def test_autospec_getattr_partial_function(self):
+        # bpo-32153 : getattr returning partial functions without
+        # __name__ should not create AttributeError in create_autospec
+        class Foo:
+            def __getattr__(self, attribute):
+                return partial(lambda name: name, attribute)
+        proxy = Foo()
+        autospec = create_autospec(proxy)
+        self.assertFalse(hasattr(autospec, '__name__'))
 
 
 class TestCallList(unittest.TestCase):
