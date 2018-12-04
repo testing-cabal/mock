@@ -12,13 +12,12 @@ import six
 import unittest
 
 import mock
-from mock import (
+from mock.mock import (
     call, DEFAULT, patch, sentinel,
     MagicMock, Mock, NonCallableMock,
-    NonCallableMagicMock,
+    NonCallableMagicMock, _Call, _CallList,
     create_autospec
 )
-from mock.mock import _CallList
 from mock.tests.support import is_instance
 
 
@@ -1731,6 +1730,19 @@ class MockTest(unittest.TestCase):
             self.assertIsInstance(mock, int)
             mock.foo
 
+    def test_name_attribute_of_call(self):
+        # bpo-35357: _Call should not disclose any attributes whose names
+        # may clash with popular ones (such as ".name")
+        self.assertIsNotNone(call.name)
+        self.assertEqual(type(call.name), _Call)
+        self.assertEqual(type(call.name().name), _Call)
+
+    def test_parent_attribute_of_call(self):
+        # bpo-35357: _Call should not disclose any attributes whose names
+        # may clash with popular ones (such as ".parent")
+        self.assertIsNotNone(call.parent)
+        self.assertEqual(type(call.parent), _Call)
+        self.assertEqual(type(call.parent().parent), _Call)
 
     @unittest.expectedFailure
     def test_pickle(self):
