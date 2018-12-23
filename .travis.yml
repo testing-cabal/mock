@@ -12,8 +12,6 @@ matrix:
       dist: xenial
     - python: "nightly"
       dist: xenial
-  allow_failures:
-  - python: pypy
 install:
  - pip install -U pip
  - pip install -U wheel setuptools
