@@ -4,6 +4,7 @@
 import socket
 
 import six
+import sys
 import time
 import unittest
 
@@ -459,6 +460,8 @@ class SpecSignatureTest(unittest.TestCase):
             self._check_someclass_mock(mock)
 
 
+    @unittest.skipIf('PyPy' in sys.version and sys.version_info < (3, 0),
+                     "Fails on pypy2 due to incorrect signature for dict.pop from funcsigs")
     def test_builtin_functions_types(self):
         # we could replace builtin functions / methods with a function
         # with *args / **kwargs signature. Using the builtin method type
