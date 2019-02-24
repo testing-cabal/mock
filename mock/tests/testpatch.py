@@ -668,6 +668,21 @@ class PatchTest(unittest.TestCase):
         test()
 
 
+    def test_patch_dict_decorator_resolution(self):
+        # bpo-35512: Ensure that patch with a string target resolves to
+        # the new dictionary during function call
+        original = support.target.copy()
+        @patch.dict('mock.tests.support.target', {'bar': 'BAR'})
+        def test():
+            self.assertEqual(support.target, {'foo': 'BAZ', 'bar': 'BAR'})
+        try:
+            support.target = {'foo': 'BAZ'}
+            test()
+            self.assertEqual(support.target, {'foo': 'BAZ'})
+        finally:
+            support.target = original
+
+
     @unittest.expectedFailure
     def test_patch_descriptor(self):
         # would be some effort to fix this - we could special case the
