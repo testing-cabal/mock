@@ -1894,6 +1894,16 @@ class MockTest(unittest.TestCase):
         self.assertEqual(type(call.parent), _Call)
         self.assertEqual(type(call.parent().parent), _Call)
 
+    def test_parent_propagation_with_create_autospec(self):
+        def foo(a, b):
+            pass
+
+        mock = Mock()
+        mock.child = create_autospec(foo)
+        mock.child(1, 2)
+        self.assertRaises(TypeError, mock.child, 1)
+        self.assertEqual(mock.mock_calls, [call.child(1, 2)])
+
     @unittest.expectedFailure
     def test_pickle(self):
         for Klass in (MagicMock, Mock, Subclass, NonCallableMagicMock):
