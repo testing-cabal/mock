@@ -158,6 +158,8 @@ class CallTest(unittest.TestCase):
         self.assertEqual(args, ('foo', (1, 2, 3)))
         self.assertEqual(args, ('foo', (1, 2, 3), {}))
         self.assertEqual(args, ((1, 2, 3), {}))
+        self.assertEqual(args.args, (1, 2, 3))
+        self.assertEqual(args.kwargs, {})
 
 
     def test_named_call_with_args(self):
@@ -165,6 +167,8 @@ class CallTest(unittest.TestCase):
 
         self.assertEqual(args, ('foo', (1, 2, 3)))
         self.assertEqual(args, ('foo', (1, 2, 3), {}))
+        self.assertEqual(args.args, (1, 2, 3))
+        self.assertEqual(args.kwargs, {})
 
         self.assertNotEqual(args, ((1, 2, 3),))
         self.assertNotEqual(args, ((1, 2, 3), {}))
@@ -177,6 +181,8 @@ class CallTest(unittest.TestCase):
         self.assertEqual(args, ('foo', dict(a=3, b=4)))
         self.assertEqual(args, ('foo', (), dict(a=3, b=4)))
         self.assertEqual(args, ((), dict(a=3, b=4)))
+        self.assertEqual(args.args, ())
+        self.assertEqual(args.kwargs, dict(a=3, b=4))
 
 
     def test_named_call_with_kwargs(self):
@@ -184,6 +190,8 @@ class CallTest(unittest.TestCase):
 
         self.assertEqual(args, ('foo', dict(a=3, b=4)))
         self.assertEqual(args, ('foo', (), dict(a=3, b=4)))
+        self.assertEqual(args.args, ())
+        self.assertEqual(args.kwargs, dict(a=3, b=4))
 
         self.assertNotEqual(args, (dict(a=3, b=4),))
         self.assertNotEqual(args, ((), dict(a=3, b=4)))
@@ -191,6 +199,7 @@ class CallTest(unittest.TestCase):
 
     def test_call_with_args_call_empty_name(self):
         args = _Call(((1, 2, 3), {}))
+
         self.assertEqual(args, call(1, 2, 3))
         self.assertEqual(call(1, 2, 3), args)
         self.assertIn(call(1, 2, 3), [args])
