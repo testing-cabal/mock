@@ -1924,6 +1924,36 @@ class MockTest(unittest.TestCase):
             self.assertIn('name="foo"', repr(new))
             self.assertEqual(new.attribute, 3)
 
+    def test_isinstance_under_settrace(self):
+        # bpo-36593 : __class__ is not set for a class that has __class__
+        # property defined when it's used with sys.settrace(trace) set.
+        # Delete the module to force reimport with tracing function set
+        # restore the old reference later since there are other tests that are
+        # dependent on unittest.mock.patch. In testpatch.PatchTest
+        # test_patch_dict_test_prefix and test_patch_test_prefix not restoring
+        # causes the objects patched to go out of sync
+        old_patch = mock.patch
+        # Directly using __setattr__ on unittest.mock causes current imported
+        # reference to be updated. Use a lambda so that during cleanup the
+        # re-imported new reference is updated.
+        self.addCleanup(lambda patch: setattr(mock, 'patch', patch),
+                        old_patch)
+        with patch.dict('sys.modules'):
+            del sys.modules['mock.mock']
+            def trace(frame, event, arg):
+                return trace
+            sys.settrace(trace)
+            self.addCleanup(sys.settrace, None)
+            from mock.mock import (
+                Mock, MagicMock, NonCallableMock, NonCallableMagicMock
+            )
+            mocks = [
+                Mock, MagicMock, NonCallableMock, NonCallableMagicMock
+            ]
+            for mock_ in mocks:
+                obj = mock_(spec=Something)
+                self.assertIsInstance(obj, Something)
+
 
 if __name__ == '__main__':
     unittest.main()
