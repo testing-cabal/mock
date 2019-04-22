@@ -62,7 +62,7 @@ try:
     import builtins
 except ImportError:
     import __builtin__ as builtins
-from types import ModuleType
+from types import ModuleType, MethodType
 from unittest.util import safe_repr
 
 import six
@@ -225,6 +225,8 @@ def _copy_func_details(func, funcopy):
 def _callable(obj):
     if isinstance(obj, ClassTypes):
         return True
+    if isinstance(obj, (staticmethod, classmethod, MethodType)):
+        return _callable(obj.__func__)
     if getattr(obj, '__call__', None) is not None:
         return True
     return False
