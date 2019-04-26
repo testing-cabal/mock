@@ -159,9 +159,9 @@ Backporting process
 4. Pull down the cPython git mirror: https://github.com/python/cpython.git
 5. Export the new revisions since the ``Last sync`::
 
-     revs=`cat lastsync.txt`
+     start=`cat lastsync.txt`
      rm migrate-export
-     git log --pretty="format:%H " $revs.. -- Lib/unittest/mock.py \
+     git log --pretty="format:%H " $start.. -- Lib/unittest/mock.py \
        Lib/unittest/test/testmock/ > migrate-revs
      tac migrate-revs > migrate-sorted-revs
      for rev in $(< migrate-sorted-revs); do
