@@ -181,5 +181,8 @@ Backporting process
    If you have to make changes, please do a ``git commit --amend`` and add notes
    about what needed doing below the ``Signed-off-by`` block.
 
+   If you have to make changes because tests fail with an applied patch, please
+   make those changes in a followup commit and take note of the "Backporting rules"
+   above.
 
 5. Rinse and repeat until ``backport.py`` reports no more patches need applying.
