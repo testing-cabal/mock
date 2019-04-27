@@ -32,7 +32,7 @@ def cpython_revs_affecting_mock(cpython_repo, start):
                f'-- Lib/unittest/mock.py Lib/unittest/test/testmock/',
                repo=cpython_repo).split()
     revs.reverse()
-    print(f'{len(revs)} patches to backport')
+    print(f'{len(revs)} patches that may need backporting')
     return revs
 
 
