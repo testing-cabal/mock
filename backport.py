@@ -1,6 +1,6 @@
 import re
 from argparse import ArgumentParser
-from os.path import dirname, abspath
+from os.path import dirname, abspath, join
 from subprocess import check_output, call
 
 
@@ -74,6 +74,11 @@ def apply_patch(mock_repo, rev, patch):
     call(f'git am -k --reject {patch_path}', cwd=mock_repo, shell=True)
 
 
+def update_last_sync(mock_repo, rev):
+    with open(join(mock_repo, 'lastsync.txt'), 'w') as target:
+        target.write(rev+'\n')
+    print(f'update lastsync.txt to {rev}')
+
 def main():
     args = parse_args()
 
@@ -88,6 +93,7 @@ def main():
     for rev in revs:
 
         if has_been_backported(args.mock, rev):
+            update_last_sync(args.mock, rev)
             continue
 
         patch = extract_patch_for(args.cpython, rev)

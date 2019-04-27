@@ -186,3 +186,6 @@ Backporting process
    above.
 
 5. Rinse and repeat until ``backport.py`` reports no more patches need applying.
+
+6. If ``backport.py`` has updated ``lastsync.txt``, now would be a good time
+   to commit that change.
