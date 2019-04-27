@@ -79,8 +79,27 @@ def update_last_sync(mock_repo, rev):
         target.write(rev+'\n')
     print(f'update lastsync.txt to {rev}')
 
+
+def rev_from_mock_patch(text):
+    match = re.search('Backports: ([a-z0-9]+)', text)
+    return match.group(1)
+
+
+def skip_current(mock_repo, reason):
+    text = git('am --show-current-patch', repo=mock_repo)
+    rev = rev_from_mock_patch(text)
+    git('am --abort', repo=mock_repo)
+    print(f'skipping {rev}')
+    update_last_sync(mock_repo, rev)
+    call(f'git commit -m "skip {rev}, {reason}" lastsync.txt', shell=True, cwd=mock_repo)
+    cleanup_old_patches(mock_repo)
+
+
 def main():
     args = parse_args()
+
+    if args.skip_current:
+        return skip_current(args.mock, args.skip_reason)
 
     if repo_state_bad(args.mock):
         return
@@ -106,6 +125,8 @@ def parse_args():
     parser = ArgumentParser()
     parser.add_argument('--cpython', default='../cpython')
     parser.add_argument('--mock', default=abspath(dirname(__file__)))
+    parser.add_argument('--skip-current', action='store_true')
+    parser.add_argument('--skip-reason', default='it has no changes needed here.')
     return parser.parse_args()
 
 

@@ -178,6 +178,9 @@ Backporting process
    If it fails, you'll have to manually work with what ``git status`` shows
    to get the patch committed.
 
+   If it turns out that there's nothing that should be applied from the failed commit,
+   run ``python backport.py --skip-current``.
+
    If you have to make changes, please do a ``git commit --amend`` and add notes
    about what needed doing below the ``Signed-off-by`` block.
 
