@@ -1,5 +1,4 @@
 .*\.pyc
-*.rej
 html/
 mock\.egg-info/
 mock\.wpu
