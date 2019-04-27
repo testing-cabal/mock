@@ -69,7 +69,7 @@ The current version is |release|. Mock is stable and widely used.
 You can checkout the latest development version from GitHub
 repository with the following command:
 
-    ``git clone https://github.com/testing-cabal/mock``
+    ``git clone https://github.com/testing-cabal/mock.git``
 
 
 .. index:: pip
@@ -77,12 +77,6 @@ repository with the following command:
 You can install mock with pip:
 
     | ``pip install -U mock``
-
-Alternatively you can download the mock distribution from PyPI and after
-unpacking run:
-
-   ``python setup.py install``
-
 
 .. index:: bug reports
 
@@ -145,48 +139,47 @@ non-bugfix changes, patch on bugfix only changes.
 Backporting rules
 -----------------
 
-isinstance checks in cPython to ``type`` need to check ``ClassTypes``.
-Code calling ``obj.isidentifier`` needs to change to ``_isidentifier(obj)``.
+- ``isinstance`` checks in cPython to ``type`` need to check ``ClassTypes``.
+  Code calling ``obj.isidentifier`` needs to change to ``_isidentifier(obj)``.
 
 Backporting process
 -------------------
 
-1. Patch your git am with `my patch <https://github.com/rbtcollins/git>`_.
-2. Install the applypatch-transform hook from tools/ to your .git hooks dir.
-3. Configure a pre-applypatch hook to test at least all the cPython versions
-   we support on each patch that is applied. I use containers, and a sample
-   script is in tools/pre-applypatch.
-4. Pull down the cPython git mirror: https://github.com/python/cpython.git
-5. Export the new revisions since the ``Last sync`::
+1. Clone cpython and mock into the same directory, eg:
 
-     start=`cat lastsync.txt`
-     rm migrate-export
-     git log --pretty="format:%H " $start.. -- Lib/unittest/mock.py \
-       Lib/unittest/test/testmock/ > migrate-revs
-     tac migrate-revs > migrate-sorted-revs
-     for rev in $(< migrate-sorted-revs); do
-           git format-patch -1 $rev -k --stdout >> migrate-export;
-           done
-     echo NEW SYNC POINT: $(git rev-parse HEAD)
+   .. code-block:: bash
 
-6. Import into mock::
+       mkdir vcs
+       cd vcs
+       git clone https://github.com/python/cpython.git
+       git clone https://github.com/testing-cabal/mock.git
 
-     git am -k --reject $path-to-cpython/migrate-export
+   Make sure they both on master and up to date!
 
-   This will transform the patches automatically. Currently it will error
-   on every NEWS change as I haven't gotten around to making those patches
-   automatic. Fixup any errors that occur. When the patch is ready, do a ``git
-   add -u`` to update the index and then ``git am --continue`` to move onto
-   the next patch. If the patch is inappropriate e.g. the patch removing
-   __ne__ which would break older pythons, then either do ``git reset --hard;
-   git am --skip`` to discard any partially applied changes and skip over it,
-   or, if it has a NEWS entry thats worth preserving, edit it down to just
-   that, with a note such as we have for the ``__ne__`` patch, and continue on
-   from there.
+2. Create a branch in your ``mock`` clone and switch to it.
 
-   The goal is that every patch work at all times.
+3. Make sure you build a suitable virtualenv for Mock development
+   and activate it. For backporting, this should use Python 3.7+.
 
-7. After the import is complete, update this document with the new sync point.
+4. Run ``backport.py``:
 
-8. Push to a personal branch and propose a PR to the main repo. This will make
-   Travis-CI test it. If it works, push to the main repo.
+   .. code-block:: bash
+
+       cd vcs/mock
+       python backport.py
+
+   This will find the next cpython patch that needs to be applied, munge it
+   and attempt to apply it with ``git am``.
+
+   If it succeeds, run the tests and/or push your branch up to a fork and
+   do a pull request into the master branch of the main repo to kick off
+   the continuous integration tests.
+
+   If it fails, you'll have to manually work with what ``git status`` shows
+   to get the patch committed.
+
+   If you have to make changes, please do a ``git commit --amend`` and add notes
+   about what needed doing below the ``Signed-off-by`` block.
+
+
+5. Rinse and repeat until ``backport.py`` reports no more patches need applying.
