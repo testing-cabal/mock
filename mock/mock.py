@@ -846,8 +846,8 @@ class NonCallableMock(Base):
                 self._mock_children[name] = value
 
         if self._mock_sealed and not hasattr(self, name):
-            mock_name = f'{self._extract_mock_name()}.{name}'
-            raise AttributeError(f'Cannot set {mock_name}')
+            mock_name = self._extract_mock_name()+'.'+name
+            raise AttributeError('Cannot set '+mock_name)
 
         return object.__setattr__(self, name, value)
 
