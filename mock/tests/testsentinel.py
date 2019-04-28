@@ -31,7 +31,6 @@ class SentinelTest(unittest.TestCase):
 
     def testPickle(self):
         for proto in range(pickle.HIGHEST_PROTOCOL+1):
-            with self.subTest(protocol=proto):
                 pickled = pickle.dumps(sentinel.whatever, proto)
                 unpickled = pickle.loads(pickled)
                 self.assertIs(unpickled, sentinel.whatever)
