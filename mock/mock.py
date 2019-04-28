@@ -357,7 +357,11 @@ class _SentinelObject(object):
         return 'sentinel.%s' % self.name
 
     def __reduce__(self):
-        return 'sentinel.%s' % self.name
+        return _unpickle_sentinel, (self.name, )
+
+
+def _unpickle_sentinel(name):
+    return getattr(sentinel, name)
 
 
 class _Sentinel(object):
