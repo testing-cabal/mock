@@ -2524,7 +2524,8 @@ def mock_open(mock=None, read_data=''):
         return type(read_data)().join(_state[0])
 
     def _readline_side_effect():
-        yield from _iter_side_effect()
+        for item in _iter_side_effect():
+            yield item
         while True:
             yield type(read_data)()
 
