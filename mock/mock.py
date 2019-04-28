@@ -1864,7 +1864,9 @@ inplace = ' '.join('i%s' % n for n in numerics.split())
 right = ' '.join('r%s' % n for n in numerics.split())
 extra = ''
 if six.PY3:
-    extra = 'bool next fspath '
+    extra = 'bool next '
+    if sys.version_info >= (3, 6):
+        extra += 'fspath '
 else:
     extra = 'unicode long nonzero oct hex truediv rtruediv '
 
