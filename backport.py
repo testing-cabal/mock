@@ -91,7 +91,7 @@ def skip_current(mock_repo, reason):
     git('am --abort', repo=mock_repo)
     print(f'skipping {rev}')
     update_last_sync(mock_repo, rev)
-    call(f'git commit -m "skip {rev}, {reason}" lastsync.txt', shell=True, cwd=mock_repo)
+    call(f'git commit -m "Backports: {rev}, skipped: {reason}" lastsync.txt', shell=True, cwd=mock_repo)
     cleanup_old_patches(mock_repo)
 
 
