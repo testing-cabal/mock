@@ -57,7 +57,7 @@ def munge(rev, patch):
 
     for pattern, sub in (
         ('(a|b)/Lib/unittest/mock.py', r'\1/mock/mock.py'),
-        ('(a|b)/Lib/unittest/test/testmock/(.+)', r'\1/mock/tests/\2'),
+        (r'(a|b)/Lib/unittest/test/testmock/(\S+)', r'\1/mock/tests/\2'),
         ('(a|b)/Misc/NEWS', r'\1/NEWS'),
         ('(a|b)/NEWS.d/next/Library/(.+\.rst)', r'\1/NEWS.d/\2'),
     ):
