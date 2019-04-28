@@ -364,7 +364,7 @@ class TestMockingMagicMethods(unittest.TestCase):
 
     def test_magic_methods_fspath(self):
         mock = MagicMock()
-        if six.PY2:
+        if sys.version_info < (3, 6):
             self.assertRaises(AttributeError, lambda: mock.__fspath__)
         else:
             expected_path = mock.__fspath__()
