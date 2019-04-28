@@ -437,7 +437,7 @@ class MockTest(unittest.TestCase):
         m = Mock()
         m(1)
         m(2)
-        self.assertRaisesRegex(AssertionError,
+        self.assertRaisesRegexp(AssertionError,
             re.escape("Calls: [call(1), call(2)]"),
             lambda: m.assert_called_once_with(2))
 
@@ -1326,7 +1326,7 @@ class MockTest(unittest.TestCase):
     def test_assert_not_called_message(self):
         m = Mock()
         m(1, 2)
-        self.assertRaisesRegex(AssertionError,
+        self.assertRaisesRegexp(AssertionError,
             re.escape("Calls: [call(1, 2)]"),
             m.assert_not_called)
 
@@ -1355,7 +1355,7 @@ class MockTest(unittest.TestCase):
         m = Mock()
         m(1, 2)
         m(3)
-        self.assertRaisesRegex(AssertionError,
+        self.assertRaisesRegexp(AssertionError,
             re.escape("Calls: [call(1, 2), call(3)]"),
             m.assert_called_once)
 
