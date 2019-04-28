@@ -142,6 +142,8 @@ Backporting rules
 - ``isinstance`` checks in cPython to ``type`` need to check ``ClassTypes``.
   Code calling ``obj.isidentifier`` needs to change to ``_isidentifier(obj)``.
 
+- f-strings need to be rewritten using some other string substitution.
+
 Backporting process
 -------------------
 
