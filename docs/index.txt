@@ -183,7 +183,7 @@ Backporting process
    to get the patch committed.
 
    If it turns out that there's nothing that should be applied from the failed commit,
-   run ``python backport.py --skip-current``.
+   run ``python backport.py --skip-current``, maybe with ``--skip-reason``.
 
    If you have to make changes, please do a ``git commit --amend`` and add notes
    about what needed doing below the ``Signed-off-by`` block.
