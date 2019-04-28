@@ -72,7 +72,10 @@ def apply_patch(mock_repo, rev, patch):
         target.write(patch)
     print(f'wrote {patch_path}')
 
-    call(f'git am -k --reject {patch_path}', cwd=mock_repo, shell=True)
+    call(f'git am -k '
+         f'--include "mock/*" --include NEWS --include "NEWS.d/*" '
+         f'--reject {patch_path} ',
+         cwd=mock_repo, shell=True)
 
 
 def update_last_sync(mock_repo, rev):
