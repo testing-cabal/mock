@@ -330,10 +330,16 @@ class TestMockingMagicMethods(unittest.TestCase):
         self.assertEqual(unicode(mock), object.__str__(mock))
         self.assertIsInstance(unicode(mock), unicode)
         self.assertTrue(bool(mock))
-        self.assertEqual(round(mock), mock.__round__())
         self.assertEqual(math.trunc(mock), mock.__trunc__())
-        self.assertEqual(math.floor(mock), mock.__floor__())
-        self.assertEqual(math.ceil(mock), mock.__ceil__())
+        if six.PY2:
+            # These fall back to __float__ in Python 2:
+            self.assertEqual(round(mock), 1.0)
+            self.assertEqual(math.floor(mock), 1.0)
+            self.assertEqual(math.ceil(mock), 1.0)
+        else:
+            self.assertEqual(round(mock), mock.__round__())
+            self.assertEqual(math.floor(mock), mock.__floor__())
+            self.assertEqual(math.ceil(mock), mock.__ceil__())
         if six.PY2:
             self.assertEqual(oct(mock), '1')
         else:
