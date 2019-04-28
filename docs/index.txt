@@ -144,6 +144,8 @@ Backporting rules
 
 - f-strings need to be rewritten using some other string substitution.
 
+- ``assertRaisesRegex`` needs to be ``assertRaisesRegexp`` for Python 2.
+
 Backporting process
 -------------------
 
