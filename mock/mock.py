@@ -1064,7 +1064,7 @@ class NonCallableMock(Base):
         """
         if not self.mock_calls:
             return ""
-        return f"\n{prefix}: {safe_repr(self.mock_calls)}."
+        return "\n"+prefix+": "+safe_repr(self.mock_calls)+"."
 
 
 
