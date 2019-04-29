@@ -19,6 +19,6 @@ install:
  - pip list
  - python --version
 script:
- - python -m unittest discover
+ - pytest
  - if [ -z "$SKIP_DOCS" ]; then python setup.py build_sphinx; fi
  - rst2html.py --strict README.rst README.html
