@@ -9,7 +9,7 @@ import six
 import unittest
 
 from mock.tests import support
-from mock.tests.support import SomeClass, is_instance
+from mock.tests.support import SomeClass, is_instance, uncache
 
 from mock import (
     NonCallableMock, CallableMixin, patch, sentinel,
