@@ -1005,21 +1005,6 @@ class SpecSignatureTest(unittest.TestCase):
         self.assertRaises(TypeError, mock, 1)
 
 
-    def test_spec_inspect_signature_annotations(self):
-
-        def foo(a: int, b: int=10, *, c:int) -> int:
-            return a + b + c
-
-        mock = create_autospec(foo)
-        mock(1, 2, c=3)
-        mock(1, c=3)
-
-        self.assertEqual(inspect.getfullargspec(mock), inspect.getfullargspec(foo))
-        self.assertEqual(mock.mock_calls, [call(1, 2, c=3), call(1, c=3)])
-        self.assertRaises(TypeError, mock, 1)
-        self.assertRaises(TypeError, mock, 1, 2, 3, c=4)
-
-
 class TestCallList(unittest.TestCase):
 
     def test_args_list_contains_call_list(self):
