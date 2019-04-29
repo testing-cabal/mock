@@ -18,6 +18,11 @@ from mock.mock import _Call, _CallList
 from datetime import datetime
 from functools import partial
 
+
+if six.PY2:
+    import funcsigs
+
+
 class SomeClass(object):
     def one(self, a, b):
         pass
@@ -1000,7 +1005,10 @@ class SpecSignatureTest(unittest.TestCase):
         mock(1, 2)
         mock(x=1, y=2)
 
-        self.assertEqual(inspect.getfullargspec(mock), inspect.getfullargspec(myfunc))
+        if six.PY2:
+            self.assertEqual(funcsigs.signature(mock), funcsigs.signature(myfunc))
+        else:
+            self.assertEqual(inspect.getfullargspec(mock), inspect.getfullargspec(myfunc))
         self.assertEqual(mock.mock_calls, [call(1, 2), call(x=1, y=2)])
         self.assertRaises(TypeError, mock, 1)
 
