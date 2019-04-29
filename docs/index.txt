@@ -146,6 +146,10 @@ Backporting rules
 
 - ``assertRaisesRegex`` needs to be ``assertRaisesRegexp`` for Python 2.
 
+- If test code won't compile on a particular version of Python, move it to
+  a matching ``_py{version}.py`` file. If ``{version}`` isn't 3, adjust
+  ``conftest.py``.
+
 Backporting process
 -------------------
 
