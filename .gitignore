@@ -12,8 +12,4 @@ runtox
 *.pyc
 .testrepository
 .*.swp
-AUTHORS
-ChangeLog
-.eggs
-README.saved
 README.html

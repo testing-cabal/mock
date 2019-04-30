@@ -67,11 +67,9 @@ from unittest.util import safe_repr
 
 import six
 from six import wraps
-from pbr.version import VersionInfo
 
-_v = VersionInfo('mock').semantic_version()
-__version__ = _v.release_string()
-version_info = _v.version_tuple()
+__version__ = '2.0.0'
+version_info = tuple(__version__.split('.'))
 
 import mock
 
