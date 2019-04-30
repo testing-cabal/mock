@@ -69,7 +69,7 @@ import six
 from six import wraps
 
 __version__ = '2.0.0'
-version_info = tuple(__version__.split('.'))
+version_info = tuple(int(p) for p in __version__.split('.'))
 
 import mock
 
