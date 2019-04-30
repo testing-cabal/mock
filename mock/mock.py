@@ -126,11 +126,6 @@ except AttributeError:
             return False
         return regex.match(string)
 
-self = 'im_self'
-builtin = '__builtin__'
-if six.PY3:
-    self = '__self__'
-    builtin = 'builtins'
 
 # NOTE: This FILTER_DIR is not used. The binding in mock.FILTER_DIR is.
 FILTER_DIR = True
