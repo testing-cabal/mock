@@ -2,66 +2,32 @@
  Mock - Mocking and Testing Library
 ===================================
 
-:Version: |release|
-:Date: |today|
-:Homepage: `Mock Homepage`_
-:Download: `Mock on PyPI`_
-:Documentation: `Python Docs`_
-:License: `BSD License`_
-:Support: `Mailing list (testing-in-python@lists.idyll.org)
- <http://lists.idyll.org/listinfo/testing-in-python>`_
-:Issue tracker: `GitHub Issues
- <https://github.com/testing-cabal/mock/issues>`_
-
-.. _Mock Homepage: https://github.com/testing-cabal/mock
-.. _BSD License: https://github.com/testing-cabal/mock/blob/master/LICENSE.txt
-.. _Python Docs: https://docs.python.org/dev/library/unittest.mock.html
+.. include:: ../README.rst
 
 .. module:: mock
    :synopsis: Mock object and testing library.
 
 .. index:: introduction
 
-TOC
-+++
-
 .. toctree::
-   :maxdepth: 2
+   :hidden:
 
    changelog
 
-Introduction
-++++++++++++
+Python Version Compatibility
+++++++++++++++++++++++++++++
 
-mock is a library for testing in Python. It allows you to replace parts of
-your system under test with mock objects and make assertions about how they
-have been used.
+* Version 1.0.1 is the last version compatible with Python < 2.6.
 
-mock is now part of the Python standard library, available as
-``unittest.mock`` in Python 3.3 onwards. However, if you are writing code that
-runs on multiple versions of Python the ``mock`` package is better, as you get
-the newest features from the latest release of Python available for all
-Pythons.
+* Version 1.3.0 is the last version compatible with Python 3.2.
 
-The ``mock`` package contains a rolling backport of the standard library mock
-code compatible with Python 2.7 and 3.4 and up.
-
-* Python 2.6 and 3.3 are supported by mock 2.0.0 and below.
-
-* Python 3.2 is supported by mock 1.3.0 and below - with pip no longer
-  supporting 3.2, we cannot test against that version anymore.
-
-Please see the standard library documentation for usage details.
+* Version 2.0.0 is the last version compatible with Python 2.6.
 
 .. index:: installing
 .. _installing:
 
 Installing
 ++++++++++
-
-The current version is |release|. Mock is stable and widely used.
-
-* `mock on PyPI <https://pypi.org/project/mock/>`_
 
 .. index:: repository
 .. index:: git
@@ -83,7 +49,6 @@ You can install mock with pip:
 Bug Reports
 +++++++++++
 
-Mock uses `unittest <https://docs.python.org/3/library/unittest.html>`_ for its own
 Issues with the backport process, such as compatibility with a particular
 Python, should be reported to the `bug tracker
 <https://github.com/testing-cabal/mock/issues>`_. Feature requests and issues
@@ -95,18 +60,7 @@ with Mock functionality should be reported to the `Python bug tracker
 Python Changes
 ++++++++++++++
 
-Python NEWS entries from cPython:
-
-.. include:: ../NEWS
-
-.. index:: older versions
-
-Older Versions of Python
-++++++++++++++++++++++++
-
-Version 1.0.1 is the last version compatible with Python < 2.6.
-
-Version 2.0.0 is the last version compatible with Python 2.6.
+See the :doc:`change log <changelog>`.
 
 .. index:: maintainer notes
 
