@@ -1,5 +1,5 @@
-Library
--------
+Unreleased
+----------
 
 - Issue #28380: unittest.mock Mock autospec functions now properly support
   assert_called, assert_not_called, and assert_called_once.
@@ -23,6 +23,9 @@ Library
 - Issue #25195: Fix a regression in mock.MagicMock. _Call is a subclass of
   tuple (changeset 3603bae63c13 only works for classes) so we need to
   implement __ne__ ourselves.  Patch by Andrew Plummer.
+
+2.0.0
+-----
 
 - Issue #26323: Add Mock.assert_called() and Mock.assert_called_once()
   methods to unittest.mock. Patch written by Amit Saha.
