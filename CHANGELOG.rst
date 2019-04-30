@@ -1,6 +1,3 @@
-Unreleased
-----------
-
 - Issue #28380: unittest.mock Mock autospec functions now properly support
   assert_called, assert_not_called, and assert_called_once.
   
@@ -24,8 +21,8 @@ Unreleased
   tuple (changeset 3603bae63c13 only works for classes) so we need to
   implement __ne__ ourselves.  Patch by Andrew Plummer.
 
-2.0.0
------
+2.0.0 and earlier
+-----------------
 
 - Issue #26323: Add Mock.assert_called() and Mock.assert_called_once()
   methods to unittest.mock. Patch written by Amit Saha.
