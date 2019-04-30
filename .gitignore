@@ -13,3 +13,5 @@ runtox
 .testrepository
 .*.swp
 README.html
+.coverage
+.coverage.*

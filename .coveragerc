@@ -1,0 +1,14 @@
+[run]
+source = mock
+omit = mock/tests/__main__.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.:
+    : pass
+
+[paths]
+source =
+    mock/
+    /root/project/mock/
