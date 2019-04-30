@@ -2400,6 +2400,12 @@ def create_autospec(spec, spec_set=False, instance=False, _parent=None,
                                             _name='()', _parent=mock)
 
     for entry in dir(spec):
+
+        # This are __ and so treated as magic on Py3, on Py2 we need to
+        # explicitly ignore them:
+        if six.PY2 and (entry.startswith('im_') or entry.startswith('func_')):
+            continue
+
         if _is_magic(entry):
             # MagicMock already does the useful magic methods for us
             continue
