@@ -99,6 +99,12 @@ def skip_current(mock_repo, reason):
     cleanup_old_patches(mock_repo)
 
 
+def commit_last_sync(revs, mock_repo):
+    print('Yay! All caught up!')
+    if len(revs):
+        git('commit -m "latest sync point" lastsync.txt', repo=mock_repo)
+
+
 def main():
     args = parse_args()
 
@@ -123,6 +129,9 @@ def main():
         patch = munge(rev, patch)
         apply_patch(args.mock, rev, patch)
         break
+
+    else:
+        commit_last_sync(revs, args.mock)
 
 
 def parse_args():
