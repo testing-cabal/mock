@@ -1,0 +1,82 @@
+version: 2.1
+
+orbs:
+  python: cjw296/python-ci@1.3
+
+jobs:
+  docs:
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - checkout
+      - run:
+          name: "Install Project"
+          command: "sudo pip install -e .[docs]"
+      - run:
+          name: "Build Docs"
+          command: |
+            python setup.py build_sphinx
+            rst2html.py --strict README.rst README.html
+
+
+common: &common
+  jobs:
+    - python/pip-run-tests:
+        name: python27
+        image: circleci/python:2.7
+    - python/pip-run-tests:
+        name: python34
+        image: circleci/python:3.4
+    - python/pip-run-tests:
+        name: python35
+        image: circleci/python:3.5
+    - python/pip-run-tests:
+        name: python36
+        image: circleci/python:3.6
+    - python/pip-run-tests:
+        name: python37
+        image: circleci/python:3.7
+    - python/pip-run-tests:
+        name: pypy27
+        image: pypy:2.7
+        sudo: false
+    - python/pip-run-tests:
+        name: pypy36
+        image: pypy:3.6
+        sudo: false
+
+    - python/coverage:
+        name: coverage
+        requires:
+          - python27
+          - python34
+          - python35
+          - python36
+          - python37
+          - pypy27
+          - pypy36
+
+    - docs:
+        requires:
+          - coverage
+
+    - python/release:
+        name: release
+        config: .carthorse.yml
+        requires:
+          - docs
+        filters:
+          branches:
+            only: master
+
+workflows:
+  push:
+    <<: *common
+  periodic:
+    <<: *common
+    triggers:
+      - schedule:
+          cron: "0 1 * * *"
+          filters:
+            branches:
+              only: master
