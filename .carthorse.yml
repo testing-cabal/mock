@@ -1,0 +1,10 @@
+carthorse:
+  version-from: setup.py
+  tag-format: "{version}"
+  when:
+    - version-not-tagged
+  actions:
+    - run: "sudo pip install -e .[build]"
+    - run: "sudo python setup.py sdist bdist_wheel"
+    - run: "twine upload -u carthorse-mock -p $PYPI_PASS dist/*"
+    - create-tag
