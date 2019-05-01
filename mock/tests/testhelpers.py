@@ -471,6 +471,9 @@ class SpecSignatureTest(unittest.TestCase):
             self._check_someclass_mock(mock)
 
 
+    @unittest.skipIf('PyPy' in sys.version,
+                     "This fails on pypy, "
+                     "see https://github.com/testing-cabal/mock/issues/452")
     def test_spec_has_descriptor_returning_function(self):
         class CrazyDescriptor(object):
             def __get__(self, obj, type_):
