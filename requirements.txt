@@ -1,2 +1,0 @@
-funcsigs>=1;python_version<"3.3"
-six>=1.9
