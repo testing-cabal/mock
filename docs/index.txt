@@ -23,6 +23,8 @@ Python Version Compatibility
 
 * Version 2.0.0 is the last version compatible with Python 2.6.
 
+* Version 2.0.0 is the last version offering official Jython support.
+
 .. index:: installing
 .. _installing:
 
@@ -76,9 +78,7 @@ Committers can just push as desired: since all semantic development takes
 place in cPython, the backport process is as lightweight as we can make it.
 
 mock is CI tested using Travis-CI on Python versions 2.7, 3.4,
-3.5, 3.6, nightly Python 3 builds, pypy, pypy3. Jython support is desired, if
-someone could contribute a patch to .travis.yml to support it that would be
-excellent.
+3.5, 3.6, nightly Python 3 builds, pypy, pypy3.
 
 Releasing
 ---------
