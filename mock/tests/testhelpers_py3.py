@@ -12,6 +12,7 @@ class CallTest(unittest.TestCase):
         def foo(a: int, b: int=10, *, c:int) -> int:
             return a + b + c
 
+        self.assertEqual(foo(1, 2, c=3), 6)
         mock = create_autospec(foo)
         mock(1, 2, c=3)
         mock(1, c=3)

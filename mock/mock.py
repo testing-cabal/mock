@@ -259,8 +259,6 @@ def _set_signature(mock, original, instance=False):
     # creates a function with signature (*args, **kwargs) that delegates to a
     # mock. It still does signature checking by calling a lambda with the same
     # signature as the original.
-    if not _callable(original):
-        return
 
     skipfirst = isinstance(original, ClassTypes)
     result = _get_signature_object(original, instance, skipfirst)
@@ -286,10 +284,6 @@ def _set_signature(mock, original, instance=False):
 
 def _setup_func(funcopy, mock, sig):
     funcopy.mock = mock
-
-    # can't use isinstance with mocks
-    if not _is_instance_mock(mock):
-        return
 
     def assert_called(*args, **kwargs):
         return mock.assert_called(*args, **kwargs)
@@ -384,12 +378,6 @@ class OldStyleClass:
 ClassType = type(OldStyleClass)
 
 
-def _copy(value):
-    if type(value) in (dict, list, tuple, set):
-        return type(value)(value)
-    return value
-
-
 ClassTypes = (type,)
 if six.PY2:
     ClassTypes = (type, ClassType)
@@ -476,8 +464,6 @@ def _check_and_set_parent(parent, value, name, new_name):
 class _MockIter(object):
     def __init__(self, obj):
         self.obj = iter(obj)
-    def __iter__(self):
-        return self
     def __next__(self):
         return next(self.obj)
 
@@ -577,7 +563,7 @@ class NonCallableMock(Base):
             if isinstance(spec, ClassTypes):
                 _spec_class = spec
             else:
-                _spec_class = _get_class(spec)
+                _spec_class = type(spec)
             res = _get_signature_object(spec,
                                         _spec_as_instance, _eat_self)
             _spec_signature = res and res[1]
@@ -749,7 +735,7 @@ class NonCallableMock(Base):
         dot = '.'
         if _name_list == ['()']:
             dot = ''
-        seen = set()
+
         while _parent is not None:
             last = _parent
 
@@ -759,11 +745,6 @@ class NonCallableMock(Base):
                 dot = ''
 
             _parent = _parent._mock_new_parent
-
-            # use ids here so as not to call __hash__ on the mocks
-            if id(_parent) in seen:
-                break
-            seen.add(id(_parent))
 
         _name_list = list(reversed(_name_list))
         _first = last._mock_name or 'mock'
@@ -882,8 +863,6 @@ class NonCallableMock(Base):
         message = 'expected call not found.\nExpected: %s\nActual: %s'
         expected_string = self._format_mock_call_signature(args, kwargs)
         call_args = self.call_args
-        if len(call_args) == 3:
-            call_args = call_args[1:]
         actual_string = self._format_mock_call_signature(*call_args)
         return message % (expected_string, actual_string)
 
@@ -1125,8 +1104,6 @@ class CallableMixin(Base):
         self.call_args = _call
         self.call_args_list.append(_call)
 
-        seen = set()
-
         # initial stuff for method_calls:
         do_method_calls = self._mock_parent is not None
         method_call_name = self._mock_name
@@ -1161,13 +1138,6 @@ class CallableMixin(Base):
 
             # follow the parental chain:
             _new_parent = _new_parent._mock_new_parent
-
-            # check we're not in an infinite loop:
-            # ( use ids here so as not to call __hash__ on the mocks)
-            _new_parent_id = id(_new_parent)
-            if _new_parent_id in seen:
-                break
-            seen.add(_new_parent_id)
 
         effect = self.side_effect
         if effect is not None:
@@ -2007,12 +1977,7 @@ def _set_return_value(mock, method, name):
 
     return_calulator = _calculate_return_value.get(name)
     if return_calulator is not None:
-        try:
-            return_value = return_calulator(mock)
-        except AttributeError:
-            # XXXX why do we return AttributeError here?
-            #      set it as a side_effect instead?
-            return_value = AttributeError(name)
+        return_value = return_calulator(mock)
         method.return_value = return_value
         return
 
@@ -2091,10 +2056,6 @@ class MagicProxy(object):
     def __init__(self, name, parent):
         self.name = name
         self.parent = parent
-
-    def __call__(self, *args, **kwargs):
-        m = self.create_mock()
-        return m(*args, **kwargs)
 
     def create_mock(self):
         entry = self.name
@@ -2499,17 +2460,8 @@ def _must_skip(spec, entry, is_type):
         else:
             return False
 
-    # shouldn't get here unless function is a dynamically provided attribute
-    # XXXX untested behaviour
+    # function is a dynamically provided attribute
     return is_type
-
-
-def _get_class(obj):
-    try:
-        return obj.__class__
-    except AttributeError:
-        # it is possible for objects to have no __class__
-        return type(obj)
 
 
 class _SpecState(object):

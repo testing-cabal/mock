@@ -375,8 +375,7 @@ class TestMockingMagicMethods(unittest.TestCase):
 
     def test_magic_methods_and_spec(self):
         class Iterable(object):
-            def __iter__(self):
-                pass
+            def __iter__(self): pass
 
         mock = Mock(spec=Iterable)
         self.assertRaises(AttributeError, lambda: mock.__iter__)
@@ -400,8 +399,7 @@ class TestMockingMagicMethods(unittest.TestCase):
 
     def test_magic_methods_and_spec_set(self):
         class Iterable(object):
-            def __iter__(self):
-                pass
+            def __iter__(self): pass
 
         mock = Mock(spec_set=Iterable)
         self.assertRaises(AttributeError, lambda: mock.__iter__)
