@@ -362,9 +362,6 @@ class _Sentinel(object):
             raise AttributeError
         return self._sentinels.setdefault(name, _SentinelObject(name))
 
-    def __reduce__(self):
-        return 'sentinel'
-
 
 sentinel = _Sentinel()
 
