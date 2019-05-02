@@ -1,3 +1,6 @@
+
+- Add missing ``funcsigs`` dependency on Python 2.
+
 3.0.1
 -----
 
