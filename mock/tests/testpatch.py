@@ -656,6 +656,14 @@ class PatchTest(unittest.TestCase):
         test()
 
 
+    def test_patch_dict_with_unicode(self):
+        @patch.dict(u'os.environ', {'konrad_delong': 'some value'})
+        def test():
+            self.assertIn('konrad_delong', os.environ)
+
+        test()
+
+
     def test_patch_dict_decorator_resolution(self):
         # bpo-35512: Ensure that patch with a string target resolves to
         # the new dictionary during function call

@@ -1768,7 +1768,7 @@ class _patch_dict(object):
 
     def _patch_dict(self):
         values = self.values
-        if isinstance(self.in_dict, str):
+        if isinstance(self.in_dict, basestring):
             self.in_dict = _importer(self.in_dict)
         in_dict = self.in_dict
         clear = self.clear
