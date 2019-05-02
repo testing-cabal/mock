@@ -86,9 +86,16 @@ Releasing
 NB: please use semver. Bump the major component on API breaks, minor on all
 non-bugfix changes, patch on bugfix only changes.
 
-1. tag -s, push --tags origin master
-2. setup.py sdist bdist_wheel upload -s
+1. Run ``release.py [major|minor|bugfix]`` which will roll out new
+   NEWS items, bump the version number and create a commit for the release.
 
+2. Review that commit, feel free to amend it if you want to note anything
+   manually in ``CHANGELOG.rst``.
+
+3. Push to the ``master`` branch on
+   https://github.com/testing-cabal/mock.git and the Circle CI
+   automation will take care of pushing releases to PyPI and
+   creating a tag.
 
 Backporting rules
 -----------------
