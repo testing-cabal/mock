@@ -1,4 +1,4 @@
-Changelog from Python's News
-============================
+Changelog
+=========
 
 .. include:: ../CHANGELOG.rst
