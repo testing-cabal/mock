@@ -1941,21 +1941,6 @@ class MockTest(unittest.TestCase):
         self.assertRaises(TypeError, mock.child, 1)
         self.assertEqual(mock.mock_calls, [call.child(1, 2)])
 
-    @unittest.expectedFailure
-    def test_pickle(self):
-        for Klass in (MagicMock, Mock, Subclass, NonCallableMagicMock):
-            mock = Klass(name='foo', attribute=3)
-            mock.foo(1, 2, 3)
-            data = pickle.dumps(mock)
-            new = pickle.loads(data)
-
-            new.foo.assert_called_once_with(1, 2, 3)
-            self.assertFalse(new.called)
-            self.assertTrue(is_instance(new, Klass))
-            self.assertIsInstance(new, Thing)
-            self.assertIn('name="foo"', repr(new))
-            self.assertEqual(new.attribute, 3)
-
     def test_isinstance_under_settrace(self):
         # bpo-36593 : __class__ is not set for a class that has __class__
         # property defined when it's used with sys.settrace(trace) set.
