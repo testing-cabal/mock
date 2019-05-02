@@ -20,8 +20,13 @@ Please see the standard library documentation for more details.
 :Issue tracker: `GitHub Issues
  <https://github.com/testing-cabal/mock/issues>`_
 :Build status:
-  .. image:: https://travis-ci.org/testing-cabal/mock.svg?branch=master
-      :target: https://travis-ci.org/testing-cabal/mock
+    |CircleCI|_ |Docs|_
+
+    .. |CircleCI| image:: https://circleci.com/gh/testing-cabal/mock/tree/master.svg?style=shield
+    .. _CircleCI: https://circleci.com/gh/testing-cabal/mock/tree/master
+
+    .. |Docs| image:: https://readthedocs.org/projects/mock/badge/?version=latest
+    .. _Docs: http://mock.readthedocs.org/en/latest/
 
 .. _Mock Homepage: https://github.com/testing-cabal/mock
 .. _BSD License: https://github.com/testing-cabal/mock/blob/master/LICENSE.txt
