@@ -1,3 +1,8 @@
+3.0.3
+-----
+
+- Fixed patching of dictionaries with a Unicodes on Python 2.
+
 3.0.2
 -----
 

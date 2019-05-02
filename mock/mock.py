@@ -68,7 +68,7 @@ from unittest.util import safe_repr
 import six
 from six import wraps
 
-__version__ = '3.0.2'
+__version__ = '3.0.3'
 version_info = tuple(int(p) for p in __version__.split('.'))
 
 import mock
