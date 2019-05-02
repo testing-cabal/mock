@@ -1,3 +1,8 @@
+3.0.1
+-----
+
+- Fix packaging issue where ``six`` was missed as a dependency.
+
 3.0.0
 -----
 
