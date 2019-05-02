@@ -1025,6 +1025,14 @@ class SpecSignatureTest(unittest.TestCase):
         self.assertEqual(mock.__name__, 'funcopy')
 
 
+    @unittest.skipIf(six.PY3, "Here to test our Py2 _isidentifier")
+    def test_spec_function_has_identifier_name(self):
+        func = lambda: 'nope'
+        func.__name__ = 'global'
+        mock = create_autospec(func)
+        self.assertEqual(mock.__name__, 'funcopy')
+
+
     def test_spec_function_assert_has_calls(self):
         def f(a): pass
         mock = create_autospec(f)
