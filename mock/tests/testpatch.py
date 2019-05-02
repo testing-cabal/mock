@@ -672,13 +672,13 @@ class PatchTest(unittest.TestCase):
 
 
     def test_patch_spec_set(self):
-        @patch('%s.SomeClass' % __name__, spec_set=SomeClass)
+        @patch('%s.SomeClass' % __name__, spec=SomeClass, spec_set=True)
         def test(MockClass):
             MockClass.z = 'foo'
 
         self.assertRaises(AttributeError, test)
 
-        @patch.object(support, 'SomeClass', spec_set=SomeClass)
+        @patch.object(support, 'SomeClass', spec=SomeClass, spec_set=True)
         def test(MockClass):
             MockClass.z = 'foo'
 
