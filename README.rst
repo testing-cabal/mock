@@ -17,6 +17,8 @@ Please see the standard library documentation for more details.
 :License: `BSD License`_
 :Support: `Mailing list (testing-in-python@lists.idyll.org)
  <http://lists.idyll.org/listinfo/testing-in-python>`_
+:Code: `GitHub
+ <https://github.com/testing-cabal/mock>`_
 :Issue tracker: `GitHub Issues
  <https://github.com/testing-cabal/mock/issues>`_
 :Build status:
@@ -28,7 +30,7 @@ Please see the standard library documentation for more details.
     .. |Docs| image:: https://readthedocs.org/projects/mock/badge/?version=latest
     .. _Docs: http://mock.readthedocs.org/en/latest/
 
-.. _Mock Homepage: https://github.com/testing-cabal/mock
+.. _Mock Homepage: http://mock.readthedocs.org/en/latest/
 .. _BSD License: https://github.com/testing-cabal/mock/blob/master/LICENSE.txt
 .. _Python Docs: https://docs.python.org/dev/library/unittest.mock.html
 .. _mock on PyPI: https://pypi.org/project/mock/
