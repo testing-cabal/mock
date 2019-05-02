@@ -1,7 +1,7 @@
 3.0.3
 -----
 
-- Fixed patching of dictionaries, when specifing the target with a
+- Fixed patching of dictionaries, when specifying the target with a
   unicode on Python 2.
 
 3.0.2
