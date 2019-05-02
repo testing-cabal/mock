@@ -1,3 +1,80 @@
+3.0.0
+-----
+
+- Issue #35226: Recursively check arguments when testing for equality of
+  :class:`unittest.mock.call` objects and add note that tracking of
+  parameters used to create ancestors of mocks in ``mock_calls`` is not
+  possible.
+
+- Issue #31177: Fix bug that prevented using :meth:`reset_mock
+  <unittest.mock.Mock.reset_mock>` on mock instances with deleted attributes
+
+- Issue #26704: Added test demonstrating double-patching of an instance
+  method.  Patch by Anthony Sottile.
+
+- Issue #35500: Write expected and actual call parameters on separate lines
+  in :meth:`unittest.mock.Mock.assert_called_with` assertion errors.
+  Contributed by Susan Su.
+
+- Issue #35330: When a :class:`Mock` instance was used to wrap an object, if
+  `side_effect` is used in one of the mocks of it methods, don't call the
+  original implementation and return the result of using the side effect the
+  same way that it is done with return_value.
+
+- Issue #30541: Add new function to seal a mock and prevent the
+  automatically creation of child mocks. Patch by Mario Corchero.
+
+- Issue #35022: :class:`unittest.mock.MagicMock` now supports the
+  ``__fspath__`` method (from :class:`os.PathLike`).
+
+- Issue #33516: :class:`unittest.mock.MagicMock` now supports the
+  ``__round__`` magic method.
+
+- Issue #35512: :func:`unittest.mock.patch.dict` used as a decorator with
+  string target resolves the target during function call instead of during
+  decorator construction. Patch by Karthikeyan Singaravelan.
+
+- Issue #36366: Calling ``stop()`` on an unstarted or stopped
+  :func:`unittest.mock.patch` object will now return `None` instead of
+  raising :exc:`RuntimeError`, making the method idempotent. Patch
+  byKarthikeyan Singaravelan.
+
+- Issue #35357: Internal attributes' names of unittest.mock._Call and
+  unittest.mock.MagicProxy (name, parent & from_kall) are now prefixed with
+  _mock_ in order to prevent clashes with widely used object attributes.
+  Fixed minor typo in test function name.
+
+- Issue #20239: Allow repeated assignment deletion of
+  :class:`unittest.mock.Mock` attributes. Patch by Pablo Galindo.
+
+- Issue #35082: Don't return deleted attributes when calling dir on a
+  :class:`unittest.mock.Mock`.
+
+- Issue #0: Improved an error message when mock assert_has_calls fails.
+
+- Issue #23078: Add support for :func:`classmethod` and :func:`staticmethod`
+  to :func:`unittest.mock.create_autospec`.  Initial patch by Felipe Ochoa.
+
+- Issue #21478: Calls to a child function created with
+  :func:`unittest.mock.create_autospec` should propagate to the parent.
+  Patch by Karthikeyan Singaravelan.
+
+- Issue #36598: Fix ``isinstance`` check for Mock objects with spec when the
+  code is executed under tracing. Patch by Karthikeyan Singaravelan.
+
+- Issue #32933: :func:`unittest.mock.mock_open` now supports iteration over
+  the file contents. Patch by Tony Flury.
+
+- Issue #21269: Add ``args`` and ``kwargs`` properties to mock call objects.
+  Contributed by Kumar Akshay.
+
+- Issue #17185: Set ``__signature__`` on mock for :mod:`inspect` to get
+  signature. Patch by Karthikeyan Singaravelan.
+
+- Issue #35047: ``unittest.mock`` now includes mock calls in exception
+  messages if ``assert_not_called``, ``assert_called_once``, or
+  ``assert_called_once_with`` fails. Patch by Petter Strandmark.
+
 - Issue #28380: unittest.mock Mock autospec functions now properly support
   assert_called, assert_not_called, and assert_called_once.
   
