@@ -614,8 +614,7 @@ class SpecSignatureTest(unittest.TestCase):
     @unittest.skipIf(six.PY3, "No old style classes in Python 3")
     def test_old_style_classes(self):
         class Foo:
-            def f(self, a, b):
-                pass
+            def f(self, a, b): pass
 
         class Bar(Foo):
             g = Foo()
@@ -797,8 +796,7 @@ class SpecSignatureTest(unittest.TestCase):
     @unittest.skipIf(six.PY3, 'no old style classes in Python 3')
     def test_signature_old_style_class(self):
         class Foo:
-            def __init__(self, a, b=3):
-                pass
+            def __init__(self, a, b=3): pass
 
         mock = create_autospec(Foo)
 
@@ -904,8 +902,7 @@ class SpecSignatureTest(unittest.TestCase):
     def test_autospec_property(self):
         class Foo(object):
             @property
-            def foo(self):
-                return 3
+            def foo(self): pass
 
         foo = create_autospec(Foo)
         mock_property = foo.foo

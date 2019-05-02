@@ -107,8 +107,7 @@ class TestCallable(unittest.TestCase):
             pass
 
         class OldStyle:
-            def __call__(self):
-                pass
+            def __call__(self): pass
 
         class OldStyleSub(OldStyle):
             pass

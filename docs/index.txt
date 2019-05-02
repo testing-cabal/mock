@@ -104,6 +104,20 @@ Backporting rules
   a matching ``_py{version}.py`` file. If ``{version}`` isn't 3, adjust
   ``conftest.py``.
 
+- If code such as this causes coverage checking to drop below 100%:
+
+  .. code-block:: python
+
+      def will_never_be_called():
+          pass
+
+  It should be adjusted to the following pattern, preferably upstream,
+  so that the ``.coveragerc`` in this repo knows to ignore it:
+
+  .. code-block:: python
+
+      def will_never_be_called(): pass
+
 Backporting process
 -------------------
 
