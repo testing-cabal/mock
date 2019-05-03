@@ -1,22 +1,25 @@
 version: 2.1
 
 orbs:
-  python: cjw296/python-ci@1.3
+  python: cjw296/python-ci@2
 
 jobs:
-  docs:
+  check-package:
+    parameters:
+      image:
+        type: string
+      python:
+        type: string
+        default: "python"
     docker:
-      - image: circleci/python:3.7
+      - image: << parameters.image >>
     steps:
-      - checkout
-      - run:
-          name: "Install Project"
-          command: "sudo pip install -e .[docs]"
-      - run:
-          name: "Build Docs"
-          command: |
-            python setup.py build_sphinx
-            rst2html.py --strict README.rst README.html
+      - python/check-package:
+          package: "mock"
+          test:
+          - run:
+              name: "Import package"
+              command: << parameters.python >> -c "import mock"
 
 
 common: &common
@@ -39,11 +42,9 @@ common: &common
     - python/pip-run-tests:
         name: pypy27
         image: pypy:2.7
-        sudo: false
     - python/pip-run-tests:
         name: pypy36
         image: pypy:3.6
-        sudo: false
 
     - python/coverage:
         name: coverage
@@ -56,18 +57,53 @@ common: &common
           - pypy27
           - pypy36
 
-    - docs:
+    - python/pip-docs:
+        name: docs
         requires:
           - coverage
 
-    - python/release:
-        name: release
-        config: .carthorse.yml
+    - python/pip-setuptools-build-package:
+        name: package
         requires:
           - docs
         filters:
           branches:
             only: master
+
+    - check-package:
+        name: check-package-python27
+        image: circleci/python:2.7
+        requires:
+          - package
+
+    - check-package:
+        name: check-package-python37
+        image: circleci/python:3.7
+        requires:
+          - package
+
+    - check-package:
+        name: check-package-pypy27
+        image: pypy:2.7
+        python: pypy
+        requires:
+          - package
+
+    - check-package:
+        name: check-package-pypy36
+        image: pypy:3.6
+        python: pypy3
+        requires:
+          - package
+
+    - python/release:
+        name: release
+        config: .carthorse.yml
+        requires:
+          - check-package-python27
+          - check-package-python37
+          - check-package-pypy27
+          - check-package-pypy36
 
 workflows:
   push:
