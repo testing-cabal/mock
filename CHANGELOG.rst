@@ -1,3 +1,8 @@
+3.0.4
+-----
+
+- Include the license, readme and changelog in the source distribution.
+
 3.0.3
 -----
 
