@@ -1,3 +1,9 @@
+3.0.5
+-----
+
+- Issue #31855: :func:`unittest.mock.mock_open` results now respects the
+  argument of read([size]). Patch contributed by Rémi Lapeyre.
+
 3.0.4
 -----
 
