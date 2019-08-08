@@ -43,3 +43,15 @@ def uncache(*names):
                 del sys.modules[name]
             except KeyError:
                 pass
+
+
+class _ALWAYS_EQ:
+    """
+    Object that is equal to anything.
+    """
+    def __eq__(self, other):
+        return True
+    def __ne__(self, other):
+        return False
+
+ALWAYS_EQ = _ALWAYS_EQ()
