@@ -2557,6 +2557,12 @@ class _Call(tuple):
         return _Call(name=name, parent=self, from_kall=False)
 
 
+    def __getattribute__(self, attr):
+        if attr in tuple.__dict__:
+            raise AttributeError
+        return tuple.__getattribute__(self, attr)
+
+
     def _get_call_arguments(self):
         if len(self) == 2:
             args, kwargs = self
