@@ -3,7 +3,7 @@ import asyncio
 import inspect
 import unittest
 
-from mock import call, AsyncMock, patch, MagicMock, create_autospec
+from mock import ANY, call, AsyncMock, patch, MagicMock, create_autospec
 from mock.mock import _AwaitEvent
 
 
@@ -204,6 +204,10 @@ class AsyncAutospecTest(unittest.TestCase):
         spec.assert_awaited_once_with(1, 2, c=3)
         spec.assert_awaited_with(1, 2, c=3)
         spec.assert_awaited()
+
+        with self.assertRaises(AssertionError):
+            spec.assert_any_await(e=1)
+
 
     def test_patch_with_autospec(self):
 
@@ -619,6 +623,30 @@ class AsyncMockAssert(unittest.TestCase):
 
         run(self._runnable_test('SomethingElse'))
         self.mock.assert_has_awaits(calls)
+
+    def test_awaits_asserts_with_any(self):
+        class Foo:
+            def __eq__(self, other): pass
+
+        run(self._runnable_test(Foo(), 1))
+
+        self.mock.assert_has_awaits([call(ANY, 1)])
+        self.mock.assert_awaited_with(ANY, 1)
+        self.mock.assert_any_await(ANY, 1)
+
+    def test_awaits_asserts_with_spec_and_any(self):
+        class Foo:
+            def __eq__(self, other): pass
+
+        mock_with_spec = AsyncMock(spec=Foo)
+
+        async def _custom_mock_runnable_test(*args):
+            await mock_with_spec(*args)
+
+        run(_custom_mock_runnable_test(Foo(), 1))
+        mock_with_spec.assert_has_awaits([call(ANY, 1)])
+        mock_with_spec.assert_awaited_with(ANY, 1)
+        mock_with_spec.assert_any_await(ANY, 1)
 
     def test_assert_has_awaits_ordered(self):
         calls = [call('NormalFoo'), call('baz')]
