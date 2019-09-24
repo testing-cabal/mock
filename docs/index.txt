@@ -141,7 +141,7 @@ Backporting process
        git clone https://github.com/python/cpython.git
        git clone https://github.com/testing-cabal/mock.git
 
-   Make sure they both on master and up to date!
+   Make sure they are both on master and up to date!
 
 2. Create a branch in your ``mock`` clone and switch to it.
 
