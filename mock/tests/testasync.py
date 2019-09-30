@@ -6,7 +6,7 @@ import unittest
 
 from mock import (ANY, call, AsyncMock, patch, MagicMock,
                   create_autospec, sentinel)
-from mock.mock import _AwaitEvent, _CallList
+from mock.mock import _CallList
 
 
 try:
@@ -192,7 +192,6 @@ class AsyncAutospecTest(unittest.TestCase):
         self.assertEqual(spec.await_count, 0)
         self.assertIsNone(spec.await_args)
         self.assertEqual(spec.await_args_list, [])
-        self.assertIsInstance(spec.awaited, _AwaitEvent)
         spec.assert_not_awaited()
 
         run(main())
@@ -226,7 +225,6 @@ class AsyncAutospecTest(unittest.TestCase):
                 self.assertEqual(mock_method.await_count, 0)
                 self.assertEqual(mock_method.await_args_list, [])
                 self.assertIsNone(mock_method.await_args)
-                self.assertIsInstance(mock_method.awaited, _AwaitEvent)
                 mock_method.assert_not_awaited()
 
                 await awaitable
