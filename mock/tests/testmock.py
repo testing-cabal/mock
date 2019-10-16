@@ -826,6 +826,7 @@ class MockTest(unittest.TestCase):
         self.assertRaises(AttributeError, set_attr)
 
 
+    @unittest.skipIf('PyPy' in sys.version, "https://bitbucket.org/pypy/pypy/issues/3094")
     def test_copy(self):
         current = sys.getrecursionlimit()
         self.addCleanup(sys.setrecursionlimit, current)
