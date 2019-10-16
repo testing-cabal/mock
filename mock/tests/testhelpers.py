@@ -974,7 +974,7 @@ class SpecSignatureTest(unittest.TestCase):
 
 
     @unittest.skipIf('PyPy' in sys.version and sys.version_info > (3, 0),
-                     "See https://github.com/testing-cabal/mock/issues/452")
+                     "https://bitbucket.org/pypy/pypy/issues/3010")
     def test_autospec_on_bound_builtin_function(self):
         meth = six.create_bound_method(time.ctime, time.time())
         self.assertIsInstance(meth(), str)
