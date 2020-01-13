@@ -4,14 +4,14 @@ import sys
 import tempfile
 
 import unittest
-from unittest.test.testmock.support import is_instance
-from unittest import mock
-from unittest.mock import (
+from mock.tests.support import is_instance
+from mock import (
     call, DEFAULT, patch, sentinel,
     MagicMock, Mock, NonCallableMock,
-    NonCallableMagicMock, AsyncMock, _Call, _CallList,
-    create_autospec
+    NonCallableMagicMock, AsyncMock,
+    create_autospec, mock
 )
+from mock.mock import _Call, _CallList
 
 
 class Iter(object):

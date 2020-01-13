@@ -1,5 +1,5 @@
 import unittest
-from unittest import mock
+import mock
 
 
 class SampleObject:

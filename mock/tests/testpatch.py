@@ -6,16 +6,16 @@ import os
 import sys
 
 import unittest
-from unittest.test.testmock import support
-from unittest.test.testmock.support import SomeClass, is_instance
+from mock.tests import support
+from mock.tests.support import SomeClass, is_instance
 
 from test.test_importlib.util import uncache
-from unittest.mock import (
-    NonCallableMock, CallableMixin, sentinel,
-    MagicMock, Mock, NonCallableMagicMock, patch, _patch,
-    DEFAULT, call, _get_target
+from mock import (
+    NonCallableMock, sentinel,
+    MagicMock, Mock, NonCallableMagicMock, patch,
+    DEFAULT, call
 )
-
+from mock.mock import CallableMixin, _patch, _get_target
 
 builtin_string = 'builtins'
 
@@ -664,7 +664,7 @@ class PatchTest(unittest.TestCase):
         # the new dictionary during function call
         original = support.target.copy()
 
-        @patch.dict('unittest.test.testmock.support.target', {'bar': 'BAR'})
+        @patch.dict('mock.tests.support.target', {'bar': 'BAR'})
         def test():
             self.assertEqual(support.target, {'foo': 'BAZ', 'bar': 'BAR'})
 
@@ -1540,7 +1540,7 @@ class PatchTest(unittest.TestCase):
         self.assertEqual(foo.fish, 'tasty')
 
 
-    @patch('unittest.mock.patch.TEST_PREFIX', 'foo')
+    @patch('mock.patch.TEST_PREFIX', 'foo')
     def test_patch_test_prefix(self):
         class Foo(object):
             thing = 'original'
@@ -1563,7 +1563,7 @@ class PatchTest(unittest.TestCase):
         self.assertEqual(foo.test_two(), 'original')
 
 
-    @patch('unittest.mock.patch.TEST_PREFIX', 'bar')
+    @patch('mock.patch.TEST_PREFIX', 'bar')
     def test_patch_dict_test_prefix(self):
         class Foo(object):
             def bar_one(self):
@@ -1601,7 +1601,7 @@ class PatchTest(unittest.TestCase):
 
 
     def test_patch_nested_autospec_repr(self):
-        with patch('unittest.test.testmock.support', autospec=True) as m:
+        with patch('mock.tests.support', autospec=True) as m:
             self.assertIn(" name='support.SomeClass.wibble()'",
                           repr(m.SomeClass.wibble()))
             self.assertIn(" name='support.SomeClass().wibble()'",
@@ -1818,7 +1818,7 @@ class PatchTest(unittest.TestCase):
 
         with patch.object(foo, '__module__', "testpatch2"):
             self.assertEqual(foo.__module__, "testpatch2")
-        self.assertEqual(foo.__module__, 'unittest.test.testmock.testpatch')
+        self.assertEqual(foo.__module__, 'mock.tests.testpatch')
 
         with patch.object(foo, '__annotations__', dict([('s', 1, )])):
             self.assertEqual(foo.__annotations__, dict([('s', 1, )]))
@@ -1834,16 +1834,15 @@ class PatchTest(unittest.TestCase):
         # This exercises the AttributeError branch of _dot_lookup.
 
         # make sure it's there
-        import unittest.test.testmock.support
+        import mock.tests.support
         # now make sure it's not:
         with patch.dict('sys.modules'):
-            del sys.modules['unittest.test.testmock.support']
-            del sys.modules['unittest.test.testmock']
-            del sys.modules['unittest.test']
-            del sys.modules['unittest']
+            del sys.modules['mock.tests.support']
+            del sys.modules['mock.tests']
+            del sys.modules['mock']
 
             # now make sure we can patch based on a dotted path:
-            @patch('unittest.test.testmock.support.X')
+            @patch('mock.tests.support.X')
             def test(mock):
                 pass
             test()
@@ -1855,7 +1854,7 @@ class PatchTest(unittest.TestCase):
 
 
     def test_cant_set_kwargs_when_passing_a_mock(self):
-        @patch('unittest.test.testmock.support.X', new=object(), x=1)
+        @patch('mock.tests.support.X', new=object(), x=1)
         def test(): pass
         with self.assertRaises(TypeError):
             test()

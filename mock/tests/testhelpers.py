@@ -3,10 +3,11 @@ import time
 import types
 import unittest
 
-from unittest.mock import (
-    call, _Call, create_autospec, MagicMock,
-    Mock, ANY, _CallList, patch, PropertyMock, _callable
+from mock import (
+    call, create_autospec, MagicMock,
+    Mock, ANY, patch, PropertyMock
 )
+from mock.mock import _Call, _CallList, _callable
 
 from datetime import datetime
 from functools import partial
@@ -15,7 +16,6 @@ class SomeClass(object):
     def one(self, a, b): pass
     def two(self): pass
     def three(self, a=None): pass
-
 
 
 class AnyTest(unittest.TestCase):

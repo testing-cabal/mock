@@ -2,8 +2,8 @@ import math
 import unittest
 import os
 import sys
-from unittest.mock import Mock, MagicMock, _magics
-
+from mock import Mock, MagicMock
+from mock.mock import _magics
 
 
 class TestMockingMagicMethods(unittest.TestCase):

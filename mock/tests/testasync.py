@@ -2,8 +2,8 @@ import asyncio
 import inspect
 import unittest
 
-from unittest.mock import (call, AsyncMock, patch, MagicMock, create_autospec,
-                           _AwaitEvent)
+from mock import call, AsyncMock, patch, MagicMock, create_autospec
+from mock.mock import _AwaitEvent
 
 
 def tearDownModule():
