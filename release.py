@@ -50,7 +50,7 @@ def news_to_changelog(version):
 
 
 def update_version(new_version):
-    path = join('mock', 'mock.py')
+    path = join('mock', '__init__.py')
     with open(path) as source:
         text = source.read()
 

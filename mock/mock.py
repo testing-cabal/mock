@@ -34,8 +34,6 @@
 from __future__ import absolute_import
 
 __all__ = (
-    '__version__',
-    'version_info',
     'Mock',
     'MagicMock',
     'patch',
@@ -69,8 +67,6 @@ from unittest.util import safe_repr
 import six
 from six import wraps
 
-__version__ = '3.0.5'
-version_info = tuple(int(p) for p in __version__.split('.'))
 
 import mock
 
