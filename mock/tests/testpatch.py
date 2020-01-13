@@ -1839,6 +1839,7 @@ class PatchTest(unittest.TestCase):
         with patch.dict('sys.modules'):
             del sys.modules['mock.tests.support']
             del sys.modules['mock.tests']
+            del sys.modules['mock.mock']
             del sys.modules['mock']
 
             # now make sure we can patch based on a dotted path:
