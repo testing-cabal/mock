@@ -25,6 +25,8 @@ Python Version Compatibility
 
 * Version 2.0.0 is the last version offering official Jython support.
 
+* version 3.0.5 is the last version supporting Python 3.5 and lower.
+
 .. index:: installing
 .. _installing:
 
@@ -77,9 +79,6 @@ Checkout from git (see :ref:`installing`) and submit pull requests.
 Committers can just push as desired: since all semantic development takes
 place in cPython, the backport process is as lightweight as we can make it.
 
-mock is CI tested using Travis-CI on Python versions 2.7, 3.4,
-3.5, 3.6, pypy, pypy3.
-
 If you end up fixing anything backport-specific, please add an entry
 to the top of ``CHANGELOG.rst`` so it shows up in the next release
 notes.
@@ -103,17 +102,6 @@ non-bugfix changes, patch on bugfix only changes.
 
 Backporting rules
 -----------------
-
-- ``isinstance`` checks in cPython to ``type`` need to check ``ClassTypes``.
-  Code calling ``obj.isidentifier`` needs to change to ``_isidentifier(obj)``.
-
-- f-strings need to be rewritten using some other string substitution.
-
-- ``assertRaisesRegex`` needs to be ``assertRaisesRegexp`` for Python 2.
-
-- If test code won't compile on a particular version of Python, move it to
-  a matching ``_py{version}.py`` file. If ``{version}`` isn't 3, adjust
-  ``conftest.py``.
 
 - If code such as this causes coverage checking to drop below 100%:
 
