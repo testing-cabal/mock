@@ -5,23 +5,19 @@
 import os
 import sys
 
-import six
 import unittest
+from unittest.test.testmock import support
+from unittest.test.testmock.support import SomeClass, is_instance
 
-from mock.tests import support
-from mock.tests.support import SomeClass, is_instance, uncache
-
-from mock import (
-    NonCallableMock, CallableMixin, patch, sentinel,
-    MagicMock, Mock, NonCallableMagicMock,
-    DEFAULT, call
+from test.test_importlib.util import uncache
+from unittest.mock import (
+    NonCallableMock, CallableMixin, sentinel,
+    MagicMock, Mock, NonCallableMagicMock, patch, _patch,
+    DEFAULT, call, _get_target
 )
-from mock.mock import _patch, _get_target
 
-builtin_string = '__builtin__'
-if six.PY3:
-    builtin_string = 'builtins'
-    unicode = str
+
+builtin_string = 'builtins'
 
 PTModule = sys.modules[__name__]
 MODNAME = '%s.PTModule' % __name__
@@ -623,6 +619,13 @@ class PatchTest(unittest.TestCase):
         self.assertEqual(foo.values, original)
 
 
+    def test_patch_dict_as_context_manager(self):
+        foo = {'a': 'b'}
+        with patch.dict(foo, a='c') as patched:
+            self.assertEqual(patched, {'a': 'c'})
+        self.assertEqual(foo, {'a': 'b'})
+
+
     def test_name_preserved(self):
         foo = {}
 
@@ -656,21 +659,15 @@ class PatchTest(unittest.TestCase):
         test()
 
 
-    def test_patch_dict_with_unicode(self):
-        @patch.dict(u'os.environ', {'konrad_delong': 'some value'})
-        def test():
-            self.assertIn('konrad_delong', os.environ)
-
-        test()
-
-
     def test_patch_dict_decorator_resolution(self):
         # bpo-35512: Ensure that patch with a string target resolves to
         # the new dictionary during function call
         original = support.target.copy()
-        @patch.dict('mock.tests.support.target', {'bar': 'BAR'})
+
+        @patch.dict('unittest.test.testmock.support.target', {'bar': 'BAR'})
         def test():
             self.assertEqual(support.target, {'foo': 'BAZ', 'bar': 'BAR'})
+
         try:
             support.target = {'foo': 'BAZ'}
             test()
@@ -1329,7 +1326,7 @@ class PatchTest(unittest.TestCase):
         try:
             f = result['f']
             foo = result['foo']
-            self.assertEqual(set(result), {'f', 'foo'})
+            self.assertEqual(set(result), set(['f', 'foo']))
 
             self.assertIs(Foo, original_foo)
             self.assertIs(Foo.f, f)
@@ -1533,18 +1530,17 @@ class PatchTest(unittest.TestCase):
 
 
     def test_patch_multiple_string_subclasses(self):
-        for base in (str, unicode):
-            Foo = type('Foo', (base,), {'fish': 'tasty'})
-            foo = Foo()
-            @patch.multiple(foo, fish='nearly gone')
-            def test():
-                self.assertEqual(foo.fish, 'nearly gone')
+        Foo = type('Foo', (str,), {'fish': 'tasty'})
+        foo = Foo()
+        @patch.multiple(foo, fish='nearly gone')
+        def test():
+            self.assertEqual(foo.fish, 'nearly gone')
 
-            test()
-            self.assertEqual(foo.fish, 'tasty')
+        test()
+        self.assertEqual(foo.fish, 'tasty')
 
 
-    @patch('mock.patch.TEST_PREFIX', 'foo')
+    @patch('unittest.mock.patch.TEST_PREFIX', 'foo')
     def test_patch_test_prefix(self):
         class Foo(object):
             thing = 'original'
@@ -1567,7 +1563,7 @@ class PatchTest(unittest.TestCase):
         self.assertEqual(foo.test_two(), 'original')
 
 
-    @patch('mock.patch.TEST_PREFIX', 'bar')
+    @patch('unittest.mock.patch.TEST_PREFIX', 'bar')
     def test_patch_dict_test_prefix(self):
         class Foo(object):
             def bar_one(self):
@@ -1605,15 +1601,12 @@ class PatchTest(unittest.TestCase):
 
 
     def test_patch_nested_autospec_repr(self):
-        p = patch('mock.tests.support', autospec=True)
-        m = p.start()
-        try:
+        with patch('unittest.test.testmock.support', autospec=True) as m:
             self.assertIn(" name='support.SomeClass.wibble()'",
                           repr(m.SomeClass.wibble()))
             self.assertIn(" name='support.SomeClass().wibble()'",
                           repr(m.SomeClass().wibble()))
-        finally:
-            p.stop()
+
 
 
     def test_mock_calls_with_patch(self):
@@ -1793,32 +1786,6 @@ class PatchTest(unittest.TestCase):
         patched()
         self.assertIs(os.path, path)
 
-
-    def test_wrapped_patch(self):
-        decorated = patch('sys.modules')(function)
-        self.assertIs(decorated.__wrapped__, function)
-
-
-    def test_wrapped_several_times_patch(self):
-        decorated = patch('sys.modules')(function)
-        decorated = patch('sys.modules')(decorated)
-        self.assertIs(decorated.__wrapped__, function)
-
-
-    def test_wrapped_patch_object(self):
-        decorated = patch.object(sys, 'modules')(function)
-        self.assertIs(decorated.__wrapped__, function)
-
-
-    def test_wrapped_patch_dict(self):
-        decorated = patch.dict('sys.modules')(function)
-        self.assertIs(decorated.__wrapped__, function)
-
-
-    def test_wrapped_patch_multiple(self):
-        decorated = patch.multiple('sys', modules={})(function)
-        self.assertIs(decorated.__wrapped__, function)
-
     def test_stopall_lifo(self):
         stopped = []
         class thing(object):
@@ -1851,32 +1818,32 @@ class PatchTest(unittest.TestCase):
 
         with patch.object(foo, '__module__', "testpatch2"):
             self.assertEqual(foo.__module__, "testpatch2")
-        self.assertEqual(foo.__module__, __name__)
+        self.assertEqual(foo.__module__, 'unittest.test.testmock.testpatch')
 
-        if hasattr(self.test_special_attrs, '__annotations__'):
-            with patch.object(foo, '__annotations__', dict([('s', 1, )])):
-                self.assertEqual(foo.__annotations__, dict([('s', 1, )]))
-            self.assertEqual(foo.__annotations__, dict())
+        with patch.object(foo, '__annotations__', dict([('s', 1, )])):
+            self.assertEqual(foo.__annotations__, dict([('s', 1, )]))
+        self.assertEqual(foo.__annotations__, dict())
 
-        if hasattr(self.test_special_attrs, '__kwdefaults__'):
-            foo = eval("lambda *a, x=0: x")
-            with patch.object(foo, '__kwdefaults__', dict([('x', 1, )])):
-                self.assertEqual(foo(), 1)
-            self.assertEqual(foo(), 0)
-
+        def foo(*a, x=0):
+            return x
+        with patch.object(foo, '__kwdefaults__', dict([('x', 1, )])):
+            self.assertEqual(foo(), 1)
+        self.assertEqual(foo(), 0)
 
     def test_dotted_but_module_not_loaded(self):
         # This exercises the AttributeError branch of _dot_lookup.
+
         # make sure it's there
-        import mock.tests.support
+        import unittest.test.testmock.support
         # now make sure it's not:
         with patch.dict('sys.modules'):
-            del sys.modules['mock.tests.support']
-            del sys.modules['mock.tests']
-            del sys.modules['mock.mock']
-            del sys.modules['mock']
+            del sys.modules['unittest.test.testmock.support']
+            del sys.modules['unittest.test.testmock']
+            del sys.modules['unittest.test']
+            del sys.modules['unittest']
+
             # now make sure we can patch based on a dotted path:
-            @patch('mock.tests.support.X')
+            @patch('unittest.test.testmock.support.X')
             def test(mock):
                 pass
             test()
@@ -1888,7 +1855,7 @@ class PatchTest(unittest.TestCase):
 
 
     def test_cant_set_kwargs_when_passing_a_mock(self):
-        @patch('mock.tests.support.X', new=object(), x=1)
+        @patch('unittest.test.testmock.support.X', new=object(), x=1)
         def test(): pass
         with self.assertRaises(TypeError):
             test()

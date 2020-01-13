@@ -1,30 +1,17 @@
-# Copyright (C) 2007-2012 Michael Foord & the mock team
-# E-mail: fuzzyman AT voidspace DOT org DOT uk
-# http://www.voidspace.org.uk/python/mock/
-
 import copy
-import pickle
 import re
 import sys
 import tempfile
 
-import six
 import unittest
-
-import mock
-from mock.mock import (
+from unittest.test.testmock.support import is_instance
+from unittest import mock
+from unittest.mock import (
     call, DEFAULT, patch, sentinel,
     MagicMock, Mock, NonCallableMock,
-    NonCallableMagicMock, _Call, _CallList,
+    NonCallableMagicMock, AsyncMock, _Call, _CallList,
     create_autospec
 )
-from mock.tests.support import is_instance
-
-
-try:
-    unicode
-except NameError:
-    unicode = str
 
 
 class Iter(object):
@@ -50,23 +37,13 @@ class Something(object):
     def smeth(a, b, c, d=None): pass
 
 
-class Subclass(MagicMock):
-    pass
-
-
-class Thing(object):
-    attribute = 6
-    foo = 'bar'
-
-
-
 class MockTest(unittest.TestCase):
 
     def test_all(self):
         # if __all__ is badly defined then import * will raise an error
         # We have to exec it because you can't import * inside a method
         # in Python 3
-        exec("from mock import *")
+        exec("from unittest.mock import *")
 
 
     def test_constructor(self):
@@ -215,7 +192,8 @@ class MockTest(unittest.TestCase):
 
         mock = create_autospec(f)
         mock.side_effect = ValueError('Bazinga!')
-        self.assertRaisesRegexp(ValueError, 'Bazinga!', mock)
+        self.assertRaisesRegex(ValueError, 'Bazinga!', mock)
+
 
     def test_reset_mock(self):
         parent = Mock()
@@ -384,8 +362,7 @@ class MockTest(unittest.TestCase):
         # Expected call doesn't match the spec's signature
         with self.assertRaises(AssertionError) as cm:
             mock.assert_called_with(e=8)
-        if hasattr(cm.exception, '__cause__'):
-            self.assertIsInstance(cm.exception.__cause__, TypeError)
+        self.assertIsInstance(cm.exception.__cause__, TypeError)
 
 
     def test_assert_called_with_method_spec(self):
@@ -435,7 +412,7 @@ class MockTest(unittest.TestCase):
         m = Mock()
         m(1)
         m(2)
-        self.assertRaisesRegexp(AssertionError,
+        self.assertRaisesRegex(AssertionError,
             re.escape("Calls: [call(1), call(2)]"),
             lambda: m.assert_called_once_with(2))
 
@@ -453,8 +430,7 @@ class MockTest(unittest.TestCase):
         # Expected call doesn't match the spec's signature
         with self.assertRaises(AssertionError) as cm:
             mock.assert_called_once_with(e=8)
-        if hasattr(cm.exception, '__cause__'):
-            self.assertIsInstance(cm.exception.__cause__, TypeError)
+        self.assertIsInstance(cm.exception.__cause__, TypeError)
         # Mock called more than once => always fails
         mock(4, 5, 6)
         self.assertRaises(AssertionError, mock.assert_called_once_with,
@@ -535,7 +511,7 @@ class MockTest(unittest.TestCase):
 
                 # this should be allowed
                 mock.something
-                self.assertRaisesRegexp(
+                self.assertRaisesRegex(
                     AttributeError,
                     "Mock object has no attribute 'something_else'",
                     getattr, mock, 'something_else'
@@ -553,12 +529,12 @@ class MockTest(unittest.TestCase):
             mock.x
             mock.y
             mock.__something__
-            self.assertRaisesRegexp(
+            self.assertRaisesRegex(
                 AttributeError,
                 "Mock object has no attribute 'z'",
                 getattr, mock, 'z'
             )
-            self.assertRaisesRegexp(
+            self.assertRaisesRegex(
                 AttributeError,
                 "Mock object has no attribute '__foobar__'",
                 getattr, mock, '__foobar__'
@@ -738,13 +714,13 @@ class MockTest(unittest.TestCase):
 
     def test_assert_called_with_message(self):
         mock = Mock()
-        self.assertRaisesRegexp(AssertionError, 'not called',
+        self.assertRaisesRegex(AssertionError, 'not called',
                                 mock.assert_called_with)
 
 
     def test_assert_called_once_with_message(self):
         mock = Mock(name='geoffrey')
-        self.assertRaisesRegexp(AssertionError,
+        self.assertRaisesRegex(AssertionError,
                      r"Expected 'geoffrey' to be called once\.",
                      mock.assert_called_once_with)
 
@@ -794,10 +770,8 @@ class MockTest(unittest.TestCase):
         mock = Mock(spec=X)
         self.assertIsInstance(mock, X)
 
-        if not six.PY2:
-            # This isn't true on Py2, we should fix if anyone complains:
-            mock = Mock(spec=X())
-            self.assertIsInstance(mock, X)
+        mock = Mock(spec=X())
+        self.assertIsInstance(mock, X)
 
         self.assertIs(mock.__class__, X)
         self.assertEqual(Mock().__class__.__name__, 'Mock')
@@ -805,10 +779,8 @@ class MockTest(unittest.TestCase):
         mock = Mock(spec_set=X)
         self.assertIsInstance(mock, X)
 
-        if not six.PY2:
-        # This isn't true on Py2, we should fix if anyone complains:
-            mock = Mock(spec_set=X())
-            self.assertIsInstance(mock, X)
+        mock = Mock(spec_set=X())
+        self.assertIsInstance(mock, X)
 
 
     def test_setting_attribute_with_spec_set(self):
@@ -826,7 +798,6 @@ class MockTest(unittest.TestCase):
         self.assertRaises(AttributeError, set_attr)
 
 
-    @unittest.skipIf('PyPy' in sys.version, "https://bitbucket.org/pypy/pypy/issues/3094")
     def test_copy(self):
         current = sys.getrecursionlimit()
         self.addCleanup(sys.setrecursionlimit, current)
@@ -835,42 +806,6 @@ class MockTest(unittest.TestCase):
         sys.setrecursionlimit(int(10e8))
         # this segfaults without the fix in place
         copy.copy(Mock())
-
-
-    @unittest.skipIf(six.PY3, "no old style classes in Python 3")
-    def test_spec_old_style_classes(self):
-        class Foo:
-            bar = 7
-
-        mock = Mock(spec=Foo)
-        mock.bar = 6
-        self.assertRaises(AttributeError, lambda: mock.foo)
-
-        mock = Mock(spec=Foo())
-        mock.bar = 6
-        self.assertRaises(AttributeError, lambda: mock.foo)
-
-
-    @unittest.skipIf(six.PY3, "no old style classes in Python 3")
-    def test_spec_set_old_style_classes(self):
-        class Foo:
-            bar = 7
-
-        mock = Mock(spec_set=Foo)
-        mock.bar = 6
-        self.assertRaises(AttributeError, lambda: mock.foo)
-
-        def _set():
-            mock.foo = 3
-        self.assertRaises(AttributeError, _set)
-
-        mock = Mock(spec_set=Foo())
-        mock.bar = 6
-        self.assertRaises(AttributeError, lambda: mock.foo)
-
-        def _set():
-            mock.foo = 3
-        self.assertRaises(AttributeError, _set)
 
 
     def test_subclass_with_properties(self):
@@ -908,7 +843,7 @@ class MockTest(unittest.TestCase):
     def test_dir(self):
         mock = Mock()
         attrs = set(dir(mock))
-        type_attrs = {m for m in dir(Mock) if not m.startswith('_')}
+        type_attrs = set([m for m in dir(Mock) if not m.startswith('_')])
 
         # all public attributes from the type are included
         self.assertEqual(set(), type_attrs - attrs)
@@ -1181,7 +1116,7 @@ class MockTest(unittest.TestCase):
         m = Mock()
         m.foo = m
         repr(m.foo())
-        self.assertRegexpMatches(repr(m.foo()), r"<Mock name='mock\(\)' id='\d+'>")
+        self.assertRegex(repr(m.foo()), r"<Mock name='mock\(\)' id='\d+'>")
 
 
     def test_mock_calls_contains(self):
@@ -1281,6 +1216,16 @@ class MockTest(unittest.TestCase):
         self.assertRaises(StopIteration, mock)
 
 
+    def test_side_effect_iterator_exceptions(self):
+        for Klass in Mock, MagicMock:
+            iterable = (ValueError, 3, KeyError, 6)
+            m = Klass(side_effect=iterable)
+            self.assertRaises(ValueError, m)
+            self.assertEqual(m(), 3)
+            self.assertRaises(KeyError, m)
+            self.assertEqual(m(), 6)
+
+
     def test_side_effect_setting_iterator(self):
         mock = Mock()
         mock.side_effect = iter([1, 2, 3])
@@ -1301,17 +1246,6 @@ class MockTest(unittest.TestCase):
                          ['this', 'is', 'an', 'iter'])
         self.assertRaises(StopIteration, mock)
         self.assertIs(mock.side_effect, this_iter)
-
-
-    def test_side_effect_iterator_exceptions(self):
-        for Klass in Mock, MagicMock:
-            iterable = (ValueError, 3, KeyError, 6)
-            m = Klass(side_effect=iterable)
-            self.assertRaises(ValueError, m)
-            self.assertEqual(m(), 3)
-            self.assertRaises(KeyError, m)
-            self.assertEqual(m(), 6)
-
 
     def test_side_effect_iterator_default(self):
         mock = Mock(return_value=2)
@@ -1476,8 +1410,7 @@ class MockTest(unittest.TestCase):
         # Expected call doesn't match the spec's signature
         with self.assertRaises(AssertionError) as cm:
             mock.assert_any_call(e=8)
-        if hasattr(cm.exception, '__cause__'):
-            self.assertIsInstance(cm.exception.__cause__, TypeError)
+        self.assertIsInstance(cm.exception.__cause__, TypeError)
 
 
     def test_mock_calls_create_autospec(self):
@@ -1511,6 +1444,7 @@ class MockTest(unittest.TestCase):
             @staticmethod
             def static_method(): pass
         for method in ('class_method', 'static_method'):
+            with self.subTest(method=method):
                 mock_method = mock.create_autospec(getattr(TestClass, method))
                 mock_method()
                 mock_method.assert_called_once_with()
@@ -1519,9 +1453,10 @@ class MockTest(unittest.TestCase):
     #Issue21238
     def test_mock_unsafe(self):
         m = Mock()
-        with self.assertRaises(AttributeError):
+        msg = "Attributes cannot start with 'assert' or 'assret'"
+        with self.assertRaisesRegex(AttributeError, msg):
             m.assert_foo_call()
-        with self.assertRaises(AttributeError):
+        with self.assertRaisesRegex(AttributeError, msg):
             m.assret_foo_call()
         m = Mock(unsafe=True)
         m.assert_foo_call()
@@ -1538,7 +1473,7 @@ class MockTest(unittest.TestCase):
     def test_assert_not_called_message(self):
         m = Mock()
         m(1, 2)
-        self.assertRaisesRegexp(AssertionError,
+        self.assertRaisesRegex(AssertionError,
             re.escape("Calls: [call(1, 2)]"),
             m.assert_not_called)
 
@@ -1567,7 +1502,7 @@ class MockTest(unittest.TestCase):
         m = Mock()
         m(1, 2)
         m(3)
-        self.assertRaisesRegexp(AssertionError,
+        self.assertRaisesRegex(AssertionError,
             re.escape("Calls: [call(1, 2), call(3)]"),
             m.assert_called_once)
 
@@ -1683,7 +1618,8 @@ class MockTest(unittest.TestCase):
 
 
     def test_adding_child_mock(self):
-        for Klass in NonCallableMock, Mock, MagicMock, NonCallableMagicMock:
+        for Klass in (NonCallableMock, Mock, MagicMock, NonCallableMagicMock,
+                      AsyncMock):
             mock = Klass()
 
             mock.foo = Mock()
@@ -1766,6 +1702,19 @@ class MockTest(unittest.TestCase):
         self.assertEqual(lines[1], 'Norwegian Blue')
         self.assertEqual(list(f1), [])
 
+    def test_mock_open_using_next(self):
+        mocked_open = mock.mock_open(read_data='1st line\n2nd line\n3rd line')
+        f1 = mocked_open('a-name')
+        line1 = next(f1)
+        line2 = f1.__next__()
+        lines = [line for line in f1]
+        self.assertEqual(line1, '1st line\n')
+        self.assertEqual(line2, '2nd line\n')
+        self.assertEqual(lines[0], '3rd line')
+        self.assertEqual(list(f1), [])
+        with self.assertRaises(StopIteration):
+            next(f1)
+
     def test_mock_open_write(self):
         # Test exception in file writing write()
         mock_namedtemp = mock.mock_open(mock.MagicMock(name='JLV'))
@@ -1785,7 +1734,6 @@ class MockTest(unittest.TestCase):
         self.assertEqual('abc', first)
         self.assertEqual('abc', second)
 
-
     def test_mock_open_after_eof(self):
         # read, readline and readlines should work after end of file.
         _open = mock.mock_open(read_data='foo')
@@ -1797,7 +1745,6 @@ class MockTest(unittest.TestCase):
         self.assertEqual('', h.readline())
         self.assertEqual([], h.readlines())
         self.assertEqual([], h.readlines())
-
 
     def test_mock_parents(self):
         for Klass in Mock, MagicMock:
@@ -1933,12 +1880,15 @@ class MockTest(unittest.TestCase):
         self.assertEqual(type(call.parent), _Call)
         self.assertEqual(type(call.parent().parent), _Call)
 
+
     def test_parent_propagation_with_create_autospec(self):
+
         def foo(a, b): pass
 
         mock = Mock()
         mock.child = create_autospec(foo)
         mock.child(1, 2)
+
         self.assertRaises(TypeError, mock.child, 1)
         self.assertEqual(mock.mock_calls, [call.child(1, 2)])
 
@@ -1950,27 +1900,35 @@ class MockTest(unittest.TestCase):
         # dependent on unittest.mock.patch. In testpatch.PatchTest
         # test_patch_dict_test_prefix and test_patch_test_prefix not restoring
         # causes the objects patched to go out of sync
-        old_patch = mock.patch
+
+        old_patch = unittest.mock.patch
+
         # Directly using __setattr__ on unittest.mock causes current imported
         # reference to be updated. Use a lambda so that during cleanup the
         # re-imported new reference is updated.
-        self.addCleanup(lambda patch: setattr(mock, 'patch', patch),
+        self.addCleanup(lambda patch: setattr(unittest.mock, 'patch', patch),
                         old_patch)
+
         with patch.dict('sys.modules'):
-            del sys.modules['mock.mock']
+            del sys.modules['unittest.mock']
+
             # This trace will stop coverage being measured ;-)
             def trace(frame, event, arg):  # pragma: no cover
                 return trace
+
             self.addCleanup(sys.settrace, sys.gettrace())
             sys.settrace(trace)
-            from mock.mock import (
+
+            from unittest.mock import (
                 Mock, MagicMock, NonCallableMock, NonCallableMagicMock
             )
+
             mocks = [
                 Mock, MagicMock, NonCallableMock, NonCallableMagicMock
             ]
-            for mock_ in mocks:
-                obj = mock_(spec=Something)
+
+            for mock in mocks:
+                obj = mock(spec=Something)
                 self.assertIsInstance(obj, Something)
 
 
