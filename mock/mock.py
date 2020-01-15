@@ -36,6 +36,7 @@ from types import CodeType, ModuleType, MethodType
 from unittest.util import safe_repr
 from functools import wraps, partial
 
+from mock import IS_PYPY
 
 _builtins = {name for name in dir(builtins) if not name.startswith('_')}
 
@@ -1818,6 +1819,10 @@ magic_methods = (
     "bool next "
     "fspath "
 )
+
+if IS_PYPY:
+    # PyPy has no __sizeof__: http://doc.pypy.org/en/latest/cpython_differences.html
+    magic_methods = magic_methods.replace('sizeof ', '')
 
 numerics = (
     "add sub mul matmul div floordiv mod lshift rshift and xor or pow truediv"

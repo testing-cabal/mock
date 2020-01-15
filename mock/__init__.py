@@ -1,6 +1,8 @@
 from __future__ import absolute_import
 
-import re
+import re, sys
+
+IS_PYPY = 'PyPy' in sys.version
 
 import mock.mock as _mock
 from mock.mock import *
