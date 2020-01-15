@@ -8,9 +8,13 @@ from mock import (
     Mock, ANY, patch, PropertyMock
 )
 from mock.mock import _Call, _CallList, _callable
+from mock import IS_PYPY
 
 from datetime import datetime
 from functools import partial
+
+import pytest
+
 
 class SomeClass(object):
     def one(self, a, b): pass
@@ -457,6 +461,8 @@ class SpecSignatureTest(unittest.TestCase):
             self._check_someclass_mock(mock)
 
 
+    @pytest.mark.skipif(IS_PYPY,
+                        reason="https://bitbucket.org/pypy/pypy/issues/3010")
     def test_spec_has_descriptor_returning_function(self):
 
         class CrazyDescriptor(object):
@@ -885,6 +891,8 @@ class SpecSignatureTest(unittest.TestCase):
         check_data_descriptor(foo.desc)
 
 
+    @pytest.mark.skipif(IS_PYPY,
+                        reason="https://bitbucket.org/pypy/pypy/issues/3010")
     def test_autospec_on_bound_builtin_function(self):
         meth = types.MethodType(time.ctime, time.time())
         self.assertIsInstance(meth(), str)
