@@ -928,6 +928,8 @@ class AsyncMockAssert(unittest.TestCase):
                         "Errors: [None, TypeError('too many positional "
                         "arguments')]\n"
                         'Expected: [call(), call(1, 2)]\n'
-                        'Actual: [call(1)]'))) as cm:
+                        'Actual: [call(1)]').replace(
+                            "arguments\\'", "arguments\\',?")
+                )) as cm:
             self.mock.assert_has_awaits([call(), call(1, 2)])
         self.assertIsInstance(cm.exception.__cause__, TypeError)
