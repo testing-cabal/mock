@@ -6,7 +6,9 @@ import unittest
 
 from mock import (ANY, call, AsyncMock, patch, MagicMock, Mock,
                   create_autospec, sentinel)
+from mock.backports import IsolatedAsyncioTestCase
 from mock.mock import _CallList
+
 
 try:
     from asyncio import run
@@ -371,7 +373,7 @@ class AsyncSpecSetTest(unittest.TestCase):
             self.assertIsInstance(cm, MagicMock)
 
 
-class AsyncArguments(unittest.IsolatedAsyncioTestCase):
+class AsyncArguments(IsolatedAsyncioTestCase):
     async def test_add_return_value(self):
         async def addition(self, var):
             return var + 1
