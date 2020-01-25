@@ -1,7 +1,6 @@
 import math
 import unittest
 import os
-import sys
 from mock import AsyncMock, Mock, MagicMock
 from mock.backports import iscoroutinefunction
 from mock.mock import _magics
@@ -429,7 +428,6 @@ class TestMockingMagicMethods(unittest.TestCase):
             self.assertEqual(dir(mock), ['foo'])
 
 
-    @unittest.skipIf('PyPy' in sys.version, "This fails differently on pypy")
     def test_bound_methods(self):
         m = Mock()
 
