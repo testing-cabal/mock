@@ -912,8 +912,6 @@ class SpecSignatureTest(unittest.TestCase):
         check_data_descriptor(foo.desc)
 
 
-    @pytest.mark.skipif(IS_PYPY,
-                        reason="https://bitbucket.org/pypy/pypy/issues/3010")
     def test_autospec_on_bound_builtin_function(self):
         meth = types.MethodType(time.ctime, time.time())
         self.assertIsInstance(meth(), str)
@@ -923,8 +921,13 @@ class SpecSignatureTest(unittest.TestCase):
         mocked()
         mocked.assert_called_once_with()
         mocked.reset_mock()
-        mocked(4, 5, 6)
-        mocked.assert_called_once_with(4, 5, 6)
+        # but pypy gets this right:
+        if IS_PYPY:
+            with self.assertRaises(TypeError):
+                mocked(4, 5, 6)
+        else:
+            mocked(4, 5, 6)
+            mocked.assert_called_once_with(4, 5, 6)
 
 
     def test_autospec_getattr_partial_function(self):
