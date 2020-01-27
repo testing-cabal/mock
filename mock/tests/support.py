@@ -28,9 +28,7 @@ def uncache(*names):
 
     """
     for name in names:
-        if name in ('sys', 'marshal', 'imp'):
-            raise ValueError(
-                "cannot uncache {0}".format(name))
+        assert name not in ('sys', 'marshal', 'imp')
         try:
             del sys.modules[name]
         except KeyError:
@@ -39,10 +37,7 @@ def uncache(*names):
         yield
     finally:
         for name in names:
-            try:
-                del sys.modules[name]
-            except KeyError:
-                pass
+            del sys.modules[name]
 
 
 class _ALWAYS_EQ:
