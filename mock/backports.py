@@ -48,18 +48,7 @@ if sys.version_info[:2] < (3, 8):
             while True:
                 query = await queue.get()
                 queue.task_done()
-                if query is None:
-                    return
-                fut, awaitable = query
-                try:
-                    ret = await awaitable
-                    if not fut.cancelled():
-                        fut.set_result(ret)
-                except asyncio.CancelledError:
-                    raise
-                except Exception as ex:
-                    if not fut.cancelled():
-                        fut.set_exception(ex)
+                assert query is None
 
         def _setupAsyncioLoop(self):
             assert self._asyncioTestLoop is None
