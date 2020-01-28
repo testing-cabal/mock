@@ -165,5 +165,25 @@ Backporting process
 
 5. Rinse and repeat until ``backport.py`` reports no more patches need applying.
 
-6. If ``backport.py`` has updated ``lastsync.txt``, now would be a good time
-   to commit that change.
+6. If ``backport.py`` has updated ``lastsync.txt`` but not committed it,
+   now would be a good time to commit that change.
+
+Checking coverage in upstream
+-----------------------------
+
+Assuming you have the checkout structure as above, and you have compiled your cpython
+master branch, then roughly as follows:
+
+.. code-block:: bash
+
+   ~/vcs/cpython/python.exe -m venv ~/virtualenvs/cpython-master
+   source ~/virtualenvs/cpython-master/bin/activate
+   pip install -U setuptools pip
+   pip install pytest pytest-cov
+   cd vcs/cpython/Lib/unittest
+   pytest --cov unittest.mock --cov unittest.test.testmock \
+          --cov-config ~/vcs/git/mock/.coveragerc \
+          --cov-report term-missing:skip-covered \
+          test/testmock/test*
+
+Ignore `test/testmock/__*__.py` as these aren't present in the backport.
