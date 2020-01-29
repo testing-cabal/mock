@@ -65,7 +65,7 @@ common: &common
           - package
 
     - check-package:
-        name: check-package-python36
+        name: check-package-python37
         image: circleci/python:3.7
         requires:
           - package
