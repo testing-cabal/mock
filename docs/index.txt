@@ -200,4 +200,4 @@ master branch, then roughly as follows:
           --cov-report term-missing:skip-covered \
           test/testmock/test*
 
-Ignore `test/testmock/__*__.py` as these aren't present in the backport.
+Ignore ``test/testmock/__*__.py`` as these aren't present in the backport.
