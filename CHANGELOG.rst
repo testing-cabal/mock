@@ -1,3 +1,108 @@
+4.0.0b1
+-------
+
+- The release is a fresh cut of cpython's `4a686504`__. All changes to :mod:`mock`
+  from that commit and before are included in this release along with the
+  subsequent changes listed below.
+
+  __ https://github.com/python/cpython/commit/4a686504eb2bbf69adf78077458508a7ba131667
+
+- Issue #37972: Subscripts to the `unittest.mock.call` objects now receive
+  the same chaining mechanism as any other custom attributes, so that the
+  following usage no longer raises a `TypeError`:
+
+  call().foo().__getitem__('bar')
+
+  Patch by blhsing
+
+- Issue #38839: Fix some unused functions in tests. Patch by Adam Johnson.
+
+- Issue #39485: Fix a bug in :func:`unittest.mock.create_autospec` that
+  would complain about the wrong number of arguments for custom descriptors
+  defined in an extension module returning functions.
+
+- Issue #39082: Allow AsyncMock to correctly patch static/class methods
+
+- Issue #38093: Fixes AsyncMock so it doesn't crash when used with
+  AsyncContextManagers or AsyncIterators.
+
+- Issue #38859: AsyncMock now returns StopAsyncIteration on the exaustion of
+  a side_effects iterable. Since PEP-479 its Impossible to raise a
+  StopIteration exception from a coroutine.
+
+- Issue #38163: Child mocks will now detect their type as either synchronous
+  or asynchronous, asynchronous child mocks will be AsyncMocks and
+  synchronous child mocks will be either MagicMock or Mock (depending on
+  their parent type).
+
+- Issue #38473: Use signature from inner mock for autospecced methods
+  attached with :func:`unittest.mock.attach_mock`. Patch by Karthikeyan
+  Singaravelan.
+
+- Issue #38136: Changes AsyncMock call count and await count to be two
+  different counters. Now await count only counts when a coroutine has been
+  awaited, not when it has been called, and vice-versa. Update the
+  documentation around this.
+
+- Issue #37555: Fix `NonCallableMock._call_matcher` returning tuple instead
+  of `_Call` object when `self._spec_signature` exists. Patch by Elizabeth
+  Uselton
+
+- Issue #37251: Remove `__code__` check in AsyncMock that incorrectly
+  evaluated function specs as async objects but failed to evaluate classes
+  with `__await__` but no `__code__` attribute defined as async objects.
+
+- Issue #38669: Raise :exc:`TypeError` when passing target as a string with
+  :meth:`unittest.mock.patch.object`.
+
+- Issue #25597: Ensure, if ``wraps`` is supplied to
+  :class:`unittest.mock.MagicMock`, it is used to calculate return values
+  for the magic methods instead of using the default return values. Patch by
+  Karthikeyan Singaravelan.
+
+- Issue #38108: Any synchronous magic methods on an AsyncMock now return a
+  MagicMock. Any asynchronous magic methods on a MagicMock now return an
+  AsyncMock.
+
+- Issue #21478: Record calls to parent when autospecced object is attached
+  to a mock using :func:`unittest.mock.attach_mock`. Patch by Karthikeyan
+  Singaravelan.
+
+- Issue #38857: AsyncMock fix for return values that are awaitable types.
+  This also covers side_effect iterable values that happend to be awaitable,
+  and wraps callables that return an awaitable type. Before these awaitables
+  were being awaited instead of being returned as is.
+
+- Issue #38932: Mock fully resets child objects on reset_mock(). Patch by
+  Vegard Stikbakke
+
+- Issue #37685: Fixed ``__eq__``, ``__lt__`` etc implementations in some
+  classes. They now return :data:`NotImplemented` for unsupported type of
+  the other operand. This allows the other operand to play role (for example
+  the equality comparison with :data:`~unittest.mock.ANY` will return
+  ``True``).
+
+- Issue #37212: :func:`unittest.mock.call` now preserves the order of
+  keyword arguments in repr output. Patch by Karthikeyan Singaravelan.
+
+- Issue #37828: Fix default mock name in
+  :meth:`unittest.mock.Mock.assert_called` exceptions. Patch by Abraham
+  Toriz Cruz.
+
+- Issue #36871: Improve error handling for the assert_has_calls and
+  assert_has_awaits methods of mocks. Fixed a bug where any errors
+  encountered while binding the expected calls to the mock's spec were
+  silently swallowed, leading to misleading error output.
+
+- Issue #21600: Fix :func:`mock.patch.stopall` to stop active patches that
+  were created with :func:`mock.patch.dict`.
+
+- Issue #38161: Removes _AwaitEvent from AsyncMock.
+
+- Issue #36871: Ensure method signature is used instead of constructor
+  signature of a class while asserting mock object against method calls.
+  Patch by Karthikeyan Singaravelan.
+
 3.0.5
 -----
 
