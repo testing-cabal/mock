@@ -79,6 +79,7 @@ common: &common
     - check-package:
         name: check-package-pypy36
         image: pypy:3.6
+        python: pypy3
         requires:
           - package
 
