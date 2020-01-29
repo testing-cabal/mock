@@ -117,6 +117,20 @@ Backporting rules
 
       def will_never_be_called(): pass
 
+- If code such as this causes coverage checking to drop below 100%:
+
+  .. code-block:: python
+
+      def will_never_be_called():
+          yield
+
+  It should be adjusted to the following pattern, preferably upstream,
+  so that the ``.coveragerc`` in this repo knows to ignore it:
+
+  .. code-block:: python
+
+      def will_never_be_called(): yield
+
 Backporting process
 -------------------
 
