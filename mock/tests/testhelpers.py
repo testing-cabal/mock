@@ -502,8 +502,6 @@ class SpecSignatureTest(unittest.TestCase):
             self._check_someclass_mock(mock)
 
 
-    @pytest.mark.skipif(IS_PYPY,
-                        reason="https://bitbucket.org/pypy/pypy/issues/3010")
     def test_spec_has_descriptor_returning_function(self):
 
         class CrazyDescriptor(object):
