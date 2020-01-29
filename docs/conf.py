@@ -71,7 +71,7 @@ copyright = u'2007-2015, Michael Foord & the mock team'
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents. Supplied by pbr.
 #
-version = release = mock.mock.__version__
+version = release = mock.__version__
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used: (Set from pbr)
