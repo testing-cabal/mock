@@ -69,7 +69,7 @@ def git(command):
 def git_commit(new_version):
     git('rm NEWS.d/*')
     git('add CHANGELOG.rst')
-    git('add mock/mock.py')
+    git('add mock/__init__.py')
     git(f'commit -m "Preparing for {new_version} release."')
 
 
