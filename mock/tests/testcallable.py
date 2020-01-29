@@ -8,9 +8,8 @@ from mock.tests.support import is_instance, X, SomeClass
 from mock import (
     Mock, MagicMock, NonCallableMagicMock,
     NonCallableMock, patch, create_autospec,
-    CallableMixin
 )
-
+from mock.mock import CallableMixin
 
 
 class TestCallable(unittest.TestCase):
@@ -106,14 +105,8 @@ class TestCallable(unittest.TestCase):
         class Multi(SomeClass, Sub):
             pass
 
-        class OldStyle:
-            def __call__(self): pass
-
-        class OldStyleSub(OldStyle):
-            pass
-
         for arg in 'spec', 'spec_set':
-            for Klass in CallableX, Sub, Multi, OldStyle, OldStyleSub:
+            for Klass in CallableX, Sub, Multi:
                 with patch('%s.X' % __name__, **{arg: Klass}) as mock:
                     instance = mock()
                     mock.assert_called_once_with()

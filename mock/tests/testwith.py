@@ -1,13 +1,9 @@
-# Copyright (C) 2007-2012 Michael Foord & the mock team
-# E-mail: fuzzyman AT voidspace DOT org DOT uk
-# http://www.voidspace.org.uk/python/mock/
-
-from warnings import catch_warnings
-
 import unittest
+from warnings import catch_warnings
 
 from mock.tests.support import is_instance
 from mock import MagicMock, Mock, patch, sentinel, mock_open, call
+
 
 
 something  = sentinel.Something
@@ -52,11 +48,10 @@ class WithTest(unittest.TestCase):
 
     def test_with_statement_nested(self):
         with catch_warnings(record=True):
-            with patch('%s.something' % __name__) as mock_something:
-                with patch('%s.something_else' % __name__) as mock_something_else:
-                    self.assertEqual(something, mock_something, "unpatched")
-                    self.assertEqual(something_else, mock_something_else,
-                                     "unpatched")
+            with patch('%s.something' % __name__) as mock_something, patch('%s.something_else' % __name__) as mock_something_else:
+                self.assertEqual(something, mock_something, "unpatched")
+                self.assertEqual(something_else, mock_something_else,
+                                 "unpatched")
 
         self.assertEqual(something, sentinel.Something)
         self.assertEqual(something_else, sentinel.SomethingElse)
@@ -235,7 +230,22 @@ class TestMockOpen(unittest.TestCase):
         self.assertEqual(lines[1], 'bar\n')
         self.assertEqual(lines[2], 'baz\n')
         self.assertEqual(h.readline(), '')
+        with self.assertRaises(StopIteration):
+            next(h)
 
+    def test_next_data(self):
+        # Check that next will correctly return the next available
+        # line and plays well with the dunder_iter part.
+        mock = mock_open(read_data='foo\nbar\nbaz\n')
+        with patch('%s.open' % __name__, mock, create=True):
+            h = open('bar')
+            line1 = next(h)
+            line2 = next(h)
+            lines = [l for l in h]
+        self.assertEqual(line1, 'foo\n')
+        self.assertEqual(line2, 'bar\n')
+        self.assertEqual(lines[0], 'baz\n')
+        self.assertEqual(h.readline(), '')
 
     def test_readlines_data(self):
         # Test that emulating a file that ends in a newline character works

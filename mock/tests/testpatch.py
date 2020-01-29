@@ -4,24 +4,21 @@
 
 import os
 import sys
+from collections import OrderedDict
 
-import six
 import unittest
-
 from mock.tests import support
-from mock.tests.support import SomeClass, is_instance, uncache
+from mock.tests.support import SomeClass, is_instance
 
+from .support import uncache
 from mock import (
-    NonCallableMock, CallableMixin, patch, sentinel,
-    MagicMock, Mock, NonCallableMagicMock,
+    NonCallableMock, sentinel,
+    MagicMock, Mock, NonCallableMagicMock, patch,
     DEFAULT, call
 )
-from mock.mock import _patch, _get_target
+from mock.mock import CallableMixin, _patch, _get_target
 
-builtin_string = '__builtin__'
-if six.PY3:
-    builtin_string = 'builtins'
-    unicode = str
+builtin_string = 'builtins'
 
 PTModule = sys.modules[__name__]
 MODNAME = '%s.PTModule' % __name__
@@ -109,6 +106,10 @@ class PatchTest(unittest.TestCase):
         self.assertEqual(Something.attribute, sentinel.Original,
                          "patch not restored")
 
+    def test_patchobject_with_string_as_target(self):
+        msg = "'Something' must be the actual object to be patched, not a str"
+        with self.assertRaisesRegex(TypeError, msg):
+            patch.object('Something', 'do_something')
 
     def test_patchobject_with_none(self):
         class Something(object):
@@ -623,6 +624,13 @@ class PatchTest(unittest.TestCase):
         self.assertEqual(foo.values, original)
 
 
+    def test_patch_dict_as_context_manager(self):
+        foo = {'a': 'b'}
+        with patch.dict(foo, a='c') as patched:
+            self.assertEqual(patched, {'a': 'c'})
+        self.assertEqual(foo, {'a': 'b'})
+
+
     def test_name_preserved(self):
         foo = {}
 
@@ -656,21 +664,15 @@ class PatchTest(unittest.TestCase):
         test()
 
 
-    def test_patch_dict_with_unicode(self):
-        @patch.dict(u'os.environ', {'konrad_delong': 'some value'})
-        def test():
-            self.assertIn('konrad_delong', os.environ)
-
-        test()
-
-
     def test_patch_dict_decorator_resolution(self):
         # bpo-35512: Ensure that patch with a string target resolves to
         # the new dictionary during function call
         original = support.target.copy()
+
         @patch.dict('mock.tests.support.target', {'bar': 'BAR'})
         def test():
             self.assertEqual(support.target, {'foo': 'BAZ', 'bar': 'BAR'})
+
         try:
             support.target = {'foo': 'BAZ'}
             test()
@@ -765,6 +767,14 @@ class PatchTest(unittest.TestCase):
             self.assertEqual(d, {'spam': 'eggs'})
         finally:
             patcher.stop()
+        self.assertEqual(d, original)
+
+
+    def test_patch_dict_stop_without_start(self):
+        d = {'foo': 'bar'}
+        original = d.copy()
+        patcher = patch.dict(d, [('spam', 'eggs')], clear=True)
+        self.assertEqual(patcher.stop(), False)
         self.assertEqual(d, original)
 
 
@@ -1329,7 +1339,7 @@ class PatchTest(unittest.TestCase):
         try:
             f = result['f']
             foo = result['foo']
-            self.assertEqual(set(result), {'f', 'foo'})
+            self.assertEqual(set(result), set(['f', 'foo']))
 
             self.assertIs(Foo, original_foo)
             self.assertIs(Foo.f, f)
@@ -1533,15 +1543,14 @@ class PatchTest(unittest.TestCase):
 
 
     def test_patch_multiple_string_subclasses(self):
-        for base in (str, unicode):
-            Foo = type('Foo', (base,), {'fish': 'tasty'})
-            foo = Foo()
-            @patch.multiple(foo, fish='nearly gone')
-            def test():
-                self.assertEqual(foo.fish, 'nearly gone')
+        Foo = type('Foo', (str,), {'fish': 'tasty'})
+        foo = Foo()
+        @patch.multiple(foo, fish='nearly gone')
+        def test():
+            self.assertEqual(foo.fish, 'nearly gone')
 
-            test()
-            self.assertEqual(foo.fish, 'tasty')
+        test()
+        self.assertEqual(foo.fish, 'tasty')
 
 
     @patch('mock.patch.TEST_PREFIX', 'foo')
@@ -1605,15 +1614,12 @@ class PatchTest(unittest.TestCase):
 
 
     def test_patch_nested_autospec_repr(self):
-        p = patch('mock.tests.support', autospec=True)
-        m = p.start()
-        try:
+        with patch('mock.tests.support', autospec=True) as m:
             self.assertIn(" name='support.SomeClass.wibble()'",
                           repr(m.SomeClass.wibble()))
             self.assertIn(" name='support.SomeClass().wibble()'",
                           repr(m.SomeClass().wibble()))
-        finally:
-            p.stop()
+
 
 
     def test_mock_calls_with_patch(self):
@@ -1658,7 +1664,7 @@ class PatchTest(unittest.TestCase):
             p1.stop()
         self.assertEqual(squizz.squozz, 3)
 
-    def test_patch_propogrates_exc_on_exit(self):
+    def test_patch_propagates_exc_on_exit(self):
         class holder:
             exc_info = None, None, None
 
@@ -1687,9 +1693,9 @@ class PatchTest(unittest.TestCase):
 
         self.assertIs(holder.exc_info[0], RuntimeError)
         self.assertIsNotNone(holder.exc_info[1],
-                            'exception value not propgated')
+                            'exception value not propagated')
         self.assertIsNotNone(holder.exc_info[2],
-                            'exception traceback not propgated')
+                            'exception traceback not propagated')
 
 
     def test_create_and_specs(self):
@@ -1793,32 +1799,6 @@ class PatchTest(unittest.TestCase):
         patched()
         self.assertIs(os.path, path)
 
-
-    def test_wrapped_patch(self):
-        decorated = patch('sys.modules')(function)
-        self.assertIs(decorated.__wrapped__, function)
-
-
-    def test_wrapped_several_times_patch(self):
-        decorated = patch('sys.modules')(function)
-        decorated = patch('sys.modules')(decorated)
-        self.assertIs(decorated.__wrapped__, function)
-
-
-    def test_wrapped_patch_object(self):
-        decorated = patch.object(sys, 'modules')(function)
-        self.assertIs(decorated.__wrapped__, function)
-
-
-    def test_wrapped_patch_dict(self):
-        decorated = patch.dict('sys.modules')(function)
-        self.assertIs(decorated.__wrapped__, function)
-
-
-    def test_wrapped_patch_multiple(self):
-        decorated = patch.multiple('sys', modules={})(function)
-        self.assertIs(decorated.__wrapped__, function)
-
     def test_stopall_lifo(self):
         stopped = []
         class thing(object):
@@ -1836,6 +1816,56 @@ class PatchTest(unittest.TestCase):
 
         self.assertEqual(stopped, ["three", "two", "one"])
 
+    def test_patch_dict_stopall(self):
+        dic1 = {}
+        dic2 = {1: 'a'}
+        dic3 = {1: 'A', 2: 'B'}
+        origdic1 = dic1.copy()
+        origdic2 = dic2.copy()
+        origdic3 = dic3.copy()
+        patch.dict(dic1, {1: 'I', 2: 'II'}).start()
+        patch.dict(dic2, {2: 'b'}).start()
+
+        @patch.dict(dic3)
+        def patched():
+            del dic3[1]
+
+        patched()
+        self.assertNotEqual(dic1, origdic1)
+        self.assertNotEqual(dic2, origdic2)
+        self.assertEqual(dic3, origdic3)
+
+        patch.stopall()
+
+        self.assertEqual(dic1, origdic1)
+        self.assertEqual(dic2, origdic2)
+        self.assertEqual(dic3, origdic3)
+
+
+    def test_patch_and_patch_dict_stopall(self):
+        original_unlink = os.unlink
+        original_chdir = os.chdir
+        dic1 = {}
+        dic2 = {1: 'A', 2: 'B'}
+        origdic1 = dic1.copy()
+        origdic2 = dic2.copy()
+
+        patch('os.unlink', something).start()
+        patch('os.chdir', something_else).start()
+        patch.dict(dic1, {1: 'I', 2: 'II'}).start()
+        patch.dict(dic2).start()
+        del dic2[1]
+
+        self.assertIsNot(os.unlink, original_unlink)
+        self.assertIsNot(os.chdir, original_chdir)
+        self.assertNotEqual(dic1, origdic1)
+        self.assertNotEqual(dic2, origdic2)
+        patch.stopall()
+        self.assertIs(os.unlink, original_unlink)
+        self.assertIs(os.chdir, original_chdir)
+        self.assertEqual(dic1, origdic1)
+        self.assertEqual(dic2, origdic2)
+
 
     def test_special_attrs(self):
         def foo(x=0):
@@ -1851,22 +1881,40 @@ class PatchTest(unittest.TestCase):
 
         with patch.object(foo, '__module__', "testpatch2"):
             self.assertEqual(foo.__module__, "testpatch2")
-        self.assertEqual(foo.__module__, __name__)
+        self.assertEqual(foo.__module__, 'mock.tests.testpatch')
 
-        if hasattr(self.test_special_attrs, '__annotations__'):
-            with patch.object(foo, '__annotations__', dict([('s', 1, )])):
-                self.assertEqual(foo.__annotations__, dict([('s', 1, )]))
-            self.assertEqual(foo.__annotations__, dict())
+        with patch.object(foo, '__annotations__', dict([('s', 1, )])):
+            self.assertEqual(foo.__annotations__, dict([('s', 1, )]))
+        self.assertEqual(foo.__annotations__, dict())
 
-        if hasattr(self.test_special_attrs, '__kwdefaults__'):
-            foo = eval("lambda *a, x=0: x")
-            with patch.object(foo, '__kwdefaults__', dict([('x', 1, )])):
-                self.assertEqual(foo(), 1)
-            self.assertEqual(foo(), 0)
+        def foo(*a, x=0):
+            return x
+        with patch.object(foo, '__kwdefaults__', dict([('x', 1, )])):
+            self.assertEqual(foo(), 1)
+        self.assertEqual(foo(), 0)
 
+    def test_patch_orderdict(self):
+        foo = OrderedDict()
+        foo['a'] = object()
+        foo['b'] = 'python'
+
+        original = foo.copy()
+        update_values = list(zip('cdefghijklmnopqrstuvwxyz', range(26)))
+        patched_values = list(foo.items()) + update_values
+
+        with patch.dict(foo, OrderedDict(update_values)):
+            self.assertEqual(list(foo.items()), patched_values)
+
+        self.assertEqual(foo, original)
+
+        with patch.dict(foo, update_values):
+            self.assertEqual(list(foo.items()), patched_values)
+
+        self.assertEqual(foo, original)
 
     def test_dotted_but_module_not_loaded(self):
         # This exercises the AttributeError branch of _dot_lookup.
+
         # make sure it's there
         import mock.tests.support
         # now make sure it's not:
@@ -1875,6 +1923,7 @@ class PatchTest(unittest.TestCase):
             del sys.modules['mock.tests']
             del sys.modules['mock.mock']
             del sys.modules['mock']
+
             # now make sure we can patch based on a dotted path:
             @patch('mock.tests.support.X')
             def test(mock):

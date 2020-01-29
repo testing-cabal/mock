@@ -25,23 +25,14 @@ jobs:
 common: &common
   jobs:
     - python/pip-run-tests:
-        name: python27
-        image: circleci/python:2.7
-    - python/pip-run-tests:
-        name: python34
-        image: circleci/python:3.4
-    - python/pip-run-tests:
-        name: python35
-        image: circleci/python:3.5
-    - python/pip-run-tests:
         name: python36
         image: circleci/python:3.6
     - python/pip-run-tests:
         name: python37
         image: circleci/python:3.7
     - python/pip-run-tests:
-        name: pypy27
-        image: pypy:2.7
+        name: python38
+        image: circleci/python:3.8
     - python/pip-run-tests:
         name: pypy36
         image: pypy:3.6
@@ -49,12 +40,9 @@ common: &common
     - python/coverage:
         name: coverage
         requires:
-          - python27
-          - python34
-          - python35
           - python36
           - python37
-          - pypy27
+          - python38
           - pypy36
 
     - python/pip-docs:
@@ -72,7 +60,7 @@ common: &common
 
     - check-package:
         name: check-package-python27
-        image: circleci/python:2.7
+        image: circleci/python:3.7
         requires:
           - package
 
@@ -83,16 +71,15 @@ common: &common
           - package
 
     - check-package:
-        name: check-package-pypy27
-        image: pypy:2.7
-        python: pypy
+        name: check-package-python38
+        image: circleci/python:3.8
         requires:
           - package
 
     - check-package:
         name: check-package-pypy36
-        image: pypy:3.6
-        python: pypy3
+        image: pypy:2.7
+        python: pypy
         requires:
           - package
 
@@ -100,9 +87,8 @@ common: &common
         name: release
         config: .carthorse.yml
         requires:
-          - check-package-python27
           - check-package-python37
-          - check-package-pypy27
+          - check-package-python38
           - check-package-pypy36
 
 workflows:

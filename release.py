@@ -12,7 +12,7 @@ VERSION_TYPES = ['major', 'minor', 'bugfix']
 
 def incremented_version(version_info, type_):
     type_index = VERSION_TYPES.index(type_)
-    version_info = tuple(e+(1 if i==type_index else 0)
+    version_info = tuple(0 if i>type_index else (e+(1 if i==type_index else 0))
                          for i, e in enumerate(version_info))
     return '.'.join(str(p) for p in version_info)
 
@@ -50,7 +50,7 @@ def news_to_changelog(version):
 
 
 def update_version(new_version):
-    path = join('mock', 'mock.py')
+    path = join('mock', '__init__.py')
     with open(path) as source:
         text = source.read()
 
@@ -69,7 +69,7 @@ def git(command):
 def git_commit(new_version):
     git('rm NEWS.d/*')
     git('add CHANGELOG.rst')
-    git('add mock/mock.py')
+    git('add mock/__init__.py')
     git(f'commit -m "Preparing for {new_version} release."')
 
 
