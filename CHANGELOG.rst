@@ -1,3 +1,8 @@
+4.0.1
+-----
+
+- Remove the universal marker from the wheel.
+
 4.0.0
 -----
 
