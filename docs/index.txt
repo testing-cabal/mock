@@ -59,6 +59,14 @@ Python, should be reported to the `bug tracker
 with Mock functionality should be reported to the `Python bug tracker
 <https://bugs.python.org>`_.
 
+To check if the issue is a backport issue (instead of an issue with the upstream
+``unittest.mock`` module), you can first test with the latest CPython `master
+<https://github.com/python/cpython>`_ or a recent `release
+<https://github.com/python/cpython/releases>`_ first - ensuring you use ``import
+unittest.mock # upstream mock`` and not ``import mock # this module``; if the
+problem is the same then the issue is likely an issue in the upstream CPython
+version.
+
 .. index:: python changes
 
 Changelog

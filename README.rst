@@ -7,7 +7,8 @@ mock is now part of the Python standard library, available as `unittest.mock
 onwards.
 
 This package contains a rolling backport of the standard library mock code
-compatible with Python 3.6 and up.
+compatible with Python 3.6 and up. That is, this module ``import mock`` follows
+the latest version of Python's official ``import unittest.mock``.
 
 Please see the standard library documentation for more details.
 
