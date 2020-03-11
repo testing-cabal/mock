@@ -1,3 +1,11 @@
+4.0.2
+-----
+
+- Issue #39915: Ensure :attr:`unittest.mock.AsyncMock.await_args_list` has
+  call objects in the order of awaited arguments instead of using
+  :attr:`unittest.mock.Mock.call_args` which has the last value of the call.
+  Patch by Karthikeyan Singaravelan.
+
 4.0.1
 -----
 
