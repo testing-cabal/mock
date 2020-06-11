@@ -1589,9 +1589,9 @@ class _patch(object):
 def _get_target(target):
     try:
         target, attribute = target.rsplit('.', 1)
-    except (TypeError, ValueError):
+    except (TypeError, ValueError) as e:
         raise TypeError("Need a valid target to patch. You supplied: %r" %
-                        (target,))
+                        (target,)) from e
     getter = lambda: _importer(target)
     return getter, attribute
 
