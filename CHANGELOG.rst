@@ -1,3 +1,21 @@
+4.0.3
+-----
+
+- Issue #42532: Remove unexpected call of ``__bool__`` when passing a
+  ``spec_arg`` argument to a Mock.
+
+- Issue #39966: Revert bpo-25597. :class:`unittest.mock.MagicMock` with
+  wraps' set uses default return values for magic methods.
+
+- Issue #41877: Mock objects which are not unsafe will now raise an
+  AttributeError if an attribute with the prefix asert, aseert, or assrt is
+  accessed, in addition to this already happening for the prefixes assert or
+  assret.
+
+- Issue #40126: Fixed reverting multiple patches in unittest.mock. Patcher's
+  ``__exit__()`` is now never called if its ``__enter__()`` is failed.
+  Returning true from ``__exit__()`` silences now the exception.
+
 4.0.2
 -----
 
