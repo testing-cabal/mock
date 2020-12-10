@@ -5,5 +5,5 @@ carthorse:
     - version-not-tagged
   actions:
     - run: "sudo pip install -e .[build]"
-    - run: "twine upload -u carthorse-mock -p $PYPI_PASS dist/*"
+    - run: "twine upload -u __token__ -p $PYPI_TOKEN dist/*"
     - create-tag
