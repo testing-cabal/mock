@@ -12,7 +12,7 @@ from mock import (
     NonCallableMagicMock, AsyncMock,
     create_autospec, mock
 )
-from mock.mock import _Call, _CallList
+from mock.mock import _Call, _CallList, InvalidSpecError
 import mock.mock as mock_module
 
 
@@ -205,6 +205,28 @@ class MockTest(unittest.TestCase):
         mock.side_effect = ValueError('Bazinga!')
         self.assertRaisesRegex(ValueError, 'Bazinga!', mock)
 
+
+    def test_autospec_mock(self):
+        class A(object):
+            class B(object):
+                C = None
+
+        with mock.patch.object(A, 'B'):
+            with self.assertRaisesRegex(InvalidSpecError,
+                                        "Cannot autospec attr 'B' from target <MagicMock spec='A'"):
+                create_autospec(A).B
+            with self.assertRaisesRegex(InvalidSpecError,
+                                        "Cannot autospec attr 'B' from target 'A'"):
+                mock.patch.object(A, 'B', autospec=True).start()
+            with self.assertRaisesRegex(InvalidSpecError,
+                                        "Cannot autospec attr 'C' as the patch target "):
+                mock.patch.object(A.B, 'C', autospec=True).start()
+            with self.assertRaisesRegex(InvalidSpecError,
+                                        "Cannot spec attr 'B' as the spec "):
+                mock.patch.object(A, 'B', spec=A.B).start()
+            with self.assertRaisesRegex(InvalidSpecError,
+                                        "Cannot spec attr 'B' as the spec_set "):
+                mock.patch.object(A, 'B', spec_set=A.B).start()
 
     def test_reset_mock(self):
         parent = Mock()
@@ -2180,7 +2202,7 @@ class MockTest(unittest.TestCase):
                 self.obj_with_bool_func = mock_module.MagicMock()
 
         obj = Something()
-        with mock_module.patch.object(obj, 'obj_with_bool_func', autospec=True): pass
+        with mock_module.patch.object(obj, 'obj_with_bool_func', spec=object): pass
 
         self.assertEqual(obj.obj_with_bool_func.__bool__.call_count, 0)
 
