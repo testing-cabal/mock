@@ -24,26 +24,21 @@ jobs:
 
 common: &common
   jobs:
+
     - python/pip-run-tests:
-        name: python36
-        image: circleci/python:3.6
-    - python/pip-run-tests:
-        name: python37
-        image: circleci/python:3.7
-    - python/pip-run-tests:
-        name: python38
-        image: circleci/python:3.8
-    - python/pip-run-tests:
-        name: pypy36
-        image: pypy:3.6
+        matrix:
+          parameters:
+            image:
+              - circleci/python:3.6
+              - circleci/python:3.7
+              - circleci/python:3.8
+              - circleci/python:3.9
+              - pypy:3.6
 
     - python/coverage:
         name: coverage
         requires:
-          - python36
-          - python37
-          - python38
-          - pypy36
+          - python/pip-run-tests
 
     - python/pip-docs:
         name: docs
@@ -59,27 +54,14 @@ common: &common
             only: master
 
     - check-package:
-        name: check-package-python36
-        image: circleci/python:3.6
-        requires:
-          - package
-
-    - check-package:
-        name: check-package-python37
-        image: circleci/python:3.7
-        requires:
-          - package
-
-    - check-package:
-        name: check-package-python38
-        image: circleci/python:3.8
-        requires:
-          - package
-
-    - check-package:
-        name: check-package-pypy36
-        image: pypy:3.6
-        python: pypy3
+        matrix:
+          parameters:
+            image:
+              - circleci/python:3.6
+              - circleci/python:3.7
+              - circleci/python:3.8
+              - circleci/python:3.9
+              - pypy:3.6
         requires:
           - package
 
@@ -87,10 +69,7 @@ common: &common
         name: release
         config: .carthorse.yml
         requires:
-          - check-package-python36
-          - check-package-python37
-          - check-package-python38
-          - check-package-pypy36
+          - check-package
 
 workflows:
   push:
