@@ -58,10 +58,7 @@ common: &common
           parameters:
             image:
               - circleci/python:3.6
-              - circleci/python:3.7
-              - circleci/python:3.8
               - circleci/python:3.9
-              - pypy:3.6
         requires:
           - package
 
