@@ -932,7 +932,7 @@ class NonCallableMock(Base):
 
         If `any_order` is False (the default) then the calls must be
         sequential. There can be extra calls before or after the
-        specified calls.
+        specified calls, but not in between the specified calls.
 
         If `any_order` is True then the calls can be in any order, but
         they must all appear in `mock_calls`."""
