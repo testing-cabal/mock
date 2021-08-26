@@ -1962,7 +1962,7 @@ if IS_PYPY:
     magic_methods = magic_methods.replace('sizeof ', '')
 
 numerics = (
-    "add sub mul matmul div floordiv mod lshift rshift and xor or pow truediv"
+    "add sub mul matmul truediv floordiv mod lshift rshift and xor or pow"
 )
 inplace = ' '.join('i%s' % n for n in numerics.split())
 right = ' '.join('r%s' % n for n in numerics.split())
