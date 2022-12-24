@@ -7,7 +7,7 @@ import unittest
 from contextlib import contextmanager
 
 from mock import (ANY, call, AsyncMock, patch, MagicMock, Mock,
-                  create_autospec, sentinel)
+                  create_autospec, sentinel, seal)
 from mock.backports import IsolatedAsyncioTestCase, iscoroutinefunction
 from mock.mock import _CallList
 
@@ -305,6 +305,14 @@ class AsyncSpecTest(unittest.TestCase):
         mock = Mock(AsyncClass)
         self.assertIsInstance(mock.async_method, AsyncMock)
         self.assertIsInstance(mock.normal_method, Mock)
+
+    def test_spec_normal_methods_on_class_with_mock_seal(self):
+        mock = Mock(AsyncClass)
+        seal(mock)
+        with self.assertRaises(AttributeError):
+            mock.normal_method
+        with self.assertRaises(AttributeError):
+            mock.async_method
 
     def test_spec_async_attributes_instance(self):
         async_instance = AsyncClass()
@@ -1097,3 +1105,7 @@ class AsyncMockAssert(unittest.TestCase):
                 )) as cm:
             self.mock.assert_has_awaits([call(), call(1, 2)])
         self.assertIsInstance(cm.exception.__cause__, TypeError)
+
+
+if __name__ == '__main__':
+    unittest.main()
