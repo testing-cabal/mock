@@ -35,7 +35,7 @@ common: &common
               - cimg/python:3.9
               - cimg/python:3.10
               - cimg/python:3.11
-              - pypy:3
+              - pypy:3.7-7.3.2  # https://foss.heptapod.net/pypy/pypy/-/issues/3436
 
     - python/coverage:
         name: coverage
