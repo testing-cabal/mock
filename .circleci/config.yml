@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  python: cjw296/python-ci@2
+  python: cjw296/python-ci@3
 
 jobs:
   check-package:
@@ -29,11 +29,13 @@ common: &common
         matrix:
           parameters:
             image:
-              - circleci/python:3.6
-              - circleci/python:3.7
-              - circleci/python:3.8
-              - circleci/python:3.9
-              - pypy:3.6
+              - cimg/python:3.6
+              - cimg/python:3.7
+              - cimg/python:3.8
+              - cimg/python:3.9
+              - cimg/python:3.10
+              - cimg/python:3.11
+              - pypy:3
 
     - python/coverage:
         name: coverage
@@ -57,8 +59,8 @@ common: &common
         matrix:
           parameters:
             image:
-              - circleci/python:3.6
-              - circleci/python:3.9
+              - cimg/python:3.6
+              - cimg/python:3.11
         requires:
           - package
 
