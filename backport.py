@@ -111,12 +111,19 @@ def main():
     if args.skip_current:
         return skip_current(args.mock, args.skip_reason)
 
+    initial_cpython_rev = find_initial_cpython_rev()
+
+    if args.list:
+        for rev in cpython_revs_affecting_mock(args.cpython, initial_cpython_rev):
+            print(git(f'show --name-only --oneline {rev}', args.cpython), end='')
+            has_been_backported(args.mock, rev)
+            print()
+        return
+
     if repo_state_bad(args.mock):
         return
 
     cleanup_old_patches(args.mock)
-
-    initial_cpython_rev = find_initial_cpython_rev()
 
     revs = cpython_revs_affecting_mock(args.cpython, initial_cpython_rev)
     for rev in revs:
@@ -138,6 +145,7 @@ def parse_args():
     parser = ArgumentParser()
     parser.add_argument('--cpython', default='../cpython')
     parser.add_argument('--mock', default=abspath(dirname(__file__)))
+    parser.add_argument('--list', action='store_true', help='list revs remaining to backport')
     parser.add_argument('--skip-current', action='store_true')
     parser.add_argument('--skip-reason', default='it has no changes needed here.')
     return parser.parse_args()
