@@ -29,7 +29,10 @@ def find_initial_cpython_rev():
 
 def cpython_revs_affecting_mock(cpython_repo, start):
     revs = git(f'log --no-merges --format=%H {start}..  '
-               f'-- Lib/unittest/mock.py Lib/unittest/test/testmock/',
+               f'-- '
+               f'Lib/unittest/mock.py '
+               f'Lib/unittest/test/testmock/ '
+               f'Lib/test/test_unittest/testmock/',
                repo=cpython_repo).split()
     revs.reverse()
     print(f'{len(revs)} patches that may need backporting')
@@ -58,6 +61,7 @@ def munge(rev, patch):
     for pattern, sub in (
         ('(a|b)/Lib/unittest/mock.py', r'\1/mock/mock.py'),
         (r'(a|b)/Lib/unittest/test/testmock/(\S+)', r'\1/mock/tests/\2'),
+        (r'(a|b)/Lib/test/test_unittest/testmock/(\S+)', r'\1/mock/tests/\2'),
         ('(a|b)/Misc/NEWS', r'\1/NEWS'),
         ('(a|b)/NEWS.d/next/[^/]+/(.+\.rst)', r'\1/NEWS.d/\2'),
     ):
