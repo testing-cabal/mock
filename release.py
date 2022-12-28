@@ -27,8 +27,10 @@ def text_from_news():
 
     text = []
     for metadata, body in blurbs:
-        bpo = metadata['bpo']
-        body = f"- Issue #{bpo}: " + body
+        bpo = metadata.get('bpo')
+        gh = metadata.get('gh-issue')
+        issue = f'bpo-{bpo}' if bpo else f'gh-{gh}'
+        body = f"- {issue}: " + body
         text.append(blurb_module.textwrap_body(body, subsequent_indent='  '))
 
     return '\n'.join(text)
