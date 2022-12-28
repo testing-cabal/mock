@@ -4,6 +4,6 @@ carthorse:
   when:
     - version-not-tagged
   actions:
-    - run: "sudo pip install -e .[build]"
+    - run: "pip install -e .[build]"
     - run: "twine upload -u __token__ -p $PYPI_TOKEN dist/*"
     - create-tag
