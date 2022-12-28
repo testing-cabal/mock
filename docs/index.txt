@@ -135,8 +135,13 @@ Backporting rules
   then commit the latest sync point and then revert the problematic commit in an immediately
   subsequent commit and make a not of the reason for the revert in that commit message.
 
-  See ``1140c2930`` for an example where ``af2a3d6def15`` broke compatibility for all Python
+  See `bc04ea7`__ for an example where `f4c8dc7`__ broke compatibility for all Python
   versions earlier than 3.10.
+
+  __ https://github.com/testing-cabal/mock/commit/bc04ea76352c2064d79160f13649f879667a89cb
+
+  __ https://github.com/testing-cabal/mock/commit/f4c8dc7098abb6b2f9a65ee86bad3891776abb50
+
 
 Backporting process
 -------------------
