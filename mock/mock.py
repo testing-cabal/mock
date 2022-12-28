@@ -30,7 +30,6 @@ import inspect
 import pprint
 import sys
 import builtins
-import pkgutil
 from asyncio import iscoroutinefunction
 from types import CodeType, ModuleType, MethodType
 from unittest.util import safe_repr
@@ -1250,6 +1249,25 @@ class Mock(CallableMixin, NonCallableMock):
     """
 
 
+def _dot_lookup(thing, comp, import_path):
+    try:
+        return getattr(thing, comp)
+    except AttributeError:
+        __import__(import_path)
+        return getattr(thing, comp)
+
+
+def _importer(target):
+    components = target.split('.')
+    import_path = components.pop(0)
+    thing = __import__(import_path)
+
+    for comp in components:
+        import_path += ".%s" % comp
+        thing = _dot_lookup(thing, comp, import_path)
+    return thing
+
+
 # _check_spec_arg_typos takes kwargs from commands like patch and checks that
 # they don't contain common misspellings of arguments related to autospeccing.
 def _check_spec_arg_typos(kwargs_to_check):
@@ -1603,7 +1621,8 @@ def _get_target(target):
     except (TypeError, ValueError):
         raise TypeError("Need a valid target to patch. You supplied: %r" %
                         (target,))
-    return partial(pkgutil.resolve_name, target), attribute
+    getter = lambda: _importer(target)
+    return getter, attribute
 
 
 def _patch_object(
@@ -1658,7 +1677,7 @@ def _patch_multiple(target, spec=None, create=False, spec_set=None,
     for choosing which methods to wrap.
     """
     if type(target) is str:
-        getter = partial(pkgutil.resolve_name, target)
+        getter = lambda: _importer(target)
     else:
         getter = lambda: target
 
@@ -1838,7 +1857,7 @@ class _patch_dict(object):
     def _patch_dict(self):
         values = self.values
         if isinstance(self.in_dict, str):
-            self.in_dict = pkgutil.resolve_name(self.in_dict)
+            self.in_dict = _importer(self.in_dict)
         in_dict = self.in_dict
         clear = self.clear
 
