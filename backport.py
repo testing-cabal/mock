@@ -129,7 +129,11 @@ def main():
 
     cleanup_old_patches(args.mock)
 
-    revs = cpython_revs_affecting_mock(args.cpython, initial_cpython_rev)
+    if args.rev:
+        revs = [args.rev]
+    else:
+        revs = cpython_revs_affecting_mock(args.cpython, initial_cpython_rev)
+
     for rev in revs:
 
         if has_been_backported(args.mock, rev):
@@ -142,7 +146,8 @@ def main():
         break
 
     else:
-        commit_last_sync(revs, args.mock)
+        if not args.rev:
+            commit_last_sync(revs, args.mock)
 
 
 def parse_args():
@@ -150,6 +155,7 @@ def parse_args():
     parser.add_argument('--cpython', default='../cpython')
     parser.add_argument('--mock', default=abspath(dirname(__file__)))
     parser.add_argument('--list', action='store_true', help='list revs remaining to backport')
+    parser.add_argument('--rev', help='backport a specific git hash')
     parser.add_argument('--skip-current', action='store_true')
     parser.add_argument('--skip-reason', default='it has no changes needed here.')
     return parser.parse_args()
