@@ -131,6 +131,13 @@ Backporting rules
 
       def will_never_be_called(): yield
 
+- If a backported patch applies cleanly, but ends up needing to be skipped,
+  then commit the latest sync point and then revert the problematic commit in an immediately
+  subsequent commit and make a not of the reason for the revert in that commit message.
+
+  See ``1140c2930`` for an example where ``af2a3d6def15`` broke compatibility for all Python
+  versions earlier than 3.10.
+
 Backporting process
 -------------------
 
