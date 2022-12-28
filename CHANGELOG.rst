@@ -1,3 +1,64 @@
+5.0.0
+-----
+
+- gh-98624: Add a mutex to unittest.mock.NonCallableMock to protect
+  concurrent access to mock attributes.
+
+- bpo-43478: Mocks can no longer be used as the specs for other Mocks. As a
+  result, an already-mocked object cannot have an attribute mocked using
+  `autospec=True` or be the subject of a `create_autospec(...)` call. This
+  can uncover bugs in tests since these Mock-derived Mocks will always pass
+  certain tests (e.g. isinstance) and builtin assert functions (e.g.
+  assert_called_once_with) will unconditionally pass.
+
+- bpo-45156: Fixes infinite loop on :func:`unittest.mock.seal` of mocks
+  created by :func:`~unittest.create_autospec`.
+
+- bpo-41403: Make :meth:`mock.patch` raise a :exc:`TypeError` with a
+  relevant error message on invalid arg. Previously it allowed a cryptic
+  :exc:`AttributeError` to escape.
+
+- gh-91803: Fix an error when using a method of objects mocked with
+  :func:`unittest.mock.create_autospec` after it was sealed with
+  :func:`unittest.mock.seal` function.
+
+- bpo-41877: AttributeError for suspected misspellings of assertions on
+  mocks are now pointing out that the cause are misspelled assertions and
+  also what to do if the misspelling is actually an intended attribute name.
+  The unittest.mock document is also updated to reflect the current set of
+  recognised misspellings.
+
+- bpo-43478: Mocks can no longer be provided as the specs for other Mocks.
+  As a result, an already-mocked object cannot be passed to `mock.Mock()`.
+  This can uncover bugs in tests since these Mock-derived Mocks will always
+  pass certain tests (e.g. isinstance) and builtin assert functions (e.g.
+  assert_called_once_with) will unconditionally pass.
+
+- bpo-45010: Remove support of special method ``__div__`` in
+  :mod:`unittest.mock`. It is not used in Python 3.
+
+- gh-84753: :func:`inspect.iscoroutinefunction` now properly returns
+  ``True`` when an instance of :class:`unittest.mock.AsyncMock` is passed to
+  it.  This makes it consistent with behavior of
+  :func:`asyncio.iscoroutinefunction`.  Patch by Mehdi ABAAKOUK.
+
+- bpo-46852: Remove the undocumented private ``float.__set_format__()``
+  method, previously known as ``float.__setformat__()`` in Python 3.7. Its
+  docstring said: "You probably don't want to use this function. It exists
+  mainly to be used in Python's test suite." Patch by Victor Stinner.
+
+- gh-98086: Make sure ``patch.dict()`` can be applied on async functions.
+
+- gh-100287: Fix the interaction of :func:`unittest.mock.seal` with
+  :class:`unittest.mock.AsyncMock`.
+
+- gh-83076: Instantiation of ``Mock()`` and ``AsyncMock()`` is now 3.8x
+  faster.
+
+- bpo-41877: A check is added against misspellings of autospect, auto_spec
+  and set_spec being passed as arguments to patch, patch.object and
+  create_autospec.
+
 4.0.3
 -----
 
