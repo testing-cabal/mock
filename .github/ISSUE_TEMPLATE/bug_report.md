@@ -12,7 +12,7 @@ As such, any problems you encounter most likely need to be fixed upstream.
 
 Before submitting an issue here, please try and reproduce the problem on the latest release of Python 3, including alphas, and replace any import from `mock` with ones from `unittest.mock`.
 
-If the issue still occurs, then please report upstream through https://bugs.python.org/ as it will need to be fixed there so that it can be backported here and released to you.
+If the issue still occurs, then please report upstream through https://github.com/python/cpython/issues as it will need to be fixed there so that it can be backported here and released to you.
 
 If the issue does not occur upstream, please file an issue using the template below as it may be an issue specific to the backport:
 
