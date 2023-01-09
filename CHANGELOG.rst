@@ -1,3 +1,20 @@
+5.0.1
+-----
+
+- gh-100740: Fix ``unittest.mock.Mock`` not respecting the spec for
+  attribute names prefixed with ``assert``.
+
+- gh-100690: ``Mock`` objects which are not unsafe will now raise an
+  ``AttributeError`` when accessing an attribute that matches the name of an
+  assertion but without the prefix ``assert_``, e.g. accessing
+  ``called_once`` instead of ``assert_called_once``. This is in addition to
+  this already happening for accessing attributes with prefixes ``assert``,
+  ``assret``, ``asert``, ``aseert``, and ``assrt``.
+
+- gh-96127: ``inspect.signature`` was raising ``TypeError`` on call with
+  mock objects. Now it correctly returns ``(*args, **kwargs)`` as infered
+  signature.
+
 5.0.0
 -----
 

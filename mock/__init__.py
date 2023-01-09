@@ -7,7 +7,7 @@ IS_PYPY = 'PyPy' in sys.version
 import mock.mock as _mock
 from mock.mock import *
 
-__version__ = '5.0.0'
+__version__ = '5.0.1'
 version_info = tuple(int(p) for p in
                      re.match(r'(\d+).(\d+).(\d+)', __version__).groups())
 
