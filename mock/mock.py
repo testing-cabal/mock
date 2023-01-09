@@ -1070,9 +1070,16 @@ class NonCallableMock(Base):
         return f"\n{prefix}: {safe_repr(self.mock_calls)}."
 
 
+try:
+    removeprefix = str.removeprefix
+except AttributeError:
+    # Py 3.8 and earlier:
+    def removeprefix(name, prefix):
+        return name[len(prefix):]
+
 # Denylist for forbidden attribute names in safe mode
 _ATTRIB_DENY_LIST = frozenset({
-    name.removeprefix("assert_")
+    removeprefix(name, "assert_")
     for name in dir(NonCallableMock)
     if name.startswith("assert_")
 })
