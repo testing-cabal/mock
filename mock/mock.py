@@ -2265,7 +2265,11 @@ class AsyncMockMixin(Base):
         )
         code_mock.co_argcount = 0
         code_mock.co_varnames = ('args', 'kwargs')
-        code_mock.co_posonlyargcount = 0
+        try:
+            code_mock.co_posonlyargcount = 0
+        except AttributeError:
+            # Python 3.7 and earlier.
+            pass
         code_mock.co_kwonlyargcount = 0
         self.__dict__['__code__'] = code_mock
         self.__dict__['__name__'] = 'AsyncMock'
