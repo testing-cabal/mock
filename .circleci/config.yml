@@ -38,9 +38,13 @@ common: &common
               - cimg/python:3.11
 
     - python/pip-run-tests:
-        name: pypy-tests
         python: pypy3
-        image: pypy:3.7-7.3.2  # https://foss.heptapod.net/pypy/pypy/-/issues/3436
+        matrix:
+          alias: pypy-tests
+          parameters:
+            image:
+              - pypy:3.7-7.3.2
+              - pypy:latest
 
     - python/coverage:
         name: coverage
