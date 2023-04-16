@@ -1,3 +1,13 @@
+5.0.2
+-----
+
+- gh-102978: Fixes :func:`unittest.mock.patch` not enforcing function
+  signatures for methods decorated with ``@classmethod`` or
+  ``@staticmethod`` when patch is called with ``autospec=True``.
+
+- gh-103329: Regression tests for the behaviour of
+  ``unittest.mock.PropertyMock`` were added.
+
 5.0.1
 -----
 
