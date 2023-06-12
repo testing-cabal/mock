@@ -2326,12 +2326,12 @@ class MockTest(unittest.TestCase):
         class Foo():
             @classmethod
             async def class_method(cls):
-                pass
+                pass  # pragma: no cover
             @staticmethod
             async def static_method():
-                pass
+                pass  # pragma: no cover
             async def method(self):
-                pass
+                pass  # pragma: no cover
         mock = Mock(spec=Foo)
         for m in (mock.method, mock.class_method, mock.static_method):
             if sys.version_info[:2] <= (3, 9) and m is not mock.method:
