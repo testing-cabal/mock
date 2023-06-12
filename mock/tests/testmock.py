@@ -2334,6 +2334,10 @@ class MockTest(unittest.TestCase):
                 pass
         mock = Mock(spec=Foo)
         for m in (mock.method, mock.class_method, mock.static_method):
+            if sys.version_info[:2] <= (3, 9) and m is not mock.method:
+                # class and static methods need bugfixes in cpython to work:
+                self.assertIsInstance(m, Mock)
+                continue
             self.assertIsInstance(m, AsyncMock)
 
 if __name__ == '__main__':
