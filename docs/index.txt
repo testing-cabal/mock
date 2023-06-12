@@ -115,7 +115,8 @@ Backporting rules
 
   .. code-block:: python
 
-      def will_never_be_called(): pass
+      def will_never_be_called():
+          pass  # pragma: no cov
 
 - If code such as this causes coverage checking to drop below 100%:
 
@@ -129,7 +130,8 @@ Backporting rules
 
   .. code-block:: python
 
-      def will_never_be_called(): yield
+      def will_never_be_called():
+          yield  # pragma: no cover
 
 - If a backported patch applies cleanly, but ends up needing to be skipped,
   then commit the latest sync point and then revert the problematic commit in an immediately
