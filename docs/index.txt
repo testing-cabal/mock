@@ -135,7 +135,7 @@ Backporting rules
 
 - If a backported patch applies cleanly, but ends up needing to be skipped,
   then commit the latest sync point and then revert the problematic commit in an immediately
-  subsequent commit and make a not of the reason for the revert in that commit message.
+  subsequent commit and make a note of the reason for the revert in that commit message.
 
   See `bc04ea7`__ for an example where `f4c8dc7`__ broke compatibility for all Python
   versions earlier than 3.10.
