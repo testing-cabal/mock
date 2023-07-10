@@ -14,7 +14,7 @@ class Something:
 
 
 class TestThreadingMock(unittest.TestCase):
-    def _call_after_delay(self, func, /, *args, **kwargs):
+    def _call_after_delay(self, func, *args, **kwargs):
         time.sleep(kwargs.pop("delay"))
         func(*args, **kwargs)
 
@@ -24,7 +24,7 @@ class TestThreadingMock(unittest.TestCase):
     def tearDown(self):
         self._executor.shutdown()
 
-    def run_async(self, func, /, *args, delay=0, **kwargs):
+    def run_async(self, func, *args, delay=0, **kwargs):
         self._executor.submit(
             self._call_after_delay, func, *args, **kwargs, delay=delay
         )

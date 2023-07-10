@@ -3063,7 +3063,7 @@ class ThreadingMixin(Base):
 
     DEFAULT_TIMEOUT = None
 
-    def _get_child_mock(self, /, **kw):
+    def _get_child_mock(self, **kw):
         if "timeout" in kw:
             kw["timeout"] = kw.pop("timeout")
         elif isinstance(kw.get("parent"), ThreadingMixin):
@@ -3081,7 +3081,7 @@ class ThreadingMixin(Base):
         self.__dict__["_mock_calls_events_lock"] = threading.Lock()
         self.__dict__["_mock_wait_timeout"] = timeout
 
-    def reset_mock(self, /, *args, **kwargs):
+    def reset_mock(self, *args, **kwargs):
         """
         See :func:`.Mock.reset_mock()`
         """
