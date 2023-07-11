@@ -1,3 +1,20 @@
+5.1.0
+-----
+
+- bpo-44185: :func:`unittest.mock.mock_open` will call the :func:`close`
+  method of the file handle mock when it is exiting from the context
+  manager. Patch by Samet Yaslan.
+
+- gh-94924: :func:`unittest.mock.create_autospec` now properly returns
+  coroutine functions compatible with :func:`inspect.iscoroutinefunction`
+
+- bpo-17013: Add ``ThreadingMock`` to :mod:`unittest.mock` that can be used
+  to create Mock objects that can wait until they are called. Patch by
+  Karthikeyan Singaravelan and Mario Corchero.
+
+- bpo-41768: :mod:`unittest.mock` speccing no longer calls class properties.
+  Patch by Melanie Witt.
+
 5.0.2
 -----
 
