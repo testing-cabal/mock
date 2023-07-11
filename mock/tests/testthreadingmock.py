@@ -7,10 +7,10 @@ from mock import patch, ThreadingMock, call
 
 class Something:
     def method_1(self):
-        pass
+        pass  # pragma: no cover
 
     def method_2(self):
-        pass
+        pass  # pragma: no cover
 
 
 class TestThreadingMock(unittest.TestCase):
