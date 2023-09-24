@@ -2,7 +2,7 @@ import time
 import unittest
 import concurrent.futures
 
-from mock import patch, ThreadingMock, call
+from mock import patch, ThreadingMock
 
 VERY_SHORT_TIMEOUT = 0.1
 
