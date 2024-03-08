@@ -575,7 +575,7 @@ class NonCallableMock(Base):
         if self._mock_delegate is not None:
             ret = self._mock_delegate.return_value
 
-        if ret is DEFAULT:
+        if ret is DEFAULT and self._mock_wraps is None:
             ret = self._get_child_mock(
                 _new_parent=self, _new_name='()'
             )
@@ -1248,6 +1248,9 @@ class CallableMixin(Base):
                 return result
 
         if self._mock_return_value is not DEFAULT:
+            return self.return_value
+
+        if self._mock_delegate and self._mock_delegate.return_value is not DEFAULT:
             return self.return_value
 
         if self._mock_wraps is not None:
@@ -2837,9 +2840,12 @@ def create_autospec(spec, spec_set=False, instance=False, _parent=None,
     if _parent is not None and not instance:
         _parent._mock_children[_name] = mock
 
+    wrapped = kwargs.get('wraps')
+
     if is_type and not instance and 'return_value' not in kwargs:
         mock.return_value = create_autospec(spec, spec_set, instance=True,
-                                            _name='()', _parent=mock)
+                                            _name='()', _parent=mock,
+                                            wraps=wrapped)
 
     for entry in dir(spec):
         if _is_magic(entry):
@@ -2861,6 +2867,9 @@ def create_autospec(spec, spec_set=False, instance=False, _parent=None,
             continue
 
         kwargs = {'spec': original}
+        # Wrap child attributes also.
+        if wrapped and hasattr(wrapped, entry):
+            kwargs.update(wraps=original)
         if spec_set:
             kwargs = {'spec_set': original}
 
