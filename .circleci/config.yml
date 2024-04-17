@@ -36,6 +36,7 @@ common: &common
               - cimg/python:3.9
               - cimg/python:3.10
               - cimg/python:3.11
+              - cimg/python:3.12
 
     - python/pip-run-tests:
         python: pypy3
@@ -70,7 +71,7 @@ common: &common
           parameters:
             image:
               - cimg/python:3.6
-              - cimg/python:3.11
+              - cimg/python:3.12
         requires:
           - package
 
