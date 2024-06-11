@@ -1978,6 +1978,13 @@ class PatchTest(unittest.TestCase):
         with self.assertRaises(TypeError):
             test()
 
+    def test_patch_proxy_object(self):
+        @patch("mock.tests.support.g", new_callable=MagicMock())
+        def test(_):
+            pass
+
+        test()
+
 
 if __name__ == '__main__':
     unittest.main()
