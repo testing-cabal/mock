@@ -1,9 +1,17 @@
 import sys
 
 
+iscoroutinefunction = None
+
 try:
-    from asyncio import iscoroutinefunction
+    from inspect import iscoroutinefunction
 except ImportError:
+    try:
+        from asyncio import iscoroutinefunction
+    except ImportError:
+        pass
+
+if iscoroutinefunction is None:
 
     import functools
     from asyncio.coroutines import _is_coroutine
