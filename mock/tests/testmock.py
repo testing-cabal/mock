@@ -2225,13 +2225,13 @@ class MockTest(unittest.TestCase):
     def test_attribute_deletion(self):
         for mock in (Mock(), MagicMock(), NonCallableMagicMock(),
                      NonCallableMock()):
-            self.assertTrue(hasattr(mock, 'm'))
+            self.assertHasAttr(mock, 'm')
 
             del mock.m
-            self.assertFalse(hasattr(mock, 'm'))
+            self.assertNotHasAttr(mock, 'm')
 
             del mock.f
-            self.assertFalse(hasattr(mock, 'f'))
+            self.assertNotHasAttr(mock, 'f')
             self.assertRaises(AttributeError, getattr, mock, 'f')
 
 
@@ -2240,18 +2240,18 @@ class MockTest(unittest.TestCase):
         for mock in (Mock(), MagicMock(), NonCallableMagicMock(),
                      NonCallableMock()):
             mock.foo = 3
-            self.assertTrue(hasattr(mock, 'foo'))
+            self.assertHasAttr(mock, 'foo')
             self.assertEqual(mock.foo, 3)
 
             del mock.foo
-            self.assertFalse(hasattr(mock, 'foo'))
+            self.assertNotHasAttr(mock, 'foo')
 
             mock.foo = 4
-            self.assertTrue(hasattr(mock, 'foo'))
+            self.assertHasAttr(mock, 'foo')
             self.assertEqual(mock.foo, 4)
 
             del mock.foo
-            self.assertFalse(hasattr(mock, 'foo'))
+            self.assertNotHasAttr(mock, 'foo')
 
 
     def test_mock_raises_when_deleting_nonexistent_attribute(self):
@@ -2269,7 +2269,7 @@ class MockTest(unittest.TestCase):
         mock.child = True
         del mock.child
         mock.reset_mock()
-        self.assertFalse(hasattr(mock, 'child'))
+        self.assertNotHasAttr(mock, 'child')
 
 
     def test_class_assignable(self):
