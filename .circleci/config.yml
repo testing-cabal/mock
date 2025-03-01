@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  python: cjw296/python-ci@4
+  python: cjw296/python-ci@5
 
 jobs:
   check-package:
