@@ -1569,12 +1569,21 @@ class MockTest(unittest.TestCase):
 
         with self.assertRaises(AssertionError) as cm:
             mock.assert_has_calls([call(), call(1, 2)])
-        self.assertEqual(str(cm.exception),
+        if sys.version_info[:2] > (3, 6):
+            message = (
                          'Error processing expected calls.\n'
                          "Errors: [None, TypeError('too many positional arguments')]\n"
                          'Expected: [call(), call(1, 2)]\n'
                          '  Actual: [call(1)]'
-                         )
+            )
+        else:
+            message = (
+                         'Error processing expected calls.\n'
+                         "Errors: [None, TypeError('too many positional arguments',)]\n"
+                         'Expected: [call(), call(1, 2)]\n'
+                         '  Actual: [call(1)]'
+            )
+        self.assertEqual(str(cm.exception), message)
         self.assertIsInstance(cm.exception.__cause__, TypeError)
 
     def test_assert_any_call(self):
