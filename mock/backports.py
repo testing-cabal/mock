@@ -87,5 +87,3 @@ else:
     from asyncio import iscoroutinefunction
     from unittest import IsolatedAsyncioTestCase
 
-
-from test.support.import_helper import DirsOnSysPath
