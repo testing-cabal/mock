@@ -1,17 +1,11 @@
 import sys
 
 
-iscoroutinefunction = None
-
-try:
+if sys.version_info[:2] > (3, 9):
     from inspect import iscoroutinefunction
-except ImportError:
-    try:
-        from asyncio import iscoroutinefunction
-    except ImportError:
-        pass
-
-if iscoroutinefunction is None:
+elif sys.version_info[:2] >= (3, 8):
+    from asyncio import iscoroutinefunction
+else:
 
     import functools
     from asyncio.coroutines import _is_coroutine
