@@ -1,6 +1,11 @@
 5.2.0
 -----
 
+This is release is `in memory of Michael Foord`__, who originally authored the `mock` package
+and passed away in January 2025.
+
+__ https://discuss.python.org/t/in-memoriam-michael-foord-1974-2025/78317
+
 - gh-65454: :func:`unittest.mock.Mock.attach_mock` no longer triggers a call
   to a ``PropertyMock`` being attached.
 
