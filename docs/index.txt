@@ -116,7 +116,7 @@ Backporting rules
   .. code-block:: python
 
       def will_never_be_called():
-          pass  # pragma: no cov
+          pass  # pragma: no cover
 
 - If code such as this causes coverage checking to drop below 100%:
 
