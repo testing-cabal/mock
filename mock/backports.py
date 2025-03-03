@@ -90,3 +90,9 @@ except ImportError:
                 return super().run(result)
             finally:
                 self._tearDownAsyncioLoop()
+
+
+try:
+    from asyncio import _set_event_loop_policy as set_event_loop_policy
+except ImportError:
+    from asyncio import set_event_loop_policy

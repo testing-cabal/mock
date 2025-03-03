@@ -8,7 +8,7 @@ from contextlib import contextmanager
 
 from mock import (ANY, call, AsyncMock, patch, MagicMock, Mock,
                   create_autospec, sentinel, seal)
-from mock.backports import IsolatedAsyncioTestCase, iscoroutinefunction
+from mock.backports import IsolatedAsyncioTestCase, iscoroutinefunction, set_event_loop_policy
 from mock.mock import _CallList
 
 
@@ -25,7 +25,7 @@ except ImportError:
 
 
 def tearDownModule():
-    asyncio._set_event_loop_policy(None)
+    set_event_loop_policy(None)
 
 
 class AsyncClass:
