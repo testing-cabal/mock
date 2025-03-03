@@ -1,3 +1,43 @@
+5.2.0
+-----
+
+- gh-65454: :func:`unittest.mock.Mock.attach_mock` no longer triggers a call
+  to a ``PropertyMock`` being attached.
+
+- gh-117765: Improved documentation for :func:`unittest.mock.patch.dict`
+
+- gh-124176: Add support for :func:`dataclasses.dataclass` in
+  :func:`unittest.mock.create_autospec`. Now ``create_autospec`` will check
+  for potential dataclasses and use :func:`dataclasses.fields` function to
+  retrieve the spec information.
+
+- gh-123934: Fix :class:`unittest.mock.MagicMock` reseting magic methods
+  return values after ``.reset_mock(return_value=True)`` was called.
+
+- gh-90848: Fixed :func:`unittest.mock.create_autospec` to configure parent
+  mock with keyword arguments.
+
+- gh-113569: Indicate if there were no actual calls in unittest
+  :meth:`~unittest.mock.Mock.assert_has_calls` failure.
+
+- gh-122858: Deprecate :func:`!asyncio.iscoroutinefunction` in favor of
+  :func:`inspect.iscoroutinefunction`.
+
+- gh-104745: Limit starting a patcher (from :func:`unittest.mock.patch` or
+  :func:`unittest.mock.patch.object`) more than once without stopping it
+
+- gh-75988: Fixed :func:`unittest.mock.create_autospec` to pass the call
+  through to the wrapped object to return the real result.
+
+- gh-119600: Fix :func:`unittest.mock.patch` to not read attributes of the
+  target when ``new_callable`` is set. Patch by Robert Collins.
+
+- gh-113407: Fix import of :mod:`unittest.mock` when CPython is built
+  without docstrings.
+
+- gh-120732: Fix ``name`` passing to :class:`unittest.mock.Mock` object when
+  using :func:`unittest.mock.create_autospec`.
+
 5.1.0
 -----
 
