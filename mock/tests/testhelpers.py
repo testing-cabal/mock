@@ -965,7 +965,7 @@ class SpecSignatureTest(unittest.TestCase):
 
         proxy = Foo()
         autospec = create_autospec(proxy)
-        self.assertNotHasAttr(autospec, '__name__')
+        self.assertFalse(hasattr(autospec, '__name__'))
 
 
     def test_autospec_signature_staticmethod(self):
