@@ -1410,7 +1410,7 @@ class _patch(object):
     def __call__(self, func):
         if isinstance(func, type):
             return self.decorate_class(func)
-        if inspect.iscoroutinefunction(func):
+        if iscoroutinefunction(func):
             return self.decorate_async_callable(func)
         return self.decorate_callable(func)
 
@@ -1904,7 +1904,7 @@ class _patch_dict(object):
     def __call__(self, f):
         if isinstance(f, type):
             return self.decorate_class(f)
-        if inspect.iscoroutinefunction(f):
+        if iscoroutinefunction(f):
             return self.decorate_async_callable(f)
         return self.decorate_callable(f)
 
