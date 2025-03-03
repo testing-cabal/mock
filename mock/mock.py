@@ -2310,7 +2310,7 @@ class MagicProxy(Base):
 try:
     _CODE_SIG = inspect.signature(partial(CodeType.__init__, None))
     _CODE_ATTRS = dir(CodeType)
-except ValueError:
+except ValueError:  # pragma: no cover - backport is only tested against builds with docstrings
     _CODE_SIG = None
 
 
@@ -2335,7 +2335,7 @@ class AsyncMockMixin(Base):
             code_mock = NonCallableMock(spec_set=_CODE_ATTRS)
             code_mock.__dict__["_spec_class"] = CodeType
             code_mock.__dict__["_spec_signature"] = _CODE_SIG
-        else:
+        else:  # pragma: no cover - backport is only tested against builds with docstrings
             code_mock = NonCallableMock(spec_set=CodeType)
         code_mock.co_flags = (
             inspect.CO_COROUTINE
