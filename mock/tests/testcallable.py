@@ -22,21 +22,21 @@ class TestCallable(unittest.TestCase):
     def test_non_callable(self):
         for mock in NonCallableMagicMock(), NonCallableMock():
             self.assertRaises(TypeError, mock)
-            self.assertNotHasAttr(mock, '__call__')
+            self.assertFalse(hasattr(mock, '__call__'))
             self.assertIn(mock.__class__.__name__, repr(mock))
 
 
     def test_hierarchy(self):
-        self.assertIsSubclass(MagicMock, Mock)
-        self.assertIsSubclass(NonCallableMagicMock, NonCallableMock)
+        self.assertTrue(issubclass(MagicMock, Mock))
+        self.assertTrue(issubclass(NonCallableMagicMock, NonCallableMock))
 
 
     def test_attributes(self):
         one = NonCallableMock()
-        self.assertIsSubclass(type(one.one), Mock)
+        self.assertTrue(issubclass(type(one.one), Mock))
 
         two = NonCallableMagicMock()
-        self.assertIsSubclass(type(two.two), MagicMock)
+        self.assertTrue(issubclass(type(two.two), MagicMock))
 
 
     def test_subclasses(self):
@@ -44,13 +44,13 @@ class TestCallable(unittest.TestCase):
             pass
 
         one = MockSub()
-        self.assertIsSubclass(type(one.one), MockSub)
+        self.assertTrue(issubclass(type(one.one), MockSub))
 
         class MagicSub(MagicMock):
             pass
 
         two = MagicSub()
-        self.assertIsSubclass(type(two.two), MagicSub)
+        self.assertTrue(issubclass(type(two.two), MagicSub))
 
 
     def test_patch_spec(self):
